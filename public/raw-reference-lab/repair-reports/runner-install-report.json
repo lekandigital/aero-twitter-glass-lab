@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-06-15T06:51:36.205Z",
+  "summary": {
+    "attempted": 0,
+    "passed": 3,
+    "failed": 0
+  },
+  "runners": [
+    {
+      "id": "glassmorphism-template",
+      "repoPath": ".raw-reference-runners/repos/glassmorphism-template",
+      "packageManager": "npm",
+      "installCommand": "npm install",
+      "installed": true,
+      "exitCode": 0,
+      "durationMs": 0,
+      "logFile": ".raw-reference-runners/logs/glassmorphism-template.install.log",
+      "skipped": true
+    },
+    {
+      "id": "liquid-dom",
+      "repoPath": ".raw-reference-runners/repos/liquid-dom",
+      "packageManager": "pnpm",
+      "installCommand": "pnpm install",
+      "installed": true,
+      "exitCode": 0,
+      "durationMs": 0,
+      "logFile": ".raw-reference-runners/logs/liquid-dom.install.log",
+      "skipped": true
+    },
+    {
+      "id": "glass-refraction",
+      "repoPath": ".raw-reference-runners/repos/glass-refraction",
+      "packageManager": "npm",
+      "installCommand": "npm install",
+      "installed": true,
+      "exitCode": 0,
+      "durationMs": 0,
+      "logFile": ".raw-reference-runners/logs/glass-refraction.install.log",
+      "skipped": true
+    }
+  ]
+}

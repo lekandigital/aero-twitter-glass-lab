@@ -1,13 +1,14 @@
 #!/usr/bin/env node
-import { readdir, readFile, stat } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
   BASE_PORT,
   VAULT_GITHUB,
   PUBLIC_RUNNERS,
-  detectPackageManagerAsync,
+  auditPackageRunner,
   findStaticServeDir,
   githubSourceUrl,
+  isWebDevServerScript,
   matchPatternsFor,
   pickRecommendedScript,
   pickRunnableScripts,
@@ -32,10 +33,86 @@ async function discoverRepo(dirName) {
     const scripts = pkg.scripts ?? {};
     const runnable = pickRunnableScripts(scripts);
     const recommended = pickRecommendedScript(scripts, dirName);
+    const audit = await auditPackageRunner(repoPath, dirName, pkg);
+
+    if (audit.startMode === 'build-then-serve-example') {
+      return {
+        id: dirName,
+        title: pkg.name ?? dirName,
+        runnerType: 'package',
+        runnable: true,
+        sourcePath,
+        sourceUrl,
+        matchPatterns: matchPatternsFor(dirName),
+        packageManager: audit.packageManager,
+        scripts: Object.keys(scripts),
+        runnableScripts: runnable,
+        recommendedScript: recommended,
+        port: null,
+        status: 'not-started',
+        localDevUrl: null,
+        expectedUrl: null,
+        startMode: audit.startMode,
+        packageStyle: true,
+        requiresInstall: audit.requiresInstall,
+        requiresBuild: audit.requiresBuild,
+        buildOnlyDevScript: audit.buildOnlyDevScript,
+        installCommand: audit.installCommand,
+        buildCommand: audit.buildCommand,
+        serveCommand: null,
+        serveTarget: audit.serveTarget,
+        serveDir: audit.serveDir,
+        urlPath: audit.urlPath,
+        devScript: audit.devScript,
+        devScriptKind: audit.devScriptKind,
+        generatedWrapper: audit.generatedWrapper,
+        instructions: audit.instructions,
+        labels: [
+          'Build then serve',
+          'Package repo',
+          ...(audit.requiresInstall ? ['Install needed'] : []),
+          ...(audit.buildOnlyDevScript ? ['Build watcher'] : []),
+        ],
+        openButtonLabel: audit.generatedWrapper ? 'Open generated wrapper' : 'Open package example',
+        notes: 'Package repo: install, build dist, then serve example or generated wrapper.',
+      };
+    }
+
+    if (audit.startMode === 'web-dev-server' && recommended) {
+      const scriptBody = scripts[recommended] ?? '';
+      return {
+        id: dirName,
+        title: pkg.name ?? dirName,
+        runnerType: 'package',
+        runnable: true,
+        sourcePath,
+        sourceUrl,
+        matchPatterns: matchPatternsFor(dirName),
+        packageManager: audit.packageManager,
+        scripts: Object.keys(scripts),
+        runnableScripts: runnable,
+        recommendedScript: recommended,
+        port: null,
+        status: 'not-started',
+        localDevUrl: null,
+        expectedUrl: null,
+        startMode: 'web-dev-server',
+        packageStyle: true,
+        requiresInstall: true,
+        requiresBuild: false,
+        buildOnlyDevScript: false,
+        installCommand: audit.installCommand,
+        devScript: scripts.dev ?? null,
+        devScriptKind: scripts.dev ? audit.devScriptKind : null,
+        labels: ['Package repo', 'Install needed', 'Open local dev server'],
+        openButtonLabel: 'Open local dev server',
+        notes: 'Package repo. Can run as isolated local dev server. Not ported.',
+      };
+    }
 
     if (!recommended && staticServeDir) {
-      return buildStaticRunner(dirName, sourcePath, staticServeDir, sourceUrl, {
-        notes: 'Package repo with no dev server script; static HTML demo available via serve.',
+      return buildStaticRunner(dirName, sourcePath, staticServeDir, sourceUrl, pkg, audit, {
+        notes: 'Package repo with static HTML demo; may still need install/build before serve.',
       });
     }
 
@@ -48,13 +125,22 @@ async function discoverRepo(dirName) {
         sourcePath,
         sourceUrl,
         matchPatterns: matchPatternsFor(dirName),
-        packageManager: await detectPackageManagerAsync(repoPath, pkg),
+        packageManager: audit.packageManager,
         scripts: Object.keys(scripts),
         runnableScripts: runnable,
         recommendedScript: null,
         port: null,
         status: 'not-runnable',
         localDevUrl: null,
+        startMode: audit.startMode,
+        packageStyle: true,
+        requiresInstall: audit.requiresInstall,
+        requiresBuild: audit.requiresBuild,
+        buildOnlyDevScript: audit.buildOnlyDevScript,
+        devScript: audit.devScript,
+        devScriptKind: audit.devScriptKind,
+        labels: ['Package repo', 'Manual step needed'],
+        openButtonLabel: 'Open source',
         notes: 'No runnable npm scripts found (dev may be watch-only build).',
         skipReason: 'No runnable npm scripts found',
       };
@@ -68,19 +154,26 @@ async function discoverRepo(dirName) {
       sourcePath,
       sourceUrl,
       matchPatterns: matchPatternsFor(dirName),
-      packageManager: await detectPackageManagerAsync(repoPath, pkg),
+      packageManager: audit.packageManager,
       scripts: Object.keys(scripts),
       runnableScripts: runnable,
       recommendedScript: recommended,
       port: null,
       status: 'not-started',
       localDevUrl: null,
+      expectedUrl: null,
+      startMode: isWebDevServerScript(scripts[recommended]) ? 'web-dev-server' : 'unknown-package',
+      packageStyle: true,
+      requiresInstall: true,
+      installCommand: audit.installCommand,
+      labels: ['Package repo'],
+      openButtonLabel: 'Open local dev server',
       notes: 'Package repo. Can run as isolated local dev server. Not ported.',
     };
   }
 
   if (staticServeDir) {
-    return buildStaticRunner(dirName, sourcePath, staticServeDir, sourceUrl);
+    return buildStaticRunner(dirName, sourcePath, staticServeDir, sourceUrl, null, null);
   }
 
   return {
@@ -103,16 +196,16 @@ async function discoverRepo(dirName) {
   };
 }
 
-function buildStaticRunner(id, sourcePath, serveDir, sourceUrl, extra = {}) {
+function buildStaticRunner(id, sourcePath, serveDir, sourceUrl, pkg, audit, extra = {}) {
   return {
     id,
-    title: id,
+    title: pkg?.name ?? id,
     runnerType: 'static',
     runnable: true,
     sourcePath,
     sourceUrl,
     matchPatterns: matchPatternsFor(id),
-    packageManager: 'npx',
+    packageManager: audit?.packageManager ?? 'npx',
     scripts: ['serve'],
     runnableScripts: ['serve'],
     recommendedScript: 'serve',
@@ -120,6 +213,14 @@ function buildStaticRunner(id, sourcePath, serveDir, sourceUrl, extra = {}) {
     port: null,
     status: 'not-started',
     localDevUrl: null,
+    expectedUrl: null,
+    startMode: 'static-serve',
+    packageStyle: !!pkg,
+    requiresInstall: !!pkg,
+    requiresBuild: false,
+    installCommand: audit?.installCommand ?? null,
+    labels: ['Open full demo'],
+    openButtonLabel: 'Open full demo',
     notes: 'Static HTML demo. Served via npx serve in isolated runner copy. Not ported.',
     ...extra,
   };
@@ -148,7 +249,16 @@ async function main() {
   for (const runner of runners) {
     if (runner.runnable) {
       runner.port = port;
-      runner.localDevUrl = `http://localhost:${port}`;
+      const urlPath = runner.urlPath ?? '/';
+      const base = `http://localhost:${port}`;
+      runner.localDevUrl = urlPath === '/' ? base : `${base}${urlPath.startsWith('/') ? urlPath : `/${urlPath}`}`;
+      runner.expectedUrl = runner.localDevUrl;
+      if (runner.serveCommand == null && runner.serveDir) {
+        runner.serveCommand = `npx serve ${runner.serveDir} -l ${port}`;
+      } else if (runner.serveCommand == null && runner.startMode === 'static-serve') {
+        const target = runner.serveDir === '.' ? '.' : runner.serveDir;
+        runner.serveCommand = `npx serve ${target} -l ${port}`;
+      }
       runner.runnerPath = `.raw-reference-runners/repos/${runner.id}`;
       port += 1;
     } else {
@@ -169,7 +279,7 @@ async function main() {
   console.log(`Output:                    ${PUBLIC_RUNNERS}`);
   console.log('\nRunnable:');
   for (const r of runnable) {
-    console.log(`  ${r.id} → ${r.localDevUrl} (${r.runnerType}, ${r.recommendedScript})`);
+    console.log(`  ${r.id} → ${r.localDevUrl} (${r.startMode ?? r.runnerType}, ${r.recommendedScript ?? 'serve'})`);
   }
   if (notRunnable.length) {
     console.log('\nNot runnable:');

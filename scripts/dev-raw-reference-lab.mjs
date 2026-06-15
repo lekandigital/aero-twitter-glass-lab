@@ -9,10 +9,12 @@ import {
   MAIN_APP_PID_FILE,
   MAIN_APP_PORT,
   MAIN_APP_URL,
+  PACKAGE_RUNNER_REPORT,
   PUBLIC_RUNNERS,
   PIDS_FILE,
   RUNNERS_LOGS,
   assessRunnerHealth,
+  ensureRunnerCopies,
   ensureRunnerDirs,
   expectedRunnerUrl,
   getListeningPid,
@@ -44,6 +46,8 @@ function runNodeScript(script, label) {
 function statusIcon(status, responding) {
   if (status === 'running' && responding) return '✅';
   if (status === 'skipped') return '⏭️';
+  if (status === 'built-no-demo') return '⚠️';
+  if (status === 'serving') return '🟡';
   return '❌';
 }
 
@@ -52,6 +56,9 @@ function formatRunnerLine(runner, result) {
   const url = result.expectedUrl ?? expectedRunnerUrl(runner);
   if (result.status === 'running' && result.responding) {
     return `${icon} ${runner.id} — ${url}`;
+  }
+  if (result.status === 'built-no-demo') {
+    return `${icon} ${runner.id} — built but demo not responding (${url})`;
   }
   if (result.status === 'process-alive-port-dead') {
     return `${icon} ${runner.id} — process alive but not responding on ${runner.port}`;
@@ -62,7 +69,7 @@ function formatRunnerLine(runner, result) {
   if (result.status === 'start-timeout') {
     return `${icon} ${runner.id} — start timeout on ${runner.port}`;
   }
-  if (result.status === 'install-failed') {
+  if (result.status === 'install-failed' || result.status === 'installing') {
     return `${icon} ${runner.id} — install failed on ${runner.port}`;
   }
   if (result.status === 'build-failed') {
@@ -70,6 +77,9 @@ function formatRunnerLine(runner, result) {
   }
   if (result.status === 'port-in-use') {
     return `${icon} ${runner.id} — port ${runner.port} already in use`;
+  }
+  if (result.status === 'manual-step-needed') {
+    return `${icon} ${runner.id} — manual step needed`;
   }
   if (result.status === 'skipped') {
     return `${icon} ${runner.id} — skipped`;
@@ -171,10 +181,10 @@ async function buildReport(runners, statusMap, mainApp) {
       id: runner.id,
       port: runner.port,
       expectedUrl: health.expectedUrl,
-      status: health.status,
+      status: live.status && !health.responding ? live.status : health.status,
       pid: health.pid,
       responding: health.responding,
-      startMode: live.startMode ?? (runner.runnerType === 'static' ? 'static-serve' : 'normal'),
+      startMode: live.startMode ?? runner.startMode ?? (runner.runnerType === 'static' ? 'static-serve' : 'normal'),
       logFile: live.logFile ?? join(RUNNERS_LOGS, `${runner.id}.log`),
       notes: [
         ...(live.notes ?? []),
@@ -183,6 +193,9 @@ async function buildReport(runners, statusMap, mainApp) {
       ].filter(Boolean),
       observedUrl: live.observedUrl ?? null,
       builtLiquidDomLayout: live.builtLiquidDomLayout ?? null,
+      buildStatus: live.buildStatus ?? null,
+      serveTarget: live.serveTarget ?? runner.serveTarget ?? null,
+      generatedWrapper: live.generatedWrapper ?? false,
     });
   }
 
@@ -214,6 +227,28 @@ async function main() {
   runNodeScript('audit-raw-reference-links.mjs', 'Audit link targets');
   runNodeScript('discover-reference-runners.mjs', 'Discover reference runners');
 
+  const runners = await readJson(PUBLIC_RUNNERS, []);
+  const runnable = runners.filter((r) => r.runnable);
+
+  console.log('\n▶ Copy runner repos');
+  const copies = await ensureRunnerCopies(runnable);
+  const copyFailed = copies.filter((c) => !c.ok);
+  if (copyFailed.length) {
+    for (const c of copyFailed) {
+      console.log(`  ✗ ${c.id}: ${c.error}`);
+    }
+  } else {
+    console.log(`  ✓ ${copies.length} repo(s) ready`);
+  }
+
+  if (process.env.RRL_SKIP_INSTALL !== '1') {
+    runNodeScript('install-reference-runners.mjs', 'Install package runner dependencies');
+  } else {
+    console.log('\n▶ Install package runner dependencies (skipped — RRL_SKIP_INSTALL=1)');
+  }
+
+  runNodeScript('audit-package-runners.mjs', 'Audit package runners');
+
   console.log('\n▶ Main Vite app');
   const mainApp = await ensureMainApp();
   if (mainApp.responding) {
@@ -222,20 +257,23 @@ async function main() {
     console.log(`  ✗ Main app not responding (${mainApp.status})`);
   }
 
-  const runners = await readJson(PUBLIC_RUNNERS, []);
   const pidsMap = (await readJson(PIDS_FILE, {})) ?? {};
   const statusMap = await readRunnerStatus();
 
-  console.log(`\n▶ Reference runners (${runners.filter((r) => r.runnable).length})`);
-  for (const runner of runners.filter((r) => r.runnable)) {
+  console.log(`\n▶ Reference runners (${runnable.length})`);
+  for (const runner of runnable) {
     await startRunner(runner, statusMap, pidsMap);
   }
 
   await writeJson(PIDS_FILE, pidsMap);
   await writeRunnerStatus(statusMap);
 
+  runNodeScript('audit-package-runners.mjs', 'Refresh package runner report');
+
   const report = await buildReport(runners, statusMap, mainApp);
   await writeJson(DEV_ALL_REPORT, report);
+
+  const packageReport = await readJson(PACKAGE_RUNNER_REPORT, null);
 
   console.log('\nRaw Reference Lab dev startup complete\n');
   console.log('Main:');
@@ -245,6 +283,22 @@ async function main() {
     const runner = runners.find((r) => r.id === result.id);
     console.log(formatRunnerLine(runner, result));
   }
+
+  if (packageReport?.runners) {
+    const manual = packageReport.runners.filter((r) =>
+      r.manualInstructions?.length || r.status === 'built-no-demo' || r.status === 'manual-step-needed',
+    );
+    if (manual.length) {
+      console.log('\nManual steps:');
+      for (const entry of manual) {
+        console.log(`\n${entry.id}:`);
+        for (const line of entry.manualInstructions ?? []) {
+          console.log(`  - ${line}`);
+        }
+      }
+    }
+  }
+
   console.log(`\nOpen:\n${MAIN_APP_URL}`);
 
   await maybeOpenUrl(MAIN_APP_URL);

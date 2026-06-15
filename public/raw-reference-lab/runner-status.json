@@ -8,7 +8,8 @@
     "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/liquidGL.log",
     "error": null,
     "responding": true,
-    "startMode": "normal"
+    "startMode": "normal",
+    "expectedUrl": "http://localhost:5310"
   },
   "glassmorphism-template": {
     "id": "glassmorphism-template",
@@ -21,7 +22,8 @@
     "error": null,
     "notes": [],
     "startMode": "normal",
-    "observedUrl": null
+    "observedUrl": null,
+    "expectedUrl": "http://localhost:5313"
   },
   "liquid-dom": {
     "id": "liquid-dom",
@@ -35,7 +37,8 @@
     "notes": [],
     "startMode": "manual-liquid-dom-vite",
     "observedUrl": null,
-    "builtLiquidDomLayout": true
+    "builtLiquidDomLayout": true,
+    "expectedUrl": "http://localhost:5314"
   },
   "archisvaze-liquid-glass": {
     "id": "archisvaze-liquid-glass",
@@ -45,7 +48,8 @@
     "pid": null,
     "responding": true,
     "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/archisvaze-liquid-glass.log",
-    "startMode": "normal"
+    "startMode": "normal",
+    "expectedUrl": "http://localhost:5311"
   },
   "liquid-glass-js": {
     "id": "liquid-glass-js",
@@ -58,20 +62,27 @@
     "error": null,
     "notes": [],
     "startMode": "static-serve",
-    "observedUrl": null
+    "observedUrl": null,
+    "expectedUrl": "http://localhost:5312"
   },
   "glass-refraction": {
     "id": "glass-refraction",
     "status": "running",
     "port": 5315,
-    "localDevUrl": "http://localhost:5315",
-    "pid": 53679,
+    "localDevUrl": "http://localhost:5315/examples/vanilla/",
+    "expectedUrl": "http://localhost:5315/examples/vanilla/",
+    "pid": 28114,
     "responding": true,
     "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/glass-refraction.log",
     "error": null,
     "notes": [],
-    "startMode": "static-serve",
-    "observedUrl": null
+    "startMode": "build-then-serve-example",
+    "observedUrl": null,
+    "buildStatus": "passed",
+    "serveTarget": "examples/vanilla",
+    "serveStatus": "passed",
+    "generatedWrapper": false,
+    "installStatus": "passed"
   },
   "glassmorphism": {
     "id": "glassmorphism",
@@ -84,7 +95,8 @@
     "error": null,
     "notes": [],
     "startMode": "static-serve",
-    "observedUrl": null
+    "observedUrl": null,
+    "expectedUrl": "http://localhost:5316"
   },
   "7-Aero-Stylesheet": {
     "id": "7-Aero-Stylesheet",
@@ -97,6 +109,7 @@
     "error": null,
     "notes": [],
     "startMode": "static-serve",
-    "observedUrl": null
+    "observedUrl": null,
+    "expectedUrl": "http://localhost:5317"
   }
 }

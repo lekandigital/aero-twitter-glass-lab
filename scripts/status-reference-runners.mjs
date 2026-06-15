@@ -35,6 +35,9 @@ async function main() {
     if (health.note) console.log(`note:     ${health.note}`);
     if (live?.observedUrl) console.log(`observed: ${live.observedUrl}`);
     if (live?.startMode) console.log(`start mode: ${live.startMode}`);
+    if (live?.buildStatus) console.log(`build:    ${live.buildStatus}`);
+    if (live?.serveTarget) console.log(`serve:    ${live.serveTarget}`);
+    if (live?.generatedWrapper) console.log(`wrapper:  generated`);
     console.log('');
   }
 }

@@ -98,6 +98,13 @@ npm run raw-reference-lab:dev:all
 # Discover runnable GitHub package runners
 node scripts/discover-reference-runners.mjs
 
+# Install dependencies for package runners (isolated under .raw-reference-runners/)
+npm run raw-reference-lab:install-runners
+# or: node scripts/install-reference-runners.mjs
+
+# Audit package runner install/build/serve classification
+node scripts/audit-package-runners.mjs
+
 # Start a specific runner (isolated copy, not the app)
 node scripts/start-reference-runners.mjs --id liquidGL
 
