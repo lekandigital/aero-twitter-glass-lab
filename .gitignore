@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local reference URL lists (not tracked)
+src/references/urls-raw.txt
+src/references/cleaned/
