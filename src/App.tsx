@@ -11,6 +11,8 @@ import { ApproachHybridFinal } from './routes/ApproachHybridFinal';
 import { ReferencesStatus } from './routes/ReferencesStatus';
 import { ReferenceLab } from './routes/ReferenceLab';
 import { ReferenceDemo } from './routes/ReferenceDemo';
+import { ApproachOne } from './routes/ApproachOne';
+import { ApproachTwo } from './routes/ApproachTwo';
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
         <Route path="/dashersw" element={<ApproachDasherswVanilla />} />
         <Route path="/aero-css" element={<ApproachAeroCssFallback />} />
         <Route path="/hybrid" element={<ApproachHybridFinal />} />
+        <Route path="/approach-1" element={<ApproachOne />} />
+        <Route path="/approach-2" element={<ApproachTwo />} />
         <Route path="/references" element={<ReferencesStatus />} />
         <Route path="/reference-lab" element={<ReferenceLab />} />
         <Route path="/reference-lab/:id" element={<ReferenceDemo />} />
