@@ -1,0 +1,3123 @@
+{
+  "generatedAt": "2026-06-15T05:42:34.754Z",
+  "playwrightAvailable": false,
+  "totalNotRunsLocally": 191,
+  "decision": "No demos promoted to runsLocally in this pass. Promotion requires headless local-only verification (no remote fetch, no fatal JS errors), unavailable without Playwright; promoting on static signals alone risks false positives, which is explicitly forbidden. URL/button mapping correctness (critical priority) is fixed, verified, and locked by checks.",
+  "bucketCounts": {
+    "external-only-skip": 149,
+    "not-worth-fixing": 8,
+    "fixable-with-package-runner": 10,
+    "fixable-with-preprocessor": 2,
+    "fixable-with-local-asset-cache": 19,
+    "extractable-from-partial-archive": 3
+  },
+  "candidates": [
+    {
+      "id": "url-dpyzmlb-pen-dpyzmlb",
+      "title": "dPYzMLb",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/Adir-SL/pen/dPYzMLb",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-wnppzwj-pen-wnppzwj",
+      "title": "WNPPzWJ",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/aldrie/pen/WNPPzWJ",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-xjmnook-pen-xjmnook",
+      "title": "XJmNOOK",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/Alexandra-Sevigny/pen/XJmNOOK",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-ggjqeke-pen-ggjqeke",
+      "title": "GgJQEKE",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/alexerlandsson/pen/GgJQEKE",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-bnebyyz-pen-bnebyyz",
+      "title": "bNeByYz",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/Benniversum/pen/bNeByYz",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-zybrrgz-pen-zybrrgz",
+      "title": "ZYbRrgZ",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/chakornk/pen/ZYbRrgZ",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-mrapwa-ction-mrapwa",
+      "title": "mrapwa",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/collection/mrapwa",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-mrapwa-ywdlijoyfq",
+      "title": "mrapwa",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/collection/mrapwa?cursor=eyJwYWdlIjoyfQ==",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-myyneea-pen-myyneea",
+      "title": "MYyNEea",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/cyrus-chau/pen/MYyNEea",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-ggqvmwj-pen-ggqvmwj",
+      "title": "GgqvMwj",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/Denis-Dumanetskiy/pen/GgqvMwj",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-zyqgzrw-pen-zyqgzrw",
+      "title": "ZYQGzRW",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/ellieepnk/pen/ZYQGzRW",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-pwzzovo-pen-pwzzovo",
+      "title": "PwzzovO",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/erichologist/pen/PwzzovO",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-kwpragr-pen-kwpragr",
+      "title": "KwpRaGr",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/fooontic/pen/KwpRaGr",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-zywoykz-pen-zywoykz",
+      "title": "ZYWoyKZ",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/Gonzalo-Chiaradia/pen/ZYWoyKZ",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-rnravzr-pen-rnravzr",
+      "title": "RNravZr",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/hdshy/pen/RNravZr",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-jokxryv-pen-jokxryv",
+      "title": "JoKXrYv",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/ikrprojects/pen/JoKXrYv",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-opnyglj-pen-opnyglj",
+      "title": "OPNyGLj",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/ikrprojects/pen/OPNyGLj",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-lerygol-pen-lerygol",
+      "title": "LERYGOL",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/iotacb/pen/LERYGOL",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-eavgajp-pen-eavgajp",
+      "title": "EaVGaJP",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/kaushalpahilwani/pen/EaVGaJP",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-yyeyywr-pen-yyeyywr",
+      "title": "yyeYywR",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/kerry-brown/pen/yyeYywR",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-opvzqpp-pen-opvzqpp",
+      "title": "OPVZqpp",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/kraelik/pen/OPVZqpp",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-nprpbjd-pen-nprpbjd",
+      "title": "NPRPBjd",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/Margarita-the-solid/pen/NPRPBjd",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-kwvdmpw-pen-kwvdmpw",
+      "title": "KwVdMpw",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/masakazuimai/pen/KwVdMpw",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-mywrmny-pen-mywrmny",
+      "title": "MYwrMNy",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/Mikhail-Bespalov/pen/MYwrMNy",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-bnvwxzp-pen-bnvwxzp",
+      "title": "bNVWxzp",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/monsieurm/pen/bNVWxzp",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-gbpzxkx-pen-gbpzxkx",
+      "title": "gbpzXKx",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/morpheuscodes/pen/gbpzXKx",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-qebwyow-pen-qebwyow",
+      "title": "qEbwYOW",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/nicksmirnov/pen/qEbwYOW",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-opxjxjx-pen-opxjxjx",
+      "title": "OPXjxjX",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/Niekes/pen/OPXjxjX",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-myjkqme-pen-myjkqme",
+      "title": "myJKQme",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/nitnelav/pen/myJKQme",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-veojmvr-pen-veojmvr",
+      "title": "vEOjMvr",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/prxju/pen/vEOjMvr",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-wbrzrmz-pen-wbrzrmz",
+      "title": "WbrzRmz",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/sanyi-dalmadi/pen/WbrzRmz",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-ggjppje-pen-ggjppje",
+      "title": "GgjppJe",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/Sis-the-builder/pen/GgjppJe",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-yyneree-pen-yyneree",
+      "title": "yyNERee",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/sohrabzia/pen/yyNERee",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-dpodbrx-pen-dpodbrx",
+      "title": "dPodbrX",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/supah/pen/dPodbrX",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-glass-io-tag-glass",
+      "title": "glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/tag/glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-glass-jm89mczwpti",
+      "title": "glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/tag/glass?cursor=ZD0xJm89MCZwPTI=",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-glass-jm89mczwptm",
+      "title": "glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/tag/glass?cursor=ZD0xJm89MCZwPTM=",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquidglass-liquidglass",
+      "title": "liquidglass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/tag/liquidglass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquidglass-jm89mczwptc",
+      "title": "liquidglass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/tag/liquidglass?cursor=ZD0xJm89MCZwPTc=",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquidglass-jm89mczwpte",
+      "title": "liquidglass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/tag/liquidglass?cursor=ZD0xJm89MCZwPTE=",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquidglass-jm89mczwpti",
+      "title": "liquidglass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/tag/liquidglass?cursor=ZD0xJm89MCZwPTI=",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquidglass-jm89mczwptm",
+      "title": "liquidglass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/tag/liquidglass?cursor=ZD0xJm89MCZwPTM=",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquidglass-jm89mczwptq",
+      "title": "liquidglass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/tag/liquidglass?cursor=ZD0xJm89MCZwPTQ=",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquidglass-jm89mczwptu",
+      "title": "liquidglass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/tag/liquidglass?cursor=ZD0xJm89MCZwPTU=",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquidglass-jm89mczwpty",
+      "title": "liquidglass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/tag/liquidglass?cursor=ZD0xJm89MCZwPTY=",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-npgzwne-pen-npgzwne",
+      "title": "NPGzWNE",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/vladracoare/pen/NPGzWNE",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-wbkjlvv-pen-wbkjlvv",
+      "title": "wBKjLVV",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://codepen.io/vladracoare/pen/wBKjLVV",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-jsfiddle-net-jsfiddle-net",
+      "title": "jsfiddle.net",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://jsfiddle.net",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-6hmpa1ax-net-6hmpa1ax",
+      "title": "6hmpa1ax",
+      "currentStatus": "needs-external-assets",
+      "classification": "not-worth-fixing",
+      "reason": "external-js-required",
+      "localDemoUrl": "/raw-reference-lab/demos/web-archives/jsfiddle-6hmpa1ax/index.html",
+      "localSourcePath": "_reference_vault/reference-library/web-archives/jsfiddle-6hmpa1ax",
+      "sourceUrl": "https://jsfiddle.net/6hmpa1ax",
+      "recommendedAction": "Editor/listing shell; actual demo code not separable locally. Keep partial.",
+      "risk": "low",
+      "expectedLocalResult": "partial-only",
+      "notes": [
+        "External css asset (needs internet): https://jsfiddle.net/css/dist-skeleton.css?development_02540212d4d69a558f076d4ed049b740d2341c6f",
+        "Decorative asset not bundled locally: /img/favicon.png",
+        "External css asset (needs internet): https://jsfiddle.net/css/dist-editor.css?development_02540212d4d69a558f076d4ed049b740d2341c6f"
+      ]
+    },
+    {
+      "id": "url-le4gt1ca-dic-le4gt1ca",
+      "title": "Le4gt1ca",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://jsfiddle.net/esedic/Le4gt1ca",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-7-net-jtsnm-7",
+      "title": "7",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://jsfiddle.net/jtsnM/7",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-41-ott-wtqjy-41",
+      "title": "41",
+      "currentStatus": "needs-external-assets",
+      "classification": "not-worth-fixing",
+      "reason": "external-js-required",
+      "localDemoUrl": "/raw-reference-lab/demos/web-archives/jsfiddle-nallenscott/index.html",
+      "localSourcePath": "_reference_vault/reference-library/web-archives/jsfiddle-nallenscott",
+      "sourceUrl": "https://jsfiddle.net/nallenscott/WtQjY/41",
+      "recommendedAction": "Editor/listing shell; actual demo code not separable locally. Keep partial.",
+      "risk": "low",
+      "expectedLocalResult": "partial-only",
+      "notes": [
+        "External css asset (needs internet): https://jsfiddle.net/css/dist-skeleton.css?development_02540212d4d69a558f076d4ed049b740d2341c6f",
+        "Decorative asset not bundled locally: /img/favicon.png",
+        "External css asset (needs internet): https://jsfiddle.net/css/dist-editor.css?development_02540212d4d69a558f076d4ed049b740d2341c6f"
+      ]
+    },
+    {
+      "id": "url-github-com-github-com",
+      "title": "github.com",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-liquid-dom-r-liquid-dom",
+      "title": "liquid dom",
+      "currentStatus": "needs-runner",
+      "classification": "fixable-with-package-runner",
+      "reason": "runner-not-started",
+      "localDemoUrl": null,
+      "localSourcePath": "_reference_vault/reference-library/github/liquid-dom",
+      "sourceUrl": "https://github.com/AndrewPrifer/liquid-dom",
+      "recommendedAction": "Start via scripts/start-reference-runners.mjs and optionally export static build.",
+      "risk": "medium",
+      "expectedLocalResult": "local-runner",
+      "notes": [
+        "Runner not running (status: not-started)"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-liquid-glass",
+      "title": "liquid glass",
+      "currentStatus": "needs-runner",
+      "classification": "fixable-with-package-runner",
+      "reason": "runner-not-started",
+      "localDemoUrl": null,
+      "localSourcePath": "_reference_vault/reference-library/github/archisvaze-liquid-glass",
+      "sourceUrl": "https://github.com/archisvaze/liquid-glass",
+      "recommendedAction": "Start via scripts/start-reference-runners.mjs and optionally export static build.",
+      "risk": "medium",
+      "expectedLocalResult": "local-runner",
+      "notes": [
+        "Runner not running (status: not-started)"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-liquid-glass-2",
+      "title": "liquid glass",
+      "currentStatus": "needs-runner",
+      "classification": "fixable-with-package-runner",
+      "reason": "runner-not-started",
+      "localDemoUrl": null,
+      "localSourcePath": "_reference_vault/reference-library/github/archisvaze-liquid-glass",
+      "sourceUrl": "https://github.com/callstack/liquid-glass",
+      "recommendedAction": "Start via scripts/start-reference-runners.mjs and optionally export static build.",
+      "risk": "medium",
+      "expectedLocalResult": "local-runner",
+      "notes": [
+        "Runner not running (status: not-started)"
+      ]
+    },
+    {
+      "id": "url-heimdall-obsidian-glass-style-css-ss-style-css",
+      "title": "heimdall obsidian glass style.css",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/cedmillion/heimdall-obsidian-glass-style.css",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-js-uid-glass-js",
+      "title": "liquid glass js",
+      "currentStatus": "needs-runner",
+      "classification": "fixable-with-package-runner",
+      "reason": "runner-not-started",
+      "localDemoUrl": null,
+      "localSourcePath": "_reference_vault/reference-library/github/liquid-glass-js",
+      "sourceUrl": "https://github.com/dashersw/liquid-glass-js",
+      "recommendedAction": "Start via scripts/start-reference-runners.mjs and optionally export static build.",
+      "risk": "medium",
+      "expectedLocalResult": "local-runner",
+      "notes": [
+        "Runner not running (status: not-started)"
+      ]
+    },
+    {
+      "id": "url-apple-liquid-glass-liquid-glass",
+      "title": "apple liquid glass",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/ektogamat/apple-liquid-glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-css-id-glass-css",
+      "title": "liquid glass css",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/GANSGX/liquid-glass-css",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-effect-glass-effect",
+      "title": "liquid glass effect",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/kevinbism/liquid-glass-effect",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-7-css-ang-nd-7-css",
+      "title": "7.css",
+      "currentStatus": "source-only",
+      "classification": "not-worth-fixing",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": "_reference_vault/reference-library/github/7.css",
+      "sourceUrl": "https://github.com/khang-nd/7.css",
+      "recommendedAction": "Vault source only; no demo entrypoint. Building one out of scope/low value.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-16-scussions-16",
+      "title": "16",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/kube/kube.io/discussions/16",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-kvideo-oyang-kvideo",
+      "title": "KVideo",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/KuekHaoYang/KVideo",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-aero-twitter-glass-lab-er-glass-lab",
+      "title": "aero twitter glass lab",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/lekandigital/aero-twitter-glass-lab",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-1557-ussions-1557",
+      "title": "1557",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/linuxserver/Heimdall/discussions/1557",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-frontend-projects-end-projects",
+      "title": "Frontend Projects",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/polidario/Frontend-Projects",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-vue-id-glass-vue",
+      "title": "liquid glass vue",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/polidario/Frontend-Projects/tree/main/liquid-glass-vue",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-glassmorphism-lassmorphism",
+      "title": "glassmorphism",
+      "currentStatus": "needs-runner",
+      "classification": "fixable-with-package-runner",
+      "reason": "runner-not-started",
+      "localDemoUrl": null,
+      "localSourcePath": "_reference_vault/reference-library/github/glassmorphism",
+      "sourceUrl": "https://github.com/rahuldotdev/glassmorphism",
+      "recommendedAction": "Start via scripts/start-reference-runners.mjs and optionally export static build.",
+      "risk": "medium",
+      "expectedLocalResult": "local-runner",
+      "notes": [
+        "Runner not running (status: not-started)"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-react-glass-react",
+      "title": "liquid glass react",
+      "currentStatus": "source-only",
+      "classification": "not-worth-fixing",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": "_reference_vault/reference-library/github/liquid-glass-react",
+      "sourceUrl": "https://github.com/rdev/liquid-glass-react",
+      "recommendedAction": "Vault source only; no demo entrypoint. Building one out of scope/low value.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-search-repositories",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/search?q=liquid%20glass&type=repositories",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-stars-o-desc",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/search?q=liquid+glass&type=repositories&s=stars&o=desc",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-glassmorphism-ui-asc-s-forks",
+      "title": "glassmorphism ui",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/topics/glassmorphism-ui?l=html&o=asc&s=forks",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-glassmorphism-ui-desc-s-stars",
+      "title": "glassmorphism ui",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/topics/glassmorphism-ui?l=html&o=desc&s=stars",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-glassmorphism-ui-desc-s-stars-2",
+      "title": "glassmorphism ui",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/topics/glassmorphism-ui?o=desc&s=stars",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-glassmorphism-asc-s-stars",
+      "title": "glassmorphism",
+      "currentStatus": "needs-runner",
+      "classification": "fixable-with-package-runner",
+      "reason": "runner-not-started",
+      "localDemoUrl": null,
+      "localSourcePath": "_reference_vault/reference-library/github/glassmorphism",
+      "sourceUrl": "https://github.com/topics/glassmorphism?o=asc&s=stars",
+      "recommendedAction": "Start via scripts/start-reference-runners.mjs and optionally export static build.",
+      "risk": "medium",
+      "expectedLocalResult": "local-runner",
+      "notes": [
+        "Runner not running (status: not-started)"
+      ]
+    },
+    {
+      "id": "url-glassmorphism-wpf-morphism-wpf",
+      "title": "glassmorphism wpf",
+      "currentStatus": "source-only",
+      "classification": "not-worth-fixing",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": "_reference_vault/reference-library/github/glassmorphism-wpf",
+      "sourceUrl": "https://github.com/trrahul/glassmorphism-wpf",
+      "recommendedAction": "Vault source only; no demo entrypoint. Building one out of scope/low value.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-lab-tuannm93-lab",
+      "title": "lab",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/tuannm93/lab",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-switcher-css-html-her-css-html",
+      "title": "liquid glass switcher css.html",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/liquid-glass-switcher-css.html",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-front-end-in-front-end",
+      "title": "front end",
+      "currentStatus": "source-only",
+      "classification": "external-only-skip",
+      "reason": "source-only-no-entrypoint",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://github.com/tuannm93/lab/tree/main/front-end",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "Local source exists but no runnable local demo page"
+      ]
+    },
+    {
+      "id": "url-glass-refraction-s-refraction",
+      "title": "glass refraction",
+      "currentStatus": "needs-runner",
+      "classification": "fixable-with-package-runner",
+      "reason": "runner-not-started",
+      "localDemoUrl": null,
+      "localSourcePath": "_reference_vault/reference-library/github/glass-refraction",
+      "sourceUrl": "https://github.com/Z1Code/glass-refraction",
+      "recommendedAction": "Start via scripts/start-reference-runners.mjs and optionally export static build.",
+      "risk": "medium",
+      "expectedLocalResult": "local-runner",
+      "notes": [
+        "Runner not running (status: not-started)"
+      ]
+    },
+    {
+      "id": "url-readme-md-er-readme-md",
+      "title": "README.md",
+      "currentStatus": "needs-runner",
+      "classification": "fixable-with-package-runner",
+      "reason": "runner-not-started",
+      "localDemoUrl": null,
+      "localSourcePath": "_reference_vault/reference-library/github/glass-refraction",
+      "sourceUrl": "https://github.com/Z1Code/glass-refraction/blob/master/README.md",
+      "recommendedAction": "Start via scripts/start-reference-runners.mjs and optionally export static build.",
+      "risk": "medium",
+      "expectedLocalResult": "local-runner",
+      "notes": [
+        "Runner not running (status: not-started)"
+      ]
+    },
+    {
+      "id": "url-glassfilters-tsx-sfilters-tsx",
+      "title": "GlassFilters.tsx",
+      "currentStatus": "needs-runner",
+      "classification": "fixable-with-package-runner",
+      "reason": "runner-not-started",
+      "localDemoUrl": null,
+      "localSourcePath": "_reference_vault/reference-library/github/glass-refraction",
+      "sourceUrl": "https://github.com/Z1Code/glass-refraction/blob/master/src/react/GlassFilters.tsx",
+      "recommendedAction": "Start via scripts/start-reference-runners.mjs and optionally export static build.",
+      "risk": "medium",
+      "expectedLocalResult": "local-runner",
+      "notes": [
+        "Runner not running (status: not-started)"
+      ]
+    },
+    {
+      "id": "url-7-aero-stylesheet-o-stylesheet",
+      "title": "7 Aero Stylesheet",
+      "currentStatus": "needs-runner",
+      "classification": "fixable-with-package-runner",
+      "reason": "runner-not-started",
+      "localDemoUrl": null,
+      "localSourcePath": "_reference_vault/reference-library/github/7-Aero-Stylesheet",
+      "sourceUrl": "https://github.com/Z2r-YT/7-Aero-Stylesheet",
+      "recommendedAction": "Start via scripts/start-reference-runners.mjs and optionally export static build.",
+      "risk": "medium",
+      "expectedLocalResult": "local-runner",
+      "notes": [
+        "Runner not running (status: not-started)"
+      ]
+    },
+    {
+      "id": "url-kvideo-pages-dev-eo-pages-dev",
+      "title": "kvideo.pages.dev",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://kvideo.pages.dev",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-eta-vercel-app-a-vercel-app",
+      "title": "liquid-glass-eta.vercel.app",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://liquid-glass-eta.vercel.app",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-webgl-html-p-webgl-html",
+      "title": "webgl.html",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://liquid-glass-eta.vercel.app/webgl.html",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquidgl-naughtyduk-com-ughtyduk-com",
+      "title": "liquidgl.naughtyduk.com",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://liquidgl.naughtyduk.com",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-demo-1-demos-demo-1",
+      "title": "demo 1",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://liquidgl.naughtyduk.com/demos/demo-1",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-demo-2-demos-demo-2",
+      "title": "demo 2",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://liquidgl.naughtyduk.com/demos/demo-2",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-css-glass-css-glass",
+      "title": "css.glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://css.glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-css-liquid-glass-liquid-glass",
+      "title": "css liquid glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://freefrontend.com/css-liquid-glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-frutiger-aero-rutiger-aero",
+      "title": "frutiger aero",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://frutiger-aero.org/frutiger-aero",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-kube-io-ps-kube-io",
+      "title": "kube.io",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://kube.io",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-css-svg-lass-css-svg",
+      "title": "liquid glass css svg",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://kube.io/blog/liquid-glass-css-svg",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-liquid-glass-3",
+      "title": "liquid glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.jsdelivr.com/package/npm/@gracefullight/liquid-glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-in-the-browser-refraction-with-css-ion-with-css",
+      "title": "liquid glass in the browser refraction with css",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.reddit.com/r/Frontend/comments/1nk0xhg/liquid_glass_in_the_browser_refraction_with_css",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-ios-26s-liquid-glass-looks-awesome-but-nothing-but-nothing",
+      "title": "ios 26s liquid glass looks awesome but nothing",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.reddit.com/r/FrutigerAero/comments/1l7g4ds/ios_26s_liquid_glass_looks_awesome_but_nothing",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-building-a-frutiger-aero-windows-vista-glass-vista-glass",
+      "title": "building a frutiger aero windows vista glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.reddit.com/r/FrutigerAero/comments/1p9pjw0/building_a_frutiger_aero_windows_vista_glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-alright-now-how-do-we-recreate-apple-liquid-glass-liquid-glass",
+      "title": "alright now how do we recreate apple liquid glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.reddit.com/r/webdev/comments/1l7dxjq/alright_now_how_do_we_recreate_apple_liquid_glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-results-liquid-glass",
+      "title": "results",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.youtube.com/results?search_query=+Liquid+Glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-results-sp-cam-253d",
+      "title": "results",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.youtube.com/results?search_query=+Liquid+Glass&sp=CAM%253D",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-results-glass-github",
+      "title": "results",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.youtube.com/results?search_query=+Liquid+Glass+github",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-results-sp-cam-253d-2",
+      "title": "results",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.youtube.com/results?search_query=+Liquid+Glass+github&sp=CAM%253D",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-kqflgy2zeok-kqflgy2zeok",
+      "title": "KqFlGY2zEOk",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.youtube.com/shorts/KqFlGY2zEOk",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-watch-cv8zfvm8fek",
+      "title": "watch",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.youtube.com/watch?v=Cv8zFvM8fEk",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-watch-ktolrsdlkqa",
+      "title": "watch",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.youtube.com/watch?v=kTOLrsDlKQA",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-liquid-glass-4",
+      "title": "Liquid Glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://de.wikipedia.org/wiki/Liquid_Glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-liquid-glass-5",
+      "title": "Liquid Glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Liquid_Glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-windows-aero-windows-aero",
+      "title": "Windows Aero",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Windows_Aero",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-aqua-macos-28macos-29",
+      "title": "Aqua (macOS)",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://es.wikipedia.org/wiki/Aqua_%28macOS%29",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-ios-26-wiki-ios-26",
+      "title": "IOS 26",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://es.wikipedia.org/wiki/IOS_26",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-liquid-glass-6",
+      "title": "Liquid Glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://es.wikipedia.org/wiki/Liquid_Glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-aqua-informatique-ormatique-29",
+      "title": "Aqua (informatique)",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://fr.wikipedia.org/wiki/Aqua_%28informatique%29",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-liquid-glass-7",
+      "title": "Liquid Glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://fr.wikipedia.org/wiki/Liquid_Glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-liquid-glass-8",
+      "title": "Liquid Glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://pt.wikipedia.org/wiki/Liquid_Glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-liquid-glass-9",
+      "title": "Liquid Glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://ru.wikipedia.org/wiki/Liquid_Glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-aqua-gui-ua-28gui-29",
+      "title": "Aqua (GUI)",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://zh.wikipedia.org/wiki/Aqua_%28GUI%29",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-liquid-glass-10",
+      "title": "Liquid Glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://zh.wikipedia.org/wiki/Liquid_Glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-1707-01442-s-1707-01442",
+      "title": "1707.01442",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://arxiv.org/abs/1707.01442",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-1904-13071-s-1904-13071",
+      "title": "1904.13071",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://arxiv.org/abs/1904.13071",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-2005-00748-s-2005-00748",
+      "title": "2005.00748",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://arxiv.org/abs/2005.00748",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-2401-01938-s-2401-01938",
+      "title": "2401.01938",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://arxiv.org/abs/2401.01938",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-what-is-liquid-glass-a-new-material-launched-in-wwdc-2025-how-will-it-impact",
+      "title": "what is liquid glass a new material launched in wwdc 2025 how will it impact on ios 26 ipados macos 66",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://indiatimes.com/technology/news/what-is-liquid-glass-a-new-material-launched-in-wwdc-2025-how-will-it-impact-on-ios-26-ipados-macos-66",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-what-is-liquid-glass-a-new-material-launched-in-wwdc-2025-how-will-it-impact-2",
+      "title": "what is liquid glass a new material launched in wwdc 2025 how will it impact on ios 26 ipados macos 660857.html",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://indiatimes.com/technology/news/what-is-liquid-glass-a-new-material-launched-in-wwdc-2025-how-will-it-impact-on-ios-26-ipados-macos-660857.html",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-apple-gives-liquid-glass-a-do-over-at-wwdc-2026-adds-a-transparency-slider-i",
+      "title": "apple gives liquid glass a do over at wwdc 2026 adds a transparency slider in ios",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://timesofindia.indiatimes.com/technology/tech-news/apple-gives-liquid-glass-a-do-over-at-wwdc-2026-adds-a-transparency-slider-in-ios",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-131593381-cms-31593381-cms",
+      "title": "131593381.cms",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://timesofindia.indiatimes.com/technology/tech-news/apple-gives-liquid-glass-a-do-over-at-wwdc-2026-adds-a-transparency-slider-in-ios-27-and-macos-golden-gate/articleshow/131593381.cms",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-apple-ios-26-liquid-glass-design-changes-beta-3-2025-7-eta-3-2025-7",
+      "title": "apple ios 26 liquid glass design changes beta 3 2025 7",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.businessinsider.com/apple-ios-26-liquid-glass-design-changes-beta-3-2025-7",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-apples-infamous-iphone-optical-illusion-is-no-more-n-is-no-more",
+      "title": "apples infamous iphone optical illusion is no more",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.creativebloq.com/design/apples-infamous-iphone-optical-illusion-is-no-more",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-apple-is-making-some-changes-to-its-liquid-glass-interface-2uqky8mkvmkcvmcbr",
+      "title": "apple is making some changes to its liquid glass interface 2Uqky8MkVMKcvMCbrdvS",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.marketwatch.com/livecoverage/apple-wwdc-keynote-live-siri-ai-watch-ios/card/apple-is-making-some-changes-to-its-liquid-glass-interface-2Uqky8MkVMKcvMCbrdvS",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-here-is-everything-apple-announced-its-annual-developer-conference-2025-06-0",
+      "title": "here is everything apple announced its annual developer conference 2025 06 09",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.reuters.com/business/here-is-everything-apple-announced-its-annual-developer-conference-2025-06-09",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-the-way-apples-design-team-intended-it-from-the-start-liquid-glass-is-getti-",
+      "title": "the way apples design team intended it from the start liquid glass is getti",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.techradar.com/computing/the-way-apples-design-team-intended-it-from-the-start-liquid-glass-is-getti",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-the-way-apples-design-team-intended-it-from-the-start-liquid-glass-is-gettin",
+      "title": "the way apples design team intended it from the start liquid glass is getting a macos 27 overhaul to fix its most glaring problems",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.techradar.com/computing/the-way-apples-design-team-intended-it-from-the-start-liquid-glass-is-getting-a-macos-27-overhaul-to-fix-its-most-glaring-problems",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-not-vibing-with-liquid-glass-in-ios-26-heres-how-to-make-it-easier-on-the-ey",
+      "title": "not vibing with liquid glass in ios 26 heres how to make it easier on the eyes",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.techradar.com/phones/ios/not-vibing-with-liquid-glass-in-ios-26-heres-how-to-make-it-easier-on-the-eyes",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-apple-liquid-design-glass-theme-wwdc-2025-me-wwdc-2025",
+      "title": "apple liquid design glass theme wwdc 2025",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.theverge.com/news/682636/apple-liquid-design-glass-theme-wwdc-2025",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-apple-liquid-glass-design-theme-wwdc-2025-me-wwdc-2025",
+      "title": "apple liquid glass design theme wwdc 2025",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.theverge.com/news/682636/apple-liquid-glass-design-theme-wwdc-2025",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-apple-ios-27-wwdc-2026-27-wwdc-2026",
+      "title": "apple ios 27 wwdc 2026",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.theverge.com/tech/941202/apple-ios-27-wwdc-2026",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-ive-used-ios-26-for-a-year-and-these-are-the-9-features-i-cant-live-without-",
+      "title": "ive used ios 26 for a year and these are the 9 features i cant live without",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.tomsguide.com/phones/iphones/ive-used-ios-26-for-a-year-and-these-are-the-9-features-i-cant-live-without",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-css-3-box-shadow-showcases-browser-differences-differences",
+      "title": "css 3 box shadow showcases browser differences",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.wired.com/2011/06/css-3-box-shadow-showcases-browser-differences",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-designers-react-to-apple-liquid-glass-liquid-glass",
+      "title": "designers react to apple liquid glass",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.wired.com/story/designers-react-to-apple-liquid-glass",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-liquid-glass-could-be-one-of-apples-most-divisive-system-designs-yet-designs",
+      "title": "liquid glass could be one of apples most divisive system designs yet",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.wired.com/story/liquid-glass-could-be-one-of-apples-most-divisive-system-designs-yet",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-gptqp9s-7wai",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=frutiger+areo+glass+codepen&sca_esv=0ffcce6111dd5c90&biw=1800&bih=997&sxsrf=ANbL-n56MNQl1uhfs0al-e7yDdRzw9DcsA%3A1781452660328&ei=dM8uauLaE8agptQP9s-7wAI",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-oq-frutiger",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=frutiger+areo+glass+codepen&sca_esv=0ffcce6111dd5c90&biw=1800&bih=997&sxsrf=ANbL-n56MNQl1uhfs0al-e7yDdRzw9DcsA%3A1781452660328&ei=dM8uauLaE8agptQP9s-7wAI&ved=0ahUKEwji5IKojIeVAxVGkIkEHfbnDigQ4dUDCBA&uact=5&oq=frutiger+",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-gws-wiz-serp",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=frutiger+areo+glass+codepen&sca_esv=0ffcce6111dd5c90&biw=1800&bih=997&sxsrf=ANbL-n56MNQl1uhfs0al-e7yDdRzw9DcsA%3A1781452660328&ei=dM8uauLaE8agptQP9s-7wAI&ved=0ahUKEwji5IKojIeVAxVGkIkEHfbnDigQ4dUDCBA&uact=5&oq=frutiger+areo+glass+codepen&gs_lp=Egxnd3Mtd2l6LXNlcnAiG2ZydXRpZ2VyIGFyZW8gZ2xhc3MgY29kZXBlbjIHECEYChigATIHECEYChigATIHECEYChigATIHECEYChigAUjSOFCCAljAN3ADeACQAQCYAXWgAYUGqgEDOC4xuAEDyAEA-AEBmAILoALoBcICChAAGEcY1gQYsAPCAgcQABiABBgNwgIIEAAYgAQYogTCAgUQABjvBcICBxAhGKsCGAqYAwDiAwUSATEgQIgGAZAGCJIHBDEwLjGgB_ktsgcDNy4xuAfjBcIHAzMuOMgHDIAIAQ&sclient=gws-wiz-serp",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-gws-wiz-serp-2",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=frutiger+areo+glass+jsfiddle&sca_esv=0ffcce6111dd5c90&sxsrf=ANbL-n7za_d2jNx_6if4s4BbTOf9YjZwzw%3A1781452648753&ei=aM8uarbaLcv-ptQPm5m6gAI&biw=1800&bih=997&ved=0ahUKEwi2rsCijIeVAxVLv4kEHZuMDiAQ4dUDCBA&uact=5&oq=frutiger+areo+glass+jsfiddle&gs_lp=Egxnd3Mtd2l6LXNlcnAiHGZydXRpZ2VyIGFyZW8gZ2xhc3MganNmaWRkbGUyCBAAGIAEGKIEMggQABiABBiiBDIIEAAYgAQYogQyCBAAGIAEGKIESP0XUIQHWLEWcAF4AJABAJgBY6ABtgmqAQIxNLgBA8gBAPgBAZgCD6AC2wnCAgsQABiABBiiBBiwA8ICCBAAGO8FGLADwgIHECMYsAIYJ8ICBRAAGO8FwgIIEAAYiQUYogTCAgQQIRgKmAMAiAYBkAYFkgcEMTQuMaAHni2yBwQxMy4xuAfXCcIHBTYuOC4xyAcYgAgB&sclient=gws-wiz-serp",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-ome-ie-utf-8",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=glass+codepen&oq=glass+codepen+&gs_lcrp=EgZjaHJvbWUyCggAEEUYFhgeGDkyCAgBEAAYFhgeMggIAhAAGBYYHjIICAMQABgWGB4yCAgEEAAYFhgeMggIBRAAGBYYHjIICAYQABgWGB4yCAgHEAAYFhgeMggICBAAGBYYHjIKCAkQABgKGBYYHtIBCDMxMTNqMGo0qAIAsAIB&sourceid=chrome&ie=UTF-8",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-ome-ie-utf-8-2",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=glass+jsfiddle&oq=glass+jsfiddle&gs_lcrp=EgZjaHJvbWUyCQgAEEUYORigATIHCAEQIRigATIHCAIQIRigATIHCAMQIRigATIHCAQQIRigATIHCAUQIRifBdIBCDIzMDhqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-tazmwowajeoa",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=glassmorphism+github&oq=glassmorphism+gi&gs_lcrp=EgZjaHJvbWUqBwgBEAAYgAQyBggAEEUYOTIHCAEQABiABDIICAIQABgWGB4yCAgDEAAYFhgeMggIBBAAGBYYHjIICAUQABgWGB4yCAgGEAAYFhgeMggIBxAAGBYYHjIICAgQABgWGB4yCAgJEAAYFhge0gEINTAzMWowajeoA",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-ome-ie-utf-8-3",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=glassmorphism+github&oq=glassmorphism+gi&gs_lcrp=EgZjaHJvbWUqBwgBEAAYgAQyBggAEEUYOTIHCAEQABiABDIICAIQABgWGB4yCAgDEAAYFhgeMggIBBAAGBYYHjIICAUQABgWGB4yCAgGEAAYFhgeMggIBxAAGBYYHjIICAgQABgWGB4yCAgJEAAYFhge0gEINTAzMWowajeoAgCwAgA&sourceid=chrome&ie=UTF-8",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-ome-ie-utf-8-4",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=Kube.io+%E2%80%94+%E2%80%9CLiquid+Glass+in+the+Browser%3A+Refraction+with+CSS+and+SVG%E2%80%9D&sourceid=chrome&ie=UTF-8",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-781454865305",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=Kube.io+%E2%80%94+%E2%80%9CLiquid+Glass+in+the+Browser%3A+Refraction+with+CSS+and+SVG%E2%80%9D+github&sca_esv=045687153d63a74d&sxsrf=ANbL-n4UrfXXF-h6pRzZwmldaxWATDvCJQ%3A1781454865305",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-ac-biw-180",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=Kube.io+%E2%80%94+%E2%80%9CLiquid+Glass+in+the+Browser%3A+Refraction+with+CSS+and+SVG%E2%80%9D+github&sca_esv=045687153d63a74d&sxsrf=ANbL-n4UrfXXF-h6pRzZwmldaxWATDvCJQ%3A1781454865305&ei=EdguapafEtyGw8cPl8O_-Ac&biw=180",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-gws-wiz-serp-3",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=Kube.io+%E2%80%94+%E2%80%9CLiquid+Glass+in+the+Browser%3A+Refraction+with+CSS+and+SVG%E2%80%9D+github&sca_esv=045687153d63a74d&sxsrf=ANbL-n4UrfXXF-h6pRzZwmldaxWATDvCJQ%3A1781454865305&ei=EdguapafEtyGw8cPl8O_-Ac&biw=1800&bih=997&ved=0ahUKEwjW67fDlIeVAxVcw_ACHZfhD38Q4dUDCBA&uact=5&oq=Kube.io+%E2%80%94+%E2%80%9CLiquid+Glass+in+the+Browser%3A+Refraction+with+CSS+and+SVG%E2%80%9D+github&gs_lp=Egxnd3Mtd2l6LXNlcnAiUUt1YmUuaW8g4oCUIOKAnExpcXVpZCBHbGFzcyBpbiB0aGUgQnJvd3NlcjogUmVmcmFjdGlvbiB3aXRoIENTUyBhbmQgU1ZH4oCdIGdpdGh1YkiVDVD4AViPDHABeAGQAQCYAVmgAfADqgEBN7gBA8gBAPgBAZgCAaACB8ICChAAGEcY1gQYsAOYAwCIBgGQBgiSBwExoAeLBbIHALgHAMIHAzItMcgHBIAIAQ&sclient=gws-wiz-serp",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-gws-wiz-serp-4",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=liquid+glass+codepen&sca_esv=0ffcce6111dd5c90&biw=1800&bih=997&sxsrf=ANbL-n7bVbcRPogfnLnnGbutC2K8j0z8HA%3A1781452700210&ei=nM8uaua8DJKA5OMP1suXgQw&ved=0ahUKEwjm-oS7jIeVAxUSAHkGHdblJcAQ4dUDCBA&uact=5&oq=liquid+glass+codepen&gs_lp=Egxnd3Mtd2l6LXNlcnAiFGxpcXVpZCBnbGFzcyBjb2RlcGVuMgUQABiABDIEEAAYHjIGEAAYBRgeMgYQABgFGB4yBhAAGAgYHjIGEAAYCBgeMgYQABgIGB4yBhAAGAgYHjIGEAAYCBgeMgYQABgIGB5ItjpQAFiRNnAAeACQAQCYAWKgAZ0EqgEBN7gBA8gBAPgBAZgCB6ACuwTCAgQQIxgnwgIGEAAYBxgewgIIEAAYBxgeGArCAggQABgIGAcYHpgDAOIDBRIBMSBAkgcDNi4xoAedNrIHAzYuMbgHuwTCBwUwLjUuMsgHFoAIAQ&sclient=gws-wiz-serp",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-id-glass-jsf",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=liquid+glass+jsfiddle&sca_esv=0ffcce6111dd5c90&biw=1800&bih=997&sxsrf=ANbL-n4OKAl4UcDWsX_n0-FYn1wZl-g7bQ%3A1781452719852&ei=r88uavvWM-aqw8cP5uSQqAk&oq=liquid+glass+jsf",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-bgfzcybqc2yq",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=liquid+glass+jsfiddle&sca_esv=0ffcce6111dd5c90&biw=1800&bih=997&sxsrf=ANbL-n4OKAl4UcDWsX_n0-FYn1wZl-g7bQ%3A1781452719852&ei=r88uavvWM-aqw8cP5uSQqAk&oq=liquid+glass+jsf&gs_lp=Egxnd3Mtd2l6LXNlcnAiEGxpcXVpZCBnbGFzcyBqc2Yq",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-gws-wiz-serp-5",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=liquid+glass+jsfiddle&sca_esv=0ffcce6111dd5c90&biw=1800&bih=997&sxsrf=ANbL-n4OKAl4UcDWsX_n0-FYn1wZl-g7bQ%3A1781452719852&ei=r88uavvWM-aqw8cP5uSQqAk&oq=liquid+glass+jsf&gs_lp=Egxnd3Mtd2l6LXNlcnAiEGxpcXVpZCBnbGFzcyBqc2YqAggAMgQQIxgnMggQABiABBiiBDIFEAAY7wUyBRAAGO8FMggQABiABBiiBDIFEAAY7wVIjg1Q4AJY1QZwAngBkAEAmAFaoAHwAaoBATO4AQPIAQD4AQGYAgWgAvwBwgIKEAAYRxjWBBiwA8ICBRAAGIAEwgILEAAYgAQYigUYkQLCAggQABgWGB4YCsICBhAAGBYYHpgDAIgGAZAGCJIHATWgB9IPsgcBM7gH-AHCBwUwLjQuMcgHCYAIAQ&sclient=gws-wiz-serp",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-ndigq4dudcba",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=liquid+glass+jsfiddle&sca_esv=0ffcce6111dd5c90&biw=1800&bih=997&sxsrf=ANbL-n56MNQl1uhfs0al-e7yDdRzw9DcsA%3A1781452660328&ei=dM8uauLaE8agptQP9s-7wAI&ved=0ahUKEwji5IKojIeVAxVGkIkEHfbnDigQ4dUDCBA",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-uid-glass-js",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=liquid+glass+jsfiddle&sca_esv=0ffcce6111dd5c90&biw=1800&bih=997&sxsrf=ANbL-n56MNQl1uhfs0al-e7yDdRzw9DcsA%3A1781452660328&ei=dM8uauLaE8agptQP9s-7wAI&ved=0ahUKEwji5IKojIeVAxVGkIkEHfbnDigQ4dUDCBA&uact=5&oq=liquid+glass+js",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-gws-wiz-serp-6",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=liquid+glass+jsfiddle&sca_esv=0ffcce6111dd5c90&biw=1800&bih=997&sxsrf=ANbL-n56MNQl1uhfs0al-e7yDdRzw9DcsA%3A1781452660328&ei=dM8uauLaE8agptQP9s-7wAI&ved=0ahUKEwji5IKojIeVAxVGkIkEHfbnDigQ4dUDCBA&uact=5&oq=liquid+glass+jsfiddle&gs_lp=Egxnd3Mtd2l6LXNlcnAiFWxpcXVpZCBnbGFzcyBqc2ZpZGRsZTIIEAAYgAQYogQyBRAAGO8FMggQABiABBiiBDIIEAAYgAQYogRIux9QAFidD3ABeACQAQCYAXGgAe4EqgEDNi4xuAEDyAEA-AEBmAIIoAL9BMICCBAAGIkFGKIEmAMA4gMFEgExIECSBwM3LjGgB4YVsgcDNi4xuAf9BMIHBTQuMy4xyAcKgAgB&sclient=gws-wiz-serp",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-gws-wiz-serp-7",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=liquid+glass+jsfiddle+code&sca_esv=0ffcce6111dd5c90&biw=1800&bih=997&sxsrf=ANbL-n6-xCzfMbjhqUfuiMgRMTolHiMF5Q%3A1781452726555&ei=ts8uavbDIfuB5OMPpcK0uQE&ved=0ahUKEwj29szHjIeVAxX7AHkGHSUhLRcQ4dUDCBA&uact=5&oq=liquid+glass+jsfiddle+code&gs_lp=Egxnd3Mtd2l6LXNlcnAiGmxpcXVpZCBnbGFzcyBqc2ZpZGRsZSBjb2RlMgUQIRigATIFECEYoAEyBRAhGKABMgUQIRigATIFECEYqwIyBRAhGKsCSLgsULIDWIoscAJ4AJABAJgBfKAB2wOqAQM0LjG4AQPIAQD4AQGYAgagAq8DwgIKEAAYRxjWBBiwA8ICBRAhGJ8FmAMAiAYBkAYIkgcDNC4yoAf5GLIHAzIuMrgHqAPCBwUxLjQuMcgHDYAIAQ&sclient=gws-wiz-serp",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-search-mylyd2xowbcw",
+      "title": "search",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.google.com/search?q=liquid+glass+jsfiddle+code&sca_esv=0ffcce6111dd5c90&biw=1800&bih=997&sxsrf=ANbL-n6-xCzfMbjhqUfuiMgRMTolHiMF5Q%3A1781452726555&ei=ts8uavbDIfuB5OMPpcK0uQE&ved=0ahUKEwj29szHjIeVAxX7AHkGHSUhLRcQ4dUDCBA&uact=5&oq=liquid+glass+jsfiddle+code&gs_lp=Egxnd3Mtd2l6LXNlcnAiGmxpcXVpZCBnbGFzcyBqc2ZpZGRsZSBjb2RlMgUQIRigATIFECEYoAEyBRAhGKABMgUQIRigATIFECEYqwIyBRAhGKsCSLgsULIDWIoscAJ4AJABAJgBfKAB2wOqAQM0LjG4AQPIAQD4AQGYAgagAq8DwgIKEAAYRxjWBBiwA8ICBRAhGJ8FmAMAiAYBkAYIkgcDNC4yoAf5GLIHAzIuMrgHqAPCBwUxLjQuMcgHDYAIAQ&sclient=gws-wiz-serp#sv=CBAS4BUKuBUKBtrZ29IPABKtFQrJBArGBLrZ29IPvwQKKmh0dHBzOi8vZnJlZWZyb250ZW5kLmNvbS9jc3MtbGlxdWlkLWdsYXNzLxIMRnJlZUZyb250ZW5kGv4DZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFCd0FBQUFjQ0FBQUFBQlhab0JJQUFBQk5VbEVRVlI0QVcyUWdZWURNUkJBQndJZ0xBSENFaUFNWUREQUlBZ0dZUHNGQmVDQSs0QUNTcUhmY2o5UlVPQkF2K1JBYnpOZDJlN2RQdXg0KzBLU3dBYm5ZQjhmTXhIbUZQMi9OR1N1cXNKY1ZOQnRXeEtsRkR5QWk4UlY0bnZMRTZVdUxwYVMxNFlIY3B2dGFlbzFWWVF0am5WYzFvbjROc0tDdHlxRHJjSVMyangrTFJ5YkpjMTJpY0xRdUQ0WHJzMDgyekdpb3NYTC9QOSt1OTN1SDZaSmduMkhIcFZtb21rb3FXM0owT05ScDJsQ1U2ODBSNkkxL3N3OHo2Wk94WUhqc2tiakFvYlFIRVhYZURtZFR1ZHE2cmpkQmF2dk1VRW5TSHVqc2NRZWNZMVk0K3U2TzlHeGVGdnpldVRQeC9jajl4Z3J2bWF4T2FReDllYWxlREN5RW14eGFBY3hhTXB1MCtpUVY4SEtZYldSRk9HTlZBdG4zNHFma3lUWUVLaFVabEVWWVF6d2x5RW1aT0VjUGV6aVp0NzlGNURFYmc4UUtFY2hBQUFBQUVsRlRrU3VRbUNDIAE4AQqBAgr-AdLZ29IP9wEKOzEwKyBDU1MgTGlxdWlkIEdsYXNzIEVmZmVjdHM6IEZyZWUgQ29kZSBTbmlwcGV0cyAmIEV4YW1wbGVzEipodHRwczovL2ZyZWVmcm9udGVuZC5jb20vY3NzLWxpcXVpZC1nbGFzcy8aiwFFeHBsb3JlIHN0dW5uaW5nIENTUyBsaXF1aWQgZ2xhc3MgZWZmZWN0cyBtaW1pY2tpbmcgbW9kZXJuIHJlZnJhY3RpdmUgT1MgaW50ZXJmYWNlcy4gRmluZCBvcHRpbWl6ZWQgY29kZSB0ZW1wbGF0ZXMgdXRpbGl6aW5nIG5hdGl2ZSBTVkcgLi4uCq0ICqoIwtnb0g-jCBI7MTArIENTUyBMaXF1aWQgR2xhc3MgRWZmZWN0czogRnJlZSBDb2RlIFNuaXBwZXRzICYgRXhhbXBsZXMa-wIKKmh0dHBzOi8vZnJlZWZyb250ZW5kLmNvbS9jc3MtbGlxdWlkLWdsYXNzLxI3Q1NTIExpcXVpZCBHbGFzcyBFZmZlY3RzOiBGcmVlIENvZGUgU25pcHBldHMgJiBFeGFtcGxlcxqLAUV4cGxvcmUgc3R1bm5pbmcgQ1NTIGxpcXVpZCBnbGFzcyBlZmZlY3RzIG1pbWlja2luZyBtb2Rlcm4gcmVmcmFjdGl2ZSBPUyBpbnRlcmZhY2VzLiBGaW5kIG9wdGltaXplZCBjb2RlIHRlbXBsYXRlcyB1dGlsaXppbmcgbmF0aXZlIFNWRyAuLi4gASoCZW4yAlVTOhsqGUxla2FuLkFkZXllcmk5OUBnbWFpbC5jb21CHy9zP3RibT1tYXAmZ3Nfcmk9bWFwcyZzdWdnZXN0PXBKMEFLUE9yMVNVRm5CU056dkxRcTViN0RvWWF5YjlzR05wMUE6MTc4MTQ1MzAzMDYwOVIMRnJlZUZyb250ZW5kUmsYBSo7MTArIENTUyBMaXF1aWQgR2xhc3MgRWZmZWN0czogRnJlZSBDb2RlIFNuaXBwZXRzICYgRXhhbXBsZXM6Kmh0dHBzOi8vZnJlZWZyb250ZW5kLmNvbS9jc3MtbGlxdWlkLWdsYXNzL3JECipodHRwczovL2ZyZWVmcm9udGVuZC5jb20vY3NzLWxpcXVpZC1nbGFzcy8oIzIUU291cmNlOiBGcmVlRnJvbnRlbmR6sgMaOzEwKyBDU1MgTGlxdWlkIEdsYXNzIEVmZmVjdHM6IEZyZWUgQ29kZSBTbmlwcGV0cyAmIEV4YW1wbGVzIhZ3ZWJyZXN1bHRfMmwtemtUTk9iSEFKMAFg7o8GagpNU0FGIC0gU1JQcrwCqgEQV0VCX1JFU1VMVF9JTk5FUrIBNQoqaHR0cHM6Ly9mcmVlZnJvbnRlbmQuY29tL2Nzcy1saXF1aWQtZ2xhc3MvEgNPRkYYACAA4gHtAQqXATxiPkV4cGxvcmUgc3R1bm5pbmcgQ1NTIGxpcXVpZCBnbGFzcyBlZmZlY3RzPC9iPiBtaW1pY2tpbmcgbW9kZXJuIHJlZnJhY3RpdmUgT1MgaW50ZXJmYWNlcy4gRmluZCBvcHRpbWl6ZWQgY29kZSB0ZW1wbGF0ZXMgdXRpbGl6aW5nIG5hdGl2ZSBTVkcmbmJzcDsuLi4STTEwKyBDU1MgPGI-TGlxdWlkIEdsYXNzPC9iPiBFZmZlY3RzOiBGcmVlIDxiPkNvZGU8L2I-IFNuaXBwZXRzICZhbXA7IEV4YW1wbGVzGAAgAqABYsABAeABAegBAQqqBgqnBsrZ29IPoAYS-AUi9QUvc2VhcmNoL2Fib3V0LXRoaXMtcmVzdWx0P29yaWdpbj13d3cuZ29vZ2xlLmNvbSZyZXE9Q2lwb2RIUndjem92TDJaeVpXVm1jbTl1ZEdWdVpDNWpiMjB2WTNOekxXeHBjWFZwWkMxbmJHRnpjeThTQkJvQ0NBQWF4Z01TQUJvQUlnQXFBRElHQ0FNU0FuVnpPZ0JDQkFnQkVBQktBRm9BY2dCNkFJSkFvZ01JQUJBQUdBQWdBQ29lQ2dac2FYRjFhV1FWOEhPNVFCb0dabXgxYVdSekdnZHNhWEYxYVdSektnd0tCV2RzWVhOekZhYTh1MEFxUVFvSWFuTm1hV1JrYkdVVkFBQUFBQm9KYW5NZ1ptbGtaR3hsR2cxcGRqdHdPMnB6Wm1sa1pHeGxHZ0pxY3hvS2FtRjJZWE5qY21sd2RCb0dabWxrWkd4bEtoSUtCR052WkdVVlFxRjRRQm9GWTI5a1pYTXlLbWgwZEhCek9pOHZabkpsWldaeWIyNTBaVzVrTG1OdmJTOWpjM010YkdseGRXbGtMV2RzWVhOekx6cE5NVEFySUVOVFV5QThZajVNYVhGMWFXUWdSMnhoYzNNOEwySS1JRVZtWm1WamRITTZJRVp5WldVZ1BHSS1RMjlrWlR3dllqNGdVMjVwY0hCbGRITWdKbUZ0Y0RzZ1JYaGhiWEJzWlhOQ2x3RThZajVGZUhCc2IzSmxJSE4wZFc1dWFXNW5JRU5UVXlCc2FYRjFhV1FnWjJ4aGMzTWdaV1ptWldOMGN6d3ZZajRnYldsdGFXTnJhVzVuSUcxdlpHVnliaUJ5WldaeVlXTjBhWFpsSUU5VElHbHVkR1Z5Wm1GalpYTXVJRVpwYm1RZ2IzQjBhVzFwZW1Wa0lHTnZaR1VnZEdWdGNHeGhkR1Z6SUhWMGFXeHBlbWx1WnlCdVlYUnBkbVVnVTFaSEptNWljM0E3TGk0dUlnSVFBVWdBV0FCb0FBJmhsPWVuLVVTJmdsPVVTGhZodHRwczovL3d3dy5nb29nbGUuY29tWgBgAWgBcAB4AIoBABIjYXRyaXRlbS1fNWRBdWFzZTRNTWJ0cHRRUDNMX1JnQWNfODMYLyD2xoWBCw",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-html2canvas-min-js-anvas-min-js",
+      "title": "html2canvas.min.js",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "url-www-chatgptexporter-com-exporter-com",
+      "title": "www.chatgptexporter.com",
+      "currentStatus": "external-only",
+      "classification": "external-only-skip",
+      "reason": "external-only",
+      "localDemoUrl": null,
+      "localSourcePath": null,
+      "sourceUrl": "https://www.chatgptexporter.com",
+      "recommendedAction": "External URL only; no local copy. Leave as external.",
+      "risk": "low",
+      "expectedLocalResult": "skip",
+      "notes": [
+        "External URL only — no local copy"
+      ]
+    },
+    {
+      "id": "codepen-glass-theme-page-and-menu",
+      "title": "glass theme page and menu",
+      "currentStatus": "needs-preprocessor",
+      "classification": "fixable-with-preprocessor",
+      "reason": "codepen-preprocessor-required",
+      "localDemoUrl": "/raw-reference-lab/demos/codepen/glass-theme-page-and-menu/entry.html",
+      "localSourcePath": "_reference_vault/zipsofglass2/extracted/glass-theme-page-and-menu/glass-theme-page-and-menu/src",
+      "sourceUrl": null,
+      "recommendedAction": "Compile SCSS/preproc into generated-runnable wrapper; verify headless before promoting.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "HTML contains CodePen-specific markers or comments"
+      ]
+    },
+    {
+      "id": "codepen-liquid-glass-components",
+      "title": "liquid glass components",
+      "currentStatus": "needs-preprocessor",
+      "classification": "fixable-with-preprocessor",
+      "reason": "codepen-preprocessor-required",
+      "localDemoUrl": "/raw-reference-lab/demos/codepen/liquid-glass-components/entry.html",
+      "localSourcePath": "_reference_vault/zipsofglass2/extracted/liquid-glass-components/liquid-glass-components/src",
+      "sourceUrl": null,
+      "recommendedAction": "Compile SCSS/preproc into generated-runnable wrapper; verify headless before promoting.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "HTML contains CodePen-specific markers or comments"
+      ]
+    },
+    {
+      "id": "codepen-liquid-glass-for-web",
+      "title": "liquid glass for web",
+      "currentStatus": "warning",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "external-decorative-asset",
+      "localDemoUrl": "/raw-reference-lab/demos/codepen/liquid-glass-for-web/entry.html",
+      "localSourcePath": "_reference_vault/zipsofglass2/extracted/liquid-glass-for-web/liquid-glass-for-web/src",
+      "sourceUrl": null,
+      "recommendedAction": "Cache stable public CDN/image/font assets into vendor/, rewrite generated copy.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "Path: https://fonts.googleapis.com → — · exists: yes",
+        "Path: https://fonts.gstatic.com → — · exists: yes",
+        "Path: https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap → — · exists: yes"
+      ]
+    },
+    {
+      "id": "codepen-liquid-glass-in-css",
+      "title": "liquid glass in css",
+      "currentStatus": "warning",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "external-decorative-asset",
+      "localDemoUrl": "/raw-reference-lab/demos/codepen/liquid-glass-in-css/entry.html",
+      "localSourcePath": "_reference_vault/zipsofglass2/extracted/liquid-glass-in-css/liquid-glass-in-css/src",
+      "sourceUrl": null,
+      "recommendedAction": "Cache stable public CDN/image/font assets into vendor/, rewrite generated copy.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "External image asset (needs internet): https://www.pexels.com/download/video/6312935/",
+        "1 external image/font URL(s) — demo likely renders online"
+      ]
+    },
+    {
+      "id": "codepen-liquid-glass-navbar-switcher",
+      "title": "liquid glass navbar switcher",
+      "currentStatus": "warning",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "external-decorative-asset",
+      "localDemoUrl": "/raw-reference-lab/demos/codepen/liquid-glass-navbar-switcher/entry.html",
+      "localSourcePath": "_reference_vault/zipsofglass2/extracted/liquid-glass-navbar-switcher/liquid-glass-navbar-switcher/src",
+      "sourceUrl": null,
+      "recommendedAction": "Cache stable public CDN/image/font assets into vendor/, rewrite generated copy.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "Path: ./demo.js → — · exists: no",
+        "Path: ./demo.css → — · exists: no",
+        "External image asset (needs internet): https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1400&auto=format&fit=crop"
+      ]
+    },
+    {
+      "id": "codepen-liquid-glass-switcher-css",
+      "title": "liquid glass switcher css",
+      "currentStatus": "warning",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "external-decorative-asset",
+      "localDemoUrl": "/raw-reference-lab/demos/codepen/liquid-glass-switcher-css/entry.html",
+      "localSourcePath": "_reference_vault/zipsofglass2/extracted/liquid-glass-switcher-css/liquid-glass-switcher-css/src",
+      "sourceUrl": null,
+      "recommendedAction": "Cache stable public CDN/image/font assets into vendor/, rewrite generated copy.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "External image asset (needs internet): https://images.unsplash.com/photo-1706720094773-d91e070e4b90?q=80&w=2515&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "External image asset (needs internet): https://images.unsplash.com/photo-1734606901283-489b25f7aa9b?q=80&w=2360&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "2 external image/font URL(s) — demo likely renders online"
+      ]
+    },
+    {
+      "id": "codepen-neon-sign",
+      "title": "neon sign",
+      "currentStatus": "warning",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "external-decorative-asset",
+      "localDemoUrl": "/raw-reference-lab/demos/codepen/neon-sign/entry.html",
+      "localSourcePath": "_reference_vault/zipsofglass2/extracted/neon-sign/neon-sign/src",
+      "sourceUrl": null,
+      "recommendedAction": "Cache stable public CDN/image/font assets into vendor/, rewrite generated copy.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "Path: https://fonts.googleapis.com/css2?family=Neonderthaw&display=swap → — · exists: yes",
+        "Path: https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap → — · exists: yes",
+        "External other asset (needs internet): https://unionassurances.ca/wp-content/uploads/2025/09/assurancevehiculeantiqueUnionAssurances_looping.mp4"
+      ]
+    },
+    {
+      "id": "codepen-select-dropdown-with-appearance-base-select-liquid-glass",
+      "title": "select dropdown with appearance base select liquid glass",
+      "currentStatus": "warning",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "external-decorative-asset",
+      "localDemoUrl": "/raw-reference-lab/demos/codepen/select-dropdown-with-appearance-base-select-liquid-glass/entry.html",
+      "localSourcePath": "_reference_vault/zipsofglass2/extracted/select-dropdown-with-appearance-base-select-liquid-glass/select-dropdown-with-appearance-base-select-liquid-glass/src",
+      "sourceUrl": null,
+      "recommendedAction": "Cache stable public CDN/image/font assets into vendor/, rewrite generated copy.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "External image asset (needs internet): https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg",
+        "External image asset (needs internet): https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Opera_2015_icon.svg/250px-Opera_2015_icon.svg.png",
+        "External image asset (needs internet): https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Microsoft_Edge_logo_%282019%29.svg/250px-Microsoft_Edge_logo_%282019%29.svg.png"
+      ]
+    },
+    {
+      "id": "github-tuannm93-action-bar-magnifying-lens",
+      "title": "action bar magnifying lens",
+      "currentStatus": "warning",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "external-decorative-asset",
+      "localDemoUrl": "/raw-reference-lab/demos/github-static/tuannm93-action-bar-magnifying-lens/index.html",
+      "localSourcePath": "_reference_vault/reference-library/github/tuannm93-lab/front-end/action-bar-magnifying-lens.html",
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/action-bar-magnifying-lens.html",
+      "recommendedAction": "Cache stable public CDN/image/font assets into vendor/, rewrite generated copy.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "External font asset (needs internet): https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0",
+        "1 external image/font URL(s) — demo likely renders online"
+      ]
+    },
+    {
+      "id": "github-tuannm93-defrost",
+      "title": "defrost",
+      "currentStatus": "warning",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "external-decorative-asset",
+      "localDemoUrl": "/raw-reference-lab/demos/github-static/tuannm93-defrost/index.html",
+      "localSourcePath": "_reference_vault/reference-library/github/tuannm93-lab/front-end/defrost.html",
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/defrost.html",
+      "recommendedAction": "Cache stable public CDN/image/font assets into vendor/, rewrite generated copy.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "External image asset (needs internet): https://images.pexels.com/photos/5516061/pexels-photo-5516061.jpeg",
+        "External font asset (needs internet): https://fonts.googleapis.com/css2?family=Manrope",
+        "2 external image/font URL(s) — demo likely renders online"
+      ]
+    },
+    {
+      "id": "github-tuannm93-gelatinous-viscous-iridescent-black-goo",
+      "title": "gelatinous viscous iridescent black goo",
+      "currentStatus": "needs-preprocessor",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "codepen-preprocessor-required",
+      "localDemoUrl": "/raw-reference-lab/demos/github-static/tuannm93-gelatinous-viscous-iridescent-black-goo/index.html",
+      "localSourcePath": "_reference_vault/reference-library/github/tuannm93-lab/front-end/gelatinous-viscous-iridescent-black-goo.html",
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/gelatinous-viscous-iridescent-black-goo.html",
+      "recommendedAction": "Compile preproc AND cache public CDN/font assets, then verify local-only.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "HTML contains CodePen-specific markers or comments",
+        "External JS required: https://cdn.jsdelivr.net/npm/dat.gui@0.7.9/build/dat.gui.min.js",
+        "1 external JS URL(s) — requires network for full behavior"
+      ]
+    },
+    {
+      "id": "github-tuannm93-glass-gel-slider",
+      "title": "glass gel slider",
+      "currentStatus": "needs-preprocessor",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "codepen-preprocessor-required",
+      "localDemoUrl": "/raw-reference-lab/demos/github-static/tuannm93-glass-gel-slider/index.html",
+      "localSourcePath": "_reference_vault/reference-library/github/tuannm93-lab/front-end/glass-gel-slider.html",
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/glass-gel-slider.html",
+      "recommendedAction": "Compile preproc AND cache public CDN/font assets, then verify local-only.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "HTML contains CodePen-specific markers or comments",
+        "External font asset (needs internet): https://fonts.bunny.net/css?family=amaranth:400,400i,700,700i|asap-condensed:200,300i,400,400i,600,700,900|m-plus-1-code:400,500,600,700",
+        "External font asset (needs internet): https://fonts.bunny.net/css?family=amaranth:400,400i,700,700i|asap-condensed:200,300i,400,400i,600,600i,700,700i,900,900i|kode-mono:400,500,600,700"
+      ]
+    },
+    {
+      "id": "github-tuannm93-glass-refraction",
+      "title": "glass refraction",
+      "currentStatus": "needs-external-assets",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "external-js-required",
+      "localDemoUrl": "/raw-reference-lab/demos/github-static/tuannm93-glass-refraction/index.html",
+      "localSourcePath": "_reference_vault/reference-library/github/tuannm93-lab/front-end/glass-refraction.html",
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/glass-refraction.html",
+      "recommendedAction": "Cache stable public CDN/image/font assets into vendor/, rewrite generated copy.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "External JS required: https://raw.githack.com/strangerintheq/rgba/0.0.8/rgba.js",
+        "1 external JS URL(s) — requires network for full behavior"
+      ]
+    },
+    {
+      "id": "github-tuannm93-honeycomb-magnifier",
+      "title": "honeycomb magnifier",
+      "currentStatus": "needs-external-assets",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "external-js-required",
+      "localDemoUrl": "/raw-reference-lab/demos/github-static/tuannm93-honeycomb-magnifier/index.html",
+      "localSourcePath": "_reference_vault/reference-library/github/tuannm93-lab/front-end/honeycomb-magnifier.html",
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/honeycomb-magnifier.html",
+      "recommendedAction": "Cache stable public CDN/image/font assets into vendor/, rewrite generated copy.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "External JS required: https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js",
+        "External JS required: https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js",
+        "2 external JS URL(s) — requires network for full behavior"
+      ]
+    },
+    {
+      "id": "github-tuannm93-hourglass",
+      "title": "hourglass",
+      "currentStatus": "warning",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "external-decorative-asset",
+      "localDemoUrl": "/raw-reference-lab/demos/github-static/tuannm93-hourglass/index.html",
+      "localSourcePath": "_reference_vault/reference-library/github/tuannm93-lab/front-end/hourglass.html",
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/hourglass.html",
+      "recommendedAction": "Cache stable public CDN/image/font assets into vendor/, rewrite generated copy.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "External other asset (needs internet): data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAAAYCAYAAAAYuwRKAAAAAXNSR0IArs4c6QAAAURJREFUaEPtmVEOgjAMQOWcehIP4En0nJoRZuYyTKEtacnzh2R0o7y+zG1Ml8Hv+bi+R+20QWBE4HZ/TX37T0MVahQIUgisERh58xWr3EQo5NEQaB2axUIqDU76tgSqS4iFF6YEvmIxW5lyZbDlH3BCLFywJlCcQixrqow3r9lVYh0x2x3xjGwuHMFE8wy1WHVHWa7WRxWcqf3X3YuPxbgmYtXXt0jIU9Rss5I034jcTcXqBdsyi7WfkKxnPmmBssftYbinj4STi1j9YZkkEWSSUJLHSL/1enF3F0uOgsgzEUCsM1Uz0Lsg1lIMzda6r6flWIFc2ZQKYjW4tLsrbf9NlQsejFiDAvUL37UFrjQuuAMu6SGWAOvaDstrRyVIKXwIYoUvUc4EEStn3cJnjVjhS5QzQcTKWbfwWSNW+BLlTLCI9QHE9wP0warayAAAAABJRU5ErkJggg==",
+        "External other asset (needs internet): data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEsAAABuCAYAAABvL+5vAAAAAXNSR0IArs4c6QAAAgpJREFUeF7t3WtOwzAQReFmnbASFsBKYJ2gFiX0ocY5qR2P7cMfhHQp0qc7UzdtxPT1+fbz/vE9nfxKCkxiJY2WgFjbrU5iiQUEQNRmiQUEQNRmiQUEQNRmiQUEQNRmiQUEQNRmiQUEQNRmiQUEQPRy0c9rWtvExNrmdEmJJRYQAFGbJRYQAFGbJRYQAFGbJRYQANHlbXtP8Wk1sdJGS0IssYAAiNossYAAiNossYAAiN58PNKz1rqcWDYLCICozdqLdf4999ZzvYfPv4slFhg2scpgubdAs8QSyzHMIgAe5Omtcx4hHhXFsllAAERX72B1FG8lxbJZQABEkzeSO4r/mmLZLCAAoslm+VoRjKFYYoHhg1i26w9s084SC2IJBpolllho0W/eWfOjjvzyRyzQLYw18u4Sq3SzRm3XrmaJBeo46jPj7maN2K6XsEYDEwusn5exRmqXWEc3a5R2ZWnWKEeJrFi9N0ysGjvr+m/2es0re7N63l9i1R7DXttVrFk9ghXH6uk4IVaUndXbceKQZvWyvw7Fan1/HY7VMlgVrFbBqmG1CFYVqzWw6lgtgYXAagUsDNYMdv4e9f8thsKKfngNiRV1LMNiRQQLjRVtj4XHut5jtZd/M1gRln9zWDVHs0msWqPZNNbRaF1g3aOVeiLoCuv+mv/8c66XT91ilYAbAgu827Ua/QWJWLR+EH/s/wAAAABJRU5ErkJggg==",
+        "2 external image/font URL(s) — demo likely renders online"
+      ]
+    },
+    {
+      "id": "github-tuannm93-liquid-effect",
+      "title": "liquid effect",
+      "currentStatus": "needs-preprocessor",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "codepen-preprocessor-required",
+      "localDemoUrl": "/raw-reference-lab/demos/github-static/tuannm93-liquid-effect/index.html",
+      "localSourcePath": "_reference_vault/reference-library/github/tuannm93-lab/front-end/liquid-effect.html",
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/liquid-effect.html",
+      "recommendedAction": "Compile preproc AND cache public CDN/font assets, then verify local-only.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "HTML contains CodePen-specific markers or comments",
+        "External font asset (needs internet): https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&amp;display=swap",
+        "1 external image/font URL(s) — demo likely renders online"
+      ]
+    },
+    {
+      "id": "github-tuannm93-liquid-glass-effect",
+      "title": "liquid glass effect",
+      "currentStatus": "warning",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "external-decorative-asset",
+      "localDemoUrl": "/raw-reference-lab/demos/github-static/tuannm93-liquid-glass-effect/index.html",
+      "localSourcePath": "_reference_vault/reference-library/github/tuannm93-lab/front-end/liquid-glass-effect.html",
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/liquid-glass-effect.html",
+      "recommendedAction": "Cache stable public CDN/image/font assets into vendor/, rewrite generated copy.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "External font asset (needs internet): https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&display=swap",
+        "External image asset (needs internet): https://images.unsplash.com/photo-1683657535824-5b570c7a1749?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "2 external image/font URL(s) — demo likely renders online"
+      ]
+    },
+    {
+      "id": "github-tuannm93-liquid-glass-switcher-css",
+      "title": "liquid glass switcher css",
+      "currentStatus": "warning",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "external-decorative-asset",
+      "localDemoUrl": "/raw-reference-lab/demos/github-static/tuannm93-liquid-glass-switcher-css/index.html",
+      "localSourcePath": "_reference_vault/reference-library/github/tuannm93-lab/front-end/liquid-glass-switcher-css.html",
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/liquid-glass-switcher-css.html",
+      "recommendedAction": "Cache stable public CDN/image/font assets into vendor/, rewrite generated copy.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "External image asset (needs internet): https://images.unsplash.com/photo-1706720094773-d91e070e4b90?q=80&w=2515&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "External image asset (needs internet): https://images.unsplash.com/photo-1734606901283-489b25f7aa9b?q=80&w=2360&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "External font asset (needs internet): https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap"
+      ]
+    },
+    {
+      "id": "github-tuannm93-liquid-glass",
+      "title": "liquid glass",
+      "currentStatus": "needs-preprocessor",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "codepen-preprocessor-required",
+      "localDemoUrl": "/raw-reference-lab/demos/github-static/tuannm93-liquid-glass/index.html",
+      "localSourcePath": "_reference_vault/reference-library/github/tuannm93-lab/front-end/liquid-glass.html",
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/liquid-glass.html",
+      "recommendedAction": "Compile preproc AND cache public CDN/font assets, then verify local-only.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "HTML contains CodePen-specific markers or comments",
+        "External font asset (needs internet): https://fonts.googleapis.com/css2?family=Manrope",
+        "External image asset (needs internet): https://i.ibb.co/ZpTYhmfq/tulip.jpg"
+      ]
+    },
+    {
+      "id": "github-tuannm93-neon-glass-context-menu",
+      "title": "neon glass context menu",
+      "currentStatus": "needs-preprocessor",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "codepen-preprocessor-required",
+      "localDemoUrl": "/raw-reference-lab/demos/github-static/tuannm93-neon-glass-context-menu/index.html",
+      "localSourcePath": "_reference_vault/reference-library/github/tuannm93-lab/front-end/neon-glass-context-menu.html",
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/neon-glass-context-menu.html",
+      "recommendedAction": "Compile preproc AND cache public CDN/font assets, then verify local-only.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "HTML contains CodePen-specific markers or comments",
+        "External font asset (needs internet): https://fonts.bunny.net/css?family=amaranth:400,400i,700,700i|asap-condensed:200,300i,400,400i,600,600i,700,700i,900,900i|asap:200,300i,400,400i,500,500i,600,600i,700,700i,900,900i|kode-mono:400,500,600,700",
+        "External font asset (needs internet): https://fonts.bunny.net/css?family=amaranth:400,400i,700,700i|asap-condensed:200,300i,400,400i,600,700,900|m-plus-1-code:400,500,600,700"
+      ]
+    },
+    {
+      "id": "github-tuannm93-oceanic-ui",
+      "title": "oceanic ui",
+      "currentStatus": "needs-preprocessor",
+      "classification": "fixable-with-local-asset-cache",
+      "reason": "codepen-preprocessor-required",
+      "localDemoUrl": "/raw-reference-lab/demos/github-static/tuannm93-oceanic-ui/index.html",
+      "localSourcePath": "_reference_vault/reference-library/github/tuannm93-lab/front-end/oceanic-ui.html",
+      "sourceUrl": "https://github.com/tuannm93/lab/blob/main/front-end/oceanic-ui.html",
+      "recommendedAction": "Compile preproc AND cache public CDN/font assets, then verify local-only.",
+      "risk": "medium",
+      "expectedLocalResult": "local-static",
+      "notes": [
+        "HTML contains CodePen-specific markers or comments",
+        "External image asset (needs internet): https://assets.codepen.io/406785/header1.webp",
+        "External image asset (needs internet): https://assets.codepen.io/406785/serum.jpg"
+      ]
+    },
+    {
+      "id": "archive-css-glass",
+      "title": "css glass",
+      "currentStatus": "needs-external-assets",
+      "classification": "extractable-from-partial-archive",
+      "reason": "external-js-required",
+      "localDemoUrl": "/raw-reference-lab/demos/web-archives/css-glass/index.html",
+      "localSourcePath": "_reference_vault/reference-library/web-archives/css-glass",
+      "sourceUrl": "https://css.glass/",
+      "recommendedAction": "Inspect archive for separable demo code; only promote if real demo source present.",
+      "risk": "high",
+      "expectedLocalResult": "partial-only",
+      "notes": [
+        "Decorative asset not bundled locally: /favicon.ico",
+        "External font asset (needs internet): https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap",
+        "Archive bundle gap (not in local copy): /_nuxt/edba94d.js"
+      ]
+    },
+    {
+      "id": "archive-freefrontend-css-liquid-glass",
+      "title": "freefrontend css liquid glass",
+      "currentStatus": "needs-preprocessor",
+      "classification": "not-worth-fixing",
+      "reason": "codepen-preprocessor-required",
+      "localDemoUrl": "/raw-reference-lab/demos/web-archives/freefrontend-css-liquid-glass/index.html",
+      "localSourcePath": "_reference_vault/reference-library/web-archives/freefrontend-css-liquid-glass",
+      "sourceUrl": "https://freefrontend.com/css-liquid-glass/",
+      "recommendedAction": "Editor/listing shell; actual demo code not separable locally. Keep partial.",
+      "risk": "low",
+      "expectedLocalResult": "partial-only",
+      "notes": [
+        "HTML contains CodePen-specific markers or comments",
+        "External JS required: https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7958472158675518",
+        "External other asset (needs internet): https://www.googletagmanager.com/gtag/js?id=G-WDG25XV6ED"
+      ]
+    },
+    {
+      "id": "archive-jsfiddle-6hmpa1ax",
+      "title": "jsfiddle 6hmpa1ax",
+      "currentStatus": "needs-external-assets",
+      "classification": "not-worth-fixing",
+      "reason": "external-js-required",
+      "localDemoUrl": "/raw-reference-lab/demos/web-archives/jsfiddle-6hmpa1ax/index.html",
+      "localSourcePath": "_reference_vault/reference-library/web-archives/jsfiddle-6hmpa1ax",
+      "sourceUrl": "https://jsfiddle.net/6hmpa1ax/",
+      "recommendedAction": "Editor/listing shell; actual demo code not separable locally. Keep partial.",
+      "risk": "low",
+      "expectedLocalResult": "partial-only",
+      "notes": [
+        "External css asset (needs internet): https://jsfiddle.net/css/dist-skeleton.css?development_02540212d4d69a558f076d4ed049b740d2341c6f",
+        "Decorative asset not bundled locally: /img/favicon.png",
+        "External css asset (needs internet): https://jsfiddle.net/css/dist-editor.css?development_02540212d4d69a558f076d4ed049b740d2341c6f"
+      ]
+    },
+    {
+      "id": "archive-jsfiddle-nallenscott",
+      "title": "jsfiddle nallenscott",
+      "currentStatus": "needs-external-assets",
+      "classification": "not-worth-fixing",
+      "reason": "external-js-required",
+      "localDemoUrl": "/raw-reference-lab/demos/web-archives/jsfiddle-nallenscott/index.html",
+      "localSourcePath": "_reference_vault/reference-library/web-archives/jsfiddle-nallenscott",
+      "sourceUrl": "https://jsfiddle.net/nallenscott/WtQjY/41/",
+      "recommendedAction": "Editor/listing shell; actual demo code not separable locally. Keep partial.",
+      "risk": "low",
+      "expectedLocalResult": "partial-only",
+      "notes": [
+        "External css asset (needs internet): https://jsfiddle.net/css/dist-skeleton.css?development_02540212d4d69a558f076d4ed049b740d2341c6f",
+        "Decorative asset not bundled locally: /img/favicon.png",
+        "External css asset (needs internet): https://jsfiddle.net/css/dist-editor.css?development_02540212d4d69a558f076d4ed049b740d2341c6f"
+      ]
+    },
+    {
+      "id": "archive-kube-liquid-glass",
+      "title": "kube liquid glass",
+      "currentStatus": "needs-external-assets",
+      "classification": "extractable-from-partial-archive",
+      "reason": "external-js-required",
+      "localDemoUrl": "/raw-reference-lab/demos/web-archives/kube-liquid-glass/index.html",
+      "localSourcePath": "_reference_vault/reference-library/web-archives/kube-liquid-glass",
+      "sourceUrl": "https://kube.io/blog/liquid-glass-css-svg",
+      "recommendedAction": "Inspect archive for separable demo code; only promote if real demo source present.",
+      "risk": "high",
+      "expectedLocalResult": "partial-only",
+      "notes": [
+        "Archive bundle gap (not in local copy): /assets/manifest-5fb19384.js",
+        "Archive bundle gap (not in local copy): /assets/entry.client-Dap_IdFV.js",
+        "Archive bundle gap (not in local copy): /assets/index-DT87w8C9.js"
+      ]
+    },
+    {
+      "id": "archive-liquidgl-demo",
+      "title": "liquidgl demo",
+      "currentStatus": "needs-external-assets",
+      "classification": "extractable-from-partial-archive",
+      "reason": "external-js-required",
+      "localDemoUrl": "/raw-reference-lab/demos/web-archives/liquidgl-demo/index.html",
+      "localSourcePath": "_reference_vault/reference-library/web-archives/liquidgl-demo",
+      "sourceUrl": "https://liquidgl.naughtyduk.com/demos/demo-1",
+      "recommendedAction": "Inspect archive for separable demo code; only promote if real demo source present.",
+      "risk": "high",
+      "expectedLocalResult": "partial-only",
+      "notes": [
+        "Decorative asset not bundled locally: /assets/favicon.ico",
+        "External JS required: https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js",
+        "External JS required: https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"
+      ]
+    }
+  ]
+}

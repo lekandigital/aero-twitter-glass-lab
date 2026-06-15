@@ -1,0 +1,19 @@
+{
+  "scssInfo": {
+    "ok": false,
+    "skipped": true
+  },
+  "paths": [
+    {
+      "ref": "script.js",
+      "resolved": "src/script.js",
+      "exists": true,
+      "fallback": false
+    },
+    {
+      "ref": "dist/script.js",
+      "resolved": "dist/script.js",
+      "exists": true
+    }
+  ]
+}

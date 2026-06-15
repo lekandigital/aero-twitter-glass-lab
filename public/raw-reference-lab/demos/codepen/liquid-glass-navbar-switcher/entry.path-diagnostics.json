@@ -1,0 +1,30 @@
+{
+  "scssInfo": {
+    "ok": false,
+    "skipped": true
+  },
+  "paths": [
+    {
+      "ref": "./demo.js",
+      "resolved": null,
+      "exists": false,
+      "fallback": false
+    },
+    {
+      "ref": "./demo.css",
+      "resolved": null,
+      "exists": false,
+      "fallback": false
+    },
+    {
+      "ref": "./demo.css",
+      "resolved": null,
+      "exists": false
+    },
+    {
+      "ref": "./demo.js",
+      "resolved": null,
+      "exists": false
+    }
+  ]
+}

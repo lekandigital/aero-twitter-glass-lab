@@ -3086,7 +3086,7 @@
     "catalogLabel": "local runnable demo",
     "sourceUrl": null,
     "localSourcePath": "_reference_vault/zipsofglass2/extracted/liquid-glass-fluid-movement/liquid-glass-fluid-movement/src",
-    "localDemoUrl": "/raw-reference-lab/demos/codepen/liquid-glass-fluid-movement/src/index.html",
+    "localDemoUrl": "/raw-reference-lab/demos/codepen/liquid-glass-fluid-movement/entry.html",
     "notes": "Locally exported CodePen — open as a separate local page. Original src/ files unchanged.",
     "tags": [
       "codepen",
@@ -3158,7 +3158,7 @@
     "catalogLabel": "local runnable demo",
     "sourceUrl": null,
     "localSourcePath": "_reference_vault/zipsofglass2/extracted/liquid-glass-navbar-switcher/liquid-glass-navbar-switcher/src",
-    "localDemoUrl": "/raw-reference-lab/demos/codepen/liquid-glass-navbar-switcher/src/index.html",
+    "localDemoUrl": "/raw-reference-lab/demos/codepen/liquid-glass-navbar-switcher/entry.html",
     "notes": "Locally exported CodePen — open as a separate local page. Original src/ files unchanged.",
     "tags": [
       "codepen",

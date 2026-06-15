@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-06-15T05:42:34.710Z",
+  "note": "totalItems reflects raw-reference-index.json entries. The lab UI shows 225 because it adds 2 runner-only pseudo-cards (localDemoUrl=null), irrelevant to URL/button mapping.",
+  "totalItems": 223,
+  "uiTotalWithRunnerCards": 225,
+  "duplicateIds": [],
+  "duplicateLocalDemoUrls": [
+    {
+      "url": "/raw-reference-lab/demos/web-archives/jsfiddle-6hmpa1ax/index.html",
+      "ids": [
+        "url-6hmpa1ax-net-6hmpa1ax",
+        "archive-jsfiddle-6hmpa1ax"
+      ],
+      "intentional": true
+    },
+    {
+      "url": "/raw-reference-lab/demos/web-archives/jsfiddle-nallenscott/index.html",
+      "ids": [
+        "url-41-ott-wtqjy-41",
+        "archive-jsfiddle-nallenscott"
+      ],
+      "intentional": true
+    }
+  ],
+  "itemsWithMissingLocalDemoFiles": [],
+  "itemsWithButtonUrlMismatch": [],
+  "rendererMappingModel": {
+    "primaryOpenButton": "anchor href baked from item.localDemoUrl at render time",
+    "cardClickFallback": "article[data-demo-url] set from item.localDemoUrl",
+    "copyButtons": "data-id -> findItem(id) exact lookup (not title, not index)",
+    "conclusion": "click targets derive from each item own metadata; no title/index resolution"
+  },
+  "knownBugCheck": {
+    "title": "liquid effect",
+    "expectedUrl": "/raw-reference-lab/demos/github-static/tuannm93-liquid-effect/index.html",
+    "wrongUrlObserved": "/raw-reference-lab/demos/github-static/tuannm93-glass-refraction/index.html",
+    "status": "fixed",
+    "mappedUrl": "/raw-reference-lab/demos/github-static/tuannm93-liquid-effect/index.html",
+    "fileContentTitleVerified": "Liquid Effect"
+  }
+}
