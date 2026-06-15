@@ -18,13 +18,42 @@ body {
   min-height: 100vh;
   font-family: var(--rrl-font);
   color: var(--rrl-text);
-  background:
-    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(94, 179, 255, 0.12), transparent),
-    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(120, 200, 255, 0.08), transparent),
-    var(--rrl-bg);
+  background-color: var(--rrl-bg);
+  isolation: isolate;
 }
 
-.rrl-app { max-width: 1400px; margin: 0 auto; padding: 1.25rem 1.5rem 2rem; }
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image: url('/aero-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(4, 12, 28, 0.15) 0%,
+    rgba(4, 12, 28, 0.45) 100%
+  );
+}
+
+.rrl-app {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem 2rem;
+}
 
 .rrl-header h1 {
   margin: 0 0 0.35rem;
