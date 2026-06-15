@@ -1,29 +1,41 @@
 #!/usr/bin/env node
 import { spawn, spawnSync } from 'node:child_process';
-import { access, open, readFile } from 'node:fs/promises';
-import http from 'node:http';
-import { join } from 'node:path';
+import { openSync } from 'node:fs';
+import { access, readFile, writeFile } from 'node:fs/promises';
+import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   PUBLIC_RUNNERS,
   PIDS_FILE,
-  STATUS_FILE,
   RUNNERS_REPOS,
   RUNNERS_LOGS,
   VAULT_GITHUB,
+  assessRunnerHealth,
+  buildLiquidDomPackages,
+  buildLiquidDomStartCommand,
   copyRepo,
   ensureRunnerDirs,
-  exportPublicStatus,
+  expectedRunnerUrl,
+  findUnexpectedPortsInLog,
+  getListeningPid,
+  isHttpResponding,
+  isPidAlive,
+  killPid,
   readJson,
+  readRunnerStatus,
+  waitForHttp,
   writeJson,
+  writeRunnerStatus,
 } from './lib/reference-runners-shared.mjs';
 
 function parseArgs(argv) {
-  const opts = { all: false, top: 5, ids: [] };
+  const opts = { all: false, top: 5, ids: [], force: false };
   for (let i = 2; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--all') opts.all = true;
     else if (arg === '--id') opts.ids.push(argv[++i]);
     else if (arg === '--top') opts.top = Number(argv[++i] ?? 5);
+    else if (arg === '--force') opts.force = true;
   }
   return opts;
 }
@@ -60,6 +72,10 @@ function buildStartCommand(runner, cwd, pkgScripts) {
     HOST: '127.0.0.1',
   };
 
+  if (runner.id === 'liquid-dom') {
+    return buildLiquidDomStartCommand(cwd, runner.port);
+  }
+
   if (runner.runnerType === 'static') {
     const target = runner.serveDir === '.' ? '.' : runner.serveDir;
     return {
@@ -67,6 +83,7 @@ function buildStartCommand(runner, cwd, pkgScripts) {
       args: ['--yes', 'serve', target, '-l', port, '--no-clipboard'],
       env,
       cwd,
+      startMode: 'static-serve',
     };
   }
 
@@ -82,67 +99,51 @@ function buildStartCommand(runner, cwd, pkgScripts) {
       args: ['--yes', 'live-server', dir, `--port=${port}`, '--host=127.0.0.1', '--no-browser'],
       env,
       cwd,
+      startMode: 'normal',
     };
   }
 
   if (pm === 'pnpm') {
     return {
       cmd: 'pnpm',
-      args: ['run', script, '--', '--host', '127.0.0.1', '--port', port],
+      args: ['run', script, '--', '--host', '127.0.0.1', '--port', port, '--strictPort'],
       env,
       cwd,
+      startMode: 'normal',
     };
   }
   if (pm === 'yarn') {
     return {
       cmd: 'yarn',
-      args: [script, '--host', '127.0.0.1', '--port', port],
+      args: [script, '--host', '127.0.0.1', '--port', port, '--strictPort'],
       env,
       cwd,
+      startMode: 'normal',
     };
   }
 
   return {
     cmd: 'npm',
-    args: ['run', script, '--', '--host', '127.0.0.1', '--port', port],
+    args: ['run', script, '--', '--host', '127.0.0.1', '--port', port, '--strictPort'],
     env,
     cwd,
+    startMode: 'normal',
   };
 }
 
-async function waitForPort(port, timeoutMs = 45000) {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    const ok = await new Promise((resolve) => {
-      const req = http.get(`http://127.0.0.1:${port}`, (res) => {
-        res.resume();
-        resolve(true);
-      });
-      req.on('error', () => resolve(false));
-      req.setTimeout(1500, () => {
-        req.destroy();
-        resolve(false);
-      });
-    });
-    if (ok) return true;
-    await new Promise((r) => setTimeout(r, 800));
-  }
-  return false;
-}
-
-async function isRunning(pid) {
+async function readLogTail(logPath) {
   try {
-    process.kill(pid, 0);
-    return true;
+    return await readFile(logPath, 'utf8');
   } catch {
-    return false;
+    return '';
   }
 }
 
-async function startRunner(runner, statusMap, pidsMap) {
+export async function startRunner(runner, statusMap, pidsMap, { force = false } = {}) {
   const src = join(VAULT_GITHUB, runner.id);
   const dest = join(RUNNERS_REPOS, runner.id);
   const logPath = join(RUNNERS_LOGS, `${runner.id}.log`);
+  const expectedUrl = expectedRunnerUrl(runner);
 
   console.log(`\n▶ ${runner.id} (port ${runner.port})`);
 
@@ -153,25 +154,56 @@ async function startRunner(runner, statusMap, pidsMap) {
       id: runner.id,
       status: 'failed',
       port: runner.port,
-      localDevUrl: runner.localDevUrl,
+      localDevUrl: expectedUrl,
       pid: null,
+      responding: false,
       logFile: logPath,
       error: 'Source repo not found in vault',
+      notes: ['Source repo not found in vault'],
     };
     return;
   }
 
-  const existingPid = pidsMap[runner.id];
-  if (existingPid && (await isRunning(existingPid))) {
-    console.log(`  Already running (pid ${existingPid})`);
+  const existingPid = pidsMap[runner.id] ?? statusMap[runner.id]?.pid ?? null;
+  const health = await assessRunnerHealth(runner, { pid: existingPid, ...statusMap[runner.id] });
+
+  if (!force && health.status === 'running' && health.responding) {
+    console.log(`  Already healthy on ${expectedUrl} (pid ${health.pid ?? 'unknown'})`);
     statusMap[runner.id] = {
+      ...statusMap[runner.id],
       id: runner.id,
       status: 'running',
       port: runner.port,
-      localDevUrl: runner.localDevUrl,
-      pid: existingPid,
+      localDevUrl: expectedUrl,
+      pid: health.pid,
+      responding: true,
       logFile: logPath,
+      startMode: statusMap[runner.id]?.startMode ?? 'normal',
     };
+    if (health.pid) pidsMap[runner.id] = health.pid;
+    return;
+  }
+
+  if (existingPid && (await isPidAlive(existingPid)) && !health.responding) {
+    console.log(`  Stale PID ${existingPid} — process alive but port dead; restarting…`);
+    await killPid(existingPid);
+    delete pidsMap[runner.id];
+  }
+
+  const listenerPid = getListeningPid(runner.port);
+  if (listenerPid && listenerPid !== existingPid) {
+    statusMap[runner.id] = {
+      id: runner.id,
+      status: 'port-in-use',
+      port: runner.port,
+      localDevUrl: expectedUrl,
+      pid: listenerPid,
+      responding: await isHttpResponding(expectedUrl),
+      logFile: logPath,
+      error: `Port ${runner.port} is already in use by pid ${listenerPid}`,
+      notes: [`Port ${runner.port} occupied by pid ${listenerPid}`],
+    };
+    console.log(`  ✗ Port ${runner.port} already in use by pid ${listenerPid}`);
     return;
   }
 
@@ -179,29 +211,56 @@ async function startRunner(runner, statusMap, pidsMap) {
   await copyRepo(src, dest);
 
   let pkgScripts = {};
+  let builtLiquidDomLayout = false;
   if (runner.runnerType === 'package') {
     try {
       const pkg = JSON.parse(await readFile(join(dest, 'package.json'), 'utf8'));
       pkgScripts = pkg.scripts ?? {};
     } catch { /* no package.json */ }
+
     const ok = pmInstall(runner);
     if (!ok) {
       statusMap[runner.id] = {
         id: runner.id,
         status: 'install-failed',
         port: runner.port,
-        localDevUrl: runner.localDevUrl,
+        localDevUrl: expectedUrl,
         pid: null,
+        responding: false,
         logFile: logPath,
         error: 'Install failed',
+        notes: ['Install failed'],
       };
       console.log('  ✗ Install failed');
       return;
     }
+
+    if (runner.id === 'liquid-dom') {
+      console.log('  Building liquid-dom workspace packages…');
+      const built = await buildLiquidDomPackages(dest);
+      builtLiquidDomLayout = built;
+      if (!built) {
+        statusMap[runner.id] = {
+          id: runner.id,
+          status: 'build-failed',
+          port: runner.port,
+          localDevUrl: expectedUrl,
+          pid: null,
+          responding: false,
+          logFile: logPath,
+          error: 'liquid-dom workspace build failed',
+          notes: ['@liquid-dom/layout/core/react build failed'],
+          builtLiquidDomLayout: false,
+        };
+        console.log('  ✗ liquid-dom workspace build failed');
+        return;
+      }
+    }
   }
 
-  const { cmd, args, env, cwd } = buildStartCommand(runner, dest, pkgScripts);
-  const logFd = await open(logPath, 'a');
+  const { cmd, args, env, cwd, startMode = 'normal' } = buildStartCommand(runner, dest, pkgScripts);
+  await writeFile(logPath, `--- start ${new Date().toISOString()} pid pending ---\n`);
+  const logFd = openSync(logPath, 'a');
 
   console.log(`  Starting: ${cmd} ${args.join(' ')}`);
 
@@ -209,27 +268,49 @@ async function startRunner(runner, statusMap, pidsMap) {
     cwd,
     env,
     detached: true,
-    stdio: ['ignore', logFd.fd, logFd.fd],
+    stdio: ['ignore', logFd, logFd],
   });
 
   child.unref();
   pidsMap[runner.id] = child.pid;
 
-  console.log(`  Waiting for http://127.0.0.1:${runner.port} …`);
-  const up = await waitForPort(runner.port);
+  console.log(`  Waiting for ${expectedUrl} …`);
+  const up = await waitForHttp(expectedUrl, 45000, 800);
+  const logContent = await readLogTail(logPath);
+  const unexpectedUrls = findUnexpectedPortsInLog(logContent, runner.port);
+
+  let status = up ? 'running' : 'start-timeout';
+  let error = up ? null : 'Port did not respond in time';
+  const notes = [];
+
+  if (!up && unexpectedUrls.length) {
+    status = 'wrong-port';
+    error = `Expected ${expectedUrl}; observed in log: ${unexpectedUrls.join(', ')}`;
+    notes.push(error);
+  } else if (!up) {
+    notes.push('Port did not respond in time (process may still be starting)');
+  }
 
   statusMap[runner.id] = {
     id: runner.id,
-    status: up ? 'running' : 'start-timeout',
+    status,
     port: runner.port,
-    localDevUrl: runner.localDevUrl,
+    localDevUrl: expectedUrl,
     pid: child.pid,
+    responding: up,
     logFile: logPath,
-    error: up ? null : 'Port did not respond in time (process may still be starting)',
+    error,
+    notes,
+    startMode,
+    observedUrl: status === 'wrong-port' ? (unexpectedUrls[0] ?? null) : null,
+    builtLiquidDomLayout: runner.id === 'liquid-dom' ? builtLiquidDomLayout : undefined,
   };
 
   if (up) {
-    console.log(`  ✓ ${runner.localDevUrl}`);
+    console.log(`  ✓ ${expectedUrl}`);
+  } else if (status === 'wrong-port') {
+    console.log(`  ✗ Started on unexpected port — check ${logPath}`);
+    console.log(`    ${error}`);
   } else {
     console.log(`  ⚠ Started pid ${child.pid} but port not responding yet — check ${logPath}`);
   }
@@ -252,22 +333,24 @@ async function main() {
   }
 
   const pidsMap = (await readJson(PIDS_FILE, {})) ?? {};
-  const statusMap = (await readJson(STATUS_FILE, {})) ?? {};
+  const statusMap = await readRunnerStatus();
 
   console.log(`Starting ${selected.length} runner(s)…`);
 
   for (const runner of selected) {
-    await startRunner(runner, statusMap, pidsMap);
+    await startRunner(runner, statusMap, pidsMap, { force: opts.force });
   }
 
   await writeJson(PIDS_FILE, pidsMap);
-  await writeJson(STATUS_FILE, statusMap);
-  await exportPublicStatus(statusMap);
+  await writeRunnerStatus(statusMap);
 
   console.log('\nDone. Check status: node scripts/status-reference-runners.mjs');
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+const isMain = resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url);
+if (isMain) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

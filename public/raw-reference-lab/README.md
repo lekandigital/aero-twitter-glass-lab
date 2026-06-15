@@ -91,14 +91,26 @@ Generated wrappers may load `./src/script.js` with `type="module"` when needed, 
 ## Useful commands
 
 ```bash
+# One-shot dev workflow: build, audit, start main app + all runners, print summary
+npm run raw-reference-lab:dev:all
+# or: node scripts/dev-raw-reference-lab.mjs
+
 # Discover runnable GitHub package runners
 node scripts/discover-reference-runners.mjs
 
 # Start a specific runner (isolated copy, not the app)
 node scripts/start-reference-runners.mjs --id liquidGL
 
-# Check runner status
+# Start all runnable runners
+node scripts/start-reference-runners.mjs --all
+
+# Stop one runner or all runners
+node scripts/stop-reference-runners.mjs --id liquid-dom
+node scripts/stop-reference-runners.mjs --all
+
+# Check runner status (HTTP response + PID)
 node scripts/status-reference-runners.mjs
+# or: npm run raw-reference-lab:status
 
 # Regenerate catalog and demo copies
 node scripts/build-raw-reference-lab.mjs
@@ -115,6 +127,8 @@ npm run build
 # Dev server — open http://localhost:5173/raw-reference-lab/
 npm run dev
 ```
+
+Runner status is based on **HTTP response on the expected port**, not PID alone. A stale PID with a dead port is reported as `process-alive-port-dead`. The dev-all report is written to `repair-reports/runner-dev-all-report.json`.
 
 ## Health statuses
 

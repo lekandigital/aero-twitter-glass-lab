@@ -1,0 +1,120 @@
+{
+  "generatedAt": "2026-06-15T06:17:00.532Z",
+  "mainApp": {
+    "url": "http://127.0.0.1:5173/raw-reference-lab/",
+    "status": "running",
+    "pid": 57921,
+    "log": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/main-vite.log",
+    "responding": true
+  },
+  "runners": [
+    {
+      "id": "liquidGL",
+      "port": 5310,
+      "expectedUrl": "http://localhost:5310",
+      "status": "running",
+      "pid": null,
+      "responding": true,
+      "startMode": "normal",
+      "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/liquidGL.log",
+      "notes": [
+        "port responding but tracked PID is not alive"
+      ],
+      "observedUrl": null,
+      "builtLiquidDomLayout": null
+    },
+    {
+      "id": "archisvaze-liquid-glass",
+      "port": 5311,
+      "expectedUrl": "http://localhost:5311",
+      "status": "running",
+      "pid": null,
+      "responding": true,
+      "startMode": "normal",
+      "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/archisvaze-liquid-glass.log",
+      "notes": [
+        "port responding but tracked PID is not alive"
+      ],
+      "observedUrl": null,
+      "builtLiquidDomLayout": null
+    },
+    {
+      "id": "liquid-glass-js",
+      "port": 5312,
+      "expectedUrl": "http://localhost:5312",
+      "status": "running",
+      "pid": 57990,
+      "responding": true,
+      "startMode": "static-serve",
+      "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/liquid-glass-js.log",
+      "notes": [],
+      "observedUrl": null,
+      "builtLiquidDomLayout": null
+    },
+    {
+      "id": "glassmorphism-template",
+      "port": 5313,
+      "expectedUrl": "http://localhost:5313",
+      "status": "running",
+      "pid": 53552,
+      "responding": true,
+      "startMode": "normal",
+      "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/glassmorphism-template.log",
+      "notes": [],
+      "observedUrl": null,
+      "builtLiquidDomLayout": null
+    },
+    {
+      "id": "liquid-dom",
+      "port": 5314,
+      "expectedUrl": "http://localhost:5314",
+      "status": "running",
+      "pid": 58758,
+      "responding": true,
+      "startMode": "manual-liquid-dom-vite",
+      "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/liquid-dom.log",
+      "notes": [],
+      "observedUrl": null,
+      "builtLiquidDomLayout": true
+    },
+    {
+      "id": "glass-refraction",
+      "port": 5315,
+      "expectedUrl": "http://localhost:5315",
+      "status": "running",
+      "pid": 53679,
+      "responding": true,
+      "startMode": "static-serve",
+      "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/glass-refraction.log",
+      "notes": [],
+      "observedUrl": null,
+      "builtLiquidDomLayout": null
+    },
+    {
+      "id": "glassmorphism",
+      "port": 5316,
+      "expectedUrl": "http://localhost:5316",
+      "status": "running",
+      "pid": 53818,
+      "responding": true,
+      "startMode": "static-serve",
+      "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/glassmorphism.log",
+      "notes": [],
+      "observedUrl": null,
+      "builtLiquidDomLayout": null
+    },
+    {
+      "id": "7-Aero-Stylesheet",
+      "port": 5317,
+      "expectedUrl": "http://localhost:5317",
+      "status": "running",
+      "pid": 53959,
+      "responding": true,
+      "startMode": "static-serve",
+      "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/7-Aero-Stylesheet.log",
+      "notes": [],
+      "observedUrl": null,
+      "builtLiquidDomLayout": null
+    }
+  ]
+}
