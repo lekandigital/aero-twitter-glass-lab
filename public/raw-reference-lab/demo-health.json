@@ -1,26 +1,25 @@
 {
-  "generatedAt": "2026-06-15T05:41:58.126Z",
+  "generatedAt": "2026-06-15T06:18:33.110Z",
   "playwrightUsed": false,
   "summary": {
     "external-only": 135,
     "needs-external-assets": 9,
     "source-only": 19,
-    "working": 32,
-    "needs-runner": 10,
+    "working": 42,
     "needs-preprocessor": 9,
     "warning": 11
   },
   "classificationSummary": {
     "total": 225,
-    "runsLocally": 32,
+    "runsLocally": 42,
     "hasLocalFiles": 76,
     "localStaticDemos": 30,
-    "localDevServers": 2,
+    "localDevServers": 12,
     "partialArchives": 8,
     "needsInternet": 27,
     "needsPreprocessor": 9,
-    "needsRunner": 10,
-    "sourceOnly": 29,
+    "needsRunner": 0,
+    "sourceOnly": 19,
     "externalOnly": 149,
     "broken": 0
   },
@@ -45,7 +44,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -69,7 +68,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -93,7 +92,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -117,7 +116,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -141,7 +140,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -165,7 +164,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -189,7 +188,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -213,7 +212,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -237,7 +236,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -261,7 +260,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -285,7 +284,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -309,7 +308,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -333,7 +332,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -357,7 +356,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -381,7 +380,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -405,7 +404,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -429,7 +428,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -453,7 +452,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -477,7 +476,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -501,7 +500,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -525,7 +524,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -549,7 +548,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -573,7 +572,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -597,7 +596,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -621,7 +620,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -645,7 +644,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -669,7 +668,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -693,7 +692,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -717,7 +716,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -741,7 +740,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -765,7 +764,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -789,7 +788,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -813,7 +812,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -837,7 +836,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -861,7 +860,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -885,7 +884,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -909,7 +908,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -933,7 +932,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -957,7 +956,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -981,7 +980,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1005,7 +1004,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1029,7 +1028,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1053,7 +1052,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1077,7 +1076,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1101,7 +1100,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1125,7 +1124,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1149,7 +1148,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1173,7 +1172,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1216,7 +1215,7 @@
       "buttonLabel": "Open partial archive",
       "classificationDescription": "This is a local archive of the JSFiddle page/editor shell, not a clean extracted runnable demo. It depends on JSFiddle assets and may require internet.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/url-6hmpa1ax-net-6hmpa1ax.html",
       "logPath": null
     },
@@ -1240,7 +1239,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1264,7 +1263,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1307,7 +1306,7 @@
       "buttonLabel": "Open partial archive",
       "classificationDescription": "This is a local archive of the JSFiddle page/editor shell, not a clean extracted runnable demo. It depends on JSFiddle assets and may require internet.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/url-41-ott-wtqjy-41.html",
       "logPath": null
     },
@@ -1331,7 +1330,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1355,79 +1354,79 @@
       "buttonLabel": "Open local dev server",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
     "url-liquid-dom-r-liquid-dom": {
-      "health": "needs-runner",
-      "healthReason": "runner-not-started",
+      "health": "working",
+      "healthReason": "runner-active",
       "healthDetails": [
-        "Runner not running (status: not-started)"
+        "Runner active at http://localhost:5314"
       ],
       "fixableLocally": false,
       "needsInternet": false,
       "isRemoteDependent": false,
       "hasLocalFiles": true,
-      "runsLocally": false,
+      "runsLocally": true,
       "isLocalStaticDemo": false,
-      "isLocalDevServer": false,
+      "isLocalDevServer": true,
       "isPartialArchive": false,
-      "isSourceOnly": true,
+      "isSourceOnly": false,
       "isExternalOnly": false,
       "partialArchiveKind": null,
-      "buttonLabel": "Open source URL",
+      "buttonLabel": "Open local dev server",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
     "url-liquid-glass-liquid-glass": {
-      "health": "needs-runner",
-      "healthReason": "runner-not-started",
+      "health": "working",
+      "healthReason": "runner-active",
       "healthDetails": [
-        "Runner not running (status: not-started)"
+        "Runner active at http://localhost:5311"
       ],
       "fixableLocally": false,
       "needsInternet": false,
       "isRemoteDependent": false,
       "hasLocalFiles": true,
-      "runsLocally": false,
+      "runsLocally": true,
       "isLocalStaticDemo": false,
-      "isLocalDevServer": false,
+      "isLocalDevServer": true,
       "isPartialArchive": false,
-      "isSourceOnly": true,
+      "isSourceOnly": false,
       "isExternalOnly": false,
       "partialArchiveKind": null,
-      "buttonLabel": "Open source URL",
+      "buttonLabel": "Open local dev server",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
     "url-liquid-glass-liquid-glass-2": {
-      "health": "needs-runner",
-      "healthReason": "runner-not-started",
+      "health": "working",
+      "healthReason": "runner-active",
       "healthDetails": [
-        "Runner not running (status: not-started)"
+        "Runner active at http://localhost:5311"
       ],
       "fixableLocally": false,
       "needsInternet": false,
       "isRemoteDependent": false,
       "hasLocalFiles": true,
-      "runsLocally": false,
+      "runsLocally": true,
       "isLocalStaticDemo": false,
-      "isLocalDevServer": false,
+      "isLocalDevServer": true,
       "isPartialArchive": false,
-      "isSourceOnly": true,
+      "isSourceOnly": false,
       "isExternalOnly": false,
       "partialArchiveKind": null,
-      "buttonLabel": "Open source URL",
+      "buttonLabel": "Open local dev server",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1451,31 +1450,31 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
     "url-liquid-glass-js-uid-glass-js": {
-      "health": "needs-runner",
-      "healthReason": "runner-not-started",
+      "health": "working",
+      "healthReason": "runner-active",
       "healthDetails": [
-        "Runner not running (status: not-started)"
+        "Runner active at http://localhost:5312"
       ],
       "fixableLocally": false,
       "needsInternet": false,
       "isRemoteDependent": false,
       "hasLocalFiles": true,
-      "runsLocally": false,
+      "runsLocally": true,
       "isLocalStaticDemo": false,
-      "isLocalDevServer": false,
+      "isLocalDevServer": true,
       "isPartialArchive": false,
-      "isSourceOnly": true,
+      "isSourceOnly": false,
       "isExternalOnly": false,
       "partialArchiveKind": null,
-      "buttonLabel": "Open source URL",
+      "buttonLabel": "Open local dev server",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1499,7 +1498,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1523,7 +1522,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1547,7 +1546,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1571,7 +1570,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1595,7 +1594,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1619,7 +1618,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1643,7 +1642,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1667,7 +1666,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1691,7 +1690,7 @@
       "buttonLabel": "Open local dev server",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1715,7 +1714,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1739,31 +1738,31 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
     "url-glassmorphism-lassmorphism": {
-      "health": "needs-runner",
-      "healthReason": "runner-not-started",
+      "health": "working",
+      "healthReason": "runner-active",
       "healthDetails": [
-        "Runner not running (status: not-started)"
+        "Runner active at http://localhost:5316"
       ],
       "fixableLocally": false,
       "needsInternet": false,
       "isRemoteDependent": false,
       "hasLocalFiles": true,
-      "runsLocally": false,
+      "runsLocally": true,
       "isLocalStaticDemo": false,
-      "isLocalDevServer": false,
+      "isLocalDevServer": true,
       "isPartialArchive": false,
-      "isSourceOnly": true,
+      "isSourceOnly": false,
       "isExternalOnly": false,
       "partialArchiveKind": null,
-      "buttonLabel": "Open source URL",
+      "buttonLabel": "Open local dev server",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1787,7 +1786,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1811,7 +1810,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1835,7 +1834,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1859,7 +1858,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1883,7 +1882,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1907,31 +1906,31 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
     "url-glassmorphism-asc-s-stars": {
-      "health": "needs-runner",
-      "healthReason": "runner-not-started",
+      "health": "working",
+      "healthReason": "runner-active",
       "healthDetails": [
-        "Runner not running (status: not-started)"
+        "Runner active at http://localhost:5316"
       ],
       "fixableLocally": false,
       "needsInternet": false,
       "isRemoteDependent": false,
       "hasLocalFiles": true,
-      "runsLocally": false,
+      "runsLocally": true,
       "isLocalStaticDemo": false,
-      "isLocalDevServer": false,
+      "isLocalDevServer": true,
       "isPartialArchive": false,
-      "isSourceOnly": true,
+      "isSourceOnly": false,
       "isExternalOnly": false,
       "partialArchiveKind": null,
-      "buttonLabel": "Open source URL",
+      "buttonLabel": "Open local dev server",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1955,7 +1954,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -1979,7 +1978,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2003,7 +2002,7 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2027,103 +2026,103 @@
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
     "url-glass-refraction-s-refraction": {
-      "health": "needs-runner",
-      "healthReason": "runner-not-started",
+      "health": "working",
+      "healthReason": "runner-active",
       "healthDetails": [
-        "Runner not running (status: not-started)"
+        "Runner active at http://localhost:5315"
       ],
       "fixableLocally": false,
       "needsInternet": false,
       "isRemoteDependent": false,
       "hasLocalFiles": true,
-      "runsLocally": false,
+      "runsLocally": true,
       "isLocalStaticDemo": false,
-      "isLocalDevServer": false,
+      "isLocalDevServer": true,
       "isPartialArchive": false,
-      "isSourceOnly": true,
+      "isSourceOnly": false,
       "isExternalOnly": false,
       "partialArchiveKind": null,
-      "buttonLabel": "Open source URL",
+      "buttonLabel": "Open local dev server",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
     "url-readme-md-er-readme-md": {
-      "health": "needs-runner",
-      "healthReason": "runner-not-started",
+      "health": "working",
+      "healthReason": "runner-active",
       "healthDetails": [
-        "Runner not running (status: not-started)"
+        "Runner active at http://localhost:5315"
       ],
       "fixableLocally": false,
       "needsInternet": false,
       "isRemoteDependent": false,
       "hasLocalFiles": true,
-      "runsLocally": false,
+      "runsLocally": true,
       "isLocalStaticDemo": false,
-      "isLocalDevServer": false,
+      "isLocalDevServer": true,
       "isPartialArchive": false,
-      "isSourceOnly": true,
+      "isSourceOnly": false,
       "isExternalOnly": false,
       "partialArchiveKind": null,
-      "buttonLabel": "Open source URL",
+      "buttonLabel": "Open local dev server",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
     "url-glassfilters-tsx-sfilters-tsx": {
-      "health": "needs-runner",
-      "healthReason": "runner-not-started",
+      "health": "working",
+      "healthReason": "runner-active",
       "healthDetails": [
-        "Runner not running (status: not-started)"
+        "Runner active at http://localhost:5315"
       ],
       "fixableLocally": false,
       "needsInternet": false,
       "isRemoteDependent": false,
       "hasLocalFiles": true,
-      "runsLocally": false,
+      "runsLocally": true,
       "isLocalStaticDemo": false,
-      "isLocalDevServer": false,
+      "isLocalDevServer": true,
       "isPartialArchive": false,
-      "isSourceOnly": true,
+      "isSourceOnly": false,
       "isExternalOnly": false,
       "partialArchiveKind": null,
-      "buttonLabel": "Open source URL",
+      "buttonLabel": "Open local dev server",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
     "url-7-aero-stylesheet-o-stylesheet": {
-      "health": "needs-runner",
-      "healthReason": "runner-not-started",
+      "health": "working",
+      "healthReason": "runner-active",
       "healthDetails": [
-        "Runner not running (status: not-started)"
+        "Runner active at http://localhost:5317"
       ],
       "fixableLocally": false,
       "needsInternet": false,
       "isRemoteDependent": false,
       "hasLocalFiles": true,
-      "runsLocally": false,
+      "runsLocally": true,
       "isLocalStaticDemo": false,
-      "isLocalDevServer": false,
+      "isLocalDevServer": true,
       "isPartialArchive": false,
-      "isSourceOnly": true,
+      "isSourceOnly": false,
       "isExternalOnly": false,
       "partialArchiveKind": null,
-      "buttonLabel": "Open source URL",
+      "buttonLabel": "Open local dev server",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2147,7 +2146,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2171,7 +2170,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2195,7 +2194,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2219,7 +2218,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2243,7 +2242,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2267,7 +2266,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2291,7 +2290,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2315,7 +2314,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2339,7 +2338,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2363,7 +2362,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2387,7 +2386,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2411,7 +2410,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2435,7 +2434,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2459,7 +2458,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2483,7 +2482,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2507,7 +2506,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2531,7 +2530,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2555,7 +2554,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2579,7 +2578,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2603,7 +2602,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2627,7 +2626,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2651,7 +2650,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2675,7 +2674,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2699,7 +2698,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2723,7 +2722,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2747,7 +2746,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2771,7 +2770,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2795,7 +2794,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2819,7 +2818,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2843,7 +2842,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2867,7 +2866,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2891,7 +2890,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2915,7 +2914,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2939,7 +2938,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2963,7 +2962,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -2987,7 +2986,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3011,7 +3010,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3035,7 +3034,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3059,7 +3058,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3083,7 +3082,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3107,7 +3106,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3131,7 +3130,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3155,7 +3154,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3179,7 +3178,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3203,7 +3202,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3227,7 +3226,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3251,7 +3250,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3275,7 +3274,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3299,7 +3298,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3323,7 +3322,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3347,7 +3346,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3371,7 +3370,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3395,7 +3394,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3419,7 +3418,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3443,7 +3442,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3467,7 +3466,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3491,7 +3490,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3515,7 +3514,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3539,7 +3538,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3563,7 +3562,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3587,7 +3586,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3611,7 +3610,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3635,7 +3634,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3659,7 +3658,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3683,7 +3682,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3707,7 +3706,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3731,7 +3730,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3755,7 +3754,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3779,7 +3778,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3803,7 +3802,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3827,7 +3826,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3851,7 +3850,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3875,7 +3874,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3899,7 +3898,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3923,7 +3922,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3947,7 +3946,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3971,7 +3970,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -3995,7 +3994,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4019,7 +4018,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4043,7 +4042,7 @@
       "buttonLabel": "Open source",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4065,7 +4064,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4087,7 +4086,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4111,7 +4110,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4133,7 +4132,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4155,7 +4154,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4177,7 +4176,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4199,7 +4198,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4221,7 +4220,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4245,7 +4244,7 @@
       "buttonLabel": null,
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/codepen-glass-theme-page-and-menu.html",
       "logPath": null
     },
@@ -4267,7 +4266,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4289,7 +4288,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4311,7 +4310,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4333,7 +4332,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4357,7 +4356,7 @@
       "buttonLabel": null,
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/codepen-liquid-glass-components.html",
       "logPath": null
     },
@@ -4382,7 +4381,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4410,7 +4409,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/codepen-liquid-glass-for-web.html",
       "logPath": null
     },
@@ -4432,7 +4431,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4457,7 +4456,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/codepen-liquid-glass-in-css.html",
       "logPath": null
     },
@@ -4486,7 +4485,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/codepen-liquid-glass-navbar-switcher.html",
       "logPath": null
     },
@@ -4508,7 +4507,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4534,7 +4533,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/codepen-liquid-glass-switcher-css.html",
       "logPath": null
     },
@@ -4556,7 +4555,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4578,7 +4577,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4605,7 +4604,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/codepen-neon-sign.html",
       "logPath": null
     },
@@ -4627,7 +4626,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4649,7 +4648,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4684,7 +4683,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/codepen-select-dropdown-with-appearance-base-select-liquid-glass.html",
       "logPath": null
     },
@@ -4706,7 +4705,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4728,7 +4727,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4753,7 +4752,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/github-tuannm93-action-bar-magnifying-lens.html",
       "logPath": null
     },
@@ -4775,7 +4774,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4797,7 +4796,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4819,7 +4818,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4845,7 +4844,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/github-tuannm93-defrost.html",
       "logPath": null
     },
@@ -4867,7 +4866,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4893,7 +4892,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/github-tuannm93-gelatinous-viscous-iridescent-black-goo.html",
       "logPath": null
     },
@@ -4921,7 +4920,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/github-tuannm93-glass-gel-slider.html",
       "logPath": null
     },
@@ -4943,7 +4942,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -4968,7 +4967,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/github-tuannm93-glass-refraction.html",
       "logPath": null
     },
@@ -4990,7 +4989,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -5016,7 +5015,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/github-tuannm93-honeycomb-magnifier.html",
       "logPath": null
     },
@@ -5042,7 +5041,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/github-tuannm93-hourglass.html",
       "logPath": null
     },
@@ -5068,7 +5067,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/github-tuannm93-liquid-effect.html",
       "logPath": null
     },
@@ -5094,7 +5093,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/github-tuannm93-liquid-glass-effect.html",
       "logPath": null
     },
@@ -5121,7 +5120,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/github-tuannm93-liquid-glass-switcher-css.html",
       "logPath": null
     },
@@ -5149,7 +5148,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/github-tuannm93-liquid-glass.html",
       "logPath": null
     },
@@ -5178,7 +5177,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/github-tuannm93-neon-glass-context-menu.html",
       "logPath": null
     },
@@ -5215,7 +5214,7 @@
       "buttonLabel": "Open remote-dependent local page",
       "classificationDescription": "A local archive exists, but this page depends on remote assets or remote site runtime. It may not run fully offline.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/github-tuannm93-oceanic-ui.html",
       "logPath": null
     },
@@ -5237,7 +5236,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -5259,7 +5258,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -5281,7 +5280,7 @@
       "buttonLabel": "Open local demo",
       "classificationDescription": null,
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null
     },
@@ -5314,7 +5313,7 @@
       "buttonLabel": "Open partial archive",
       "classificationDescription": "This archive is missing bundled app assets such as /_nuxt or /assets files. Treat it as a partial archive, not a local runnable demo.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/archive-css-glass.html",
       "logPath": null
     },
@@ -5344,7 +5343,7 @@
       "buttonLabel": "Open partial archive",
       "classificationDescription": "This is a local archive of the listing/source page. It may reference CodePen snippets, ads, analytics, GitHub avatars, or remote assets. It is not necessarily a standalone runnable demo.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/archive-freefrontend-css-liquid-glass.html",
       "logPath": null
     },
@@ -5387,7 +5386,7 @@
       "buttonLabel": "Open partial archive",
       "classificationDescription": "This is a local archive of the JSFiddle page/editor shell, not a clean extracted runnable demo. It depends on JSFiddle assets and may require internet.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/archive-jsfiddle-6hmpa1ax.html",
       "logPath": null
     },
@@ -5430,7 +5429,7 @@
       "buttonLabel": "Open partial archive",
       "classificationDescription": "This is a local archive of the JSFiddle page/editor shell, not a clean extracted runnable demo. It depends on JSFiddle assets and may require internet.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/archive-jsfiddle-nallenscott.html",
       "logPath": null
     },
@@ -5473,7 +5472,7 @@
       "buttonLabel": "Open partial archive",
       "classificationDescription": "This archive is missing bundled app assets such as /_nuxt or /assets files. Treat it as a partial archive, not a local runnable demo.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/archive-kube-liquid-glass.html",
       "logPath": null
     },
@@ -5513,7 +5512,7 @@
       "buttonLabel": "Open partial archive",
       "classificationDescription": "This archive is missing bundled app assets such as /_nuxt or /assets files. Treat it as a partial archive, not a local runnable demo.",
       "likelyWrapperIssue": false,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": "/raw-reference-lab/debug/archive-liquidgl-demo.html",
       "logPath": null
     },
@@ -5535,7 +5534,7 @@
       "partialArchiveKind": null,
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null,
       "likelyCauses": [
@@ -5560,7 +5559,7 @@
       "partialArchiveKind": null,
       "buttonLabel": "Open source URL",
       "classificationDescription": null,
-      "lastCheckedAt": "2026-06-15T05:41:58.126Z",
+      "lastCheckedAt": "2026-06-15T06:18:33.110Z",
       "debugUrl": null,
       "logPath": null,
       "likelyCauses": [

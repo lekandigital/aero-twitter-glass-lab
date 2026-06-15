@@ -9,7 +9,13 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "reference-lab:build": "node scripts/build-reference-lab.mjs",
-    "reference-lab:check": "npm run reference-lab:build && npm run build"
+    "reference-lab:check": "npm run reference-lab:build && npm run build",
+    "raw-reference-lab:build": "node scripts/build-raw-reference-lab.mjs",
+    "raw-reference-lab:audit": "node scripts/audit-raw-reference-demos.mjs",
+    "raw-reference-lab:links": "node scripts/audit-raw-reference-links.mjs",
+    "raw-reference-lab:status": "node scripts/status-reference-runners.mjs",
+    "raw-reference-lab:dev:all": "node scripts/dev-raw-reference-lab.mjs",
+    "raw-reference-lab:check": "node scripts/audit-raw-reference-demos.mjs && node scripts/audit-raw-reference-links.mjs && node scripts/check-raw-reference-lab.mjs"
   },
   "dependencies": {
     "7.css": "^0.21.1",
