@@ -1,0 +1,20 @@
+.aero-wallpaper {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/aero-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.aero-wallpaper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(4, 12, 28, 0.15) 0%,
+    rgba(4, 12, 28, 0.45) 100%
+  );
+}
