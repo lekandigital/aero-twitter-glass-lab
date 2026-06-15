@@ -1,0 +1,188 @@
+.roboto-regular {
+    font-family: "Roboto", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings:
+      "wdth" 100;
+  }
+  
+
+* {
+    font-family: "Roboto", sans-serif;
+    letter-spacing: 0.06rem;
+    line-height: 1.6rem;
+}
+
+body {
+    background: url(https://res.cloudinary.com/dwiiy8qjn/image/upload/v1761130422/bg_ch1cwj.webp);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    aspect-ratio: 16 / 9;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: grid;
+    place-items: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay[hidden] {
+    display: none;
+}
+
+.modal {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    backdrop-filter: blur(12px) saturate(180%);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 60%);
+    transform: rotate(25deg);
+    animation: shine 3s infinite linear;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.modal-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transition: transform 0.2s ease-out;
+    will-change: transform;
+}
+
+.modal-backdrop {
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1));
+    backdrop-filter: blur(16px) saturate(200%);
+    transform: translate(25px 25px);
+    border-radius: 16px;
+    box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
+    animation: shrimmer 6s linear infinite;
+    z-index: 0;
+}
+
+.modal-foreground {
+    position: relative;
+    z-index: 1;
+    padding: 2rem 2.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px) saturate(180%);
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    color: white;
+    text-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+}
+
+.modal-foreground h2 {
+    font-weight: 800;
+    font-size: calc(2.5rem + 1vw);
+    padding-bottom: 2rem;
+    border-bottom: solid 3px rgba(255, 255, 255, 0.3);
+    box-shadow: border-box;
+    display: block;
+}
+
+.modal-foreground p {
+    font-weight: 500;
+    font-size: clamp(1rem, 1vw, 1.25rem);
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    display: block;
+}
+
+.modal-overlay.show .modal {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 2.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #da0049;
+    text-shadow: 0 2px 5px rgba(255, 255, 255, 0.3);
+    transition: transform 0.4s ease, font-weight 0.4s ease, color 0.4s ease;
+    z-index: 10000000;
+}
+
+.modal-close:hover {
+    transform: scale(1.1);
+    font-weight: 800;
+    color: #ff3176;
+}
+
+#open-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.3s ease, background 0.3s ease, text-shadow 0.3s ease;
+    z-index: 10;
+}
+
+#open-modal::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    filter: url(#noise-filter);
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 1;
+}
+
+#open-modal:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%) scale(1.05);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) rotate(25deg); }
+    100% { transform: translateX(100%) rotate(25deg); }
+}
+
+@keyframes shimmer {
+    0% { transform: scale(1) rotate(0deg); }
+    100% { transform: scale(1.05) rotate(360deg); }
+}

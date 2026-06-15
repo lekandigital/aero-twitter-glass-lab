@@ -6,6 +6,7 @@ import './styles/reset.css';
 import './styles/tokens.css';
 import './styles/aero-background.css';
 import './styles/workspace.css';
+import './styles/reference-lab.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

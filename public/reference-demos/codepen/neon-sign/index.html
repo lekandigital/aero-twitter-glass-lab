@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reference Demo</title>
+  <link rel="stylesheet" href="./style.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; }
+  </style>
+</head>
+<body>
+
+
+<div class="neon-wrapper">
+<div class="neoncontainer">
+  <div class="neon">
+    <span class="">V</span>
+    <span class="neon-flicker1">O</span>
+    <span class="">I</span>
+    <span class="">T</span>
+    <span class="">U</span>
+    <span class="neon-flicker3">R</span>
+    <span class="neon-flicker2">E</span>
+    <span class="">S</span>
+  </div>
+  <div class="flux">
+Anciennes
+  </div>
+</div>
+  
+</div>
+<video autoplay muted loop id="bg-video">
+  <source src="https://unionassurances.ca/wp-content/uploads/2025/09/assurancevehiculeantiqueUnionAssurances_looping.mp4">
+</video>
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Neonderthaw&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap" rel="stylesheet">
+
+<svg width="0" height="0" style="position: absolute;">
+  <defs>
+    <filter id="liquidglass1" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.001 0.005"
+        numOctaves="1"
+        seed="17"
+        result="turbulence"
+      />
+
+      <feComponentTransfer in="turbulence" result="mapped">
+        <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+        <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+        <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+      </feComponentTransfer>
+
+      <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+
+      <feSpecularLighting
+        in="softMap"
+        surfaceScale="5"
+        specularConstant="1"
+        specularExponent="100"
+        lighting-color="white"
+        result="specLight"
+      >
+        <fePointLight x="-200" y="-200" z="300" />
+      </feSpecularLighting>
+
+      <feComposite
+        in="specLight"
+        operator="arithmetic"
+        k1="0" k2="1" k3="1" k4="0"
+        result="litImage"
+      />
+
+      <feDisplacementMap
+        in="SourceGraphic"
+        in2="softMap"
+        scale="200"
+        xChannelSelector="R"
+        yChannelSelector="G"
+      />
+    
+    
+    </filter>
+    <filter id="liquidglass2" x="-50%" y="-50%" width="200%" height="200%">
+      <feTurbulence baseFrequency="0.012 0.018" numOctaves="3" result="turbulence" seed="1" type="fractalNoise" />
+      <feColorMatrix in="turbulence" type="saturate" values="0" result="grayscale" />
+      <feDisplacementMap in="SourceGraphic" in2="grayscale" scale="30" result="displaced1" />
+      <feTurbulence baseFrequency="0.025 0.035" numOctaves="2" result="turbulence2" seed="2" type="fractalNoise" />
+      <feColorMatrix in="turbulence2" type="saturate" values="0" result="grayscale2" />
+      <feDisplacementMap in="displaced1" in2="grayscale2" scale="20" result="displaced2" />
+      <feOffset in="displaced2" dx="-1" dy="0" result="offsetR" />
+      <feOffset in="displaced2" dx="1" dy="0" result="offsetB" />
+      <feColorMatrix in="offsetR" type="matrix" result="redChannel"
+        values="1 0 0 0 0
+                0 0 0 0 0
+                0 0 0 0 0
+                0 0 0 1 0" />
+      <feColorMatrix in="displaced2" type="matrix" result="greenChannel"
+        values="0 0 0 0 0
+                0 1 0 0 0
+                0 0 0 0 0
+                0 0 0 1 0" />
+      <feColorMatrix in="offsetB" type="matrix" result="blueChannel"
+        values="0 0 0 0 0
+                0 0 0 0 0
+                0 0 1 0 0
+                0 0 0 1 0" />
+      <feComposite in="redChannel" in2="greenChannel" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="rg" />
+      <feComposite in="rg" in2="blueChannel" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="rgb" />
+      <feGaussianBlur in="rgb" stdDeviation="0.8" />
+  </defs>
+</svg>
+  <script src="./script.js" defer></script>
+</body>
+</html>

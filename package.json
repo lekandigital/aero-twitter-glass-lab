@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "reference-lab:build": "node scripts/build-reference-lab.mjs",
+    "reference-lab:check": "npm run reference-lab:build && npm run build"
   },
   "dependencies": {
     "7.css": "^0.21.1",
