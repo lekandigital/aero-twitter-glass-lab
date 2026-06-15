@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug: hourglass</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0f1419; --panel:#1a2332; --text:#e8eef5; --muted:#8aa0b5; --accent:#5eb3ff; --warn:#ffb080; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    header { padding: 1rem 1.25rem; border-bottom: 1px solid #2a3544; background: var(--panel); }
+    h1 { margin: 0 0 0.25rem; font-size: 1.1rem; }
+    .meta { font-size: 0.8rem; color: var(--muted); word-break: break-all; }
+    main { display: grid; grid-template-columns: minmax(280px, 380px) 1fr; min-height: calc(100vh - 72px); }
+    .panel { padding: 1rem 1.25rem; border-right: 1px solid #2a3544; overflow: auto; }
+    .panel h2 { font-size: 0.85rem; margin: 1rem 0 0.4rem; color: var(--accent); }
+    .panel h2:first-child { margin-top: 0; }
+    .badge { display: inline-block; font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 999px; border: 1px solid #445; margin-bottom: 0.5rem; }
+    ul { margin: 0.25rem 0 0; padding-left: 1.1rem; font-size: 0.78rem; color: #c8d6e4; }
+    code { font-size: 0.72rem; word-break: break-all; }
+    .preview { background: #000; }
+    iframe { width: 100%; height: 100%; min-height: calc(100vh - 72px); border: 0; background: #fff; }
+    a { color: var(--accent); }
+    .reason { color: var(--warn); font-size: 0.82rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>hourglass</h1>
+    <div class="meta">Health: <strong>warning</strong> · ID: github-tuannm93-hourglass</div>
+  </header>
+  <main>
+    <section class="panel">
+      <span class="badge">warning</span>
+      <p class="reason">Likely issue: external-decorative-asset</p>
+      
+      <h2>Details</h2>
+      <ul><li>External other asset (needs internet): data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAAAYCAYAAAAYuwRKAAAAAXNSR0IArs4c6QAAAURJREFUaEPtmVEOgjAMQOWcehIP4En0nJoRZuYyTKEtacnzh2R0o7y+zG1Ml8Hv+bi+R+20QWBE4HZ/TX37T0MVahQIUgisERh58xWr3EQo5NEQaB2axUIqDU76tgSqS4iFF6YEvmIxW5lyZbDlH3BCLFywJlCcQixrqow3r9lVYh0x2x3xjGwuHMFE8wy1WHVHWa7WRxWcqf3X3YuPxbgmYtXXt0jIU9Rss5I034jcTcXqBdsyi7WfkKxnPmmBssftYbinj4STi1j9YZkkEWSSUJLHSL/1enF3F0uOgsgzEUCsM1Uz0Lsg1lIMzda6r6flWIFc2ZQKYjW4tLsrbf9NlQsejFiDAvUL37UFrjQuuAMu6SGWAOvaDstrRyVIKXwIYoUvUc4EEStn3cJnjVjhS5QzQcTKWbfwWSNW+BLlTLCI9QHE9wP0warayAAAAABJRU5ErkJggg==</li><li>External other asset (needs internet): data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEsAAABuCAYAAABvL+5vAAAAAXNSR0IArs4c6QAAAgpJREFUeF7t3WtOwzAQReFmnbASFsBKYJ2gFiX0ocY5qR2P7cMfhHQp0qc7UzdtxPT1+fbz/vE9nfxKCkxiJY2WgFjbrU5iiQUEQNRmiQUEQNRmiQUEQNRmiQUEQNRmiQUEQNRmiQUEQNRmiQUEQPRy0c9rWtvExNrmdEmJJRYQAFGbJRYQAFGbJRYQAFGbJRYQANHlbXtP8Wk1sdJGS0IssYAAiNossYAAiNossYAAiN58PNKz1rqcWDYLCICozdqLdf4999ZzvYfPv4slFhg2scpgubdAs8QSyzHMIgAe5Omtcx4hHhXFsllAAERX72B1FG8lxbJZQABEkzeSO4r/mmLZLCAAoslm+VoRjKFYYoHhg1i26w9s084SC2IJBpolllho0W/eWfOjjvzyRyzQLYw18u4Sq3SzRm3XrmaJBeo46jPj7maN2K6XsEYDEwusn5exRmqXWEc3a5R2ZWnWKEeJrFi9N0ysGjvr+m/2es0re7N63l9i1R7DXttVrFk9ghXH6uk4IVaUndXbceKQZvWyvw7Fan1/HY7VMlgVrFbBqmG1CFYVqzWw6lgtgYXAagUsDNYMdv4e9f8thsKKfngNiRV1LMNiRQQLjRVtj4XHut5jtZd/M1gRln9zWDVHs0msWqPZNNbRaF1g3aOVeiLoCuv+mv/8c66XT91ilYAbAgu827Ua/QWJWLR+EH/s/wAAAABJRU5ErkJggg==</li><li>2 external image/font URL(s) — demo likely renders online</li></ul>
+      <h2>Local demo URL</h2>
+      <p class="meta"><a href="/raw-reference-lab/demos/github-static/tuannm93-hourglass/index.html" target="_blank" rel="noopener">/raw-reference-lab/demos/github-static/tuannm93-hourglass/index.html</a></p>
+      <h2>Local source path</h2>
+      <p class="meta"><code>_reference_vault/reference-library/github/tuannm93-lab/front-end/hourglass.html</code></p>
+      <h2>Source URL</h2>
+      <p class="meta"><a href="https://github.com/tuannm93/lab/blob/main/front-end/hourglass.html" target="_blank" rel="noopener">https://github.com/tuannm93/lab/blob/main/front-end/hourglass.html</a></p>
+      
+      
+      <h2>External URLs</h2><ul><li><code>data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAAAYCAYAAAAYuwRKAAAAAXNSR0IArs4c6QAAAURJREFUaEPtmVEOgjAMQOWcehIP4En0nJoRZuYyTKEtacnzh2R0o7y+zG1Ml8Hv+bi+R+20QWBE4HZ/TX37T0MVahQIUgisERh58xWr3EQo5NEQaB2axUIqDU76tgSqS4iFF6YEvmIxW5lyZbDlH3BCLFywJlCcQixrqow3r9lVYh0x2x3xjGwuHMFE8wy1WHVHWa7WRxWcqf3X3YuPxbgmYtXXt0jIU9Rss5I034jcTcXqBdsyi7WfkKxnPmmBssftYbinj4STi1j9YZkkEWSSUJLHSL/1enF3F0uOgsgzEUCsM1Uz0Lsg1lIMzda6r6flWIFc2ZQKYjW4tLsrbf9NlQsejFiDAvUL37UFrjQuuAMu6SGWAOvaDstrRyVIKXwIYoUvUc4EEStn3cJnjVjhS5QzQcTKWbfwWSNW+BLlTLCI9QHE9wP0warayAAAAABJRU5ErkJggg==</code></li><li><code>data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEsAAABuCAYAAABvL+5vAAAAAXNSR0IArs4c6QAAAgpJREFUeF7t3WtOwzAQReFmnbASFsBKYJ2gFiX0ocY5qR2P7cMfhHQp0qc7UzdtxPT1+fbz/vE9nfxKCkxiJY2WgFjbrU5iiQUEQNRmiQUEQNRmiQUEQNRmiQUEQNRmiQUEQNRmiQUEQNRmiQUEQPRy0c9rWtvExNrmdEmJJRYQAFGbJRYQAFGbJRYQAFGbJRYQANHlbXtP8Wk1sdJGS0IssYAAiNossYAAiNossYAAiN58PNKz1rqcWDYLCICozdqLdf4999ZzvYfPv4slFhg2scpgubdAs8QSyzHMIgAe5Omtcx4hHhXFsllAAERX72B1FG8lxbJZQABEkzeSO4r/mmLZLCAAoslm+VoRjKFYYoHhg1i26w9s084SC2IJBpolllho0W/eWfOjjvzyRyzQLYw18u4Sq3SzRm3XrmaJBeo46jPj7maN2K6XsEYDEwusn5exRmqXWEc3a5R2ZWnWKEeJrFi9N0ysGjvr+m/2es0re7N63l9i1R7DXttVrFk9ghXH6uk4IVaUndXbceKQZvWyvw7Fan1/HY7VMlgVrFbBqmG1CFYVqzWw6lgtgYXAagUsDNYMdv4e9f8thsKKfngNiRV1LMNiRQQLjRVtj4XHut5jtZd/M1gRln9zWDVHs0msWqPZNNbRaF1g3aOVeiLoCuv+mv/8c66XT91ilYAbAgu827Ua/QWJWLR+EH/s/wAAAABJRU5ErkJggg==</code></li></ul>
+      
+      
+      
+    </section>
+    <section class="preview">
+      <iframe src="/raw-reference-lab/demos/github-static/tuannm93-hourglass/index.html" title="Demo preview"></iframe>
+    </section>
+  </main>
+</body>
+</html>

@@ -36,9 +36,24 @@ body {
 
 .rrl-stats {
   display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 1.25rem 0;
+}
+
+.rrl-stats__row {
+  display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
-  margin: 1.25rem 0;
+}
+
+.rrl-stats__row--health {
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--rrl-border);
+}
+
+.rrl-stats__row--health .rrl-stat strong {
+  color: #b8e4ff;
 }
 
 .rrl-stat {
@@ -132,6 +147,7 @@ body {
 
 .rrl-card__meta { font-size: 0.75rem; color: var(--rrl-muted); margin-bottom: 0.25rem; word-break: break-all; }
 .rrl-card__notes { font-size: 0.78rem; color: var(--rrl-muted); margin: 0.35rem 0; line-height: 1.45; }
+.rrl-card__classification { color: #ffd0a8; border-left: 2px solid rgba(255, 180, 100, 0.45); padding-left: 0.55rem; }
 
 .rrl-card__tags { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.35rem 0; }
 
@@ -205,9 +221,61 @@ body {
 }
 
 .rrl-badge--available { border-color: rgba(94, 255, 168, 0.45); color: #b8ffd8; background: rgba(94, 255, 168, 0.1); }
+.rrl-badge--runs-locally { border-color: rgba(94, 255, 168, 0.6); color: #5effa8; background: rgba(94, 255, 168, 0.15); font-weight: 600; }
+.rrl-badge--has-files { border-color: rgba(140, 180, 255, 0.45); color: #b8d4ff; background: rgba(140, 180, 255, 0.1); }
+.rrl-badge--static-demo { border-color: rgba(94, 179, 255, 0.5); color: #b8e4ff; background: rgba(94, 179, 255, 0.14); }
+.rrl-badge--dev-server { border-color: rgba(255, 200, 80, 0.55); color: #ffe0a0; background: rgba(255, 200, 80, 0.14); font-weight: 600; }
+.rrl-badge--partial-archive { border-color: rgba(180, 140, 255, 0.5); color: #e0d4ff; background: rgba(180, 140, 255, 0.12); }
+.rrl-badge--needs-internet { border-color: rgba(255, 180, 100, 0.5); color: #ffd0a8; background: rgba(255, 180, 100, 0.1); }
+.rrl-badge--remote-dependent { border-color: rgba(255, 140, 120, 0.5); color: #ffc8b8; background: rgba(255, 140, 120, 0.1); }
 .rrl-badge--demo { border-color: rgba(94, 179, 255, 0.45); color: #b8e4ff; background: rgba(94, 179, 255, 0.12); }
 .rrl-badge--runner { border-color: rgba(255, 200, 80, 0.45); color: #ffe0a0; background: rgba(255, 200, 80, 0.1); }
 .rrl-badge--running { border-color: rgba(94, 255, 168, 0.55); color: #5effa8; background: rgba(94, 255, 168, 0.15); }
 .rrl-badge--stopped { border-color: rgba(255, 160, 100, 0.45); color: #ffc8a0; background: rgba(255, 160, 100, 0.1); }
 .rrl-badge--source { border-color: rgba(180, 140, 255, 0.45); color: #e0d4ff; background: rgba(180, 140, 255, 0.12); }
 .rrl-badge--external { border-color: var(--rrl-border); color: var(--rrl-muted); }
+
+.rrl-badge--health { font-weight: 600; }
+.rrl-badge--health-working { border-color: rgba(94, 255, 168, 0.55); color: #5effa8; background: rgba(94, 255, 168, 0.12); }
+.rrl-badge--health-warning { border-color: rgba(255, 200, 80, 0.5); color: #ffe0a0; background: rgba(255, 200, 80, 0.12); }
+.rrl-badge--health-broken { border-color: rgba(255, 100, 100, 0.55); color: #ffb0b0; background: rgba(255, 100, 100, 0.12); }
+.rrl-badge--health-preprocessor { border-color: rgba(200, 140, 255, 0.5); color: #e0c8ff; background: rgba(200, 140, 255, 0.1); }
+.rrl-badge--health-external { border-color: rgba(140, 180, 255, 0.45); color: #b8d4ff; background: rgba(140, 180, 255, 0.1); }
+.rrl-badge--health-runner { border-color: rgba(255, 200, 80, 0.45); color: #ffe0a0; background: rgba(255, 200, 80, 0.1); }
+.rrl-badge--health-failed { border-color: rgba(255, 80, 80, 0.55); color: #ff9090; background: rgba(255, 80, 80, 0.12); }
+.rrl-badge--health-source { border-color: rgba(180, 140, 255, 0.45); color: #e0d4ff; background: rgba(180, 140, 255, 0.12); }
+.rrl-badge--health-extonly { border-color: var(--rrl-border); color: var(--rrl-muted); }
+.rrl-badge--health-unknown { border-color: rgba(140, 160, 180, 0.35); color: #a0b4c8; }
+
+.rrl-health {
+  margin: 0.55rem 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 120, 120, 0.22);
+  background: rgba(255, 80, 80, 0.05);
+}
+
+.rrl-health__reason {
+  font-size: 0.75rem;
+  color: #ffb080;
+  margin: 0.35rem 0 0.25rem;
+}
+
+.rrl-health__note {
+  font-size: 0.74rem;
+  color: var(--rrl-muted);
+  margin: 0.35rem 0 0.25rem;
+  line-height: 1.45;
+}
+
+.rrl-health__details {
+  margin: 0.25rem 0 0.35rem;
+  padding-left: 1.1rem;
+  font-size: 0.72rem;
+  color: #c8d6e4;
+}
+
+.rrl-health__details li { margin-bottom: 0.15rem; }
+
+.rrl-card--health-broken { border-color: rgba(255, 100, 100, 0.35); }
+.rrl-card--health-warning { border-color: rgba(255, 200, 80, 0.3); }

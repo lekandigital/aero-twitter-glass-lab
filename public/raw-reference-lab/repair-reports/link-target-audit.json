@@ -1,0 +1,145 @@
+{
+  "generatedAt": "2026-06-15T05:41:58.228Z",
+  "ok": true,
+  "totalItems": 223,
+  "summary": {
+    "duplicateIds": 0,
+    "missingLocalDemoFiles": 0,
+    "missingGeneratedRunnableFiles": 0,
+    "missingDebugFiles": 0,
+    "badLocalDevUrls": 0,
+    "crossWiredGithubStatic": 0,
+    "duplicateLocalDemoUrls": 2,
+    "knownMappingFailures": 0,
+    "errors": 0,
+    "warnings": 2
+  },
+  "indexSafetyAssertion": {
+    "usesDataId": true,
+    "usesBakedHref": true,
+    "usesDataDemoUrl": true,
+    "indexBasedOpen": false,
+    "indexSafe": true
+  },
+  "duplicateIds": [],
+  "missingLocalDemoFiles": [],
+  "missingGeneratedRunnableFiles": [],
+  "missingDebugFiles": [],
+  "badLocalDevUrls": [],
+  "crossWiredGithubStatic": [],
+  "duplicateLocalDemoUrls": [
+    {
+      "url": "/raw-reference-lab/demos/web-archives/jsfiddle-6hmpa1ax/index.html",
+      "ids": [
+        "url-6hmpa1ax-net-6hmpa1ax",
+        "archive-jsfiddle-6hmpa1ax"
+      ],
+      "intentional": true
+    },
+    {
+      "url": "/raw-reference-lab/demos/web-archives/jsfiddle-nallenscott/index.html",
+      "ids": [
+        "url-41-ott-wtqjy-41",
+        "archive-jsfiddle-nallenscott"
+      ],
+      "intentional": true
+    }
+  ],
+  "knownMappingResults": [
+    {
+      "title": "liquid effect",
+      "expectedUrl": "/raw-reference-lab/demos/github-static/tuannm93-liquid-effect/index.html",
+      "resolvedId": "github-tuannm93-liquid-effect",
+      "candidateIds": [
+        "github-tuannm93-liquid-effect"
+      ],
+      "status": "ok"
+    },
+    {
+      "title": "glass refraction",
+      "expectedUrl": "/raw-reference-lab/demos/github-static/tuannm93-glass-refraction/index.html",
+      "resolvedId": "github-tuannm93-glass-refraction",
+      "candidateIds": [
+        "github-tuannm93-glass-refraction"
+      ],
+      "status": "ok"
+    },
+    {
+      "title": "liquid glass",
+      "expectedUrl": "/raw-reference-lab/demos/github-static/tuannm93-liquid-glass/index.html",
+      "resolvedId": "github-tuannm93-liquid-glass",
+      "candidateIds": [
+        "github-tuannm93-liquid-glass"
+      ],
+      "status": "ok"
+    },
+    {
+      "title": "liquid glass effect",
+      "expectedUrl": "/raw-reference-lab/demos/github-static/tuannm93-liquid-glass-effect/index.html",
+      "resolvedId": "github-tuannm93-liquid-glass-effect",
+      "candidateIds": [
+        "github-tuannm93-liquid-glass-effect"
+      ],
+      "status": "ok"
+    },
+    {
+      "title": "glass magnifier",
+      "expectedUrl": "/raw-reference-lab/demos/github-static/tuannm93-glass-magnifier/index.html",
+      "resolvedId": "github-tuannm93-glass-magnifier",
+      "candidateIds": [
+        "github-tuannm93-glass-magnifier"
+      ],
+      "status": "ok"
+    },
+    {
+      "title": "glass gel slider",
+      "expectedUrl": "/raw-reference-lab/demos/github-static/tuannm93-glass-gel-slider/index.html",
+      "resolvedId": "github-tuannm93-glass-gel-slider",
+      "candidateIds": [
+        "github-tuannm93-glass-gel-slider"
+      ],
+      "status": "ok"
+    },
+    {
+      "title": "honeycomb magnifier",
+      "expectedUrl": "/raw-reference-lab/demos/github-static/tuannm93-honeycomb-magnifier/index.html",
+      "resolvedId": "github-tuannm93-honeycomb-magnifier",
+      "candidateIds": [
+        "github-tuannm93-honeycomb-magnifier"
+      ],
+      "status": "ok"
+    },
+    {
+      "title": "shader",
+      "expectedUrl": "/raw-reference-lab/demos/github-static/tuannm93-shader/index.html",
+      "resolvedId": "github-tuannm93-shader",
+      "candidateIds": [
+        "github-tuannm93-shader"
+      ],
+      "status": "ok"
+    },
+    {
+      "title": "shock wave shader pass",
+      "expectedUrl": "/raw-reference-lab/demos/github-static/tuannm93-shock-wave-shader-pass/index.html",
+      "resolvedId": "github-tuannm93-shock-wave-shader-pass",
+      "candidateIds": [
+        "github-tuannm93-shock-wave-shader-pass"
+      ],
+      "status": "ok"
+    },
+    {
+      "title": "bubbles",
+      "expectedUrl": "/raw-reference-lab/demos/github-static/tuannm93-bubbles/index.html",
+      "resolvedId": "github-tuannm93-bubbles",
+      "candidateIds": [
+        "github-tuannm93-bubbles"
+      ],
+      "status": "ok"
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    "Intentional duplicate localDemoUrl (web archive): /raw-reference-lab/demos/web-archives/jsfiddle-6hmpa1ax/index.html (url-6hmpa1ax-net-6hmpa1ax, archive-jsfiddle-6hmpa1ax)",
+    "Intentional duplicate localDemoUrl (web archive): /raw-reference-lab/demos/web-archives/jsfiddle-nallenscott/index.html (url-41-ott-wtqjy-41, archive-jsfiddle-nallenscott)"
+  ]
+}

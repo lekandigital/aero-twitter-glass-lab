@@ -1,0 +1,20 @@
+{
+  "scssInfo": {
+    "ok": false,
+    "skipped": true
+  },
+  "paths": [
+    {
+      "ref": "https://fonts.googleapis.com/css2?family=Neonderthaw&display=swap",
+      "resolved": null,
+      "exists": true,
+      "fallback": false
+    },
+    {
+      "ref": "https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap",
+      "resolved": null,
+      "exists": true,
+      "fallback": false
+    }
+  ]
+}

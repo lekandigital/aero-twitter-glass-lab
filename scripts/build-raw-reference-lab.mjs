@@ -13,7 +13,7 @@ import {
   writeFile,
 } from 'node:fs/promises';
 import { execSync } from 'node:child_process';
-import { basename, dirname, join, relative } from 'node:path';
+import { basename, dirname, extname, join, normalize, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -506,35 +506,329 @@ async function copyDir(src, dest) {
   }
 }
 
+const EXTERNAL_REF = /^https?:|^\/\/|^data:/i;
+
+function usesJsModules(jsContent) {
+  return /\b(import|export)\s/m.test(jsContent);
+}
+
+async function buildAssetIndex(rootDir) {
+  const files = [];
+  async function walk(dir) {
+    let entries;
+    try {
+      entries = await readdir(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) await walk(full);
+      else files.push(relative(rootDir, full).split('\\').join('/'));
+    }
+  }
+  await walk(rootDir);
+  return files;
+}
+
+async function assetExists(rootDir, relPath) {
+  try {
+    await stat(join(rootDir, relPath));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function relFromDemoRoot(demoRoot, absPath) {
+  return './' + relative(demoRoot, absPath).split('\\').join('/');
+}
+
+async function resolveAssetRef(ref, htmlBaseDir, demoRoot, assetIndex) {
+  if (!ref || ref.startsWith('#') || ref.startsWith('mailto:') || ref.startsWith('javascript:')) {
+    return { type: 'skip', ref };
+  }
+  if (EXTERNAL_REF.test(ref)) {
+    return { type: 'external', ref, url: ref };
+  }
+
+  const attempted = [];
+  const tryPath = async (absPath) => {
+    const rel = relative(demoRoot, absPath).split('\\').join('/');
+    attempted.push(rel);
+    if (await assetExists(demoRoot, rel)) {
+      return { type: 'local', ref, resolved: rel, href: relFromDemoRoot(demoRoot, absPath) };
+    }
+    return null;
+  };
+
+  const direct = await tryPath(normalize(resolve(htmlBaseDir, ref)));
+  if (direct) return direct;
+
+  const fromRoot = await tryPath(normalize(resolve(demoRoot, ref)));
+  if (fromRoot) return fromRoot;
+
+  const base = basename(ref);
+  const ext = extname(base).toLowerCase();
+  for (const file of assetIndex) {
+    if (basename(file) === base) {
+      const hit = await tryPath(join(demoRoot, file));
+      if (hit) return hit;
+    }
+  }
+
+  if (ext === '.css' || ext === '.js') {
+    const pool = assetIndex.filter((f) => {
+      if (!f.endsWith(ext)) return false;
+      if (ext === '.css' && /\.(scss|sass)$/i.test(f)) return false;
+      return f.startsWith('src/') || f.startsWith('dist/');
+    });
+    if (pool.length === 1) {
+      const hit = await tryPath(join(demoRoot, pool[0]));
+      if (hit) return { ...hit, fallback: true };
+    }
+  }
+
+  return { type: 'missing', ref, attempted };
+}
+
+function stripFragmentWrappers(html) {
+  let out = html.trim();
+  out = out.replace(/^<body[^>]*>/i, '').replace(/<\/body>\s*<\/html>\s*$/i, '').replace(/<\/body>\s*$/i, '').replace(/<\/html>\s*$/i, '');
+  return out.trim();
+}
+
+function extractHeadAndBody(html) {
+  const trimmed = html.trim();
+  if (!isCompleteHtml(trimmed)) {
+    return { isFull: false, headHtml: '', bodyHtml: stripFragmentWrappers(trimmed), title: null };
+  }
+  const titleMatch = trimmed.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  const headMatch = trimmed.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
+  const bodyMatch = trimmed.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  return {
+    isFull: true,
+    headHtml: headMatch?.[1]?.trim() ?? '',
+    bodyHtml: bodyMatch?.[1]?.trim() ?? trimmed,
+    title: titleMatch?.[1]?.trim() ?? null,
+  };
+}
+
+function extractInlineRefs(html) {
+  const refs = [];
+  const patterns = [
+    { kind: 'css', re: /<link[^>]+href=["']([^"']+)["'][^>]*>/gi },
+    { kind: 'js', re: /<script([^>]*?)src=["']([^"']+)["']([^>]*)>/gi, moduleGroup: 1, srcGroup: 2, tailGroup: 3 },
+  ];
+  for (const m of html.matchAll(patterns[0].re)) refs.push({ kind: 'css', raw: m[0], href: m[1] });
+  for (const m of html.matchAll(patterns[1].re)) {
+    refs.push({
+      kind: 'js',
+      raw: m[0],
+      href: m[2],
+      isModule: /type\s*=\s*["']module["']/i.test(`${m[1] || ''}${m[3] || ''}`),
+    });
+  }
+  return refs;
+}
+
+async function rewriteHtmlAssetRefs(html, htmlBaseDir, demoRoot, assetIndex, scssInfo) {
+  let out = html;
+  const diagnostics = [];
+
+  out = out.replace(/<link[^>]+href=["']([^"']+)["'][^>]*>/gi, (raw, href) => {
+    const ext = extname(href).toLowerCase();
+    if ((ext === '.scss' || ext === '.sass') && scssInfo?.generatedHref) {
+      diagnostics.push({ ref: href, resolved: scssInfo.generatedRel, exists: true, note: 'scss-compiled' });
+      return raw.replace(href, scssInfo.generatedHref);
+    }
+    return raw;
+  });
+
+  const refs = extractInlineRefs(out);
+  for (const ref of refs) {
+    const resolved = await resolveAssetRef(ref.href, htmlBaseDir, demoRoot, assetIndex);
+    if (resolved.type === 'local' && resolved.href !== ref.href) {
+      out = out.replace(ref.raw, ref.raw.replace(ref.href, resolved.href.replace(/^\.\//, '')));
+      if (!resolved.href.startsWith('./')) {
+        out = out.replace(ref.href, resolved.href);
+      } else {
+        out = out.replace(ref.href, resolved.href);
+      }
+    }
+    diagnostics.push({
+      ref: ref.href,
+      resolved: resolved.resolved ?? resolved.href ?? null,
+      exists: resolved.type === 'local' || resolved.type === 'external',
+      fallback: resolved.fallback ?? false,
+    });
+  }
+
+  // Second pass: rewrite remaining refs in place
+  for (const ref of extractInlineRefs(out)) {
+    const resolved = await resolveAssetRef(ref.href, htmlBaseDir, demoRoot, assetIndex);
+    if (resolved.type === 'local') {
+      const newHref = resolved.href.startsWith('./') ? resolved.href : `./${resolved.resolved}`;
+      if (ref.href !== newHref.replace(/^\.\//, '') && ref.href !== newHref) {
+        out = out.replaceAll(ref.href, newHref.replace(/^\.\//, ''));
+      }
+    }
+  }
+
+  return { html: out, diagnostics };
+}
+
+async function scriptTagForFile(demoRoot, relPath) {
+  const abs = join(demoRoot, relPath);
+  let content = '';
+  try {
+    content = await readFile(abs, 'utf8');
+  } catch {
+    return `    <script src="./${relPath}"></script>`;
+  }
+  const moduleType = usesJsModules(content) ? ' type="module"' : '';
+  return `    <script${moduleType} src="./${relPath}"></script>`;
+}
+
+async function compileScssIfNeeded(destDir, srcDir) {
+  const scssPath = join(srcDir, 'style.scss');
+  const cssPath = join(srcDir, 'style.css');
+  const generatedPath = join(destDir, 'entry.generated.css');
+  const generatedRel = 'entry.generated.css';
+
+  try {
+    await stat(scssPath);
+  } catch {
+    return { ok: false, skipped: true };
+  }
+
+  try {
+    await stat(cssPath);
+    return { ok: true, useExistingCss: `./src/style.css`, skipped: true };
+  } catch { /* compile */ }
+
+  try {
+    execSync(`npx --yes sass "${scssPath}" "${generatedPath}"`, {
+      cwd: ROOT,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    return {
+      ok: true,
+      generatedHref: `./${generatedRel}`,
+      generatedRel,
+      compiled: true,
+    };
+  } catch (err) {
+    const msg = err.stderr?.toString?.() || err.stdout?.toString?.() || err.message;
+    return { ok: false, error: msg.trim(), skipped: false };
+  }
+}
+
 async function buildCodepenEntryUrl(destDir, safeId) {
   const srcDir = join(destDir, 'src');
   const srcIndexPath = join(srcDir, 'index.html');
 
   let content = '';
-  let isFull = false;
   try {
     content = await readFile(srcIndexPath, 'utf8');
-    isFull = isCompleteHtml(content);
   } catch {
     return null;
   }
 
   const base = `/raw-reference-lab/demos/codepen/${safeId}`;
+  const assetIndex = await buildAssetIndex(destDir);
+  const scssInfo = await compileScssIfNeeded(destDir, srcDir);
+  const parsed = extractHeadAndBody(content);
+  const pathDiagnostics = [];
 
-  if (isFull) {
-    return `${base}/src/index.html`;
+  let headLinks = [];
+  let bodyHtml = parsed.bodyHtml;
+  let scripts = [];
+  const referencedJs = new Set();
+  const referencedCss = new Set();
+
+  const collectResolved = async (htmlChunk, htmlBaseDir) => {
+    const { html, diagnostics } = await rewriteHtmlAssetRefs(
+      htmlChunk,
+      htmlBaseDir,
+      destDir,
+      assetIndex,
+      scssInfo,
+    );
+    pathDiagnostics.push(...diagnostics);
+    return html;
+  };
+
+  if (parsed.isFull) {
+    bodyHtml = await collectResolved(parsed.bodyHtml, srcDir);
+    const headProcessed = await collectResolved(parsed.headHtml, srcDir);
+    for (const ref of extractInlineRefs(headProcessed)) {
+      if (ref.kind === 'css') {
+        const resolved = await resolveAssetRef(ref.href, srcDir, destDir, assetIndex);
+        if (resolved.type === 'local') {
+          const href = resolved.href.startsWith('./') ? resolved.href : `./${resolved.resolved}`;
+          headLinks.push(`    <link rel="stylesheet" href="${href.replace(/^\.\//, './')}" />`);
+          referencedCss.add(resolved.resolved);
+          pathDiagnostics.push({ ref: ref.href, resolved: resolved.resolved, exists: true, fallback: resolved.fallback });
+        } else if ((extname(ref.href).toLowerCase() === '.scss' || extname(ref.href).toLowerCase() === '.sass') && scssInfo.generatedHref) {
+          headLinks.push(`    <link rel="stylesheet" href="${scssInfo.generatedHref}" />`);
+          referencedCss.add(scssInfo.generatedRel);
+        } else {
+          pathDiagnostics.push({ ref: ref.href, resolved: null, exists: false });
+        }
+      }
+    }
+    for (const ref of extractInlineRefs(bodyHtml)) {
+      if (ref.kind === 'js') {
+        const resolved = await resolveAssetRef(ref.href, srcDir, destDir, assetIndex);
+        if (resolved.type === 'local') {
+          referencedJs.add(resolved.resolved);
+          pathDiagnostics.push({ ref: ref.href, resolved: resolved.resolved, exists: true, fallback: resolved.fallback });
+        } else {
+          pathDiagnostics.push({ ref: ref.href, resolved: null, exists: false });
+        }
+      }
+    }
+    bodyHtml = bodyHtml
+      .replace(/<link[^>]+href=["'][^"']+["'][^>]*>\s*/gi, '')
+      .replace(/<script[^>]+src=["'][^"']+["'][^>]*>\s*<\/script>\s*/gi, '');
+  } else {
+    bodyHtml = await collectResolved(parsed.bodyHtml, srcDir);
+    bodyHtml = bodyHtml
+      .replace(/<link[^>]+href=["'][^"']+["'][^>]*>\s*/gi, '')
+      .replace(/<script[^>]+src=["'][^"']+["'][^>]*>\s*<\/script>\s*/gi, '');
   }
 
-  const entries = await readdir(srcDir);
-  const cssFiles = entries.filter((f) => /\.(css|scss)$/i.test(f));
-  const jsFiles = entries.filter((f) => /\.js$/i.test(f));
+  if (scssInfo.generatedHref && !referencedCss.size) {
+    headLinks.push(`    <link rel="stylesheet" href="${scssInfo.generatedHref}" />`);
+    referencedCss.add(scssInfo.generatedRel);
+  } else if (!referencedCss.size) {
+    for (const file of assetIndex) {
+      if (file.startsWith('src/') && file.endsWith('.css') && !file.endsWith('.scss')) {
+        headLinks.push(`    <link rel="stylesheet" href="./${file}" />`);
+        referencedCss.add(file);
+        break;
+      }
+    }
+  }
 
-  const cssLinks = cssFiles
-    .map((f) => `    <link rel="stylesheet" href="./src/${f}" />`)
-    .join('\n');
-  const jsScripts = jsFiles
-    .map((f) => `    <script src="./src/${f}"></script>`)
-    .join('\n');
+  for (const ref of extractInlineRefs(bodyHtml)) {
+    if (ref.kind === 'js') {
+      const resolved = await resolveAssetRef(ref.href, srcDir, destDir, assetIndex);
+      if (resolved.type === 'local') scripts.push(await scriptTagForFile(destDir, resolved.resolved));
+    }
+  }
+
+  if (!scripts.length) {
+    for (const file of assetIndex) {
+      if (file.startsWith('src/') && file.endsWith('.js') && !referencedJs.has(file)) {
+        scripts.push(await scriptTagForFile(destDir, file));
+      }
+    }
+  }
+
+  const uniqueScripts = [...new Set(scripts)];
 
   await writeFile(
     join(destDir, 'entry.html'),
@@ -543,16 +837,24 @@ async function buildCodepenEntryUrl(destDir, safeId) {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-${cssLinks}
+${parsed.title ? `    <title>${parsed.title.replace(/</g, '&lt;')}</title>\n` : ''}${headLinks.join('\n')}
   </head>
   <body>
-${content}
-${jsScripts}
+${bodyHtml}
+${uniqueScripts.join('\n')}
   </body>
 </html>
 `,
     'utf8',
   );
+
+  if (pathDiagnostics.length) {
+    await writeFile(
+      join(destDir, 'entry.path-diagnostics.json'),
+      JSON.stringify({ scssInfo, paths: pathDiagnostics }, null, 2),
+      'utf8',
+    );
+  }
 
   return `${base}/entry.html`;
 }
@@ -584,11 +886,20 @@ async function buildCodepenDemos(usedIds) {
 
     const safeId = uniqueId(dedupeKey, usedIds);
     const destDir = join(DEMO_CODEPEN, safeId);
-    const destSrc = join(destDir, 'src');
+    const exportRoot = dirname(srcDir);
 
     try {
       await mkdir(destDir, { recursive: true });
-      await copyDir(srcDir, destSrc);
+      const exportEntries = await readdir(exportRoot, { withFileTypes: true });
+      for (const exportEntry of exportEntries) {
+        const from = join(exportRoot, exportEntry.name);
+        const to = join(destDir, exportEntry.name);
+        if (exportEntry.isDirectory()) {
+          await copyDir(from, to);
+        } else if (!['README.md', 'LICENSE.txt'].includes(exportEntry.name)) {
+          await cp(from, to);
+        }
+      }
 
       const demoUrl = await buildCodepenEntryUrl(destDir, safeId);
       if (!demoUrl) {

@@ -1,0 +1,659 @@
+/* ============= Variables & Theme ============= */
+:root {
+  --hue1: 255;
+  --hue2: 222;
+  --glow: .85;
+  --blur: 12px;
+  --radius: 22px;
+  --border: 1px;
+  --ease: cubic-bezier(.5,1,.89,1);
+  --bg: #08090d;
+  --fg: #cfd6e6;
+  --muted:#8c93a5;
+  --border-color: hsl(var(--hue2) 12% 20%);
+}
+
+/* Accessibility */
+:focus-visible {
+  outline: 2px solid hsl(var(--hue1), 90%, 60%);
+  outline-offset: 2px;
+}
+
+kbd {
+  background: rgba(17, 17, 17, 0.4);
+  padding: 0.15em 0.4em;
+  border-radius: 6px;
+  border: 1px solid #222;
+  font-size: 0.8em;
+}
+
+/* Base layout */
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+#app {
+  min-height: 100svh;
+  position: relative;
+  overflow: hidden;
+  padding: clamp(16px, 2svw, 32px);
+}
+
+/* === Shared neon-glass shading (identical to menu) === */
+.glass-panel, #palette #pal-list li, .demo-grid .tile .shorts li {
+  position: relative;
+  border-radius: var(--radius);
+  border: var(--border) solid var(--border-color);
+  padding: 12px;
+  color: #cbd2e2;
+  background: linear-gradient(235deg, hsl(var(--hue1), 50%, 10%, 0.8), hsl(var(--hue1), 50%, 10%, 0) 33%), linear-gradient(45deg, hsl(var(--hue2), 50%, 10%, 0.8), hsl(var(--hue2), 50%, 10%, 0) 33%), linear-gradient(hsla(220, 25%, 4.8%, 0.66));
+  backdrop-filter: blur(var(--blur));
+  box-shadow: hsl(var(--hue2), 50%, 2%) 0 10px 16px -8px, hsl(var(--hue2), 50%, 4%) 0 20px 36px -14px;
+  /* edge sheen + glow borrowed from menu */
+}
+.glass-panel::before, #palette #pal-list li::before, .demo-grid .tile .shorts li::before, .glass-panel::after, #palette #pal-list li::after, .demo-grid .tile .shorts li::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  mask: linear-gradient(transparent), linear-gradient(black);
+  mask-repeat: no-repeat;
+  mask-clip: padding-box, border-box;
+  mask-composite: subtract;
+}
+.glass-panel::before, #palette #pal-list li::before, .demo-grid .tile .shorts li::before {
+  border: 1px solid transparent;
+  background: conic-gradient(from -45deg at 75% 0% in oklch, transparent 0%, hsl(var(--hue1), 80%, 75%), transparent 33%);
+  opacity: 0.25;
+  filter: blur(1px);
+  border-top-right-radius: inherit;
+  border-bottom-left-radius: inherit;
+}
+.glass-panel::after, #palette #pal-list li::after, .demo-grid .tile .shorts li::after {
+  border: 1px solid transparent;
+  background: conic-gradient(from 135deg at 0% 100% in oklch, transparent 0%, hsl(var(--hue2), 90%, 75%), transparent 33%);
+  opacity: 0.18;
+  filter: blur(1.5px);
+  border-bottom-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+.glass-panel, #palette #pal-list li, .demo-grid .tile .shorts li {
+  /* subtle hover lift for cards/buttons that use it */
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease);
+}
+.glass-panel:hover, #palette #pal-list li:hover, .demo-grid .tile .shorts li:hover {
+  transform: translateY(-1px);
+  box-shadow: hsl(var(--hue2), 50%, 4%, 0.9) 0 14px 22px -12px, hsl(var(--hue1), 50%, 6%, 0.7) 0 28px 48px -18px;
+}
+
+/* Topbar */
+.topbar {
+  z-index: 2;
+  margin-bottom: clamp(12px, 3svh, 24px);
+}
+.topbar h1 {
+  margin: 0 0 4px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: color-mix(in oklab, white 85%, hsl(var(--hue1), 60%, 60%));
+}
+.topbar p {
+  margin: 0;
+  color: color-mix(in oklab, var(--fg) 55%, hsl(var(--hue2), 60%, 60%));
+}
+
+/* Background */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  filter: saturate(1.2) brightness(0.9) contrast(1.05);
+}
+
+#grain {
+  position: fixed;
+  inset: -10vmax;
+  pointer-events: none;
+  z-index: 1;
+  background: url(https://assets.codepen.io/13471/noise-base.png) repeat;
+  opacity: 0.035;
+  mix-blend-mode: soft-light;
+  animation: grainShift 14s linear infinite;
+}
+
+@keyframes grainShift {
+  to {
+    transform: translate3d(-10%, 10%, 0);
+  }
+}
+/* Demo Grid */
+.demo-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(12px, 1.5svw, 20px);
+}
+.demo-grid .tile {
+  grid-column: span 3;
+  min-height: 140px;
+  padding: 16px 16px 18px;
+}
+.demo-grid .tile h3 {
+  margin: 0.1rem 0 0.35rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+.demo-grid .tile p {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+}
+.demo-grid .tile.wide {
+  grid-column: span 6;
+}
+.demo-grid .tile .shorts {
+  list-style: none;
+  padding: 0;
+  margin: 0.35rem 0 0;
+  display: grid;
+  gap: 6px;
+}
+.demo-grid .tile .shorts li {
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+
+/* Buttons / Chips */
+.btn, .chip {
+  --bg:#ffffff12;
+  --bd:#ffffff2a;
+  --fg:var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--bd);
+  color: var(--fg);
+  padding: 8px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: transform 0.2s var(--ease), background 0.2s, border-color 0.2s;
+}
+.btn:hover, .chip:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.0941176471);
+  border-color: rgba(255, 255, 255, 0.2666666667);
+}
+
+.btn.ghost, .ghost.chip {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.1333333333);
+}
+
+.chip {
+  font-size: 0.9rem;
+  padding: 6px 10px;
+}
+
+/* Controls Footer */
+.controlbar {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  margin-top: 6svh;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.controlbar h2 {
+  width: 100%;
+  margin: 2px 0 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: color-mix(in oklab, var(--fg) 70%, hsl(var(--hue1), 50%, 60%));
+}
+.controlbar .range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.controlbar .range span {
+  width: 64px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.controlbar .range input[type=range] {
+  width: 220px;
+  accent-color: hsl(var(--hue1), 80%, 60%);
+}
+
+/* ======= Context Menu (inherits glass-panel) ======= */
+.menu {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: visibility 0s 0.5s, opacity 0.25s var(--ease), filter 0.25s var(--ease), transform 0.2s var(--ease);
+  filter: blur(4px);
+  transform: scale(0.98);
+  z-index: 10;
+  min-width: 300px;
+}
+.menu.open {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: 0s;
+  filter: blur(0) brightness(1.02);
+  transform: scale(1);
+}
+.menu.open::before, .menu.open::after, .menu.open .glow, .menu.open .shine {
+  animation: glow 1s var(--ease) both;
+}
+.menu .inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  font-size: 0.95rem;
+}
+.menu hr {
+  width: 100%;
+  height: 1px;
+  border: none;
+  background: var(--border-color);
+  opacity: 0.6;
+  margin: 0.25em 0 0.5em;
+}
+.menu .searchbar {
+  display: grid;
+  grid-template: 1fr/1fr;
+  width: 100%;
+  margin-bottom: 0.5em;
+}
+.menu .searchbar > * {
+  grid-area: 1/1;
+  align-self: center;
+}
+.menu .searchbar input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.031372549);
+  border: 1px solid rgba(255, 255, 255, 0.1215686275);
+  color: var(--fg);
+  border-radius: 10px;
+  padding: 10px 12px 10px 40px;
+  font-weight: 300;
+}
+.menu .searchbar svg {
+  height: 20px;
+  margin-left: 10px;
+  opacity: 0.6;
+}
+.menu .group header {
+  font-size: 0.8rem;
+  font-weight: 300;
+  padding: 0 0.66em;
+  color: var(--muted);
+}
+.menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.menu li {
+  position: relative;
+  padding: 0.66em 0.66em;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: linear-gradient(90deg in oklch, hsl(var(--hue1), 29%, 13%, var(--item-opacity)), hsl(var(--hue1), 30%, 15%, var(--item-opacity)) 24% 32%, hsl(var(--hue1), 5%, 7%, var(--item-opacity)));
+  transition: all 0.2s ease, --item-opacity 0.2s ease;
+  --item-opacity:0;
+}
+.menu li:hover, .menu li.selected {
+  --item-opacity:.5;
+  color: white;
+}
+.menu li.selected {
+  animation: flash 0.75s ease-out 1 forwards;
+}
+.menu li kbd {
+  margin-left: auto;
+  opacity: 0.7;
+}
+.menu .ico {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 6px hsl(var(--hue1), 90%, 60%, var(--glow)));
+}
+.menu .has-sub {
+  cursor: default;
+}
+.menu .has-sub .arrow {
+  margin-left: auto;
+  opacity: 0.6;
+}
+.menu .has-sub .submenu {
+  position: absolute;
+  top: 2px;
+  left: calc(100% + 8px);
+  min-width: 180px;
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  /* submenu inherits .glass-panel above via class */
+}
+.menu .has-sub .submenu li {
+  height: 32px;
+  border-radius: 8px;
+}
+.menu .has-sub:hover > .submenu, .menu .has-sub.open > .submenu {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition: opacity 0.15s var(--ease), transform 0.15s var(--ease);
+}
+.menu .has-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+.menu .has-toggle .switch {
+  position: relative;
+  width: 48px;
+  height: 24px;
+}
+.menu .has-toggle .switch input {
+  display: none;
+}
+.menu .has-toggle .switch .slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.0705882353);
+  border: 1px solid rgba(255, 255, 255, 0.1450980392);
+  border-radius: 999px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.menu .has-toggle .switch .slider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  transform: translateY(-50%);
+  background: white;
+  border-radius: 50%;
+  transition: left 0.2s var(--ease), box-shadow 0.2s;
+  box-shadow: 0 0 12px hsl(var(--hue1), 90%, 60%, 0.6);
+}
+.menu .has-toggle .switch input:checked + .slider {
+  background: hsl(var(--hue1), 80%, 60%, 0.25);
+  border-color: hsl(var(--hue1), 80%, 60%, 0.5);
+}
+.menu .has-toggle .switch input:checked + .slider::after {
+  left: calc(100% - 22px);
+}
+
+/* Shine / Glow carried over (menu-specific elements) */
+.menu .shine, .menu .glow {
+  --hue: var(--hue1) ;
+}
+
+.menu .shine-bottom, .menu .glow-bottom {
+  --hue: var(--hue2);
+  --conic:135deg ;
+}
+
+.menu .shine, .menu .shine::before, .menu .shine::after {
+  pointer-events: none;
+  width: 75%;
+  aspect-ratio: 1;
+  position: absolute;
+  right: calc(var(--border) * -1);
+  top: calc(var(--border) * -1);
+  border: 1px solid transparent;
+  z-index: 1;
+  border-top-right-radius: inherit;
+  border-bottom-left-radius: inherit;
+  --start:12%;
+  background: conic-gradient(from var(--conic, -45deg) at center in oklch, transparent var(--start, 0%), hsl(var(--hue), 80%, 60%), transparent var(--end, 50%)) border-box;
+  mask: linear-gradient(transparent), linear-gradient(black);
+  mask-repeat: no-repeat;
+  mask-clip: padding-box, border-box;
+  mask-composite: subtract;
+}
+
+.menu .shine::before, .menu .shine::after {
+  content: "";
+  inset: -2px;
+  width: auto;
+  mask: none;
+}
+
+.menu .shine::after {
+  z-index: 2;
+  --start:17%;
+  --end:33%;
+  background: conic-gradient(from var(--conic, -45deg) at center in oklch, transparent var(--start, 0%), hsl(var(--hue), 80%, 85%), transparent var(--end, 50%));
+}
+
+.menu .shine-bottom {
+  top: auto;
+  bottom: calc(var(--border) * -1);
+  left: calc(var(--border) * -1);
+  right: auto;
+}
+
+.menu .glow {
+  pointer-events: none;
+  border-top-right-radius: calc(var(--radius) * 2.5);
+  border-bottom-left-radius: calc(var(--radius) * 2.5);
+  border: calc(var(--radius) * 1.25) solid transparent;
+  inset: calc(var(--radius) * -2);
+  width: 75%;
+  aspect-ratio: 1;
+  position: absolute;
+  left: auto;
+  bottom: auto;
+  mask: url(https://assets.codepen.io/13471/noise-base.png);
+  mask-mode: luminance;
+  mask-size: 29%;
+  opacity: calc(0.75 * var(--glow));
+  filter: blur(12px) saturate(1.25) brightness(0.55);
+  mix-blend-mode: plus-lighter;
+  z-index: 3;
+}
+.menu .glow::before, .menu .glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: inherit;
+  border-radius: inherit;
+  background: conic-gradient(from var(--conic, -45deg) at center in oklch, transparent var(--start, 0%), hsl(var(--hue), 95%, 60%), transparent var(--end, 50%)) border-box;
+  mask: linear-gradient(transparent), linear-gradient(black);
+  mask-repeat: no-repeat;
+  mask-clip: padding-box, border-box;
+  mask-composite: subtract;
+  filter: saturate(2) brightness(1);
+}
+.menu .glow::after {
+  --lit:70%;
+  --sat:100%;
+  --start:15%;
+  --end:35%;
+  border-width: calc(var(--radius) * 1.75);
+  border-radius: calc(var(--radius) * 2.75);
+  inset: calc(var(--radius) * -0.25);
+  z-index: 4;
+  opacity: 0.75;
+}
+.menu .glow.glow-bottom {
+  inset: calc(var(--radius) * -2);
+  top: auto;
+  right: auto;
+}
+
+.menu .glow-bright {
+  --lit:80%;
+  --sat:100%;
+  --start:13%;
+  --end:37%;
+  border-width: 5px;
+  border-radius: calc(var(--radius) + 2px);
+  inset: -7px;
+  left: auto;
+  filter: blur(2px) brightness(0.66);
+}
+.menu .glow-bright::after {
+  content: none;
+}
+.menu .glow-bright.glow-bottom {
+  inset: -7px;
+  right: auto;
+  top: auto;
+}
+
+/* Palette dialog adopts glass-panel fully */
+#palette::backdrop {
+  background: rgba(0, 0, 0, 0.5333333333);
+  backdrop-filter: blur(3px);
+}
+
+#palette {
+  border: none;
+  padding: 0;
+  overflow: hidden;
+  width: min(720px, 92svw);
+}
+#palette .pal-body {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
+  padding: 12px;
+}
+#palette #pal-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.062745098);
+  border: 1px solid rgba(255, 255, 255, 0.1215686275);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--fg);
+}
+#palette #pal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  max-height: 50svh;
+  overflow: auto;
+}
+#palette #pal-list li {
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+#palette #pal-list li.active, #palette #pal-list li:hover {
+  border-color: rgba(255, 255, 255, 0.2274509804);
+  background: rgba(255, 255, 255, 0.0705882353);
+}
+#palette .pal-hint {
+  display: flex;
+  justify-content: flex-end;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Social bubbles also glass */
+.social-icon {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 3;
+  color: rgba(255, 255, 255, 0.5333333333);
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 8px 10px;
+  border-radius: 12px;
+}
+
+.social-icon.twitter {
+  right: 64px;
+}
+
+.social-icon.github {
+  right: 120px;
+}
+
+.social-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: rgba(255, 255, 255, 0.6);
+}
+
+/* Animations */
+@keyframes glow {
+  0% {
+    opacity: 0;
+  }
+  3% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.7;
+  }
+  16% {
+    opacity: 0.3;
+    animation-timing-function: var(--ease);
+  }
+  100% {
+    opacity: 1;
+    animation-timing-function: var(--ease);
+  }
+}
+@keyframes flash {
+  0% {
+    opacity: 0;
+    --item-opacity:0;
+  }
+  7% {
+    opacity: 0.5;
+    --item-opacity:1;
+  }
+  14% {
+    opacity: 0;
+    --item-opacity:.5;
+  }
+  21%, 100% {
+    opacity: 1;
+    --item-opacity:1;
+  }
+}
+/* Responsive */
+@media (max-width: 900px) {
+  .demo-grid .tile {
+    grid-column: span 6;
+  }
+  .demo-grid .tile.wide {
+    grid-column: span 12;
+  }
+}
+@media (max-width: 560px) {
+  .demo-grid .tile {
+    grid-column: span 12;
+  }
+  .controlbar .range input {
+    width: 160px;
+  }
+}
+
+/*# sourceMappingURL=entry.generated.css.map */
