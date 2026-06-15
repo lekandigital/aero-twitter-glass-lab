@@ -1,0 +1,12 @@
+https://github.com/naughtyduk/liquidGL
+https://github.com/archisvaze/liquid-glass
+https://github.com/dashersw/liquid-glass-js
+https://github.com/AndrewPrifer/liquid-dom
+https://github.com/rahuldotdev/glassmorphism
+https://github.com/trrahul/glassmorphism-wpf
+https://github.com/AADI-1331/glassmorphism-template
+https://github.com/rdev/liquid-glass-react
+https://github.com/khang-nd/7.css
+https://github.com/Z2r-YT/7-Aero-Stylesheet
+https://github.com/tuannm93/lab
+https://github.com/Z1Code/glass-refraction

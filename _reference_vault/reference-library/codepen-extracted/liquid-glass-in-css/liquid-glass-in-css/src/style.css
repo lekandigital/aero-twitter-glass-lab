@@ -1,0 +1,28 @@
+body {
+  width: 100dvw;
+  height: 100dvh;
+  
+  position: relative;
+}
+
+video {
+  display: block;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.glass {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 28px;
+  will-change: transform;
+  user-select: none;
+  filter: drop-shadow(-8px -10px 45px #0000005f);
+  backdrop-filter: brightness(1.2) blur(4px) url(#glassFilter);
+}

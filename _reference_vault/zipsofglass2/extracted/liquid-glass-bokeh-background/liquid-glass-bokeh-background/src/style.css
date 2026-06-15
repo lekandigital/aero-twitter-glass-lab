@@ -1,0 +1,100 @@
+    :root {
+      --bubble-count: 40;           /* Wie viele Bubbles? 30–80 je nach Performance */
+      --bg-color: #0f0e17;          /* Dunkler Hintergrund für Bokeh-Pop */
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100dvh;
+      background: var(--bg-color) url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&q=80&w=2000') center/cover no-repeat fixed;
+      /* Dein Hintergrund-Bild – ersetze die URL durch dein eigenes! */
+      overflow: hidden;
+      font-family: system-ui, sans-serif;
+      color: white;
+    }
+
+    /* Bubble-Container – filter für extra Weichheit */
+    .bubbles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;           /* Klicks gehen durch */
+      filter: blur(6px) brightness(1.1);  /* Bokeh-typische Weichzeichnung */
+      mix-blend-mode: screen;         /* Glow-Effekt über dem Bild */
+    }
+
+    /* Einzelne Bubble – mit CSS-Variablen für Random-ähnliches Verhalten */
+    .bubble {
+      position: absolute;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(100,200,255,0.4) 40%, transparent 70%);
+      border-radius: 50%;
+      box-shadow: 0 0 30px 10px rgba(100,200,255,0.5);  /* Glow für Bokeh-Feeling */
+      animation: float linear infinite;
+      will-change: transform, opacity;
+    }
+
+    /* Generiere random-ähnliche Werte via :nth-child und calc() */
+    .bubble:nth-child(1)  { --size: 80px;  --x: 10vw; --duration: 28s; --delay: -2s; --drift: 8vw; }
+    .bubble:nth-child(2)  { --size: 120px; --x: 25vw; --duration: 35s; --delay: -8s; --drift: -6vw; }
+    .bubble:nth-child(3)  { --size: 60px;  --x: 40vw; --duration: 42s; --delay: -12s; --drift: 12vw; }
+    .bubble:nth-child(4)  { --size: 150px; --x: 60vw; --duration: 38s; --delay: -5s; --drift: -10vw; }
+    /* ... du brauchst ~30–40 solcher Zeilen oder nutzt JS/Sass für echte Randomisierung */
+
+    /* Für Demo nur 10 – erweitere einfach per Copy-Paste oder Scss-Loop */
+    .bubble:nth-child(n+5) { --size: calc(40px + (var(--i, 1) * 10px)); --drift: calc(-15vw + (var(--i, 1) * 3vw)); }
+
+    .bubble {
+      width: var(--size);
+      height: var(--size);
+      left: var(--x);
+      bottom: -150px;                 /* Start unten außerhalb */
+      opacity: 0;
+      animation-duration: var(--duration);
+      animation-delay: var(--delay);
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) scale(0.8);
+        opacity: 0;
+      }
+      10% { opacity: 0.7; }
+      50% {
+        transform: translate(var(--drift), -80vh) scale(1.1);
+        opacity: 0.9;
+      }
+      90% { opacity: 0.6; }
+      100% {
+        transform: translate(calc(var(--drift) * 0.5), -120vh) scale(0.9);
+        opacity: 0;
+      }
+    }
+
+    /* Unser Liquid-Glass-Dummy-Box (zentriert, halbtransparent) */
+    .glass-box {
+      position: relative;
+      z-index: 10;
+      width: 90%;
+      max-width: 500px;
+      margin: 10vh auto;
+      padding: 3rem;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      text-align: center;
+      transition: transform 0.4s ease;
+    }
+
+    .glass-box:hover {
+      transform: translateY(-10px) scale(1.02);
+    }
+
+    h1 { font-size: 3rem; margin-bottom: 1rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    p  { font-size: 1.2rem; line-height: 1.6; opacity: 0.9; }

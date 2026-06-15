@@ -1,0 +1,6 @@
+kube-liquid-glass: https://kube.io/blog/liquid-glass-css-svg
+freefrontend-css-liquid-glass: https://freefrontend.com/css-liquid-glass/
+css-glass: https://css.glass/
+liquidgl-demo: https://liquidgl.naughtyduk.com/demos/demo-1
+jsfiddle-nallenscott: https://jsfiddle.net/nallenscott/WtQjY/41/
+jsfiddle-6hmpa1ax: https://jsfiddle.net/6hmpa1ax/

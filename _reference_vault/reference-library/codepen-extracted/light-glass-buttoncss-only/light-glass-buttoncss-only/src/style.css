@@ -1,0 +1,139 @@
+main {
+  background-image: linear-gradient(180deg, #E7EAEF 0%, #CBD4E9 100%);
+}
+.button {
+  user-select: none;
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 56px;
+  gap: 10px;
+  transition: all ease-in-out 0.15s;
+  border-radius: 56px;
+  z-index: 1;
+  backdrop-filter: blur(6px);
+  font-weight: 600;
+  color: #5b596c;
+  cursor: pointer;
+}
+.button * {
+  cursor: pointer;
+  user-select: none;
+}
+.button__container {
+  position: relative;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 32px;
+  overflow: hidden;
+  border-radius: 56px;
+  transition: all ease-in-out 0.15s;
+  z-index: 2;
+}
+.button__label {
+  position: relative;
+  z-index: 3;
+}
+.button--icon-only,
+.button--icon-only .button__container {
+  width: 56px;
+  padding: 0;
+}
+
+.button--glass .button__container {
+  background: linear-gradient(
+    180deg,
+    rgba(224, 230, 239, 0.8) 0%,
+    rgba(191, 200, 216, 0.8) 57.59%,
+    rgba(214, 218, 227, 0.8) 100%
+  );
+
+  box-shadow: 0 -3px 4px 0 rgba(63, 63, 90, 0.1) inset,
+    0 -27px 12px 0 rgba(255, 255, 255, 0.42) inset,
+    1px 1px 1px 0 rgba(255, 255, 255, 0.45) inset,
+    -1px -1px 1px 0 rgba(255, 255, 255, 0.45) inset,
+    0 4px 4px 0 rgba(255, 255, 255, 0.3) inset,
+    0 4px 8px 0 rgba(255, 255, 255, 0.25) inset,
+    0 4px 12px 0 rgba(78, 84, 103, 0.29);
+}
+
+.button--glass .button__container::before {
+  content: "";
+  transform: rotate(-15deg);
+  position: absolute;
+  transition: all ease-in-out 0.15s;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 33.33%;
+  background: linear-gradient(
+    90deg,
+    #ebe8f5 0%,
+    #eec3ff 30.34%,
+    #ffdfcd 51.92%,
+    #d1ffd1 75.48%,
+    #7fcffb 100%
+  );
+  box-shadow: 0 -9px 8px 0 rgba(255, 255, 255, 0.42) inset;
+  filter: blur(8px);
+  z-index: 2;
+}
+.button--glass::after {
+  content: "";
+  transition: all ease-in-out 0.15s;
+  transform-origin: top;
+  transform: rotate(-15deg) scaleX(0.8) scaleY(1.2);
+  position: absolute;
+  bottom: -8px;
+  left: -8px;
+  width: 100%;
+  height: 33.33%;
+  background: linear-gradient(
+    90deg,
+    #ebe8f5 0%,
+    #eec3ff 30.34%,
+    #ffdfcd 51.92%,
+    #d1ffd1 75.48%,
+    #7fcffb 100%
+  );
+  opacity: 0.7;
+  box-shadow: 0 -9px 8px 0 rgba(255, 255, 255, 0.42) inset;
+  filter: blur(8px);
+  z-index: -1;
+}
+.button--glass {
+  box-shadow: 0px 4px 12px 0px rgba(255, 255, 255, 0.7);
+}
+.button--glass:hover {
+  box-shadow: 0px 6px 24px 6px rgba(255, 255, 255, 0.7);
+}
+.button--glass:active {
+  box-shadow: 0px 8px 32px 8px rgba(255, 255, 255, 0.9);
+}
+.button--glass:hover .button__container {
+  background-color: rgba(255, 255, 255, 1);
+}
+.button--glass:active .button__container {
+  background-color: rgba(191, 200, 216, 0.8);
+}
+.button--glass:hover::after {
+  opacity: 0.9;
+  transform: rotate(-12deg) scaleX(0.8) scaleY(1.8);
+}
+
+.button--glass:hover .button__container:before {
+  transform: scale(1.2);
+}
+
+.button--glass:active::after {
+  opacity: 1;
+  transform: rotate(-12deg) scaleX(1.1) scaleY(1.8) translateX(-8px);
+  filter: blur(10px);
+}
+
+.button--glass:active .button__container:before {
+  transform: scale(1.8);
+}
