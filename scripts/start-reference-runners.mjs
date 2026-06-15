@@ -5,24 +5,36 @@ import { access, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  INSTALL_STATUS_FILE,
   PUBLIC_RUNNERS,
   PIDS_FILE,
-  RUNNERS_REPOS,
   RUNNERS_LOGS,
+  RUNNERS_REPOS,
   VAULT_GITHUB,
   assessRunnerHealth,
   buildLiquidDomPackages,
   buildLiquidDomStartCommand,
+  buildServeStartCommand,
   copyRepo,
+  distLooksBuilt,
   ensureRunnerDirs,
   expectedRunnerUrl,
   findUnexpectedPortsInLog,
+  generateNoDemoWrapper,
   getListeningPid,
+  hasNodeModules,
+  installCommandFor,
   isHttpResponding,
   isPidAlive,
   killPid,
+  listDistFiles,
   readJson,
+  readPackageJson,
   readRunnerStatus,
+  resolveServeTarget,
+  runPackageBuild,
+  runPackageInstall,
+  runWatchUntilDist,
   waitForHttp,
   writeJson,
   writeRunnerStatus,
@@ -49,21 +61,147 @@ function selectRunners(runners, opts) {
   return runnable.slice(0, opts.top);
 }
 
-function pmInstall(runner) {
-  const cwd = join(RUNNERS_REPOS, runner.id);
-  const map = {
-    pnpm: ['pnpm', 'install'],
-    yarn: ['yarn', 'install'],
-    bun: ['bun', 'install'],
-    npm: ['npm', 'install'],
+async function ensureInstalled(runner, dest, statusMap) {
+  const skip = process.env.RRL_SKIP_INSTALL === '1';
+  const force = process.env.RRL_FORCE_INSTALL === '1';
+  const logPath = join(RUNNERS_LOGS, `${runner.id}.install.log`);
+  const expectedUrl = expectedRunnerUrl(runner);
+
+  if (skip) {
+    if (!(await hasNodeModules(dest))) {
+      statusMap[runner.id] = {
+        id: runner.id,
+        status: 'install-failed',
+        port: runner.port,
+        localDevUrl: expectedUrl,
+        expectedUrl,
+        pid: null,
+        responding: false,
+        logFile: join(RUNNERS_LOGS, `${runner.id}.log`),
+        error: 'Dependencies not installed (RRL_SKIP_INSTALL=1)',
+        notes: ['Run node scripts/install-reference-runners.mjs'],
+      };
+      return false;
+    }
+    return true;
+  }
+
+  const installStatus = (await readJson(INSTALL_STATUS_FILE, {})) ?? {};
+  const prior = installStatus[runner.id];
+  if (!force && prior?.installed && (await hasNodeModules(dest))) {
+    return true;
+  }
+  if (!force && !runner.requiresInstall && runner.runnerType === 'static') {
+    return true;
+  }
+  if (!force && (await hasNodeModules(dest)) && runner.runnerType !== 'package') {
+    return true;
+  }
+
+  const pm = runner.packageManager === 'unknown' || runner.packageManager === 'npx'
+    ? 'npm'
+    : runner.packageManager;
+  console.log(`  Installing (${installCommandFor(pm)})…`);
+  statusMap[runner.id] = {
+    ...statusMap[runner.id],
+    id: runner.id,
+    status: 'installing',
+    port: runner.port,
+    localDevUrl: expectedUrl,
+    expectedUrl,
   };
-  const cmd = map[runner.packageManager] ?? map.npm;
-  console.log(`  Installing (${cmd[0]})…`);
-  const result = spawnSync(cmd[0], cmd.slice(1), { cwd, stdio: 'inherit', env: process.env });
-  return result.status === 0;
+
+  const result = await runPackageInstall(dest, pm, logPath);
+  if (result.exitCode !== 0) {
+    statusMap[runner.id] = {
+      id: runner.id,
+      status: 'install-failed',
+      port: runner.port,
+      localDevUrl: expectedUrl,
+      expectedUrl,
+      pid: null,
+      responding: false,
+      logFile: join(RUNNERS_LOGS, `${runner.id}.log`),
+      installLogFile: logPath,
+      error: 'Install failed',
+      notes: ['Install failed — see install log'],
+      installStatus: 'failed',
+    };
+    console.log('  ✗ Install failed');
+    return false;
+  }
+  return true;
 }
 
-function buildStartCommand(runner, cwd, pkgScripts) {
+async function ensureBuilt(runner, dest, pkg, statusMap) {
+  const force = process.env.RRL_FORCE_BUILD === '1';
+  const expectedUrl = expectedRunnerUrl(runner);
+  const logPath = join(RUNNERS_LOGS, `${runner.id}.build.log`);
+  const pm = runner.packageManager === 'unknown' || runner.packageManager === 'npx'
+    ? 'npm'
+    : runner.packageManager;
+
+  if (!runner.requiresBuild && runner.startMode !== 'build-then-serve-example') {
+    return { ok: true, built: false };
+  }
+
+  if (!force && (await distLooksBuilt(dest, pkg))) {
+    return { ok: true, built: true, skipped: true };
+  }
+
+  const scripts = pkg?.scripts ?? {};
+  if (scripts.build) {
+    console.log(`  Building (${runner.buildCommand ?? 'npm run build'})…`);
+    const result = await runPackageBuild(dest, pm, 'build', logPath);
+    if (result.exitCode !== 0) {
+      statusMap[runner.id] = {
+        id: runner.id,
+        status: 'build-failed',
+        port: runner.port,
+        localDevUrl: expectedUrl,
+        expectedUrl,
+        pid: null,
+        responding: false,
+        logFile: join(RUNNERS_LOGS, `${runner.id}.log`),
+        buildLogFile: logPath,
+        error: 'Build failed',
+        notes: ['Build failed — see build log'],
+        buildStatus: 'failed',
+      };
+      console.log('  ✗ Build failed');
+      return { ok: false, built: false };
+    }
+    return { ok: true, built: true, buildStatus: 'passed' };
+  }
+
+  if (scripts.dev && runner.buildOnlyDevScript) {
+    console.log('  Running dev watcher briefly until dist appears…');
+    const result = await runWatchUntilDist(dest, pm, 'dev', logPath);
+    if (!result.built) {
+      statusMap[runner.id] = {
+        id: runner.id,
+        status: 'build-failed',
+        port: runner.port,
+        localDevUrl: expectedUrl,
+        expectedUrl,
+        pid: null,
+        responding: false,
+        logFile: join(RUNNERS_LOGS, `${runner.id}.log`),
+        buildLogFile: logPath,
+        error: 'Watch build did not produce dist in time',
+        notes: ['Dev watcher did not produce dist files'],
+        buildStatus: 'failed',
+      };
+      console.log('  ✗ Watch build timed out');
+      return { ok: false, built: false };
+    }
+    return { ok: true, built: true, buildStatus: 'passed' };
+  }
+
+  return { ok: true, built: false };
+}
+
+function buildStartCommand(runner, cwd, pkgScripts, serveInfo) {
   const port = String(runner.port);
   const env = {
     ...process.env,
@@ -76,7 +214,13 @@ function buildStartCommand(runner, cwd, pkgScripts) {
     return buildLiquidDomStartCommand(cwd, runner.port);
   }
 
-  if (runner.runnerType === 'static') {
+  if (runner.startMode === 'build-then-serve-example' || serveInfo) {
+    const serveDir = serveInfo?.serveDir ?? runner.serveDir ?? '.';
+    const serveCwd = serveInfo?.serveCwd ?? cwd;
+    return buildServeStartCommand(serveDir, runner.port, serveCwd);
+  }
+
+  if (runner.runnerType === 'static' || runner.startMode === 'static-serve') {
     const target = runner.serveDir === '.' ? '.' : runner.serveDir;
     return {
       cmd: 'npx',
@@ -99,7 +243,7 @@ function buildStartCommand(runner, cwd, pkgScripts) {
       args: ['--yes', 'live-server', dir, `--port=${port}`, '--host=127.0.0.1', '--no-browser'],
       env,
       cwd,
-      startMode: 'normal',
+      startMode: 'web-dev-server',
     };
   }
 
@@ -109,7 +253,7 @@ function buildStartCommand(runner, cwd, pkgScripts) {
       args: ['run', script, '--', '--host', '127.0.0.1', '--port', port, '--strictPort'],
       env,
       cwd,
-      startMode: 'normal',
+      startMode: 'web-dev-server',
     };
   }
   if (pm === 'yarn') {
@@ -118,7 +262,7 @@ function buildStartCommand(runner, cwd, pkgScripts) {
       args: [script, '--host', '127.0.0.1', '--port', port, '--strictPort'],
       env,
       cwd,
-      startMode: 'normal',
+      startMode: 'web-dev-server',
     };
   }
 
@@ -127,7 +271,7 @@ function buildStartCommand(runner, cwd, pkgScripts) {
     args: ['run', script, '--', '--host', '127.0.0.1', '--port', port, '--strictPort'],
     env,
     cwd,
-    startMode: 'normal',
+    startMode: 'web-dev-server',
   };
 }
 
@@ -155,6 +299,7 @@ export async function startRunner(runner, statusMap, pidsMap, { force = false } 
       status: 'failed',
       port: runner.port,
       localDevUrl: expectedUrl,
+      expectedUrl,
       pid: null,
       responding: false,
       logFile: logPath,
@@ -175,10 +320,11 @@ export async function startRunner(runner, statusMap, pidsMap, { force = false } 
       status: 'running',
       port: runner.port,
       localDevUrl: expectedUrl,
+      expectedUrl,
       pid: health.pid,
       responding: true,
       logFile: logPath,
-      startMode: statusMap[runner.id]?.startMode ?? 'normal',
+      startMode: statusMap[runner.id]?.startMode ?? runner.startMode ?? 'normal',
     };
     if (health.pid) pidsMap[runner.id] = health.pid;
     return;
@@ -192,73 +338,83 @@ export async function startRunner(runner, statusMap, pidsMap, { force = false } 
 
   const listenerPid = getListeningPid(runner.port);
   if (listenerPid && listenerPid !== existingPid) {
+    const responding = await isHttpResponding(expectedUrl);
     statusMap[runner.id] = {
       id: runner.id,
-      status: 'port-in-use',
+      status: responding ? 'running' : 'port-in-use',
       port: runner.port,
       localDevUrl: expectedUrl,
+      expectedUrl,
       pid: listenerPid,
-      responding: await isHttpResponding(expectedUrl),
+      responding,
       logFile: logPath,
       error: `Port ${runner.port} is already in use by pid ${listenerPid}`,
       notes: [`Port ${runner.port} occupied by pid ${listenerPid}`],
     };
-    console.log(`  ✗ Port ${runner.port} already in use by pid ${listenerPid}`);
+    console.log(`  ${responding ? '✓' : '✗'} Port ${runner.port} already in use by pid ${listenerPid}`);
     return;
   }
 
   console.log('  Copying repo to runner workspace…');
   await copyRepo(src, dest);
 
-  let pkgScripts = {};
+  const pkg = await readPackageJson(dest);
+  const pkgScripts = pkg?.scripts ?? {};
   let builtLiquidDomLayout = false;
-  if (runner.runnerType === 'package') {
-    try {
-      const pkg = JSON.parse(await readFile(join(dest, 'package.json'), 'utf8'));
-      pkgScripts = pkg.scripts ?? {};
-    } catch { /* no package.json */ }
+  let buildStatus = null;
+  let serveInfo = null;
+  let generatedWrapper = false;
 
-    const ok = pmInstall(runner);
-    if (!ok) {
-      statusMap[runner.id] = {
-        id: runner.id,
-        status: 'install-failed',
-        port: runner.port,
-        localDevUrl: expectedUrl,
-        pid: null,
-        responding: false,
-        logFile: logPath,
-        error: 'Install failed',
-        notes: ['Install failed'],
-      };
-      console.log('  ✗ Install failed');
-      return;
-    }
+  if (runner.runnerType === 'package' || runner.packageStyle || runner.requiresInstall) {
+    const installed = await ensureInstalled(runner, dest, statusMap);
+    if (!installed) return;
 
     if (runner.id === 'liquid-dom') {
       console.log('  Building liquid-dom workspace packages…');
       const built = await buildLiquidDomPackages(dest);
       builtLiquidDomLayout = built;
+      buildStatus = built ? 'passed' : 'failed';
       if (!built) {
         statusMap[runner.id] = {
           id: runner.id,
           status: 'build-failed',
           port: runner.port,
           localDevUrl: expectedUrl,
+          expectedUrl,
           pid: null,
           responding: false,
           logFile: logPath,
           error: 'liquid-dom workspace build failed',
           notes: ['@liquid-dom/layout/core/react build failed'],
           builtLiquidDomLayout: false,
+          buildStatus: 'failed',
         };
         console.log('  ✗ liquid-dom workspace build failed');
         return;
       }
+    } else if (runner.startMode === 'build-then-serve-example' || runner.requiresBuild) {
+      const buildResult = await ensureBuilt(runner, dest, pkg, statusMap);
+      if (!buildResult.ok) return;
+      buildStatus = buildResult.buildStatus ?? (buildResult.built ? 'passed' : 'n/a');
     }
   }
 
-  const { cmd, args, env, cwd, startMode = 'normal' } = buildStartCommand(runner, dest, pkgScripts);
+  if (runner.startMode === 'build-then-serve-example') {
+    serveInfo = await resolveServeTarget(dest, runner.id);
+    if (!serveInfo) {
+      const builtFiles = await listDistFiles(dest);
+      serveInfo = await generateNoDemoWrapper(runner.id, dest, builtFiles);
+      generatedWrapper = true;
+    }
+    console.log(`  Serving ${serveInfo.serveTarget ?? serveInfo.serveDir}…`);
+  }
+
+  const { cmd, args, env, cwd, startMode = runner.startMode ?? 'normal' } = buildStartCommand(
+    runner,
+    dest,
+    pkgScripts,
+    serveInfo,
+  );
   await writeFile(logPath, `--- start ${new Date().toISOString()} pid pending ---\n`);
   const logFd = openSync(logPath, 'a');
 
@@ -274,45 +430,74 @@ export async function startRunner(runner, statusMap, pidsMap, { force = false } 
   child.unref();
   pidsMap[runner.id] = child.pid;
 
-  console.log(`  Waiting for ${expectedUrl} …`);
-  const up = await waitForHttp(expectedUrl, 45000, 800);
+  const checkUrl = expectedUrl;
+  console.log(`  Waiting for ${checkUrl} …`);
+  const up = await waitForHttp(checkUrl, 45000, 800);
   const logContent = await readLogTail(logPath);
   const unexpectedUrls = findUnexpectedPortsInLog(logContent, runner.port);
 
-  let status = up ? 'running' : 'start-timeout';
-  let error = up ? null : 'Port did not respond in time';
+  let status;
+  let error = null;
   const notes = [];
 
-  if (!up && unexpectedUrls.length) {
+  if (up && generatedWrapper) {
+    status = 'built-no-demo';
+  } else if (up) {
+    status = 'running';
+  } else if (generatedWrapper || serveInfo?.serveTarget === 'generated-wrapper') {
+    status = 'built-no-demo';
+    error = 'Package built but no runnable example; serving status wrapper';
+    notes.push('No runnable local example detected — generated wrapper served');
+  } else if (buildStatus === 'passed' && runner.startMode === 'build-then-serve-example') {
+    status = 'built-no-demo';
+    error = 'Build succeeded but expected demo URL is not responding';
+    notes.push('Inspect examples/ and README to wire a local example');
+  } else if (unexpectedUrls.length) {
     status = 'wrong-port';
-    error = `Expected ${expectedUrl}; observed in log: ${unexpectedUrls.join(', ')}`;
+    error = `Expected ${checkUrl}; observed in log: ${unexpectedUrls.join(', ')}`;
     notes.push(error);
-  } else if (!up) {
+  } else if (child.pid && !(await isHttpResponding(checkUrl))) {
+    status = 'start-timeout';
+    error = 'Port did not respond in time';
     notes.push('Port did not respond in time (process may still be starting)');
+  } else {
+    status = 'start-timeout';
+    error = 'Port did not respond in time';
+    notes.push('Port did not respond in time');
   }
+
+  const responding = up;
 
   statusMap[runner.id] = {
     id: runner.id,
-    status,
+    status: up && generatedWrapper ? 'built-no-demo' : (up ? 'running' : status),
     port: runner.port,
     localDevUrl: expectedUrl,
+    expectedUrl,
     pid: child.pid,
-    responding: up,
+    responding,
     logFile: logPath,
     error,
     notes,
-    startMode,
+    startMode: serveInfo ? 'build-then-serve-example' : startMode,
     observedUrl: status === 'wrong-port' ? (unexpectedUrls[0] ?? null) : null,
     builtLiquidDomLayout: runner.id === 'liquid-dom' ? builtLiquidDomLayout : undefined,
+    buildStatus,
+    serveTarget: serveInfo?.serveTarget ?? runner.serveTarget ?? null,
+    serveStatus: serveInfo ? (responding ? 'passed' : (generatedWrapper ? 'missing' : 'failed')) : null,
+    generatedWrapper: generatedWrapper || serveInfo?.generatedWrapper || false,
+    installStatus: 'passed',
   };
 
-  if (up) {
-    console.log(`  ✓ ${expectedUrl}`);
+  if (responding) {
+    console.log(`  ✓ ${checkUrl}`);
+  } else if (status === 'built-no-demo') {
+    console.log(`  ⚠ Built but demo not responding — ${error}`);
   } else if (status === 'wrong-port') {
     console.log(`  ✗ Started on unexpected port — check ${logPath}`);
     console.log(`    ${error}`);
   } else {
-    console.log(`  ⚠ Started pid ${child.pid} but port not responding yet — check ${logPath}`);
+    console.log(`  ⚠ Started pid ${child.pid} but not responding yet — check ${logPath}`);
   }
 }
 

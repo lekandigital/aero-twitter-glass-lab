@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-15T06:17:00.532Z",
+  "generatedAt": "2026-06-15T06:51:37.802Z",
   "mainApp": {
     "url": "http://127.0.0.1:5173/raw-reference-lab/",
     "status": "running",
@@ -21,7 +21,10 @@
         "port responding but tracked PID is not alive"
       ],
       "observedUrl": null,
-      "builtLiquidDomLayout": null
+      "builtLiquidDomLayout": null,
+      "buildStatus": null,
+      "serveTarget": null,
+      "generatedWrapper": false
     },
     {
       "id": "archisvaze-liquid-glass",
@@ -36,7 +39,10 @@
         "port responding but tracked PID is not alive"
       ],
       "observedUrl": null,
-      "builtLiquidDomLayout": null
+      "builtLiquidDomLayout": null,
+      "buildStatus": null,
+      "serveTarget": null,
+      "generatedWrapper": false
     },
     {
       "id": "liquid-glass-js",
@@ -49,7 +55,10 @@
       "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/liquid-glass-js.log",
       "notes": [],
       "observedUrl": null,
-      "builtLiquidDomLayout": null
+      "builtLiquidDomLayout": null,
+      "buildStatus": null,
+      "serveTarget": null,
+      "generatedWrapper": false
     },
     {
       "id": "glassmorphism-template",
@@ -62,7 +71,10 @@
       "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/glassmorphism-template.log",
       "notes": [],
       "observedUrl": null,
-      "builtLiquidDomLayout": null
+      "builtLiquidDomLayout": null,
+      "buildStatus": null,
+      "serveTarget": null,
+      "generatedWrapper": false
     },
     {
       "id": "liquid-dom",
@@ -75,12 +87,15 @@
       "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/liquid-dom.log",
       "notes": [],
       "observedUrl": null,
-      "builtLiquidDomLayout": true
+      "builtLiquidDomLayout": true,
+      "buildStatus": null,
+      "serveTarget": null,
+      "generatedWrapper": false
     },
     {
       "id": "glass-refraction",
       "port": 5315,
-      "expectedUrl": "http://localhost:5315",
+      "expectedUrl": "http://localhost:5315/examples/vanilla/",
       "status": "running",
       "pid": 53679,
       "responding": true,
@@ -88,7 +103,10 @@
       "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/glass-refraction.log",
       "notes": [],
       "observedUrl": null,
-      "builtLiquidDomLayout": null
+      "builtLiquidDomLayout": null,
+      "buildStatus": null,
+      "serveTarget": "examples/vanilla",
+      "generatedWrapper": false
     },
     {
       "id": "glassmorphism",
@@ -101,7 +119,10 @@
       "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/glassmorphism.log",
       "notes": [],
       "observedUrl": null,
-      "builtLiquidDomLayout": null
+      "builtLiquidDomLayout": null,
+      "buildStatus": null,
+      "serveTarget": null,
+      "generatedWrapper": false
     },
     {
       "id": "7-Aero-Stylesheet",
@@ -114,7 +135,10 @@
       "logFile": "/Users/lekan/Dev/aero-twitter-glass-lab/.raw-reference-runners/logs/7-Aero-Stylesheet.log",
       "notes": [],
       "observedUrl": null,
-      "builtLiquidDomLayout": null
+      "builtLiquidDomLayout": null,
+      "buildStatus": null,
+      "serveTarget": null,
+      "generatedWrapper": false
     }
   ]
 }

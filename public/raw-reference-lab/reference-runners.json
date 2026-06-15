@@ -22,7 +22,18 @@
     "port": 5310,
     "status": "not-started",
     "localDevUrl": "http://localhost:5310",
+    "expectedUrl": "http://localhost:5310",
+    "startMode": "static-serve",
+    "packageStyle": false,
+    "requiresInstall": false,
+    "requiresBuild": false,
+    "installCommand": null,
+    "labels": [
+      "Open full demo"
+    ],
+    "openButtonLabel": "Open full demo",
     "notes": "Static HTML demo. Served via npx serve in isolated runner copy. Not ported.",
+    "serveCommand": "npx serve . -l 5310",
     "runnerPath": ".raw-reference-runners/repos/liquidGL"
   },
   {
@@ -48,7 +59,18 @@
     "port": 5311,
     "status": "not-started",
     "localDevUrl": "http://localhost:5311",
+    "expectedUrl": "http://localhost:5311",
+    "startMode": "static-serve",
+    "packageStyle": false,
+    "requiresInstall": false,
+    "requiresBuild": false,
+    "installCommand": null,
+    "labels": [
+      "Open full demo"
+    ],
+    "openButtonLabel": "Open full demo",
     "notes": "Static HTML demo. Served via npx serve in isolated runner copy. Not ported.",
+    "serveCommand": "npx serve . -l 5311",
     "runnerPath": ".raw-reference-runners/repos/archisvaze-liquid-glass"
   },
   {
@@ -74,7 +96,18 @@
     "port": 5312,
     "status": "not-started",
     "localDevUrl": "http://localhost:5312",
+    "expectedUrl": "http://localhost:5312",
+    "startMode": "static-serve",
+    "packageStyle": false,
+    "requiresInstall": false,
+    "requiresBuild": false,
+    "installCommand": null,
+    "labels": [
+      "Open full demo"
+    ],
+    "openButtonLabel": "Open full demo",
     "notes": "Static HTML demo. Served via npx serve in isolated runner copy. Not ported.",
+    "serveCommand": "npx serve . -l 5312",
     "runnerPath": ".raw-reference-runners/repos/liquid-glass-js"
   },
   {
@@ -100,6 +133,21 @@
     "port": 5313,
     "status": "not-started",
     "localDevUrl": "http://localhost:5313",
+    "expectedUrl": "http://localhost:5313",
+    "startMode": "web-dev-server",
+    "packageStyle": true,
+    "requiresInstall": true,
+    "requiresBuild": false,
+    "buildOnlyDevScript": false,
+    "installCommand": "npm install",
+    "devScript": null,
+    "devScriptKind": null,
+    "labels": [
+      "Package repo",
+      "Install needed",
+      "Open local dev server"
+    ],
+    "openButtonLabel": "Open local dev server",
     "notes": "Package repo. Can run as isolated local dev server. Not ported.",
     "runnerPath": ".raw-reference-runners/repos/glassmorphism-template"
   },
@@ -135,13 +183,28 @@
     "port": 5314,
     "status": "not-started",
     "localDevUrl": "http://localhost:5314",
+    "expectedUrl": "http://localhost:5314",
+    "startMode": "web-dev-server",
+    "packageStyle": true,
+    "requiresInstall": true,
+    "requiresBuild": false,
+    "buildOnlyDevScript": false,
+    "installCommand": "pnpm install",
+    "devScript": "pnpm --parallel --filter @liquid-dom/core --filter editor dev",
+    "devScriptKind": "unknown-package",
+    "labels": [
+      "Package repo",
+      "Install needed",
+      "Open local dev server"
+    ],
+    "openButtonLabel": "Open local dev server",
     "notes": "Package repo. Can run as isolated local dev server. Not ported.",
     "runnerPath": ".raw-reference-runners/repos/liquid-dom"
   },
   {
     "id": "glass-refraction",
     "title": "glass-refraction",
-    "runnerType": "static",
+    "runnerType": "package",
     "runnable": true,
     "sourcePath": "_reference_vault/reference-library/github/glass-refraction",
     "sourceUrl": "https://github.com/Z1Code/glass-refraction",
@@ -149,19 +212,44 @@
       "glass-refraction",
       "glassrefraction"
     ],
-    "packageManager": "npx",
+    "packageManager": "npm",
     "scripts": [
-      "serve"
+      "build",
+      "dev",
+      "prepublishOnly"
     ],
-    "runnableScripts": [
-      "serve"
-    ],
-    "recommendedScript": "serve",
-    "serveDir": "examples/vanilla",
+    "runnableScripts": [],
+    "recommendedScript": null,
     "port": 5315,
     "status": "not-started",
-    "localDevUrl": "http://localhost:5315",
-    "notes": "Package repo with no dev server script; static HTML demo available via serve.",
+    "localDevUrl": "http://localhost:5315/examples/vanilla/",
+    "expectedUrl": "http://localhost:5315/examples/vanilla/",
+    "startMode": "build-then-serve-example",
+    "packageStyle": true,
+    "requiresInstall": true,
+    "requiresBuild": true,
+    "buildOnlyDevScript": true,
+    "installCommand": "npm install",
+    "buildCommand": "npm run build",
+    "serveCommand": "npx serve . -l 5315",
+    "serveTarget": "examples/vanilla",
+    "serveDir": ".",
+    "urlPath": "/examples/vanilla/",
+    "devScript": "tsup --watch",
+    "devScriptKind": "build-watch-only",
+    "generatedWrapper": false,
+    "instructions": [
+      "This repo's dev script is a build watcher, not a web server.",
+      "Install dependencies, build dist, then serve examples or generated wrapper."
+    ],
+    "labels": [
+      "Build then serve",
+      "Package repo",
+      "Install needed",
+      "Build watcher"
+    ],
+    "openButtonLabel": "Open package example",
+    "notes": "Package repo: install, build dist, then serve example or generated wrapper.",
     "runnerPath": ".raw-reference-runners/repos/glass-refraction"
   },
   {
@@ -186,7 +274,18 @@
     "port": 5316,
     "status": "not-started",
     "localDevUrl": "http://localhost:5316",
+    "expectedUrl": "http://localhost:5316",
+    "startMode": "static-serve",
+    "packageStyle": false,
+    "requiresInstall": false,
+    "requiresBuild": false,
+    "installCommand": null,
+    "labels": [
+      "Open full demo"
+    ],
+    "openButtonLabel": "Open full demo",
     "notes": "Static HTML demo. Served via npx serve in isolated runner copy. Not ported.",
+    "serveCommand": "npx serve . -l 5316",
     "runnerPath": ".raw-reference-runners/repos/glassmorphism"
   },
   {
@@ -213,7 +312,18 @@
     "port": 5317,
     "status": "not-started",
     "localDevUrl": "http://localhost:5317",
+    "expectedUrl": "http://localhost:5317",
+    "startMode": "static-serve",
+    "packageStyle": false,
+    "requiresInstall": false,
+    "requiresBuild": false,
+    "installCommand": null,
+    "labels": [
+      "Open full demo"
+    ],
+    "openButtonLabel": "Open full demo",
     "notes": "Static HTML demo. Served via npx serve in isolated runner copy. Not ported.",
+    "serveCommand": "npx serve . -l 5317",
     "runnerPath": ".raw-reference-runners/repos/7-Aero-Stylesheet"
   },
   {
@@ -237,6 +347,18 @@
     "port": null,
     "status": "not-runnable",
     "localDevUrl": null,
+    "startMode": "build-only",
+    "packageStyle": true,
+    "requiresInstall": true,
+    "requiresBuild": true,
+    "buildOnlyDevScript": false,
+    "devScript": null,
+    "devScriptKind": null,
+    "labels": [
+      "Package repo",
+      "Manual step needed"
+    ],
+    "openButtonLabel": "Open source",
     "notes": "No runnable npm scripts found (dev may be watch-only build).",
     "skipReason": "No runnable npm scripts found",
     "runnerPath": ".raw-reference-runners/repos/7.css"
@@ -289,6 +411,18 @@
     "port": null,
     "status": "not-runnable",
     "localDevUrl": null,
+    "startMode": "build-only",
+    "packageStyle": true,
+    "requiresInstall": true,
+    "requiresBuild": true,
+    "buildOnlyDevScript": true,
+    "devScript": "npm run build:esm -- --watch",
+    "devScriptKind": "build-watch-only",
+    "labels": [
+      "Package repo",
+      "Manual step needed"
+    ],
+    "openButtonLabel": "Open source",
     "notes": "No runnable npm scripts found (dev may be watch-only build).",
     "skipReason": "No runnable npm scripts found",
     "runnerPath": ".raw-reference-runners/repos/liquid-glass-react"

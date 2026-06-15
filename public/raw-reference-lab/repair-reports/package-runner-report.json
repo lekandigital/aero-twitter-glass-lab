@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-06-15T06:52:12.420Z",
+  "summary": {
+    "packageRunners": 3,
+    "installed": 3,
+    "buildSucceeded": 1,
+    "running": 3,
+    "manualStepNeeded": 0
+  },
+  "runners": [
+    {
+      "id": "glassmorphism-template",
+      "repoPath": ".raw-reference-runners/repos/glassmorphism-template",
+      "packageManager": "npm",
+      "installCommand": "npm install",
+      "installStatus": "skipped",
+      "devScript": null,
+      "devScriptKind": null,
+      "buildCommand": "npm run build",
+      "buildStatus": "n/a",
+      "serveTarget": null,
+      "serveStatus": "missing",
+      "expectedUrl": "http://localhost:5313",
+      "responding": true,
+      "status": "running",
+      "generatedWrapper": false,
+      "manualInstructions": [
+        "npm install passed",
+        "no runnable local example was detected",
+        "inspect examples/ and README",
+        "likely next step: create a generated wrapper that imports dist files"
+      ]
+    },
+    {
+      "id": "liquid-dom",
+      "repoPath": ".raw-reference-runners/repos/liquid-dom",
+      "packageManager": "pnpm",
+      "installCommand": "pnpm install",
+      "installStatus": "skipped",
+      "devScript": "pnpm --parallel --filter @liquid-dom/core --filter editor dev",
+      "devScriptKind": "unknown-package",
+      "buildCommand": "pnpm run build",
+      "buildStatus": "not-run",
+      "serveTarget": "demo/minimal",
+      "serveStatus": "not-run",
+      "expectedUrl": "http://localhost:5314",
+      "responding": true,
+      "status": "running",
+      "generatedWrapper": false,
+      "manualInstructions": [
+        "pnpm install passed"
+      ]
+    },
+    {
+      "id": "glass-refraction",
+      "repoPath": ".raw-reference-runners/repos/glass-refraction",
+      "packageManager": "npm",
+      "installCommand": "npm install",
+      "installStatus": "skipped",
+      "devScript": "tsup --watch",
+      "devScriptKind": "build-watch-only",
+      "buildCommand": "npm run build",
+      "buildStatus": "passed",
+      "serveTarget": "examples/vanilla",
+      "serveStatus": "passed",
+      "expectedUrl": "http://localhost:5315/examples/vanilla/",
+      "responding": true,
+      "status": "running",
+      "generatedWrapper": false,
+      "manualInstructions": [
+        "npm install passed",
+        "dist built successfully"
+      ]
+    }
+  ]
+}
