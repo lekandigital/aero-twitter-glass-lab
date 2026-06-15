@@ -10,6 +10,7 @@ const routes = [
   { path: '/aero-css', label: 'Aero CSS' },
   { path: '/hybrid', label: 'Hybrid' },
   { path: '/references', label: 'References' },
+  { path: '/reference-lab', label: 'Reference Lab' },
 ] as const;
 
 export function RouteSwitcher() {

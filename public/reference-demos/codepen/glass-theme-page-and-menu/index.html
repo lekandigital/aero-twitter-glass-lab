@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reference Demo</title>
+  <link rel="stylesheet" href="./style.scss">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; }
+  </style>
+</head>
+<body>
+<main id="app" class="neon-ui" aria-label="Neon Glass Context UI">
+  <!-- Animated Background -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <div id="grain"></div>
+
+  <!-- Top Bar -->
+  <header class="topbar glass-panel">
+    <h1>Neon Glass Context</h1>
+    <p>Right-click anywhere • Press <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>K</kbd> for Command Palette</p>
+  </header>
+
+  <!-- Demo Content Grid -->
+  <section class="demo-grid" aria-label="Demo Tiles">
+    <article class="tile glass-panel">
+      <h3>Projects</h3>
+      <p>Hover me. Right-click the page for actions.</p>
+      <button class="btn ghost">Open</button>
+    </article>
+    <article class="tile glass-panel">
+      <h3>Scenes</h3>
+      <p>Neon vibes, glass, and micro-interactions.</p>
+      <button class="btn ghost">Preview</button>
+    </article>
+    <article class="tile glass-panel">
+      <h3>Shortcuts</h3>
+      <ul class="shorts">
+        <li><span>Palette</span><kbd>Ctrl/⌘ K</kbd></li>
+        <li><span>Theme Pulse</span><kbd>T</kbd></li>
+        <li><span>Focus Mode</span><kbd>F</kbd></li>
+      </ul>
+    </article>
+    <article class="tile wide glass-panel">
+      <h3>Notes</h3>
+      <p>Keep the feel — push color contrast via <em>H1/H2</em> hues; use presets to snap a palette quickly.</p>
+      <div class="token-row" role="group" aria-label="Theme Presets">
+        <button class="chip" data-preset="synth">Synthwave</button>
+        <button class="chip" data-preset="aqua">Aqua Noir</button>
+        <button class="chip" data-preset="vio">Violet Night</button>
+        <button class="chip" data-preset="amber">Amber Glass</button>
+      </div>
+    </article>
+  </section>
+
+  <!-- Controls Footer -->
+  <footer class="controlbar glass-panel dark">
+    <h2>Pick your own colors</h2>
+    <label class="range">
+      <span>Hue 1</span>
+      <input type="range" id="h1" min="0" max="360" value="255" />
+    </label>
+    <label class="range">
+      <span>Hue 2</span>
+      <input type="range" id="h2" min="0" max="360" value="222" />
+    </label>
+    <label class="range">
+      <span>Glow</span>
+      <input type="range" id="glow" min="0" max="1" step="0.01" value="0.85" />
+    </label>
+    <label class="range">
+      <span>Blur</span>
+      <input type="range" id="blur" min="0" max="24" step="1" value="12" />
+    </label>
+    <button id="saveTheme" class="btn">Save</button>
+    <button id="resetTheme" class="btn ghost">Reset</button>
+  </footer>
+
+  <!-- Context Menu -->
+  <aside id="menu" class="menu glass-panel dark" role="menu" aria-label="Context Menu">
+    <span class="shine shine-top"></span>
+    <span class="shine shine-bottom"></span>
+    <span class="glow glow-top"></span>
+    <span class="glow glow-bottom"></span>
+    <span class="glow glow-bright glow-top "></span>
+    <span class="glow glow-bright glow-bottom "></span>
+
+    <div class="inner">
+      <label class="searchbar">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 21l-4.2-4.2M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" fill="none"/>
+        </svg>
+        <input id="menuSearch" type="text" placeholder="Type a command or search" aria-label="Command search"/>
+      </label>
+
+      <section class="group">
+        <header>Quick Actions</header>
+        <ul>
+          <li data-action="calendar" class="selected">
+            <span class="ico" data-ico="calendar"></span>
+            <span>Open Calendar</span>
+            <kbd>C</kbd>
+          </li>
+          <li data-action="calculator">
+            <span class="ico" data-ico="calc"></span>
+            <span>Calculator</span>
+            <kbd>=</kbd>
+          </li>
+          <li data-action="messages">
+            <span class="ico" data-ico="msg"></span>
+            <span>Messages</span>
+            <kbd>M</kbd>
+          </li>
+        </ul>
+      </section>
+
+      <hr/>
+
+      <section class="group">
+        <header>Settings</header>
+        <ul>
+          <li class="has-sub" aria-haspopup="true" aria-expanded="false">
+            <span class="ico" data-ico="theme"></span>
+            <span>Theme</span>
+            <span class="arrow">▶</span>
+            <ul class="submenu glass-panel">
+              <li data-preset="synth">Synthwave</li>
+              <li data-preset="aqua">Aqua Noir</li>
+              <li data-preset="vio">Violet Night</li>
+              <li data-preset="amber">Amber Glass</li>
+            </ul>
+          </li>
+          <li class="has-sub" aria-haspopup="true" aria-expanded="false">
+            <span class="ico" data-ico="display"></span>
+            <span>Display</span>
+            <span class="arrow">▶</span>
+            <ul class="submenu glass-panel">
+              <li data-display="focus">Toggle Focus Mode</li>
+              <li data-display="grid">Toggle Subtle Grid</li>
+              <li data-display="parallax">Toggle Parallax</li>
+            </ul>
+          </li>
+          <li class="has-toggle">
+            <label class="switch">
+              <input id="particlesToggle" type="checkbox" checked />
+              <span class="slider"></span>
+            </label>
+            <span>Particles</span>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </aside>
+
+  <!-- Command Palette -->
+  <dialog id="palette" class="glass-panel" aria-label="Command Palette">
+    <form method="dialog" class="pal-body">
+      <input id="pal-input" type="text" placeholder="Start typing…" aria-label="Palette input" />
+      <ul id="pal-list" role="listbox" aria-label="Command results"></ul>
+      <div class="pal-hint">
+        <span>↑↓ to navigate • Enter to run • Esc to close</span>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Socials -->
+  <a class="social-icon codepen glass-panel" href="https://codepen.io/simeydotme" title="Original inspiration">Base by Simey</a>
+  <a class="social-icon twitter glass-panel" href="https://twitter.com/simeydotme" title="Simey on Twitter">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 4.01c-1 .49-1.98.69-3 .99-1.12-1.27-2.78-1.34-4.38-.74-1.6.6-2.64 2.06-2.62 3.74v1C8.76 9.08 5.87 7.6 4 5c0 0-4.18 7.43 4 11-1.87 1.25-3.74 2.09-6 2 3.31 1.8 6.91 2.42 10.03 1.52 3.58-1.04 6.52-3.72 7.65-7.74.22-1.2.42-2.47.5-3.75.01-.25 1.52-2.77 1.82-4.03z"/></svg>
+  </a>
+  <a class="social-icon github glass-panel" href="https://github.com/simeydotme" title="Simey on GitHub">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.7 5.4 3 5.4 3a4.2 4.2 0 0 0-.1 3.2 4.6 4.6 0 0 0-1.3 3.2c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+  </a>
+</main>
+
+  <script src="./script.js" defer></script>
+</body>
+</html>

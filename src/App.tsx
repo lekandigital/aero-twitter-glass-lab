@@ -9,6 +9,8 @@ import { ApproachDasherswVanilla } from './routes/ApproachDasherswVanilla';
 import { ApproachAeroCssFallback } from './routes/ApproachAeroCssFallback';
 import { ApproachHybridFinal } from './routes/ApproachHybridFinal';
 import { ReferencesStatus } from './routes/ReferencesStatus';
+import { ReferenceLab } from './routes/ReferenceLab';
+import { ReferenceDemo } from './routes/ReferenceDemo';
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
         <Route path="/aero-css" element={<ApproachAeroCssFallback />} />
         <Route path="/hybrid" element={<ApproachHybridFinal />} />
         <Route path="/references" element={<ReferencesStatus />} />
+        <Route path="/reference-lab" element={<ReferenceLab />} />
+        <Route path="/reference-lab/:id" element={<ReferenceDemo />} />
       </Routes>
     </WorkspaceShell>
   );
