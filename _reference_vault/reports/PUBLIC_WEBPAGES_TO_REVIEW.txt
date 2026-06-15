@@ -26,7 +26,6 @@ https://codepen.io/iotacb/pen/LERYGOL
 https://codepen.io/kaushalpahilwani/pen/EaVGaJP
 https://codepen.io/kerry-brown/pen/yyeYywR
 https://codepen.io/kraelik/pen/OPVZqpp
-https://codepen.io/login
 https://codepen.io/Margarita-the-solid/pen/NPRPBjd
 https://codepen.io/masakazuimai/pen/KwVdMpw
 https://codepen.io/Mikhail-Bespalov/pen/MYwrMNy
@@ -144,9 +143,6 @@ https://www.youtube.com/watch?v=kTOLrsDlKQA
 WIKIPEDIA/DESIGN HISTORY
 ================================================================================
 https://de.wikipedia.org/wiki/Liquid_Glass
-https://en.wikipedia.org/wiki/Ben_Shelton
-https://en.wikipedia.org/wiki/Ben_Shelton#Personal_life
-https://en.wikipedia.org/wiki/Bryan_Shelton
 https://en.wikipedia.org/wiki/Liquid_Glass
 https://en.wikipedia.org/wiki/Windows_Aero
 https://es.wikipedia.org/wiki/Aqua_%28macOS%29
@@ -219,4 +215,3 @@ OTHER PUBLIC
 ================================================================================
 https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js
 https://www.chatgptexporter.com
-
