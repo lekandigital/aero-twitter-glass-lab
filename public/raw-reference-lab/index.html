@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raw Reference Lab</title>
+  <link rel="stylesheet" href="./raw-reference-lab.css">
+</head>
+<body>
+  <div class="rrl-app">
+    <header class="rrl-header">
+      <h1>Raw Reference Lab</h1>
+      <p class="rrl-subtitle">Original local HTML/CSS/JS demos opened as separate pages. No React ports. No CSS rewrites.</p>
+    </header>
+
+    <section class="rrl-stats" id="rrl-stats"></section>
+
+    <section class="rrl-controls">
+      <input type="search" id="rrl-search" class="rrl-search" placeholder="Search title, group, tags, URLs…" autocomplete="off">
+      <div class="rrl-filters" id="rrl-filters"></div>
+      <div class="rrl-sort-row">
+        <label for="rrl-sort">Sort</label>
+        <select id="rrl-sort" class="rrl-sort">
+          <option value="usefulnessScore">usefulness score</option>
+          <option value="title">title</option>
+          <option value="group">group</option>
+          <option value="previewMode">preview mode</option>
+        </select>
+      </div>
+    </section>
+
+    <p class="rrl-count" id="rrl-count" aria-live="polite"></p>
+    <div class="rrl-grid" id="rrl-grid"></div>
+  </div>
+  <script src="./raw-reference-lab.js"></script>
+</body>
+</html>

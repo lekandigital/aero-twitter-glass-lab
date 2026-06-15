@@ -25,3 +25,4 @@ src/references/cleaned/
 src/references/urls-raw.txt
 yarn-debug.log*
 yarn-error.log*
+.raw-reference-runners/
