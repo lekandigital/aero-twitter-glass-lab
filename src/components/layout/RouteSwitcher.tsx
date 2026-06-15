@@ -9,6 +9,8 @@ const routes = [
   { path: '/dashersw', label: 'Dashersw' },
   { path: '/aero-css', label: 'Aero CSS' },
   { path: '/hybrid', label: 'Hybrid' },
+  { path: '/approach-1', label: 'Approach 1' },
+  { path: '/approach-2', label: 'Approach 2' },
   { path: '/references', label: 'References' },
   { path: '/reference-lab', label: 'Reference Lab' },
 ] as const;
