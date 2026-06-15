@@ -1,0 +1,4 @@
+https://github.com/polidario/Frontend-Projects/tree/main/liquid-glass-vue
+https://github.com/Z1Code/glass-refraction/blob/master/README.md
+https://github.com/Z1Code/glass-refraction/blob/master/src/react/GlassFilters.tsx
+https://github.com/tuannm93/lab/blob/main/front-end/liquid-glass-switcher-css.html

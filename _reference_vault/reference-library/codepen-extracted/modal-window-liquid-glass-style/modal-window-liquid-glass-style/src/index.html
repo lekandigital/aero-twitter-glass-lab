@@ -1,0 +1,20 @@
+<button id="open-modal">Open Modal</button>
+
+    <div class="modal-overlay" id="modal-overlay" hidden>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
+            <button class="modal-close" id="modal-close" aria-label="Close modal">×</button>
+            <div class="modal-layer modal-backdrop"></div>
+            <div class="modal-layer modal-foreground">
+              <h2 id="modal-title">Modal Title</h2>
+              <p>This is a reusable modal window component.</p>
+            </div>
+          </div>
+    </div>
+
+    <svg width="0" height="0">
+        <filter id="noise-filter">
+          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" result="noise"/>
+          <feColorMatrix type="saturate" values="0" />
+          <feBlend in="SourceGraphic" in2="noise" mode="multiply" />
+        </filter>
+      </svg>
