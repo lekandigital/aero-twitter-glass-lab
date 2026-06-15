@@ -1,0 +1,340 @@
+[
+  {
+    "id": "liquidGL",
+    "title": "liquidGL",
+    "runnerType": "static",
+    "runnable": true,
+    "sourcePath": "_reference_vault/reference-library/github/liquidGL",
+    "sourceUrl": "https://github.com/naughtyduk/liquidGL",
+    "matchPatterns": [
+      "liquidGL",
+      "liquidgl"
+    ],
+    "packageManager": "npx",
+    "scripts": [
+      "serve"
+    ],
+    "runnableScripts": [
+      "serve"
+    ],
+    "recommendedScript": "serve",
+    "serveDir": ".",
+    "port": 5310,
+    "status": "not-started",
+    "localDevUrl": "http://localhost:5310",
+    "notes": "Static HTML demo. Served via npx serve in isolated runner copy. Not ported.",
+    "runnerPath": ".raw-reference-runners/repos/liquidGL"
+  },
+  {
+    "id": "archisvaze-liquid-glass",
+    "title": "archisvaze-liquid-glass",
+    "runnerType": "static",
+    "runnable": true,
+    "sourcePath": "_reference_vault/reference-library/github/archisvaze-liquid-glass",
+    "sourceUrl": "https://github.com/archisvaze/liquid-glass",
+    "matchPatterns": [
+      "archisvaze-liquid-glass",
+      "archisvazeliquidglass"
+    ],
+    "packageManager": "npx",
+    "scripts": [
+      "serve"
+    ],
+    "runnableScripts": [
+      "serve"
+    ],
+    "recommendedScript": "serve",
+    "serveDir": ".",
+    "port": 5311,
+    "status": "not-started",
+    "localDevUrl": "http://localhost:5311",
+    "notes": "Static HTML demo. Served via npx serve in isolated runner copy. Not ported.",
+    "runnerPath": ".raw-reference-runners/repos/archisvaze-liquid-glass"
+  },
+  {
+    "id": "liquid-glass-js",
+    "title": "liquid-glass-js",
+    "runnerType": "static",
+    "runnable": true,
+    "sourcePath": "_reference_vault/reference-library/github/liquid-glass-js",
+    "sourceUrl": "https://github.com/dashersw/liquid-glass-js",
+    "matchPatterns": [
+      "liquid-glass-js",
+      "liquidglassjs"
+    ],
+    "packageManager": "npx",
+    "scripts": [
+      "serve"
+    ],
+    "runnableScripts": [
+      "serve"
+    ],
+    "recommendedScript": "serve",
+    "serveDir": ".",
+    "port": 5312,
+    "status": "not-started",
+    "localDevUrl": "http://localhost:5312",
+    "notes": "Static HTML demo. Served via npx serve in isolated runner copy. Not ported.",
+    "runnerPath": ".raw-reference-runners/repos/liquid-glass-js"
+  },
+  {
+    "id": "glassmorphism-template",
+    "title": "glassmorphism-template",
+    "runnerType": "package",
+    "runnable": true,
+    "sourcePath": "_reference_vault/reference-library/github/glassmorphism-template",
+    "sourceUrl": "https://github.com/AADI-1331/glassmorphism-template",
+    "matchPatterns": [
+      "glassmorphism-template",
+      "glassmorphismtemplate"
+    ],
+    "packageManager": "npm",
+    "scripts": [
+      "build",
+      "start"
+    ],
+    "runnableScripts": [
+      "start"
+    ],
+    "recommendedScript": "start",
+    "port": 5313,
+    "status": "not-started",
+    "localDevUrl": "http://localhost:5313",
+    "notes": "Package repo. Can run as isolated local dev server. Not ported.",
+    "runnerPath": ".raw-reference-runners/repos/glassmorphism-template"
+  },
+  {
+    "id": "liquid-dom",
+    "title": "liquid-dom",
+    "runnerType": "package",
+    "runnable": true,
+    "sourcePath": "_reference_vault/reference-library/github/liquid-dom",
+    "sourceUrl": "https://github.com/AndrewPrifer/liquid-dom",
+    "matchPatterns": [
+      "liquid-dom",
+      "liquiddom"
+    ],
+    "packageManager": "pnpm",
+    "scripts": [
+      "build",
+      "changeset",
+      "dev",
+      "dev:minimal",
+      "dev:three",
+      "dev:three-layout",
+      "dev:three-react",
+      "dev:three-r3f",
+      "release:check",
+      "release:publish",
+      "release:version"
+    ],
+    "runnableScripts": [
+      "dev"
+    ],
+    "recommendedScript": "dev:minimal",
+    "port": 5314,
+    "status": "not-started",
+    "localDevUrl": "http://localhost:5314",
+    "notes": "Package repo. Can run as isolated local dev server. Not ported.",
+    "runnerPath": ".raw-reference-runners/repos/liquid-dom"
+  },
+  {
+    "id": "glass-refraction",
+    "title": "glass-refraction",
+    "runnerType": "static",
+    "runnable": true,
+    "sourcePath": "_reference_vault/reference-library/github/glass-refraction",
+    "sourceUrl": "https://github.com/Z1Code/glass-refraction",
+    "matchPatterns": [
+      "glass-refraction",
+      "glassrefraction"
+    ],
+    "packageManager": "npx",
+    "scripts": [
+      "serve"
+    ],
+    "runnableScripts": [
+      "serve"
+    ],
+    "recommendedScript": "serve",
+    "serveDir": "examples/vanilla",
+    "port": 5315,
+    "status": "not-started",
+    "localDevUrl": "http://localhost:5315",
+    "notes": "Package repo with no dev server script; static HTML demo available via serve.",
+    "runnerPath": ".raw-reference-runners/repos/glass-refraction"
+  },
+  {
+    "id": "glassmorphism",
+    "title": "glassmorphism",
+    "runnerType": "static",
+    "runnable": true,
+    "sourcePath": "_reference_vault/reference-library/github/glassmorphism",
+    "sourceUrl": null,
+    "matchPatterns": [
+      "glassmorphism"
+    ],
+    "packageManager": "npx",
+    "scripts": [
+      "serve"
+    ],
+    "runnableScripts": [
+      "serve"
+    ],
+    "recommendedScript": "serve",
+    "serveDir": ".",
+    "port": 5316,
+    "status": "not-started",
+    "localDevUrl": "http://localhost:5316",
+    "notes": "Static HTML demo. Served via npx serve in isolated runner copy. Not ported.",
+    "runnerPath": ".raw-reference-runners/repos/glassmorphism"
+  },
+  {
+    "id": "7-Aero-Stylesheet",
+    "title": "7-Aero-Stylesheet",
+    "runnerType": "static",
+    "runnable": true,
+    "sourcePath": "_reference_vault/reference-library/github/7-Aero-Stylesheet",
+    "sourceUrl": null,
+    "matchPatterns": [
+      "7-Aero-Stylesheet",
+      "7-aero-stylesheet",
+      "7aerostylesheet"
+    ],
+    "packageManager": "npx",
+    "scripts": [
+      "serve"
+    ],
+    "runnableScripts": [
+      "serve"
+    ],
+    "recommendedScript": "serve",
+    "serveDir": ".",
+    "port": 5317,
+    "status": "not-started",
+    "localDevUrl": "http://localhost:5317",
+    "notes": "Static HTML demo. Served via npx serve in isolated runner copy. Not ported.",
+    "runnerPath": ".raw-reference-runners/repos/7-Aero-Stylesheet"
+  },
+  {
+    "id": "7.css",
+    "title": "7.css",
+    "runnerType": "package",
+    "runnable": false,
+    "sourcePath": "_reference_vault/reference-library/github/7.css",
+    "sourceUrl": "https://github.com/khang-nd/7.css",
+    "matchPatterns": [
+      "7.css"
+    ],
+    "packageManager": "npm",
+    "scripts": [
+      "build",
+      "deploy",
+      "release"
+    ],
+    "runnableScripts": [],
+    "recommendedScript": null,
+    "port": null,
+    "status": "not-runnable",
+    "localDevUrl": null,
+    "notes": "No runnable npm scripts found (dev may be watch-only build).",
+    "skipReason": "No runnable npm scripts found",
+    "runnerPath": ".raw-reference-runners/repos/7.css"
+  },
+  {
+    "id": "glassmorphism-wpf",
+    "title": "glassmorphism-wpf",
+    "runnerType": "unknown",
+    "runnable": false,
+    "sourcePath": "_reference_vault/reference-library/github/glassmorphism-wpf",
+    "sourceUrl": null,
+    "matchPatterns": [
+      "glassmorphism-wpf",
+      "glassmorphismwpf"
+    ],
+    "packageManager": "unknown",
+    "scripts": [],
+    "runnableScripts": [],
+    "recommendedScript": null,
+    "port": null,
+    "status": "not-runnable",
+    "localDevUrl": null,
+    "notes": "No package.json and no index.html demo found.",
+    "skipReason": "No package.json found",
+    "runnerPath": ".raw-reference-runners/repos/glassmorphism-wpf"
+  },
+  {
+    "id": "liquid-glass-react",
+    "title": "liquid-glass-react",
+    "runnerType": "package",
+    "runnable": false,
+    "sourcePath": "_reference_vault/reference-library/github/liquid-glass-react",
+    "sourceUrl": "https://github.com/rdev/liquid-glass-react",
+    "matchPatterns": [
+      "liquid-glass-react",
+      "liquidglassreact"
+    ],
+    "packageManager": "npm",
+    "scripts": [
+      "build",
+      "build:esm",
+      "build:cjs",
+      "build:types",
+      "clean",
+      "dev",
+      "prepublishOnly"
+    ],
+    "runnableScripts": [],
+    "recommendedScript": null,
+    "port": null,
+    "status": "not-runnable",
+    "localDevUrl": null,
+    "notes": "No runnable npm scripts found (dev may be watch-only build).",
+    "skipReason": "No runnable npm scripts found",
+    "runnerPath": ".raw-reference-runners/repos/liquid-glass-react"
+  },
+  {
+    "id": "polidario-frontend-projects",
+    "title": "polidario-frontend-projects",
+    "runnerType": "unknown",
+    "runnable": false,
+    "sourcePath": "_reference_vault/reference-library/github/polidario-frontend-projects",
+    "sourceUrl": null,
+    "matchPatterns": [
+      "polidario-frontend-projects",
+      "polidariofrontendprojects"
+    ],
+    "packageManager": "unknown",
+    "scripts": [],
+    "runnableScripts": [],
+    "recommendedScript": null,
+    "port": null,
+    "status": "not-runnable",
+    "localDevUrl": null,
+    "notes": "No package.json and no index.html demo found.",
+    "skipReason": "No package.json found",
+    "runnerPath": ".raw-reference-runners/repos/polidario-frontend-projects"
+  },
+  {
+    "id": "tuannm93-lab",
+    "title": "tuannm93-lab",
+    "runnerType": "unknown",
+    "runnable": false,
+    "sourcePath": "_reference_vault/reference-library/github/tuannm93-lab",
+    "sourceUrl": null,
+    "matchPatterns": [
+      "tuannm93-lab",
+      "tuannm93lab"
+    ],
+    "packageManager": "unknown",
+    "scripts": [],
+    "runnableScripts": [],
+    "recommendedScript": null,
+    "port": null,
+    "status": "not-runnable",
+    "localDevUrl": null,
+    "notes": "No package.json and no index.html demo found.",
+    "skipReason": "No package.json found",
+    "runnerPath": ".raw-reference-runners/repos/tuannm93-lab"
+  }
+]

@@ -1,0 +1,208 @@
+/* ============= Variables & Theme ============= */
+:root{
+  --hue1: 255; --hue2: 222; --glow: .85; --blur: 12px;
+  --radius: 22px; --border: 1px; --ease: cubic-bezier(.5,1,.89,1);
+  --bg: #08090d; --fg: #cfd6e6; --muted:#8c93a5;
+  --border-color: hsl(var(--hue2) 12% 20%);
+}
+
+/* Accessibility */
+:focus-visible { outline: 2px solid hsl(var(--hue1) 90% 60%); outline-offset: 2px; }
+kbd{ background:#1116; padding:.15em .4em; border-radius:6px; border:1px solid #222; font-size:.8em }
+
+/* Base layout */
+body{ margin:0; background:var(--bg); color:var(--fg); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial }
+#app{ min-height:100svh; position:relative; overflow:hidden; padding:clamp(16px,2svw,32px) }
+
+/* === Shared neon-glass shading (identical to menu) === */
+.glass-panel{
+  position: relative;
+  border-radius: var(--radius);
+  border: var(--border) solid var(--border-color);
+  padding: 12px;
+  color:#cbd2e2;
+  background:
+    linear-gradient(235deg, hsl(var(--hue1) 50% 10% / .8), hsl(var(--hue1) 50% 10% / 0) 33%),
+    linear-gradient(45deg , hsl(var(--hue2) 50% 10% / .8), hsl(var(--hue2) 50% 10% / 0) 33%),
+    linear-gradient(hsl(220deg 25% 4.8% / .66));
+  backdrop-filter: blur(var(--blur));
+  box-shadow:
+    hsl(var(--hue2) 50% 2%) 0 10px 16px -8px,
+    hsl(var(--hue2) 50% 4%) 0 20px 36px -14px;
+
+  /* edge sheen + glow borrowed from menu */
+  &::before, &::after{
+    content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+    mask: linear-gradient(transparent), linear-gradient(black);
+    mask-repeat:no-repeat; mask-clip: padding-box, border-box; mask-composite: subtract;
+  }
+  &::before{
+    border: 1px solid transparent;
+    background: conic-gradient(from -45deg at 75% 0% in oklch, transparent 0%, hsl(var(--hue1) 80% 75%), transparent 33%);
+    opacity:.25; filter: blur(1px);
+    border-top-right-radius: inherit; border-bottom-left-radius: inherit;
+  }
+  &::after{
+    border: 1px solid transparent;
+    background: conic-gradient(from 135deg at 0% 100% in oklch, transparent 0%, hsl(var(--hue2) 90% 75%), transparent 33%);
+    opacity:.18; filter: blur(1.5px);
+    border-bottom-left-radius: inherit; border-top-right-radius: inherit;
+  }
+
+  /* subtle hover lift for cards/buttons that use it */
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease);
+  &:hover{ transform: translateY(-1px); box-shadow:
+      hsl(var(--hue2) 50% 4% / .9) 0 14px 22px -12px,
+      hsl(var(--hue1) 50% 6% / .7) 0 28px 48px -18px; }
+}
+
+/* Topbar */
+.topbar{ z-index:2; margin-bottom: clamp(12px,3svh,24px);
+  h1{ margin:0 0 4px; font-weight:700; letter-spacing:.4px; color: color-mix(in oklab, white 85%, hsl(var(--hue1) 60% 60%)) }
+  p{ margin:0; color: color-mix(in oklab, var(--fg) 55%, hsl(var(--hue2) 60% 60%)) }
+}
+
+/* Background */
+#bg-canvas{ position:fixed; inset:0; z-index:0; filter: saturate(1.2) brightness(.9) contrast(1.05) }
+#grain{ position:fixed; inset:-10vmax; pointer-events:none; z-index:1; background:url(https://assets.codepen.io/13471/noise-base.png) repeat; opacity:.035; mix-blend-mode:soft-light; animation:grainShift 14s linear infinite }
+@keyframes grainShift{ to{ transform: translate3d(-10%, 10%, 0) } }
+
+/* Demo Grid */
+.demo-grid{
+  position:relative; z-index:2;
+  display:grid; grid-template-columns: repeat(12,1fr); gap: clamp(12px,1.5svw,20px);
+  .tile{ grid-column: span 3; min-height: 140px; padding: 16px 16px 18px;
+    h3{ margin:.1rem 0 .35rem; font-weight:700; letter-spacing:.2px }
+    p{ margin:0 0 .75rem; color: var(--muted) }
+    &.wide{ grid-column: span 6 }
+    .shorts{ list-style:none; padding:0; margin:.35rem 0 0; display:grid; gap:6px;
+      li{ @extend .glass-panel; padding:8px 10px; border-radius:10px; }
+    }
+  }
+}
+
+/* Buttons / Chips */
+.btn{ --bg:#ffffff12; --bd:#ffffff2a; --fg:var(--fg);
+  background:var(--bg); border:1px solid var(--bd); color:var(--fg);
+  padding:8px 12px; border-radius:14px; cursor:pointer; backdrop-filter: blur(6px);
+  transition: transform .2s var(--ease), background .2s, border-color .2s;
+  &:hover{ transform: translateY(-1px); background:#ffffff18; border-color:#ffffff44; }
+}
+.btn.ghost{ background:transparent; border-color:#ffffff22 }
+.chip{ @extend .btn; font-size:.9rem; padding:6px 10px }
+
+/* Controls Footer */
+.controlbar{ position:sticky; bottom:0; z-index:3; margin-top:6svh; display:flex; align-items:center; flex-wrap:wrap; gap:12px;
+  h2{ width:100%; margin:2px 0 6px; font-size:1rem; font-weight:700; color: color-mix(in oklab, var(--fg) 70%, hsl(var(--hue1) 50% 60%)) }
+  .range{ display:flex; align-items:center; gap:8px;
+    span{ width:64px; color:var(--muted); font-size:.9rem }
+    input[type="range"]{ width:220px; accent-color: hsl(var(--hue1) 80% 60%) }
+  }
+}
+
+/* ======= Context Menu (inherits glass-panel) ======= */
+.menu{
+  visibility:hidden; opacity:0; pointer-events:none;
+  transition: visibility 0s .5s, opacity .25s var(--ease), filter .25s var(--ease), transform .2s var(--ease);
+  filter: blur(4px); transform: scale(.98); z-index:10; min-width:300px;
+
+  &.open{ visibility:visible; opacity:1; pointer-events:auto; transition-delay:0s; filter:blur(0) brightness(1.02); transform:scale(1);
+    &::before,&::after,& .glow,& .shine{ animation: glow 1s var(--ease) both }
+  }
+  .inner{ display:flex; flex-direction:column; gap:.5em; font-size:.95rem }
+  hr{ width:100%; height:1px; border:none; background: var(--border-color); opacity:.6; margin:.25em 0 .5em }
+  .searchbar{ display:grid; grid-template:1fr/1fr; width:100%; margin-bottom:.5em;
+    &>*{ grid-area:1/1; align-self:center }
+    input{ width:100%; background:#ffffff08; border:1px solid #ffffff1f; color:var(--fg); border-radius:10px; padding:10px 12px 10px 40px; font-weight:300 }
+    svg{ height:20px; margin-left:10px; opacity:.6 }
+  }
+  .group header{ font-size:.8rem; font-weight:300; padding:0 .66em; color:var(--muted) }
+  ul{ list-style:none; margin:0; padding:0 }
+  li{ position:relative; padding:.66em .66em; height:36px; display:flex; align-items:center; gap:.6em; border-radius:10px; border:1px solid transparent;
+    background:
+      linear-gradient(90deg in oklch,
+        hsl(var(--hue1) 29% 13% / var(--item-opacity)),
+        hsl(var(--hue1) 30% 15% / var(--item-opacity)) 24% 32%,
+        hsl(var(--hue1) 5% 7% / var(--item-opacity)));
+    transition: all .2s ease, --item-opacity .2s ease; --item-opacity:0;
+    &:hover,&.selected{ --item-opacity:.5; color:white }
+    &.selected{ animation: flash .75s ease-out 1 forwards }
+    kbd{ margin-left:auto; opacity:.7 }
+  }
+  .ico{ width:18px; height:18px; display:inline-block; opacity:.8; filter: drop-shadow(0 0 6px hsl(var(--hue1) 90% 60% / var(--glow))) }
+  .has-sub{ cursor:default; .arrow{ margin-left:auto; opacity:.6 } .submenu{
+      position:absolute; top:2px; left: calc(100% + 8px); min-width:180px; opacity:0; transform: translateY(6px); pointer-events:none;
+      /* submenu inherits .glass-panel above via class */
+      li{ height:32px; border-radius:8px }
+    }
+    &:hover > .submenu, &.open > .submenu{ opacity:1; transform: translateY(0); pointer-events:auto; transition: opacity .15s var(--ease), transform .15s var(--ease) }
+  }
+  .has-toggle{ display:flex; align-items:center; gap:.6em;
+    .switch{ position:relative; width:48px; height:24px; input{ display:none }
+      .slider{ position:absolute; inset:0; background:#ffffff12; border:1px solid #ffffff25; border-radius:999px; transition: background .2s, border-color .2s;
+        &::after{ content:""; position:absolute; top:50%; left:2px; width:20px; height:20px; transform:translateY(-50%); background:white; border-radius:50%; transition:left .2s var(--ease), box-shadow .2s;
+          box-shadow: 0 0 12px hsl(var(--hue1) 90% 60% / .6) }
+      }
+      input:checked + .slider{ background: hsl(var(--hue1) 80% 60% / .25); border-color: hsl(var(--hue1) 80% 60% / .5);
+        &::after{ left: calc(100% - 22px) }
+      }
+    }
+  }
+}
+
+/* Shine / Glow carried over (menu-specific elements) */
+.menu .shine, .menu .glow { --hue: var(--hue1) }
+.menu .shine-bottom, .menu .glow-bottom { --hue: var(--hue2); --conic:135deg }
+.menu .shine, .menu .shine::before, .menu .shine::after{
+  pointer-events:none; width:75%; aspect-ratio:1; position:absolute; right:calc(var(--border) * -1); top:calc(var(--border) * -1);
+  border:1px solid transparent; z-index:1; border-top-right-radius: inherit; border-bottom-left-radius: inherit;
+  --start:12%;
+  background: conic-gradient(from var(--conic, -45deg) at center in oklch, transparent var(--start,0%), hsl(var(--hue) 80% 60%), transparent var(--end,50%)) border-box;
+  mask: linear-gradient(transparent), linear-gradient(black); mask-repeat:no-repeat; mask-clip: padding-box, border-box; mask-composite: subtract;
+}
+.menu .shine::before,.menu .shine::after{ content:""; inset:-2px; width:auto; mask:none }
+.menu .shine::after{ z-index:2; --start:17%; --end:33%;
+  background: conic-gradient(from var(--conic,-45deg) at center in oklch, transparent var(--start,0%), hsl(var(--hue) 80% 85%), transparent var(--end,50%)) }
+.menu .shine-bottom{ top:auto; bottom:calc(var(--border) * -1); left:calc(var(--border) * -1); right:auto }
+.menu .glow{
+  pointer-events:none; border-top-right-radius: calc(var(--radius) * 2.5); border-bottom-left-radius: calc(var(--radius) * 2.5);
+  border: calc(var(--radius) * 1.25) solid transparent; inset: calc(var(--radius) * -2);
+  width:75%; aspect-ratio:1; position:absolute; left:auto; bottom:auto;
+  mask: url(https://assets.codepen.io/13471/noise-base.png); mask-mode:luminance; mask-size:29%;
+  opacity: calc(.75 * var(--glow)); filter: blur(12px) saturate(1.25) brightness(.55); mix-blend-mode: plus-lighter; z-index:3;
+  &::before,&::after{ content:""; position:absolute; inset:0; border:inherit; border-radius:inherit;
+    background: conic-gradient(from var(--conic,-45deg) at center in oklch, transparent var(--start,0%), hsl(var(--hue) 95% 60%), transparent var(--end,50%)) border-box;
+    mask: linear-gradient(transparent), linear-gradient(black); mask-repeat:no-repeat; mask-clip: padding-box, border-box; mask-composite: subtract; filter: saturate(2) brightness(1);
+  }
+  &::after{ --lit:70%; --sat:100%; --start:15%; --end:35%; border-width: calc(var(--radius) * 1.75); border-radius: calc(var(--radius) * 2.75); inset: calc(var(--radius) * -0.25); z-index:4; opacity:.75 }
+  &.glow-bottom{ inset: calc(var(--radius) * -2); top:auto; right:auto }
+}
+.menu .glow-bright{ --lit:80%; --sat:100%; --start:13%; --end:37%; border-width:5px; border-radius: calc(var(--radius) + 2px); inset:-7px; left:auto;
+  filter: blur(2px) brightness(.66); &::after{ content:none }
+  &.glow-bottom{ inset:-7px; right:auto; top:auto }
+}
+
+/* Palette dialog adopts glass-panel fully */
+#palette::backdrop{ background:#0008; backdrop-filter: blur(3px) }
+#palette{ border:none; padding:0; overflow:hidden; width:min(720px,92svw);
+  .pal-body{ display:grid; grid-template-rows:auto 1fr auto; gap:10px; padding:12px }
+  #pal-input{ width:100%; background:#ffffff10; border:1px solid #ffffff1f; border-radius:12px; padding:12px 14px; color:var(--fg) }
+  #pal-list{ list-style:none; margin:0; padding:0; display:grid; gap:6px; max-height:50svh; overflow:auto }
+  #pal-list li{ @extend .glass-panel; padding:10px 12px; border-radius:10px;
+    &.active, &:hover{ border-color:#ffffff3a; background:#ffffff12 } }
+  .pal-hint{ display:flex; justify-content:flex-end; color:var(--muted); font-size:.9rem }
+}
+
+/* Social bubbles also glass */
+.social-icon{ position:fixed; right:12px; bottom:12px; z-index:3; color:#fff8; text-decoration:none; font-size:.9rem; padding:8px 10px; border-radius:12px }
+.social-icon.twitter{ right:64px }
+.social-icon.github{ right:120px }
+.social-icon svg{ width:20px; height:20px; fill:#fff9 }
+
+/* Animations */
+@keyframes glow{ 0%{opacity:0} 3%{opacity:1} 10%{opacity:0} 12%{opacity:.7} 16%{opacity:.3; animation-timing-function:var(--ease)} 100%{opacity:1; animation-timing-function:var(--ease)} }
+@keyframes flash{ 0%{opacity:0; --item-opacity:0} 7%{opacity:.5; --item-opacity:1} 14%{opacity:0; --item-opacity:.5} 21%,100%{opacity:1; --item-opacity:1} }
+
+/* Responsive */
+@media (max-width:900px){ .demo-grid .tile{ grid-column: span 6 } .demo-grid .tile.wide{ grid-column: span 12 } }
+@media (max-width:560px){ .demo-grid .tile{ grid-column: span 12 } .controlbar .range input{ width:160px } }
