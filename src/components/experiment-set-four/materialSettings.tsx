@@ -245,14 +245,14 @@ const RADIAL_PER_CORNER_DEFAULTS = {
 } as const;
 
 const GLASS_REFLEX_PER_CORNER_DEFAULTS = {
-  TlLight: 1,
-  TlDark: 1,
-  TrLight: 0,
-  TrDark: 0,
-  BlLight: 0,
-  BlDark: 0,
-  BrLight: 1,
-  BrDark: 1,
+  TlLight: 1.22,
+  TlDark: 0.72,
+  TrLight: 0.48,
+  TrDark: 0.32,
+  BlLight: 0.18,
+  BlDark: 0.42,
+  BrLight: 0.62,
+  BrDark: 0.72,
 } as const;
 
 const GLASS_REFLEX_EDGE_IDS = ['Left', 'Right'] as const;
@@ -263,18 +263,18 @@ const GLASS_REFLEX_EDGE_LABELS: Record<(typeof GLASS_REFLEX_EDGE_IDS)[number], s
 };
 
 const GLASS_REFLEX_EDGE_DEFAULTS = {
-  LeftLight: 0,
-  LeftDark: 0,
-  LeftSpread: 22,
-  RightLight: 0,
-  RightDark: 0,
-  RightSpread: 22,
+  LeftLight: 0.82,
+  LeftDark: 0.4,
+  LeftSpread: 24,
+  RightLight: 0.76,
+  RightDark: 0.38,
+  RightSpread: 24,
 } as const;
 
 function glassReflexAppearanceDefaults(prefix: 'layerA' | 'layerB') {
   return {
-    [`${prefix}GlassReflexLightColor`]: '#ffffff',
-    [`${prefix}GlassReflexDarkColor`]: '#000000',
+    [`${prefix}GlassReflexLightColor`]: '#F4FCFF',
+    [`${prefix}GlassReflexDarkColor`]: '#123A5C',
     [`${prefix}GlassReflexRimPx`]: 1,
     [`${prefix}GlassReflexMaskReach`]: 44,
     [`${prefix}GlassReflexMaskFade`]: 74,
@@ -295,19 +295,49 @@ function radialAppearanceDefaults(prefix: 'layerA' | 'layerB') {
   } as Record<string, number | string>;
 }
 
+function glassReflexPerCornerDefaults(prefix: 'layerA' | 'layerB') {
+  if (prefix === 'layerB') {
+    return {
+      TlLight: 0.35,
+      TlDark: 0.28,
+      TrLight: 0.42,
+      TrDark: 0.38,
+      BlLight: 1.1,
+      BlDark: 0.68,
+      BrLight: 0.48,
+      BrDark: 1.05,
+    } as const;
+  }
+  return GLASS_REFLEX_PER_CORNER_DEFAULTS;
+}
+
+function glassReflexEdgeDefaults(prefix: 'layerA' | 'layerB') {
+  if (prefix === 'layerB') {
+    return {
+      LeftLight: 0.74,
+      LeftDark: 0.36,
+      LeftSpread: 22,
+      RightLight: 0.7,
+      RightDark: 0.34,
+      RightSpread: 22,
+    } as const;
+  }
+  return GLASS_REFLEX_EDGE_DEFAULTS;
+}
+
 function glassReflexDefaultsForLayer(prefix: 'layerA' | 'layerB') {
   return {
-    [`${prefix}GlassReflexMode`]: 1,
-    [`${prefix}GlassReflexLight`]: 1,
-    [`${prefix}GlassReflexDark`]: 1,
+    [`${prefix}GlassReflexMode`]: 3,
+    [`${prefix}GlassReflexLight`]: prefix === 'layerA' ? 0.82 : 0.74,
+    [`${prefix}GlassReflexDark`]: prefix === 'layerA' ? 0.82 : 0.74,
     ...Object.fromEntries(
-      (Object.entries(GLASS_REFLEX_PER_CORNER_DEFAULTS) as [string, number][]).map(([key, value]) => [
+      (Object.entries(glassReflexPerCornerDefaults(prefix)) as [string, number][]).map(([key, value]) => [
         `${prefix}GlassReflex${key}`,
         value,
       ]),
     ),
     ...Object.fromEntries(
-      (Object.entries(GLASS_REFLEX_EDGE_DEFAULTS) as [string, number][]).map(([key, value]) => [
+      (Object.entries(glassReflexEdgeDefaults(prefix)) as [string, number][]).map(([key, value]) => [
         `${prefix}GlassReflex${key}`,
         value,
       ]),
