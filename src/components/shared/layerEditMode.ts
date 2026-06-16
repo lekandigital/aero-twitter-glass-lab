@@ -11,6 +11,19 @@ export function stripLayerSectionPrefix(section: string): string {
   return section.replace(/^Layer [AB] · /, '');
 }
 
+/** Stable foldable-section key across Both / Layer A / Layer B display names. */
+export function canonicalSectionKey(section: string): string {
+  return stripLayerSectionPrefix(section);
+}
+
+export function foldableSectionId(experimentKey: string, section: string): string {
+  return `${experimentKey}-${canonicalSectionKey(section)}`;
+}
+
+export function foldableSectionDomId(experimentKey: string, section: string): string {
+  return `${experimentKey}-${section}`;
+}
+
 export function layerFieldSuffix(fieldId: string): string | null {
   if (fieldId.startsWith('layerA')) return fieldId.slice(6);
   if (fieldId.startsWith('layerB')) return fieldId.slice(6);

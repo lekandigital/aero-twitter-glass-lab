@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 type MaterialSettingCollapsibleSectionProps = {
   id: string;
+  domId?: string;
   title: string;
   count: number;
   open: boolean;
@@ -13,6 +14,7 @@ type MaterialSettingCollapsibleSectionProps = {
 
 export function MaterialSettingCollapsibleSection({
   id,
+  domId,
   title,
   count,
   open,
@@ -21,16 +23,20 @@ export function MaterialSettingCollapsibleSection({
   fieldsClassName = 'experiment-one-settings-dock__fields',
   children,
 }: MaterialSettingCollapsibleSectionProps) {
+  const elementId = domId ?? id;
+
   return (
     <section
       className={`mat-setting-section mat-setting-section--collapsible${open ? ' mat-setting-section--open' : ''}`}
+      data-foldable-section={id}
+      data-foldable-dom-id={elementId}
     >
       <button
         type="button"
         className="mat-setting-section__head mat-setting-section__head--toggle"
         onClick={() => onToggle(id)}
         aria-expanded={open}
-        aria-controls={`mat-section-${id}`}
+        aria-controls={`mat-section-${elementId}`}
       >
         <span className="mat-setting-section__chevron" aria-hidden="true" />
         <span className="mat-setting-section__head-text">
@@ -39,7 +45,7 @@ export function MaterialSettingCollapsibleSection({
         </span>
       </button>
       {open && (
-        <div id={`mat-section-${id}`} className={`mat-setting-section__body ${fieldsClassName}`.trim()}>
+        <div id={`mat-section-${elementId}`} className={`mat-setting-section__body ${fieldsClassName}`.trim()}>
           {children}
         </div>
       )}
