@@ -91,8 +91,7 @@ function findRunnerForItem(item, runners) {
   const sourceUrl = item.sourceUrl || '';
   const localPath = item.localSourcePath || '';
   const itemRepo = githubRepoKey(sourceUrl);
-  const sorted = [...runners].sort((a, b) => b.id.length - a.id.length);
-  return sorted.find((r) => {
+  const matches = runners.filter((r) => {
     const rid = r.id.toLowerCase();
     const ridSlug = rid.replace(/[^a-z0-9]+/g, '');
     if (r.sourceUrl && item.sourceUrl && normalizeUrl(item.sourceUrl) === normalizeUrl(r.sourceUrl)) return true;
@@ -101,7 +100,8 @@ function findRunnerForItem(item, runners) {
     if (itemRepo && runnerRepo && itemRepo === runnerRepo) return true;
     if (itemRepo && (itemRepo === rid || itemRepo.replace(/[^a-z0-9]+/g, '') === ridSlug)) return true;
     return false;
-  }) ?? null;
+  });
+  return matches.find((r) => !r.variantOf) ?? matches[0] ?? null;
 }
 
 async function pathExists(path) {
@@ -965,7 +965,11 @@ async function main() {
     index.filter((i) => findRunnerForItem(i, runners)).map((i) => findRunnerForItem(i, runners).id),
   );
   for (const runner of runners) {
-    if (matchedRunnerIds.has(runner.id)) continue;
+    if (runner.variantOf) {
+      // Variant demos always get their own catalog health record.
+    } else if (matchedRunnerIds.has(runner.id)) {
+      continue;
+    }
     const id = `runner-${runner.id}`;
     const liveStatus = runnerStatus[runner.id];
     const rAudit = auditRunnerItem({ localSourcePath: runner.sourcePath }, runner, liveStatus);

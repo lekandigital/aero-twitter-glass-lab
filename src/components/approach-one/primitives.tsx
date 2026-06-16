@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from 'react';
+import { a1InspectAttrs, type A1InspectTarget } from './inspectCatalog';
 
 /* Approach 1 — Aero Component Composition Lab primitives */
 
@@ -59,7 +60,10 @@ export function AeroPanel({
     .join(' ');
 
   return (
-    <div className={mods}>
+    <div
+      className={mods}
+      {...a1InspectAttrs('panel', `${variant.replace('-', ' ')} panel`)}
+    >
       <div className={`a1-panel-inner ${innerClassName}`.trim()}>{children}</div>
     </div>
   );
@@ -67,8 +71,23 @@ export function AeroPanel({
 
 type HighlightKind = 'rim-top' | 'inner-border' | 'blue-shadow' | 'sparkle' | 'sheen';
 
+const HIGHLIGHT_INSPECT: Record<HighlightKind, A1InspectTarget> = {
+  'rim-top': 'highlight-rim-top',
+  'inner-border': 'highlight-inner-border',
+  'blue-shadow': 'highlight-blue-shadow',
+  sparkle: 'highlight-sparkle',
+  sheen: 'highlight-sheen',
+};
+
 export function AeroHighlight({ kind }: { kind: HighlightKind }) {
-  return <span className={`a1-highlight a1-highlight--${kind}`} aria-hidden="true" />;
+  const target = HIGHLIGHT_INSPECT[kind];
+  return (
+    <span
+      className={`a1-highlight a1-highlight--${kind}`}
+      aria-hidden="true"
+      {...a1InspectAttrs(target)}
+    />
+  );
 }
 
 const BUBBLES = [
@@ -90,11 +109,12 @@ const SPARKLES = [
 
 export function AeroBackgroundLayer() {
   return (
-    <div className="a1-bg-layer" aria-hidden="true">
+    <div className="a1-bg-layer" aria-hidden="true" {...a1InspectAttrs('background')}>
       {BUBBLES.map((b, i) => (
         <span
           key={`bubble-${i}`}
           className="a1-bubble"
+          {...a1InspectAttrs('bubble', 'Background bubble')}
           style={{
             left: b.left,
             top: b.top,
@@ -108,6 +128,7 @@ export function AeroBackgroundLayer() {
         <span
           key={`sparkle-${i}`}
           className="a1-sparkle"
+          {...a1InspectAttrs('background', 'Background sparkle')}
           style={{ left: s.left, top: s.top, animationDelay: `${i * 0.6}s` }}
         />
       ))}
@@ -146,6 +167,7 @@ export function AeroButton({
     <button
       type="button"
       className={`a1-btn a1-btn--${variant} ${className}`.trim()}
+      {...a1InspectAttrs(variant === 'primary' ? 'button-primary' : 'button-glass')}
       {...props}
     >
       {children}
@@ -160,7 +182,12 @@ export function AeroIconButton({
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & { badge?: number }) {
   return (
-    <button type="button" className={`a1-icon-btn ${className}`.trim()} {...props}>
+    <button
+      type="button"
+      className={`a1-icon-btn ${className}`.trim()}
+      {...a1InspectAttrs('icon-button')}
+      {...props}
+    >
       {children}
       {badge != null && badge > 0 && (
         <span className="a1-badge a1-badge--on-icon">{badge > 9 ? '9+' : badge}</span>
@@ -184,6 +211,7 @@ export function AeroNavPill({
     <button
       type="button"
       className={`a1-nav-pill ${active ? 'a1-nav-pill--active' : ''}`.trim()}
+      {...a1InspectAttrs('nav-pill', active ? 'Active nav pill' : 'Nav pill')}
       onClick={onClick}
     >
       {icon}
@@ -198,7 +226,7 @@ export function AeroSearchPill({
   ...props
 }: InputHTMLAttributes<HTMLInputElement> & { className?: string }) {
   return (
-    <label className={`a1-search ${className}`.trim()}>
+    <label className={`a1-search ${className}`.trim()} {...a1InspectAttrs('search')}>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
         <circle cx="11" cy="11" r="7" />
         <path d="M20 20l-3-3" />
@@ -209,7 +237,11 @@ export function AeroSearchPill({
 }
 
 export function AeroBadge({ children }: { children: ReactNode }) {
-  return <span className="a1-badge">{children}</span>;
+  return (
+    <span className="a1-badge" {...a1InspectAttrs('badge')}>
+      {children}
+    </span>
+  );
 }
 
 export function AeroComposer({
@@ -218,7 +250,7 @@ export function AeroComposer({
   placeholder?: string;
 }) {
   return (
-    <div className="a1-composer">
+    <div className="a1-composer" {...a1InspectAttrs('composer')}>
       <textarea className="a1-composer-input" placeholder={placeholder} rows={3} />
       <div className="a1-composer-footer">
         <AeroIconButton aria-label="Attach media">
@@ -244,11 +276,13 @@ export function AeroFeedCard({
   showMedia?: boolean;
 }) {
   return (
-    <article className="a1-card">
+    <article className="a1-card" {...a1InspectAttrs('card')}>
       {showMedia && <div className="a1-media-placeholder">Sample Media</div>}
       <div className="a1-card-body">
         <h3 className="a1-card-title">{title}</h3>
-        <p className="a1-card-text">{body}</p>
+        <p className="a1-card-text" {...a1InspectAttrs('typography', 'Muted card text')}>
+          {body}
+        </p>
         <p className="a1-card-meta">Glass Card · 2h ago</p>
       </div>
       <div className="a1-card-actions">
@@ -301,7 +335,7 @@ export function AeroSegmented({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="a1-segmented" role="group">
+    <div className="a1-segmented" role="group" {...a1InspectAttrs('segmented')}>
       {options.map((opt) => (
         <button
           key={opt}
@@ -313,6 +347,18 @@ export function AeroSegmented({
         </button>
       ))}
     </div>
+  );
+}
+
+export function AeroChip({
+  children,
+  className = '',
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button type="button" className={`a1-chip ${className}`.trim()} {...a1InspectAttrs('chip')} {...props}>
+      {children}
+    </button>
   );
 }
 

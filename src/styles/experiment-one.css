@@ -1,0 +1,829 @@
+/* Experiment Set 1 — Single Aero Glass Panel */
+
+.experiment-one-page {
+  --e1-cyan: #7ee8ff;
+  --e1-blue: #2d8ee8;
+  --e1-deep: #0a4a9a;
+  --e1-text: #f4faff;
+  --e1-text-muted: rgba(244, 250, 255, 0.78);
+  --e1-radius: 28px;
+  --e1-font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  /* Tunable via settings dock */
+  --e1-transparency: 0.32;
+  --e1-frost: 5px;
+  --e1-saturate: 130%;
+  --e1-brightness: 104%;
+  --e1-rim-strength: 0.88;
+  --e1-rim-border: 0.62;
+  --e1-inner-bevel: 0.42;
+  --e1-depth-strength: 0.72;
+  --e1-fill-top: 0.38;
+  --e1-fill-mid: 0.18;
+  --e1-fill-bottom: 0.14;
+  --e1-body-tint: 0.05;
+  --e1-top-shine: 0.55;
+  --e1-top-radial: 0.45;
+  --e1-diagonal-gloss: 0.42;
+  --e1-shine-opacity: 0.92;
+  --e1-inner-depth: 0.32;
+  --e1-outer-shadow: 0.38;
+  --e1-shadow-spread: 56px;
+  --e1-glow: 0.28;
+  --e1-refraction: 0.22;
+  --e1-sparkle: 1;
+
+  position: relative;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 0 4rem;
+  font-family: var(--e1-font);
+  color: var(--e1-text);
+  text-align: left;
+}
+
+.experiment-one-svg-filters {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* ── Page header (minimal, secondary to panel) ── */
+
+.experiment-one-header {
+  margin-bottom: 1.75rem;
+}
+
+.experiment-one-header h1 {
+  margin: 0 0 0.4rem;
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--e1-text);
+  text-shadow: 0 1px 3px rgba(0, 30, 70, 0.45);
+}
+
+.experiment-one-header p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--e1-text-muted);
+  max-width: 58ch;
+}
+
+/* ── Stage: panel centerpiece ── */
+
+.experiment-one-stage {
+  position: relative;
+  margin: 0 calc(50% - 50vw) 1.5rem;
+  width: 100vw;
+  min-height: calc(100vh - 18rem);
+}
+
+.experiment-one-stage__canvas {
+  position: relative;
+  width: 100%;
+  min-height: inherit;
+}
+
+.experiment-one-drag-bounds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.experiment-one-drag-bounds--viewport {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.experiment-one-draggable {
+  position: absolute;
+  top: 0;
+  left: 0;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  will-change: transform, left, top;
+  pointer-events: auto;
+}
+
+.experiment-one-drag-bounds--viewport .experiment-one-draggable {
+  position: fixed;
+  top: auto;
+  left: auto;
+  transform: none;
+}
+
+.experiment-one-draggable--active {
+  cursor: grabbing;
+}
+
+.experiment-one-draggable:not(.experiment-one-settings-dock) {
+  cursor: grab;
+}
+
+.experiment-one-draggable:not(.experiment-one-settings-dock) .experiment-one-panel {
+  cursor: inherit;
+}
+
+/* ── Main glass panel ── */
+
+.experiment-one-panel {
+  position: relative;
+  width: min(100%, 680px);
+  min-height: 420px;
+  border-radius: var(--e1-radius);
+  isolation: isolate;
+  overflow: hidden;
+
+  /* Surface: translucent cyan acrylic body */
+  background:
+    linear-gradient(
+      168deg,
+      rgba(255, 255, 255, calc(var(--e1-fill-top) * var(--e1-transparency))) 0%,
+      rgba(200, 240, 255, calc(var(--e1-fill-mid) * var(--e1-transparency))) 22%,
+      rgba(80, 180, 255, calc(var(--e1-fill-mid) * 0.44 * var(--e1-transparency))) 58%,
+      rgba(0, 90, 200, calc(var(--e1-fill-bottom) * var(--e1-transparency) * var(--e1-depth-strength))) 100%
+    ),
+    radial-gradient(ellipse 85% 55% at 18% 0%, rgba(255, 255, 255, calc(var(--e1-top-radial) * var(--e1-transparency))), transparent 52%),
+    radial-gradient(ellipse 70% 50% at 88% 95%, rgba(0, 120, 255, calc(0.22 * var(--e1-depth-strength))), transparent 55%),
+    rgba(130, 215, 255, calc(var(--e1-body-tint) * var(--e1-transparency)));
+
+  border: calc(2px + 1px * var(--e1-rim-strength)) solid rgba(255, 255, 255, calc(var(--e1-rim-border) * var(--e1-rim-strength)));
+  outline: 1px solid rgba(255, 255, 255, calc(0.18 * var(--e1-rim-strength)));
+  outline-offset: -4px;
+
+  backdrop-filter: blur(var(--e1-frost)) saturate(var(--e1-saturate)) brightness(var(--e1-brightness));
+  -webkit-backdrop-filter: blur(var(--e1-frost)) saturate(var(--e1-saturate)) brightness(var(--e1-brightness));
+
+  box-shadow:
+    /* inner top rim highlight */
+    inset 0 2px 0 rgba(255, 255, 255, calc(0.88 * var(--e1-rim-strength))),
+    inset 0 1px 2px rgba(255, 255, 255, calc(0.45 * var(--e1-rim-strength))),
+    /* inner lower blue depth */
+    inset 0 -24px 42px rgba(0, 68, 170, calc(var(--e1-inner-depth) * var(--e1-depth-strength))),
+    inset 0 -8px 18px rgba(0, 100, 210, calc(0.22 * var(--e1-depth-strength))),
+    inset 0 0 0 1px rgba(255, 255, 255, calc(0.28 * var(--e1-rim-strength))),
+    0 22px var(--e1-shadow-spread) rgba(0, 38, 100, calc(var(--e1-outer-shadow) * var(--e1-depth-strength))),
+    0 8px 24px rgba(0, 60, 140, calc(0.22 * var(--e1-depth-strength))),
+    0 0 48px rgba(90, 200, 255, calc(var(--e1-glow) * var(--e1-depth-strength)));
+
+  transition:
+    box-shadow 0.3s ease,
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+/* Outer white rim ring */
+.experiment-one-panel__rim {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, calc(0.72 * var(--e1-rim-strength))) 0%,
+      rgba(255, 255, 255, calc(0.22 * var(--e1-rim-strength))) 10%,
+      transparent 28%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(0, 100, 210, calc(0.18 * var(--e1-depth-strength))) 0%,
+      transparent 18%
+    );
+  mask-image: linear-gradient(#000, #000);
+  -webkit-mask-image: linear-gradient(#000, #000);
+}
+
+/* Inner bevel lip */
+.experiment-one-panel__bevel {
+  position: absolute;
+  inset: 3px;
+  border-radius: calc(var(--e1-radius) - 3px);
+  pointer-events: none;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, calc(var(--e1-inner-bevel) * var(--e1-rim-strength)));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, calc(0.62 * var(--e1-rim-strength))),
+    inset 0 -2px 0 rgba(0, 80, 170, calc(0.38 * var(--e1-depth-strength))),
+    inset 3px 3px 8px rgba(255, 255, 255, calc(0.14 * var(--e1-rim-strength))),
+    inset -3px -4px 12px rgba(0, 55, 130, calc(0.18 * var(--e1-depth-strength)));
+}
+
+/* Top shine + diagonal gloss sweep */
+.experiment-one-panel__shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 3;
+  background:
+    linear-gradient(
+      115deg,
+      transparent 32%,
+      rgba(255, 255, 255, 0.08) 42%,
+      rgba(255, 255, 255, calc(var(--e1-diagonal-gloss) * var(--e1-rim-strength))) 48%,
+      rgba(255, 255, 255, 0.12) 54%,
+      transparent 64%
+    ),
+    radial-gradient(ellipse 110% 60% at 50% -12%, rgba(255, 255, 255, calc(var(--e1-top-shine) * var(--e1-rim-strength))), transparent 68%),
+    radial-gradient(circle at 92% 8%, rgba(255, 255, 255, calc(0.65 * var(--e1-rim-strength))), transparent 28%);
+  mix-blend-mode: screen;
+  opacity: var(--e1-shine-opacity);
+}
+
+/* Subtle refraction at edges */
+.experiment-one-panel__refraction {
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 4;
+  filter: url(#e1-glass-refract);
+  opacity: calc(var(--e1-refraction) * var(--e1-rim-strength));
+  background:
+    conic-gradient(
+      from 220deg at 50% 50%,
+      transparent 0deg,
+      rgba(255, 255, 255, 0.35) 40deg,
+      transparent 80deg,
+      rgba(126, 232, 255, 0.25) 160deg,
+      transparent 220deg,
+      rgba(255, 255, 255, 0.28) 300deg,
+      transparent 360deg
+    );
+  mask-image: radial-gradient(ellipse 98% 96% at 50% 50%, transparent 72%, #000 100%);
+  -webkit-mask-image: radial-gradient(ellipse 98% 96% at 50% 50%, transparent 72%, #000 100%);
+}
+
+/* Sparkle glints */
+.experiment-one-page[data-e1-show-sparkles='false'] .experiment-one-panel__sparkle {
+  display: none;
+}
+
+.experiment-one-panel__sparkle {
+  opacity: var(--e1-sparkle);
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fff;
+  pointer-events: none;
+  z-index: 6;
+  box-shadow:
+    0 0 8px 2px rgba(255, 255, 255, 0.95),
+    0 0 18px 4px rgba(126, 232, 255, 0.55);
+  animation: e1-sparkle-pulse 3.2s ease-in-out infinite;
+}
+
+.experiment-one-panel__sparkle--a {
+  top: 14%;
+  left: 22%;
+  animation-delay: 0s;
+}
+
+.experiment-one-panel__sparkle--b {
+  top: 8%;
+  right: 18%;
+  width: 4px;
+  height: 4px;
+  animation-delay: 1.1s;
+}
+
+.experiment-one-panel__sparkle--c {
+  bottom: 28%;
+  right: 32%;
+  width: 3px;
+  height: 3px;
+  animation-delay: 2.2s;
+}
+
+@keyframes e1-sparkle-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.75);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+/* Panel content */
+.experiment-one-panel__content {
+  position: relative;
+  z-index: 8;
+  padding: 2.75rem 2.5rem 2.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.experiment-one-panel__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(200, 240, 255, 0.85);
+  text-shadow: 0 1px 2px rgba(0, 40, 90, 0.35);
+}
+
+.experiment-one-panel__title {
+  margin: 0;
+  font-size: 2.35rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: #fff;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.35),
+    0 2px 8px rgba(0, 50, 110, 0.45);
+}
+
+.experiment-one-panel__subtitle {
+  margin: 0.15rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: rgba(230, 248, 255, 0.92);
+  text-shadow: 0 1px 3px rgba(0, 40, 90, 0.3);
+}
+
+.experiment-one-panel__body {
+  margin: 0.85rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--e1-text-muted);
+  max-width: 36ch;
+  text-shadow: 0 1px 2px rgba(0, 30, 70, 0.25);
+}
+
+.experiment-one-panel__drag-hint {
+  margin: 1.5rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(180, 230, 255, 0.62);
+  text-shadow: 0 1px 2px rgba(0, 40, 90, 0.25);
+}
+
+/* ── Settings dock (collapsible + draggable) ── */
+
+.experiment-one-settings-dock.experiment-one-draggable {
+  z-index: 50;
+  cursor: default;
+}
+
+.experiment-one-settings-dock__shell {
+  display: flex;
+  flex-direction: column;
+  width: min(94vw, 480px);
+  max-height: min(90vh, 820px);
+  border-radius: 16px;
+  background: rgba(6, 18, 42, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 16px 40px rgba(0, 20, 50, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+
+.experiment-one-settings-dock__shell--collapsed {
+  min-height: 0;
+  width: auto;
+  min-width: 220px;
+}
+
+.experiment-one-settings-dock__header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  padding: 0.55rem 0.65rem 0.55rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: grab;
+  touch-action: none;
+}
+
+.experiment-one-draggable--active .experiment-one-settings-dock__header {
+  cursor: grabbing;
+}
+
+.experiment-one-settings-dock__header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  width: 100%;
+  max-height: 5.5rem;
+  overflow-y: auto;
+  padding-right: 0.1rem;
+  cursor: default;
+  -webkit-overflow-scrolling: touch;
+}
+
+.experiment-one-settings-dock__shell--collapsed .experiment-one-settings-dock__header {
+  border-bottom: none;
+}
+
+.experiment-one-settings-dock__drag-handle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0.25rem 0.35rem;
+  border-radius: 8px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.experiment-one-draggable--active .experiment-one-settings-dock__drag-handle {
+  cursor: grabbing;
+}
+
+.experiment-one-settings-dock__grip {
+  width: 10px;
+  height: 16px;
+  flex-shrink: 0;
+  background:
+    radial-gradient(circle, rgba(180, 220, 255, 0.75) 1.5px, transparent 2px) 0 0 / 5px 5px;
+  opacity: 0.8;
+}
+
+.experiment-one-settings-dock__title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(190, 230, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.experiment-one-settings-dock__toggle {
+  flex-shrink: 0;
+  padding: 0.28rem 0.6rem;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(220, 240, 255, 0.9);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.experiment-one-settings-dock__toggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(126, 232, 255, 0.4);
+}
+
+.experiment-one-settings-dock__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0.85rem 0.9rem 1rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.experiment-one-settings-dock__fields {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.experiment-one-settings-dock__field {
+  display: grid;
+  grid-template-columns: minmax(9rem, 10.5rem) 1fr;
+  align-items: start;
+  gap: 0.55rem;
+}
+
+.experiment-one-settings-dock__field-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(170, 215, 255, 0.82);
+}
+
+.experiment-one-settings-dock__toggle--active {
+  color: #fff;
+  background: rgba(60, 160, 255, 0.28);
+  border-color: rgba(126, 232, 255, 0.55);
+}
+
+.experiment-one-settings-dock__toggle--save {
+  color: rgba(190, 245, 220, 0.95);
+  background: rgba(40, 140, 90, 0.18);
+  border-color: rgba(100, 220, 160, 0.35);
+}
+
+.experiment-one-settings-dock__toggle--save:hover {
+  background: rgba(40, 160, 100, 0.28);
+  border-color: rgba(120, 240, 180, 0.5);
+}
+
+.experiment-one-settings-dock__section-title {
+  margin: 0 0 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(126, 232, 255, 0.85);
+}
+
+.experiment-one-settings-dock__selection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 10px;
+  background: rgba(60, 160, 255, 0.12);
+  border: 1px solid rgba(126, 232, 255, 0.28);
+}
+
+.experiment-one-settings-dock__selection-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(160, 220, 255, 0.75);
+}
+
+.experiment-one-settings-dock__selection-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #f4faff;
+}
+
+.experiment-one-settings-dock__selection-meta {
+  font-size: 0.72rem;
+  color: rgba(180, 220, 255, 0.7);
+}
+
+.experiment-one-settings-dock__hint,
+.experiment-one-settings-dock__note {
+  margin: 0 0 0.65rem;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: rgba(180, 215, 245, 0.75);
+}
+
+.experiment-one-settings-dock__stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+  width: 100%;
+}
+
+.experiment-one-settings-dock__stepper--color .experiment-one-settings-dock__color {
+  flex: 1;
+  min-width: 0;
+}
+
+.experiment-one-settings-dock__step-btn {
+  flex-shrink: 0;
+  width: 1.65rem;
+  height: 1.65rem;
+  padding: 0;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+  color: rgba(220, 240, 255, 0.92);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.experiment-one-settings-dock__step-btn:hover:not(:disabled) {
+  background: rgba(60, 160, 255, 0.22);
+  border-color: rgba(126, 232, 255, 0.45);
+}
+
+.experiment-one-settings-dock__step-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.experiment-one-settings-dock__toggle-value {
+  flex: 1;
+  text-align: center;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: rgba(180, 210, 240, 0.75);
+  padding: 0.32rem 0.4rem;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.experiment-one-settings-dock__toggle-value--on {
+  color: #e8f8ff;
+  background: rgba(60, 160, 255, 0.18);
+  border-color: rgba(126, 232, 255, 0.35);
+}
+
+.experiment-one-settings-dock__color {
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.experiment-one-settings-dock__field-input {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.experiment-one-settings-dock__field-input input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.38rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: #f4faff;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  outline: none;
+}
+
+.experiment-one-settings-dock__field-input input:focus {
+  border-color: rgba(126, 232, 255, 0.55);
+  box-shadow: 0 0 0 2px rgba(80, 180, 255, 0.2);
+}
+
+.experiment-one-settings-dock__field-unit,
+.experiment-one-settings-dock__unit {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(160, 200, 240, 0.65);
+  min-width: 1.4rem;
+}
+
+.experiment-one-settings-dock .experiment-one-material-notes {
+  padding: 0.75rem 0.8rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ── Material notes ── */
+
+.experiment-one-panel--hero:hover {
+  border-color: rgba(255, 255, 255, calc(0.78 * var(--e1-rim-strength)));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, calc(0.95 * var(--e1-rim-strength))),
+    inset 0 -26px 46px rgba(0, 60, 160, calc(0.35 * var(--e1-depth-strength))),
+    inset 0 0 0 1px rgba(255, 255, 255, calc(0.35 * var(--e1-rim-strength))),
+    0 26px 62px rgba(0, 35, 95, calc(0.42 * var(--e1-depth-strength))),
+    0 0 58px rgba(100, 210, 255, calc(0.35 * var(--e1-depth-strength)));
+}
+
+.experiment-one-material-notes__title {
+  margin: 0 0 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(160, 210, 255, 0.75);
+}
+
+.experiment-one-material-notes__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.experiment-one-material-notes__list li {
+  display: grid;
+  grid-template-columns: 9.5rem 1fr;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.experiment-one-material-notes__layer {
+  font-weight: 600;
+  color: rgba(200, 235, 255, 0.88);
+}
+
+.experiment-one-material-notes__detail {
+  color: rgba(200, 220, 240, 0.62);
+}
+
+/* ── Click-to-inspect ── */
+
+.experiment-one-page[data-e1-inspect-mode='true'] [data-e1-inspect] {
+  cursor: crosshair;
+}
+
+.experiment-one-page[data-e1-inspect-mode='true'] .experiment-one-draggable:not(.experiment-one-settings-dock):not(.experiment-one-draggable--active) {
+  cursor: grab;
+}
+
+.experiment-one-page[data-e1-inspect-mode='true'] .experiment-one-draggable:not(.experiment-one-settings-dock).experiment-one-draggable--active,
+.experiment-one-page[data-e1-inspect-mode='true'] .experiment-one-draggable:not(.experiment-one-settings-dock).experiment-one-draggable--active [data-e1-inspect] {
+  cursor: grabbing;
+}
+
+@keyframes inspect-outline-blink {
+  0%,
+  20%,
+  40%,
+  60%,
+  80%,
+  100% {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    outline: 2px solid var(--inspect-blink-color, #ff8c42);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--inspect-blink-glow, rgba(255, 140, 66, 0.35));
+  }
+}
+
+@keyframes inspect-outline-blink-panel {
+  0%,
+  20%,
+  40%,
+  60%,
+  80%,
+  100% {
+    outline: 2px solid transparent;
+    outline-offset: 3px;
+    box-shadow: none;
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    outline: 2px solid var(--inspect-blink-color, #ff8c42);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px var(--inspect-blink-glow, rgba(255, 140, 66, 0.35));
+  }
+}
+
+.experiment-one-page [data-e1-inspect].e1-inspect-blink {
+  --inspect-blink-color: #ff8c42;
+  --inspect-blink-glow: rgba(255, 140, 66, 0.35);
+  animation: inspect-outline-blink 0.7s linear 1;
+}
+
+.experiment-one-page [data-e1-inspect].e1-inspect-blink.experiment-one-panel {
+  animation: inspect-outline-blink-panel 0.7s linear 1;
+}
+
+@media (max-width: 640px) {
+  .experiment-one-settings-dock__field {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
+  .experiment-one-panel__content {
+    padding: 2rem 1.5rem 1.75rem;
+  }
+
+  .experiment-one-panel__title {
+    font-size: 1.85rem;
+  }
+
+  .experiment-one-material-notes__list li {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+  }
+}

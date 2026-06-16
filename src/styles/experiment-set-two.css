@@ -1,0 +1,553 @@
+/* Experiment Set 1 — shared stage + Experiment Two layers */
+
+.experiment-set-one-page {
+  position: relative;
+  --e2-cyan: #7ee8ff;
+  --e2-blue: #2d8ee8;
+  --e2-deep: #0a4a9a;
+  --e2-trans-width: 680px;
+  --e2-trans-height: 420px;
+  --e2-trans-radius: 28px;
+  --e2-trans-alpha: 0.1;
+  --e2-trans-blur: 2px;
+  --e2-trans-saturate: 118%;
+  --e2-trans-brightness: 104%;
+  --e2-trans-border: 0.38;
+  --e2-trans-fill-top: 0.22;
+  --e2-trans-fill-mid: 0.1;
+  --e2-trans-fill-bottom: 0.08;
+  --e2-trans-shine: 0.42;
+  --e2-trans-diagonal: 0.28;
+  --e2-trans-shine-opacity: 0.75;
+  --e2-trans-depth: 0.55;
+  --e2-trans-inner-depth: 0.22;
+  --e2-trans-outer-shadow: 0.28;
+  --e2-trans-shadow-spread: 40px;
+  --e2-trans-glow: 0.18;
+  --e2-frost-width: 400px;
+  --e2-frost-height: 340px;
+  --e2-frost-radius: 22px;
+  --e2-frost-alpha: 0.54;
+  --e2-frost-blur: 26px;
+  --e2-frost-saturate: 145%;
+  --e2-frost-brightness: 108%;
+  --e2-frost-border: 0.58;
+  --e2-frost-fill-light: 0.48;
+  --e2-frost-fill-deep: 0.32;
+  --e2-frost-shine: 0.52;
+  --e2-frost-diagonal: 0.38;
+  --e2-frost-shine-opacity: 0.88;
+  --e2-frost-depth: 0.62;
+  --e2-frost-inner-depth: 0.28;
+  --e2-frost-outer-shadow: 0.34;
+  --e2-frost-shadow-spread: 44px;
+  --e2-frost-glow: 0.22;
+}
+
+.experiment-set-one-header {
+  margin-bottom: 1.75rem;
+}
+
+.experiment-set-one-header h1 {
+  margin: 0 0 0.4rem;
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--e1-text);
+  text-shadow: 0 1px 3px rgba(0, 30, 70, 0.45);
+}
+
+.experiment-set-one-header p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--e1-text-muted);
+  max-width: 68ch;
+}
+
+.experiment-set-one-header strong {
+  color: rgba(210, 240, 255, 0.95);
+  font-weight: 600;
+}
+
+.experiment-set-one-stage {
+  position: relative;
+  margin: 0 calc(50% - 50vw) 1.5rem;
+  width: 100vw;
+  min-height: calc(100vh - 16rem);
+}
+
+.experiment-set-one-stage__canvas {
+  position: relative;
+  width: 100%;
+  min-height: inherit;
+}
+
+.experiment-set-one-stage__slot {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.experiment-set-one-stage__slot .experiment-set-two-draggable {
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.experiment-set-one-stage__slot--raised .experiment-set-two-draggable {
+  z-index: 4;
+}
+
+.experiment-set-one-page[data-hide-panel-text='true'] .experiment-one-panel__content,
+.experiment-set-one-page[data-hide-panel-text='true'] .experiment-two-sheet__content,
+.experiment-set-one-page[data-hide-panel-text='true'] .experiment-three-layer-a__content,
+.experiment-set-one-page[data-hide-panel-text='true'] .experiment-three-layer-b__content {
+  visibility: hidden;
+}
+
+.experiment-set-one-dock__experiment {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.experiment-set-one-dock__experiment:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.experiment-set-one-dock__experiment-title {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #e8f6ff;
+}
+
+.experiment-set-one-dock__experiment-desc {
+  margin: -0.25rem 0 0.15rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: rgba(175, 215, 245, 0.72);
+}
+
+.experiment-set-one-page [data-e2-inspect].e2-inspect-blink {
+  --inspect-blink-color: #ff8c42;
+  --inspect-blink-glow: rgba(255, 140, 66, 0.35);
+  animation: inspect-outline-blink 0.7s linear 1;
+}
+
+.experiment-set-one-page[data-e2-inspect-mode='true'] [data-e2-inspect] {
+  cursor: crosshair;
+}
+
+.experiment-set-one-page[data-e2-inspect-mode='true'] .experiment-set-two-draggable:not(.experiment-set-two-draggable--active) {
+  cursor: grab;
+}
+
+.experiment-set-one-page[data-e2-inspect-mode='true'] .experiment-set-two-draggable--active,
+.experiment-set-one-page[data-e2-inspect-mode='true'] .experiment-set-two-draggable--active [data-e2-inspect] {
+  cursor: grabbing;
+}
+
+/* ── Experiment Two sheets (bezel-less, border + shine + depth) ── */
+
+.experiment-two-sheet {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  cursor: inherit;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.experiment-two-sheet--transparent {
+  width: var(--e2-trans-width);
+  min-height: var(--e2-trans-height);
+  border-radius: var(--e2-trans-radius);
+  border: 1px solid rgba(255, 255, 255, var(--e2-trans-border));
+  background:
+    linear-gradient(
+      168deg,
+      rgba(255, 255, 255, calc(var(--e2-trans-fill-top) * var(--e2-trans-alpha))) 0%,
+      rgba(200, 240, 255, calc(var(--e2-trans-fill-mid) * var(--e2-trans-alpha))) 24%,
+      rgba(80, 180, 255, calc(var(--e2-trans-fill-bottom) * var(--e2-trans-alpha) * var(--e2-trans-depth))) 100%
+    ),
+    rgba(130, 215, 255, calc(0.04 * var(--e2-trans-alpha)));
+  backdrop-filter: blur(var(--e2-trans-blur)) saturate(var(--e2-trans-saturate)) brightness(var(--e2-trans-brightness));
+  -webkit-backdrop-filter: blur(var(--e2-trans-blur)) saturate(var(--e2-trans-saturate)) brightness(var(--e2-trans-brightness));
+  box-shadow:
+    inset 0 -20px 36px rgba(0, 68, 170, calc(var(--e2-trans-inner-depth) * var(--e2-trans-depth))),
+    0 18px var(--e2-trans-shadow-spread) rgba(0, 38, 100, calc(var(--e2-trans-outer-shadow) * var(--e2-trans-depth))),
+    0 0 40px rgba(90, 200, 255, calc(var(--e2-trans-glow) * var(--e2-trans-depth)));
+}
+
+.experiment-two-sheet--frost {
+  width: var(--e2-frost-width);
+  min-height: var(--e2-frost-height);
+  border-radius: var(--e2-frost-radius);
+  border: 1px solid rgba(255, 255, 255, var(--e2-frost-border));
+  background:
+    linear-gradient(
+      168deg,
+      rgba(255, 255, 255, calc(var(--e2-frost-fill-light) * var(--e2-frost-alpha))) 0%,
+      rgba(200, 235, 255, calc(var(--e2-frost-fill-light) * 0.72 * var(--e2-frost-alpha))) 28%,
+      rgba(80, 170, 255, calc(var(--e2-frost-fill-deep) * var(--e2-frost-alpha) * var(--e2-frost-depth))) 100%
+    );
+  backdrop-filter: blur(var(--e2-frost-blur)) saturate(var(--e2-frost-saturate)) brightness(var(--e2-frost-brightness));
+  -webkit-backdrop-filter: blur(var(--e2-frost-blur)) saturate(var(--e2-frost-saturate)) brightness(var(--e2-frost-brightness));
+  box-shadow:
+    inset 0 -22px 40px rgba(0, 68, 170, calc(var(--e2-frost-inner-depth) * var(--e2-frost-depth))),
+    0 20px var(--e2-frost-shadow-spread) rgba(0, 38, 100, calc(var(--e2-frost-outer-shadow) * var(--e2-frost-depth))),
+    0 0 44px rgba(90, 200, 255, calc(var(--e2-frost-glow) * var(--e2-frost-depth)));
+}
+
+.experiment-two-sheet__shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: screen;
+}
+
+.experiment-two-sheet--transparent .experiment-two-sheet__shine {
+  opacity: var(--e2-trans-shine-opacity);
+  background:
+    linear-gradient(
+      115deg,
+      transparent 32%,
+      rgba(255, 255, 255, 0.06) 42%,
+      rgba(255, 255, 255, var(--e2-trans-diagonal)) 48%,
+      rgba(255, 255, 255, 0.1) 54%,
+      transparent 64%
+    ),
+    radial-gradient(ellipse 110% 60% at 50% -12%, rgba(255, 255, 255, var(--e2-trans-shine)), transparent 68%);
+}
+
+.experiment-two-sheet--frost .experiment-two-sheet__shine {
+  opacity: var(--e2-frost-shine-opacity);
+  background:
+    linear-gradient(
+      115deg,
+      transparent 32%,
+      rgba(255, 255, 255, 0.08) 42%,
+      rgba(255, 255, 255, var(--e2-frost-diagonal)) 48%,
+      rgba(255, 255, 255, 0.14) 54%,
+      transparent 64%
+    ),
+    radial-gradient(ellipse 110% 60% at 50% -12%, rgba(255, 255, 255, var(--e2-frost-shine)), transparent 68%);
+}
+
+.experiment-two-sheet__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: inherit;
+  padding: 2rem 2.25rem 2.5rem;
+  pointer-events: none;
+}
+
+.experiment-two-sheet__content .experiment-one-panel__drag-hint {
+  margin-top: 1.25rem;
+}
+
+.experiment-set-two-drag-bounds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.experiment-set-two-drag-bounds--viewport {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.experiment-set-two-draggable {
+  position: absolute;
+  top: 0;
+  left: 0;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  will-change: transform, left, top;
+  pointer-events: auto;
+}
+
+.experiment-set-two-drag-bounds--viewport .experiment-set-two-draggable {
+  position: fixed;
+  top: auto;
+  left: auto;
+  transform: none;
+}
+
+.experiment-set-two-draggable--active {
+  cursor: grabbing;
+}
+
+.experiment-set-two-draggable:not(.e2-settings-dock) {
+  cursor: grab;
+}
+
+/* e2 field controls in combined dock */
+
+.e2-settings-dock__shell {
+  display: flex;
+  flex-direction: column;
+  width: min(94vw, 480px);
+  max-height: min(90vh, 820px);
+  border-radius: 16px;
+  background: rgba(6, 18, 42, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 16px 40px rgba(0, 20, 50, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+
+.e2-settings-dock__shell--collapsed {
+  min-height: 0;
+  width: auto;
+  min-width: 220px;
+}
+
+.e2-settings-dock__header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  padding: 0.55rem 0.65rem 0.55rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: grab;
+  touch-action: none;
+}
+
+.experiment-set-two-draggable--active .e2-settings-dock__header {
+  cursor: grabbing;
+}
+
+.e2-settings-dock__header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  width: 100%;
+  max-height: 5.5rem;
+  overflow-y: auto;
+  padding-right: 0.1rem;
+  cursor: default;
+  -webkit-overflow-scrolling: touch;
+}
+
+.e2-settings-dock__shell--collapsed .e2-settings-dock__header {
+  border-bottom: none;
+}
+
+.e2-settings-dock__drag-handle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0.25rem 0.35rem;
+  border-radius: 8px;
+}
+
+.e2-settings-dock__grip {
+  width: 10px;
+  height: 16px;
+  flex-shrink: 0;
+  background: radial-gradient(circle, rgba(180, 220, 255, 0.75) 1.5px, transparent 2px) 0 0 / 5px 5px;
+  opacity: 0.8;
+}
+
+.e2-settings-dock__title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(190, 230, 255, 0.92);
+}
+
+.e2-settings-dock__toggle {
+  padding: 0.28rem 0.55rem;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(220, 240, 255, 0.9);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.e2-settings-dock__toggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(126, 232, 255, 0.4);
+}
+
+.e2-settings-dock__toggle--active {
+  color: #fff;
+  background: rgba(60, 160, 255, 0.28);
+  border-color: rgba(126, 232, 255, 0.55);
+}
+
+.e2-settings-dock__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0.85rem 0.9rem 1rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.e2-settings-dock__fields {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.e2-settings-dock__field {
+  display: grid;
+  grid-template-columns: minmax(9rem, 10.5rem) 1fr;
+  align-items: start;
+  gap: 0.55rem;
+}
+
+.e2-settings-dock__field-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(170, 215, 255, 0.82);
+}
+
+.e2-settings-dock__section-title {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(126, 232, 255, 0.85);
+}
+
+.e2-settings-dock__selection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.5rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: 10px;
+  background: rgba(126, 232, 255, 0.08);
+  border: 1px solid rgba(126, 232, 255, 0.22);
+}
+
+.e2-settings-dock__selection-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(160, 210, 255, 0.75);
+}
+
+.e2-settings-dock__selection-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #e8f8ff;
+}
+
+.e2-settings-dock__selection-meta {
+  font-size: 0.68rem;
+  color: rgba(170, 210, 245, 0.7);
+}
+
+.e2-settings-dock__hint,
+.e2-settings-dock__note {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: rgba(180, 215, 245, 0.72);
+}
+
+.e2-settings-dock__stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+}
+
+.e2-settings-dock__step-btn {
+  width: 1.65rem;
+  height: 1.65rem;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  color: rgba(220, 240, 255, 0.95);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.e2-settings-dock__step-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.e2-settings-dock__field-input {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.e2-settings-dock__field-input input[type='number'] {
+  width: 100%;
+  min-width: 0;
+  padding: 0.32rem 0.45rem;
+  font-size: 0.78rem;
+  color: #f4faff;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  outline: none;
+}
+
+.e2-settings-dock__unit {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(160, 200, 240, 0.65);
+  min-width: 1.4rem;
+}
+
+.e2-settings-dock__color {
+  width: 2rem;
+  height: 1.65rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.e2-settings-dock__stepper--color {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .e2-settings-dock__field {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
+  .experiment-set-two-frost__content {
+    padding: 0.85rem;
+  }
+}

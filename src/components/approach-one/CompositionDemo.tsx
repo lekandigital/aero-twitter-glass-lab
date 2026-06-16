@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { a1InspectAttrs } from './inspectCatalog';
 import {
   AeroButton,
   AeroComposer,
@@ -59,7 +60,7 @@ export function CompositionDemo() {
 
         <AeroPanel variant="footer" className="a1-footer-panel">
           <div className="a1-profile-compact">
-            <div className="a1-avatar a1-avatar--sm" />
+            <div className="a1-avatar a1-avatar--sm" {...a1InspectAttrs('avatar')} />
             <div>
               <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>Glass User</div>
               <div style={{ fontSize: '0.72rem', color: 'rgba(240,248,255,0.6)' }}>@aero.demo</div>

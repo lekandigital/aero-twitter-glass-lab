@@ -2,7 +2,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import http from 'node:http';
 import https from 'node:https';
 import { cp, mkdir, readFile, writeFile, access, stat, readdir } from 'node:fs/promises';
-import { join, dirname } from 'node:path';
+import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -46,7 +46,25 @@ export const DEMO_DIRS = [
   'docs',
   'site',
   'website',
+  'front-end',
+  'game',
+  'static',
+  'css-examples',
+  'twcss-examples',
 ];
+
+const HTML_WALK_SKIP_DIRS = new Set([
+  'node_modules',
+  '.git',
+  'dist',
+  '.next',
+  '.turbo',
+  'coverage',
+  'build',
+  'vendor',
+  '.cache',
+  '.raw-reference-runners',
+]);
 
 export const PRIORITY_IDS = [
   'liquidGL',
@@ -234,6 +252,310 @@ export function pickRecommendedScript(scripts = {}, id) {
     if (name.startsWith('dev:') && !isWatchOnlyDev(scripts[name])) return name;
   }
   return available[0] ?? null;
+}
+
+export function runnerRepoId(runner) {
+  return runner?.repoId ?? runner?.id ?? null;
+}
+
+export function isRunnerVariant(runner) {
+  return Boolean(runner?.variantOf);
+}
+
+export function isLiquidDomRunner(runner) {
+  return runnerRepoId(runner) === 'liquid-dom';
+}
+
+export function variantRunnerId(repoId, demoKey) {
+  return `${repoId}--${demoKey}`;
+}
+
+export function formatDemoLabel(key, pkg = null) {
+  const labels = {
+    showcase: 'Showcase (Vercel site)',
+    minimal: 'Minimal dev lab',
+    webgl: 'WebGL',
+    old: 'Legacy',
+  };
+  if (labels[key]) return labels[key];
+  if (pkg?.name && pkg.name !== key) {
+    return pkg.name
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+  return key
+    .replace(/[-_]+/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+const LIQUID_DOM_BUILD_ORDER = [
+  '@liquid-dom/layout',
+  '@liquid-dom/core',
+  '@liquid-dom/react',
+  '@liquid-dom/three',
+  '@liquid-dom/r3f',
+];
+
+export async function liquidDomBuildFiltersForDemo(repoPath, demoCwd) {
+  const pkg = await readPackageJson(join(repoPath, demoCwd));
+  if (!pkg) return ['@liquid-dom/layout', '@liquid-dom/core', '@liquid-dom/react'];
+  const deps = new Set([
+    ...Object.keys(pkg.dependencies ?? {}),
+    ...Object.keys(pkg.devDependencies ?? {}),
+  ]);
+  return LIQUID_DOM_BUILD_ORDER.filter((name) => deps.has(name));
+}
+
+export async function discoverWorkspaceViteDemos(repoPath, repoId, primaryDemoCwd = null) {
+  const demoRoot = join(repoPath, 'demo');
+  const variants = [];
+  let subs = [];
+  try {
+    subs = await readdir(demoRoot, { withFileTypes: true });
+  } catch {
+    return variants;
+  }
+
+  for (const sub of subs) {
+    if (!sub.isDirectory()) continue;
+    const demoCwd = join('demo', sub.name);
+    if (primaryDemoCwd && demoCwd === primaryDemoCwd) continue;
+    const spec = await packageDemoSpec(repoPath, demoCwd, repoId);
+    if (spec) variants.push(spec);
+  }
+
+  return variants;
+}
+
+async function packageDemoSpec(repoPath, demoCwd, repoId) {
+  const demoAbs = join(repoPath, demoCwd);
+  const pkg = await readPackageJson(demoAbs);
+  if (!pkg) return null;
+  const devScript = pkg.scripts?.dev ?? pkg.scripts?.start ?? '';
+  if (!isWebDevServerScript(devScript)) return null;
+  if (!(await pathExists(join(demoAbs, 'index.html'))) && !(await pathExists(join(demoAbs, 'src')))) {
+    return null;
+  }
+  const demoKey = demoCwd.replace(/[/\\]+/g, '-').replace(/^-+/, '');
+  return {
+    demoKey,
+    demoCwd,
+    demoLabel: formatDemoLabel(basename(demoCwd), pkg),
+    startMode: repoId === 'liquid-dom' ? 'liquid-dom-vite-demo' : 'nested-package-dev',
+    packageName: pkg.name,
+  };
+}
+
+export async function discoverNestedPackageDemos(repoPath, repoId, primaryDemoCwd = null) {
+  const variants = [];
+
+  async function walk(relDir) {
+    const absDir = relDir === '.' ? repoPath : join(repoPath, relDir);
+    let entries;
+    try {
+      entries = await readdir(absDir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const relPath = relDir === '.' ? entry.name : `${relDir}/${entry.name}`;
+      if (HTML_WALK_SKIP_DIRS.has(entry.name) || entry.name.startsWith('.')) continue;
+
+      const demoCwd = relPath;
+      if (primaryDemoCwd && demoCwd === primaryDemoCwd) {
+        await walk(relPath);
+        continue;
+      }
+
+      try {
+        await access(join(repoPath, demoCwd, 'package.json'));
+        const spec = await packageDemoSpec(repoPath, demoCwd, repoId);
+        if (spec && !spec.demoCwd.startsWith('demo/')) {
+          variants.push(spec);
+          continue;
+        }
+      } catch { /* not a package dir */ }
+      await walk(relPath);
+    }
+  }
+
+  await walk('.');
+  return variants;
+}
+
+export async function exampleNeedsRepoRootServe(repoPath, htmlRelPath) {
+  try {
+    const html = await readFile(join(repoPath, htmlRelPath), 'utf8');
+    if (/\.\.\/\.\.\/dist\b|\.\.\/dist\b|href=["']\.\.\/\.\.\/dist|src=["']\.\.\/\.\.\/dist/.test(html)) {
+      return true;
+    }
+    return /(?:src|href)=["']\/(?!\/)/.test(html);
+  } catch {
+    return false;
+  }
+}
+
+export async function resolveHtmlServeTarget(repoPath, htmlRelPath) {
+  const normalized = htmlRelPath.replace(/\\/g, '/');
+  const needsRoot = await exampleNeedsRepoRootServe(repoPath, normalized);
+  if (needsRoot) {
+    return {
+      serveDir: '.',
+      urlPath: `/${normalized}`,
+      htmlRelPath: normalized,
+    };
+  }
+
+  const dir = dirname(normalized);
+  const file = basename(normalized);
+  if (file === 'index.html') {
+    return {
+      serveDir: dir === '.' ? '.' : dir,
+      urlPath: '/',
+      htmlRelPath: normalized,
+    };
+  }
+
+  return {
+    serveDir: dir === '.' ? '.' : dir,
+    urlPath: `/${file}`,
+    htmlRelPath: normalized,
+  };
+}
+
+function demoKeyFromHtmlPath(htmlRelPath) {
+  return htmlRelPath
+    .replace(/\\/g, '/')
+    .replace(/\.html$/, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase();
+}
+
+export async function discoverAllHtmlDemoPages(repoPath) {
+  const pages = [];
+  const seen = new Set();
+
+  async function walk(relDir) {
+    const absDir = relDir === '.' ? repoPath : join(repoPath, relDir);
+    let entries;
+    try {
+      entries = await readdir(absDir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+
+    for (const entry of entries) {
+      const relPath = relDir === '.' ? entry.name : `${relDir}/${entry.name}`;
+      if (entry.isDirectory()) {
+        if (HTML_WALK_SKIP_DIRS.has(entry.name) || entry.name.startsWith('.')) continue;
+        await walk(relPath);
+        continue;
+      }
+      if (!entry.name.endsWith('.html')) continue;
+
+      const normalized = relPath.replace(/\\/g, '/');
+      const dedupeKey = `${normalized}`;
+      if (seen.has(dedupeKey)) continue;
+      seen.add(dedupeKey);
+
+      const target = await resolveHtmlServeTarget(repoPath, normalized);
+      pages.push({
+        demoKey: demoKeyFromHtmlPath(normalized),
+        demoLabel: formatDemoLabel(basename(normalized, '.html')),
+        ...target,
+        startMode: 'static-serve-page',
+      });
+    }
+  }
+
+  await walk('.');
+
+  pages.sort((a, b) => {
+    const score = (page) => {
+      if (page.htmlRelPath === 'index.html') return 0;
+      if (page.htmlRelPath.endsWith('/index.html')) return 1;
+      return 2;
+    };
+    return score(a) - score(b) || a.htmlRelPath.localeCompare(b.htmlRelPath);
+  });
+
+  return pages;
+}
+
+export function isPrimaryHtmlPage(primary, page) {
+  if (!primary || !page) return false;
+  if (primary.htmlRelPath && page.htmlRelPath && primary.htmlRelPath === page.htmlRelPath) {
+    return true;
+  }
+  const normalizePath = (value) => (value ?? '/').replace(/\/+$/, '') || '/';
+  const primaryPath = normalizePath(primary.urlPath);
+  const pagePath = normalizePath(page.urlPath);
+  if (primaryPath === pagePath && (primary.serveDir ?? '.') === (page.serveDir ?? '.')) {
+    return true;
+  }
+  if (primary.startMode === 'build-then-serve-example' && page.htmlRelPath) {
+    const target = primary.serveTarget ?? '';
+    if (target && page.htmlRelPath === `${target}/index.html`) {
+      return true;
+    }
+  }
+  const pageServe = page.serveDir ?? '.';
+  if (!primary.htmlRelPath && primaryPath === '/' && page.htmlRelPath === 'index.html' && pageServe === '.') {
+    return true;
+  }
+  return false;
+}
+
+export async function discoverStaticHtmlPageVariants(repoPath, primaryRunner) {
+  if (!primaryRunner?.runnable) return [];
+  const allPages = await discoverAllHtmlDemoPages(repoPath);
+  return allPages.filter((page) => !isPrimaryHtmlPage(primaryRunner, page));
+}
+
+export function buildVariantRunner(primary, spec, { port = null } = {}) {
+  const repoId = primary.repoId ?? primary.id;
+  const id = variantRunnerId(repoId, spec.demoKey);
+  const runner = {
+    ...primary,
+    id,
+    repoId,
+    variantOf: repoId,
+    variantLabel: spec.demoLabel,
+    demoKey: spec.demoKey,
+    title: `${primary.title ?? repoId} — ${spec.demoLabel}`,
+    matchPatterns: matchPatternsFor(id),
+    port,
+    status: 'not-started',
+    localDevUrl: null,
+    expectedUrl: null,
+    runnerPath: `.raw-reference-runners/repos/${repoId}`,
+    inheritsPortFrom: null,
+    runnable: true,
+    demoCwd: spec.demoCwd ?? null,
+    serveDir: spec.serveDir ?? primary.serveDir ?? '.',
+    htmlRelPath: spec.htmlRelPath ?? null,
+    urlPath: spec.urlPath ?? '/',
+    startMode: spec.startMode ?? primary.startMode,
+    openButtonLabel: spec.startMode === 'static-serve-page' ? 'Open demo page' : 'Open local dev server',
+    notes: `Additional runnable demo from ${repoId}. Uses the same repo copy as the primary runner.`,
+    labels: [
+      ...(primary.labels ?? []).filter((l) => l !== 'Open full demo' && l !== 'Open local dev server' && l !== 'Shared runner port'),
+      'Additional demo',
+    ],
+    requiresInstall: primary.requiresInstall ?? false,
+    requiresBuild: false,
+    packageStyle: primary.packageStyle ?? false,
+  };
+
+  if (spec.startMode === 'liquid-dom-vite-demo') {
+    runner.requiresBuild = true;
+    runner.liquidDomDemoCwd = spec.demoCwd;
+  }
+
+  return runner;
 }
 
 export async function findStaticServeDir(repoPath) {
@@ -485,14 +807,12 @@ export async function assessRunnerHealth(runner, live = {}) {
   };
 }
 
-export async function buildLiquidDomPackages(repoPath) {
-  const steps = [
-    ['pnpm', ['--filter', '@liquid-dom/layout', 'build']],
-    ['pnpm', ['--filter', '@liquid-dom/core', 'build']],
-    ['pnpm', ['--filter', '@liquid-dom/react', 'build']],
-  ];
-  for (const [cmd, args] of steps) {
-    const result = spawnSync(cmd, args, {
+export async function buildLiquidDomPackages(repoPath, filters = null) {
+  const resolved = filters?.length
+    ? filters
+    : ['@liquid-dom/layout', '@liquid-dom/core', '@liquid-dom/react'];
+  for (const filter of resolved) {
+    const result = spawnSync('pnpm', ['--filter', filter, 'build'], {
       cwd: repoPath,
       stdio: 'inherit',
       env: process.env,
@@ -502,13 +822,20 @@ export async function buildLiquidDomPackages(repoPath) {
   return true;
 }
 
-export function buildLiquidDomStartCommand(repoPath, port) {
+export function buildViteDemoStartCommand(repoPath, demoCwd, port) {
   return {
     cmd: 'pnpm',
     args: ['exec', 'vite', '--host', '127.0.0.1', '--port', String(port), '--strictPort'],
-    cwd: join(repoPath, 'demo/minimal'),
+    cwd: join(repoPath, demoCwd),
     env: { ...process.env },
-    startMode: 'manual-liquid-dom-vite',
+    startMode: 'vite-demo',
+  };
+}
+
+export function buildLiquidDomStartCommand(repoPath, port, demoCwd = 'demo/minimal') {
+  return {
+    ...buildViteDemoStartCommand(repoPath, demoCwd, port),
+    startMode: 'liquid-dom-vite-demo',
   };
 }
 
@@ -521,7 +848,8 @@ export async function pathExists(path) {
   }
 }
 
-export async function ensureRunnerCopy(id) {
+export async function ensureRunnerCopy(idOrRunner) {
+  const id = typeof idOrRunner === 'string' ? idOrRunner : runnerRepoId(idOrRunner);
   const src = join(VAULT_GITHUB, id);
   const dest = join(RUNNERS_REPOS, id);
   try {
@@ -535,10 +863,14 @@ export async function ensureRunnerCopy(id) {
 
 export async function ensureRunnerCopies(runners) {
   const results = [];
+  const copied = new Set();
   for (const runner of runners) {
     if (!runner.runnable) continue;
-    const result = await ensureRunnerCopy(runner.id);
-    results.push({ id: runner.id, ...result });
+    const repoId = runnerRepoId(runner);
+    if (copied.has(repoId)) continue;
+    copied.add(repoId);
+    const result = await ensureRunnerCopy(repoId);
+    results.push({ id: repoId, ...result });
   }
   return results;
 }
@@ -584,15 +916,6 @@ export async function findExampleHtmlPages(repoPath) {
   return pages;
 }
 
-export async function exampleNeedsRepoRootServe(repoPath, htmlRelPath) {
-  try {
-    const html = await readFile(join(repoPath, htmlRelPath), 'utf8');
-    return /\.\.\/\.\.\/dist\b|\.\.\/dist\b|href=["']\.\.\/\.\.\/dist|src=["']\.\.\/\.\.\/dist/.test(html);
-  } catch {
-    return false;
-  }
-}
-
 export async function resolveServeTarget(repoPath, id) {
   if (id === 'glass-refraction') {
     const vanilla = join(repoPath, 'examples/vanilla/index.html');
@@ -602,8 +925,29 @@ export async function resolveServeTarget(repoPath, id) {
         urlPath: '/examples/vanilla/',
         serveTarget: 'examples/vanilla',
         generatedWrapper: false,
+        htmlRelPath: 'examples/vanilla/index.html',
       };
     }
+  }
+
+  if (id === '7.css') {
+    const distIndex = join(repoPath, 'dist/index.html');
+    if (await pathExists(distIndex)) {
+      return {
+        serveDir: 'dist',
+        urlPath: '/',
+        serveTarget: 'dist',
+        generatedWrapper: false,
+        htmlRelPath: 'dist/index.html',
+      };
+    }
+    return {
+      serveDir: 'dist',
+      urlPath: '/',
+      serveTarget: 'dist',
+      generatedWrapper: false,
+      htmlRelPath: 'dist/index.html',
+    };
   }
 
   const pages = await findExampleHtmlPages(repoPath);
@@ -817,6 +1161,11 @@ export async function auditPackageRunner(repoPath, id, pkg, { port = null } = {}
     requiresBuild = true;
     buildOnlyDevScriptFlag = false;
     instructions.push('Build workspace packages, then run demo/minimal via Vite.');
+  } else if (id === '7.css') {
+    startMode = 'build-then-serve-example';
+    requiresBuild = true;
+    buildOnlyDevScriptFlag = false;
+    instructions.push('Build docs to dist/, then serve dist/ with live-server.');
   } else if (id === 'glass-refraction') {
     startMode = 'build-then-serve-example';
     requiresBuild = true;
@@ -893,13 +1242,13 @@ export async function auditPackageRunner(repoPath, id, pkg, { port = null } = {}
   };
 }
 
-export function buildServeStartCommand(serveDir, port, cwd) {
+export function buildServeStartCommand(serveDir, port, cwd, startMode = 'static-serve') {
   const target = serveDir === '.' ? '.' : serveDir;
   return {
     cmd: 'npx',
     args: ['--yes', 'serve', target, '-l', String(port), '--no-clipboard'],
     cwd,
     env: { ...process.env },
-    startMode: 'build-then-serve-example',
+    startMode,
   };
 }

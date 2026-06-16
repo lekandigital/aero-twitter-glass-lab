@@ -15,6 +15,7 @@ import {
   buildLiquidDomPackages,
   buildLiquidDomStartCommand,
   buildServeStartCommand,
+  buildViteDemoStartCommand,
   copyRepo,
   distLooksBuilt,
   ensureRunnerDirs,
@@ -25,13 +26,16 @@ import {
   hasNodeModules,
   installCommandFor,
   isHttpResponding,
+  isLiquidDomRunner,
   isPidAlive,
   killPid,
+  liquidDomBuildFiltersForDemo,
   listDistFiles,
   readJson,
   readPackageJson,
   readRunnerStatus,
   resolveServeTarget,
+  runnerRepoId,
   runPackageBuild,
   runPackageInstall,
   runWatchUntilDist,
@@ -210,14 +214,45 @@ function buildStartCommand(runner, cwd, pkgScripts, serveInfo) {
     HOST: '127.0.0.1',
   };
 
-  if (runner.id === 'liquid-dom') {
-    return buildLiquidDomStartCommand(cwd, runner.port);
+  if (isLiquidDomRunner(runner)) {
+    const demoCwd = runner.demoCwd ?? runner.liquidDomDemoCwd ?? 'demo/minimal';
+    return buildLiquidDomStartCommand(cwd, runner.port, demoCwd);
+  }
+
+  if (runner.startMode === 'vite-demo' && runner.demoCwd) {
+    return buildViteDemoStartCommand(cwd, runner.demoCwd, runner.port);
+  }
+
+  if (runner.startMode === 'nested-package-dev' && runner.demoCwd) {
+    const pm = runner.packageManager === 'unknown' ? 'npm' : runner.packageManager;
+    const script = runner.recommendedScript === 'start' ? 'start' : 'dev';
+    if (pm === 'pnpm') {
+      return {
+        cmd: 'pnpm',
+        args: ['run', script, '--', '--host', '127.0.0.1', '--port', port, '--strictPort'],
+        env,
+        cwd: join(cwd, runner.demoCwd),
+        startMode: 'nested-package-dev',
+      };
+    }
+    return {
+      cmd: 'npm',
+      args: ['run', script, '--', '--host', '127.0.0.1', '--port', port, '--strictPort'],
+      env,
+      cwd: join(cwd, runner.demoCwd),
+      startMode: 'nested-package-dev',
+    };
   }
 
   if (runner.startMode === 'build-then-serve-example' || serveInfo) {
     const serveDir = serveInfo?.serveDir ?? runner.serveDir ?? '.';
     const serveCwd = serveInfo?.serveCwd ?? cwd;
-    return buildServeStartCommand(serveDir, runner.port, serveCwd);
+    return buildServeStartCommand(serveDir, runner.port, serveCwd, 'build-then-serve-example');
+  }
+
+  if (runner.startMode === 'static-serve-page' || (runner.runnerType === 'static' && runner.urlPath && runner.urlPath !== '/')) {
+    const target = runner.serveDir === '.' ? '.' : runner.serveDir;
+    return buildServeStartCommand(target, runner.port, cwd, 'static-serve-page');
   }
 
   if (runner.runnerType === 'static' || runner.startMode === 'static-serve') {
@@ -284,8 +319,9 @@ async function readLogTail(logPath) {
 }
 
 export async function startRunner(runner, statusMap, pidsMap, { force = false } = {}) {
-  const src = join(VAULT_GITHUB, runner.id);
-  const dest = join(RUNNERS_REPOS, runner.id);
+  const repoId = runnerRepoId(runner);
+  const src = join(VAULT_GITHUB, repoId);
+  const dest = join(RUNNERS_REPOS, repoId);
   const logPath = join(RUNNERS_LOGS, `${runner.id}.log`);
   const expectedUrl = expectedRunnerUrl(runner);
 
@@ -369,9 +405,11 @@ export async function startRunner(runner, statusMap, pidsMap, { force = false } 
     const installed = await ensureInstalled(runner, dest, statusMap);
     if (!installed) return;
 
-    if (runner.id === 'liquid-dom') {
-      console.log('  Building liquid-dom workspace packages…');
-      const built = await buildLiquidDomPackages(dest);
+    if (isLiquidDomRunner(runner)) {
+      const demoCwd = runner.demoCwd ?? runner.liquidDomDemoCwd ?? 'demo/minimal';
+      const filters = await liquidDomBuildFiltersForDemo(dest, demoCwd);
+      console.log(`  Building liquid-dom workspace packages (${filters.join(', ')})…`);
+      const built = await buildLiquidDomPackages(dest, filters);
       builtLiquidDomLayout = built;
       buildStatus = built ? 'passed' : 'failed';
       if (!built) {
@@ -385,7 +423,7 @@ export async function startRunner(runner, statusMap, pidsMap, { force = false } 
           responding: false,
           logFile: logPath,
           error: 'liquid-dom workspace build failed',
-          notes: ['@liquid-dom/layout/core/react build failed'],
+          notes: [`${filters.join(', ')} build failed`],
           builtLiquidDomLayout: false,
           buildStatus: 'failed',
         };
@@ -400,7 +438,7 @@ export async function startRunner(runner, statusMap, pidsMap, { force = false } 
   }
 
   if (runner.startMode === 'build-then-serve-example') {
-    serveInfo = await resolveServeTarget(dest, runner.id);
+    serveInfo = await resolveServeTarget(dest, repoId);
     if (!serveInfo) {
       const builtFiles = await listDistFiles(dest);
       serveInfo = await generateNoDemoWrapper(runner.id, dest, builtFiles);
@@ -481,7 +519,7 @@ export async function startRunner(runner, statusMap, pidsMap, { force = false } 
     notes,
     startMode: serveInfo ? 'build-then-serve-example' : startMode,
     observedUrl: status === 'wrong-port' ? (unexpectedUrls[0] ?? null) : null,
-    builtLiquidDomLayout: runner.id === 'liquid-dom' ? builtLiquidDomLayout : undefined,
+    builtLiquidDomLayout: isLiquidDomRunner(runner) ? builtLiquidDomLayout : undefined,
     buildStatus,
     serveTarget: serveInfo?.serveTarget ?? runner.serveTarget ?? null,
     serveStatus: serveInfo ? (responding ? 'passed' : (generatedWrapper ? 'missing' : 'failed')) : null,

@@ -1,17 +1,24 @@
 #!/usr/bin/env node
 import { readdir, readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 import {
   BASE_PORT,
   VAULT_GITHUB,
   PUBLIC_RUNNERS,
   auditPackageRunner,
+  buildVariantRunner,
+  discoverAllHtmlDemoPages,
+  discoverNestedPackageDemos,
+  discoverStaticHtmlPageVariants,
+  discoverWorkspaceViteDemos,
   findStaticServeDir,
   githubSourceUrl,
+  isPrimaryHtmlPage,
   isWebDevServerScript,
   matchPatternsFor,
   pickRecommendedScript,
   pickRunnableScripts,
+  runnerRepoId,
   writeJson,
 } from './lib/reference-runners-shared.mjs';
 
@@ -38,6 +45,7 @@ async function discoverRepo(dirName) {
     if (audit.startMode === 'build-then-serve-example') {
       return {
         id: dirName,
+        repoId: dirName,
         title: pkg.name ?? dirName,
         runnerType: 'package',
         runnable: true,
@@ -63,6 +71,7 @@ async function discoverRepo(dirName) {
         serveTarget: audit.serveTarget,
         serveDir: audit.serveDir,
         urlPath: audit.urlPath,
+        htmlRelPath: audit.serveTarget ? `${audit.serveTarget}/index.html`.replace(/^\.\//, '') : null,
         devScript: audit.devScript,
         devScriptKind: audit.devScriptKind,
         generatedWrapper: audit.generatedWrapper,
@@ -82,6 +91,7 @@ async function discoverRepo(dirName) {
       const scriptBody = scripts[recommended] ?? '';
       return {
         id: dirName,
+        repoId: dirName,
         title: pkg.name ?? dirName,
         runnerType: 'package',
         runnable: true,
@@ -117,8 +127,52 @@ async function discoverRepo(dirName) {
     }
 
     if (!recommended) {
+      const nestedDemos = await discoverNestedPackageDemos(repoPath, dirName);
+      if (nestedDemos.length) {
+        const first = nestedDemos[0];
+        return {
+          id: dirName,
+          repoId: dirName,
+          title: pkg.name ?? dirName,
+          runnerType: 'package',
+          runnable: true,
+          sourcePath,
+          sourceUrl,
+          matchPatterns: matchPatternsFor(dirName),
+          packageManager: audit.packageManager,
+          scripts: Object.keys(scripts),
+          runnableScripts: runnable,
+          recommendedScript: 'dev',
+          port: null,
+          status: 'not-started',
+          localDevUrl: null,
+          expectedUrl: null,
+          startMode: 'nested-package-dev',
+          demoCwd: first.demoCwd,
+          packageStyle: true,
+          requiresInstall: true,
+          requiresBuild: false,
+          installCommand: audit.installCommand,
+          labels: ['Package repo', 'Nested demo', 'Install needed', 'Open local dev server'],
+          openButtonLabel: 'Open local dev server',
+          notes: `Runnable nested demo at ${first.demoCwd}.`,
+        };
+      }
+
+      const htmlPages = await discoverAllHtmlDemoPages(repoPath);
+      if (htmlPages.length) {
+        const primaryPage = htmlPages[0];
+        return buildStaticRunner(dirName, sourcePath, primaryPage.serveDir, sourceUrl, pkg, audit, {
+          urlPath: primaryPage.urlPath,
+          htmlRelPath: primaryPage.htmlRelPath,
+          startMode: primaryPage.urlPath === '/' ? 'static-serve' : 'static-serve-page',
+          notes: 'Package repo with static HTML demos; served via npx serve.',
+        });
+      }
+
       return {
         id: dirName,
+        repoId: dirName,
         title: pkg.name ?? dirName,
         runnerType: 'package',
         runnable: false,
@@ -148,6 +202,7 @@ async function discoverRepo(dirName) {
 
     return {
       id: dirName,
+      repoId: dirName,
       title: pkg.name ?? dirName,
       runnerType: 'package',
       runnable: true,
@@ -176,6 +231,17 @@ async function discoverRepo(dirName) {
     return buildStaticRunner(dirName, sourcePath, staticServeDir, sourceUrl, null, null);
   }
 
+  const htmlPages = await discoverAllHtmlDemoPages(repoPath);
+  if (htmlPages.length) {
+    const primaryPage = htmlPages[0];
+    return buildStaticRunner(dirName, sourcePath, primaryPage.serveDir, sourceUrl, null, null, {
+      urlPath: primaryPage.urlPath,
+      htmlRelPath: primaryPage.htmlRelPath,
+      startMode: primaryPage.urlPath === '/' ? 'static-serve' : 'static-serve-page',
+      notes: 'Static HTML demo collection. Each page can be run independently via npx serve.',
+    });
+  }
+
   return {
     id: dirName,
     title: dirName,
@@ -197,8 +263,12 @@ async function discoverRepo(dirName) {
 }
 
 function buildStaticRunner(id, sourcePath, serveDir, sourceUrl, pkg, audit, extra = {}) {
+  const htmlRelPath = extra.htmlRelPath ?? (serveDir === '.' ? 'index.html' : `${serveDir}/index.html`);
+  const urlPath = extra.urlPath ?? '/';
+  const startMode = extra.startMode ?? 'static-serve';
   return {
     id,
+    repoId: id,
     title: pkg?.name ?? id,
     runnerType: 'static',
     runnable: true,
@@ -210,39 +280,91 @@ function buildStaticRunner(id, sourcePath, serveDir, sourceUrl, pkg, audit, extr
     runnableScripts: ['serve'],
     recommendedScript: 'serve',
     serveDir,
+    htmlRelPath,
+    urlPath,
     port: null,
     status: 'not-started',
     localDevUrl: null,
     expectedUrl: null,
-    startMode: 'static-serve',
+    startMode,
     packageStyle: !!pkg,
     requiresInstall: !!pkg,
     requiresBuild: false,
     installCommand: audit?.installCommand ?? null,
     labels: ['Open full demo'],
-    openButtonLabel: 'Open full demo',
+    openButtonLabel: urlPath === '/' ? 'Open full demo' : 'Open demo page',
     notes: 'Static HTML demo. Served via npx serve in isolated runner copy. Not ported.',
     ...extra,
   };
 }
 
+async function discoverVariantRunners(primary, repoPath) {
+  const variants = [];
+  const viteDemoCwds = new Set();
+
+  if (primary.runnerType === 'package' && primary.runnable) {
+    const primaryDemoCwd = primary.demoCwd ?? (primary.id === 'liquid-dom' ? 'demo/minimal' : null);
+    const viteDemos = await discoverWorkspaceViteDemos(repoPath, primary.id, primaryDemoCwd);
+    variants.push(...viteDemos);
+    for (const demo of viteDemos) viteDemoCwds.add(demo.demoCwd);
+    if (primaryDemoCwd) viteDemoCwds.add(primaryDemoCwd);
+
+    const nestedDemos = await discoverNestedPackageDemos(repoPath, primary.id, primaryDemoCwd);
+    for (const demo of nestedDemos) {
+      if (demo.demoCwd === primary.demoCwd) continue;
+      variants.push(demo);
+      viteDemoCwds.add(demo.demoCwd);
+    }
+  }
+
+  if (primary.startMode === 'build-then-serve-example') {
+    return variants.map((spec) => buildVariantRunner(primary, spec));
+  }
+
+  if (primary.runnerType === 'static' || primary.startMode === 'static-serve' || primary.startMode === 'static-serve-page') {
+    variants.push(...await discoverStaticHtmlPageVariants(repoPath, primary));
+  } else if (primary.runnerType === 'package' && primary.runnable) {
+    const allPages = await discoverAllHtmlDemoPages(repoPath);
+    for (const page of allPages) {
+      if (isPrimaryHtmlPage(primary, page)) continue;
+      const pageDir = dirname(page.htmlRelPath);
+      const inPackageDemo = [...viteDemoCwds].some((cwd) => pageDir === cwd || pageDir.startsWith(`${cwd}/`));
+      if (inPackageDemo) continue;
+      variants.push(page);
+    }
+  }
+
+  return variants.map((spec) => buildVariantRunner(primary, spec));
+}
+
 async function main() {
   const entries = await readdir(VAULT_GITHUB, { withFileTypes: true });
-  const runners = [];
+  const primaries = [];
 
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
     const runner = await discoverRepo(entry.name);
-    runners.push(runner);
+    primaries.push(runner);
+  }
+
+  const runners = [];
+  for (const primary of primaries) {
+    runners.push(primary);
+    if (!primary.runnable) continue;
+    const repoPath = join(VAULT_GITHUB, primary.id);
+    const variants = await discoverVariantRunners(primary, repoPath);
+    runners.push(...variants);
   }
 
   runners.sort((a, b) => {
     const score = (r) => {
       if (!r.runnable) return 1000;
-      const idx = ['liquidGL', 'archisvaze-liquid-glass', 'liquid-glass-js', 'glassmorphism-template', 'liquid-dom', 'glass-refraction', 'glassmorphism', '7-Aero-Stylesheet'].indexOf(r.id);
-      return idx === -1 ? 500 : idx;
+      const baseId = r.variantOf ?? r.id;
+      const idx = ['liquidGL', 'archisvaze-liquid-glass', 'liquid-glass-js', 'glassmorphism-template', 'liquid-dom', 'glass-refraction', 'glassmorphism', '7-Aero-Stylesheet', 'tuannm93-lab', 'polidario-frontend-projects'].indexOf(baseId);
+      const base = idx === -1 ? 500 : idx;
+      return base + (r.variantOf ? 0.1 : 0);
     };
-    return score(a) - score(b) || a.id.localeCompare(b.id);
+    return score(a) - score(b) || (a.variantOf ?? a.id).localeCompare(b.variantOf ?? b.id) || (a.variantOf ? 1 : -1) || a.id.localeCompare(b.id);
   });
 
   let port = BASE_PORT;
@@ -253,16 +375,16 @@ async function main() {
       const base = `http://localhost:${port}`;
       runner.localDevUrl = urlPath === '/' ? base : `${base}${urlPath.startsWith('/') ? urlPath : `/${urlPath}`}`;
       runner.expectedUrl = runner.localDevUrl;
-      if (runner.serveCommand == null && runner.serveDir) {
-        runner.serveCommand = `npx serve ${runner.serveDir} -l ${port}`;
-      } else if (runner.serveCommand == null && runner.startMode === 'static-serve') {
-        const target = runner.serveDir === '.' ? '.' : runner.serveDir;
-        runner.serveCommand = `npx serve ${target} -l ${port}`;
+      const serveTarget = runner.serveDir === '.' ? '.' : runner.serveDir;
+      if (runner.serveCommand == null && (runner.startMode === 'static-serve' || runner.startMode === 'static-serve-page')) {
+        runner.serveCommand = `npx serve ${serveTarget} -l ${port}`;
+      } else if (runner.serveCommand == null && runner.serveDir) {
+        runner.serveCommand = `npx serve ${serveTarget} -l ${port}`;
       }
-      runner.runnerPath = `.raw-reference-runners/repos/${runner.id}`;
+      runner.runnerPath = `.raw-reference-runners/repos/${runnerRepoId(runner)}`;
       port += 1;
     } else {
-      runner.runnerPath = `.raw-reference-runners/repos/${runner.id}`;
+      runner.runnerPath = `.raw-reference-runners/repos/${runnerRepoId(runner)}`;
     }
   }
 
@@ -278,8 +400,11 @@ async function main() {
   console.log(`Not runnable:              ${notRunnable.length}`);
   console.log(`Output:                    ${PUBLIC_RUNNERS}`);
   console.log('\nRunnable:');
-  for (const r of runnable) {
+  for (const r of runnable.slice(0, 40)) {
     console.log(`  ${r.id} → ${r.localDevUrl} (${r.startMode ?? r.runnerType}, ${r.recommendedScript ?? 'serve'})`);
+  }
+  if (runnable.length > 40) {
+    console.log(`  … and ${runnable.length - 40} more`);
   }
   if (notRunnable.length) {
     console.log('\nNot runnable:');
