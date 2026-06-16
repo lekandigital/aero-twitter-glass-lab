@@ -61,7 +61,12 @@ import { MaterialSettingCollapsibleSection } from '../shared/MaterialSettingColl
 import { MaterialSettingFieldRow } from '../shared/MaterialSettingControl';
 import { ExperimentMultiLayerSettings } from '../shared/ExperimentMultiLayerSettings';
 import { LayerEditModeToggle } from '../shared/LayerEditModeToggle';
-import { sectionsForLayerMode, type LayerEditMode } from '../shared/layerEditMode';
+import { sectionsForLayerMode, foldableSectionId, type LayerEditMode } from '../shared/layerEditMode';
+import {
+  captureSettingsScrollAnchor,
+  restoreSettingsScrollAnchor,
+  type SettingsScrollAnchor,
+} from '../shared/settingsScrollAnchor';
 import { consumeClickAfterHoldDrag } from '../shared/useHoldDrag';
 import { orderedSections, filterFieldsWhen } from '../shared/materialSettingGroups';
 import { useFoldableSections } from '../shared/useFoldableSections';
@@ -721,13 +726,31 @@ export function ExperimentSetOneSettingsDock() {
     () => [
       ...visibleE1Sections.map((s) => `e1-${s}`),
       ...visibleE2Sections.map((s) => `e2-${s}`),
-      ...visibleE3SectionsForMode.map((s) => `e3-${s}`),
-      ...visibleE4SectionsForMode.map((s) => `e4-${s}`),
-      ...visibleE5SectionsForMode.map((s) => `e5-${s}`),
+      ...visibleE3SectionsForMode.map((s) => foldableSectionId('e3', s)),
+      ...visibleE4SectionsForMode.map((s) => foldableSectionId('e4', s)),
+      ...visibleE5SectionsForMode.map((s) => foldableSectionId('e5', s)),
     ],
     [visibleE1Sections, visibleE2Sections, visibleE3SectionsForMode, visibleE4SectionsForMode, visibleE5SectionsForMode],
   );
   const { isOpen, toggle, openAll, collapseAll } = useFoldableSections(foldableSectionIds, false);
+  const settingsScrollRef = useRef<HTMLDivElement>(null);
+  const pendingScrollAnchorRef = useRef<SettingsScrollAnchor | null>(null);
+
+  const handleLayerEditModeChange = useCallback((mode: LayerEditMode) => {
+    const container = settingsScrollRef.current;
+    if (container) {
+      pendingScrollAnchorRef.current = captureSettingsScrollAnchor(container);
+    }
+    setLayerEditMode(mode);
+  }, []);
+
+  useLayoutEffect(() => {
+    const container = settingsScrollRef.current;
+    const anchor = pendingScrollAnchorRef.current;
+    if (!container || !anchor) return;
+    pendingScrollAnchorRef.current = null;
+    restoreSettingsScrollAnchor(container, anchor);
+  }, [layerEditMode, visibleE3SectionsForMode, visibleE4SectionsForMode, visibleE5SectionsForMode]);
 
   useEffect(() => {
     const session = loadExperimentSetOneSession();
@@ -853,7 +876,17 @@ export function ExperimentSetOneSettingsDock() {
               </div>
             </div>
 
-            <div className="experiment-one-settings-dock__settings-scroll">
+            <div
+              className={`experiment-one-settings-dock__workspace${showLayerEditToggle ? ' experiment-one-settings-dock__workspace--layered' : ''}`}
+            >
+              {showLayerEditToggle && (
+                <aside className="experiment-one-settings-dock__layer-rail" aria-label="Layer edit mode">
+                  <span className="experiment-one-settings-dock__layer-rail-label">Edit</span>
+                  <LayerEditModeToggle value={layerEditMode} onChange={handleLayerEditModeChange} layout="side" />
+                </aside>
+              )}
+
+            <div ref={settingsScrollRef} className="experiment-one-settings-dock__settings-scroll">
               {selection ? (
                 <div className="experiment-one-settings-dock__selection">
                   <span className="experiment-one-settings-dock__selection-label">Inspecting</span>
@@ -876,9 +909,6 @@ export function ExperimentSetOneSettingsDock() {
                 </p>
               )}
               {note && <p className="experiment-one-settings-dock__note">{note}</p>}
-              {showLayerEditToggle && (
-                <LayerEditModeToggle value={layerEditMode} onChange={setLayerEditMode} />
-              )}
 
             {dockExperiment === 'one' && visibleE1Fields.length > 0 && (
             <section className="experiment-set-one-dock__experiment">
@@ -1047,6 +1077,7 @@ export function ExperimentSetOneSettingsDock() {
                 onToggle={toggle}
               />
             )}
+            </div>
             </div>
           </div>
         )}

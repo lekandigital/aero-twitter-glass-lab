@@ -3,6 +3,8 @@ import { MaterialSettingCollapsibleSection } from './MaterialSettingCollapsibleS
 import { MaterialSettingFieldRow } from './MaterialSettingControl';
 import type { ExperimentSetOneSnapshot } from '../experiment-set-one/savedConfigs';
 import {
+  foldableSectionDomId,
+  foldableSectionId,
   layerPairValuesDiffer,
   resolveFieldValueForLayerMode,
   resolvePairedSuffix,
@@ -73,13 +75,17 @@ export function ExperimentMultiLayerSettings<TSettings extends Record<string, un
         const sectionFields = displayFields.filter((field) => field.section === section);
         if (sectionFields.length === 0) return null;
 
+        const sectionStateKey = foldableSectionId(experimentKey, section);
+        const sectionDomId = foldableSectionDomId(experimentKey, section);
+
         return (
           <MaterialSettingCollapsibleSection
-            key={`${experimentKey}-${section}`}
-            id={`${experimentKey}-${section}`}
+            key={sectionDomId}
+            id={sectionStateKey}
+            domId={sectionDomId}
             title={section}
             count={sectionFields.length}
-            open={isOpen(`${experimentKey}-${section}`)}
+            open={isOpen(sectionStateKey)}
             onToggle={onToggle}
             titleClassName="experiment-one-settings-dock__section-title"
             fieldsClassName="experiment-one-settings-dock__fields"
