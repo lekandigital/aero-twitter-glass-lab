@@ -40,13 +40,17 @@
   -webkit-backdrop-filter: blur(var(--e4-layerA-frost)) saturate(var(--e4-layerA-saturate))
     brightness(var(--e4-layerA-brightness));
 
+  /* Aero "wet glass" bevel: crisp top highlight lip, cool base shade for pane
+     thickness, tight contact shadow, soft ambient drop, and the cyan halo.
+     Brightness floors keep the bevel readable even when borderWidth is low. */
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, calc(0.92 * var(--e4-layerA-rim-strength))),
-    inset 0 1px 3px rgba(255, 255, 255, calc(0.5 * var(--e4-layerA-rim-strength))),
-    inset 0 -16px 28px rgba(0, 68, 170, calc(var(--e4-layerA-inner-depth) * var(--e4-layerA-depth-strength) * 0.45)),
-    inset 0 0 0 1px rgba(255, 255, 255, calc(0.32 * var(--e4-layerA-rim-strength))),
-    0 18px var(--e4-layerA-shadow-spread) rgba(0, 38, 100, calc(var(--e4-layerA-outer-shadow) * var(--e4-layerA-depth-strength))),
-    0 0 40px rgba(90, 200, 255, calc(var(--e4-layerA-glow) * var(--e4-layerA-depth-strength)));
+    inset 0 1.5px 0 rgba(255, 255, 255, calc(0.6 + 0.4 * var(--e4-layerA-rim-strength, 0.3))),
+    inset 0 3px 7px rgba(255, 255, 255, calc(0.16 + 0.34 * var(--e4-layerA-rim-strength, 0.3))),
+    inset 0 -18px 30px rgba(0, 70, 170, calc(0.1 + var(--e4-layerA-inner-depth, 0.2) * var(--e4-layerA-depth-strength, 0.5) * 0.5)),
+    inset 0 0 0 1px rgba(255, 255, 255, calc(0.18 + 0.3 * var(--e4-layerA-rim-strength, 0.3))),
+    0 2px 6px rgba(0, 28, 78, calc(0.12 + var(--e4-layerA-outer-shadow, 0.3) * var(--e4-layerA-depth-strength, 0.5) * 0.3)),
+    0 22px var(--e4-layerA-shadow-spread, 56px) rgba(0, 38, 100, calc(0.1 + var(--e4-layerA-outer-shadow, 0.3) * var(--e4-layerA-depth-strength, 0.5) * 0.6)),
+    0 0 46px rgba(90, 200, 255, calc(0.06 + var(--e4-layerA-glow, 0.2) * var(--e4-layerA-depth-strength, 0.5) * 0.85));
 }
 
 .experiment-four-layer-a__bezel-rim {
@@ -55,18 +59,70 @@
   border-radius: inherit;
   pointer-events: none;
   z-index: 1;
+  /* Wet-glass top reflection: a broad specular bloom from above plus a tight
+     bright band hugging the very top edge, then a cool wash at the base. */
   background:
+    radial-gradient(
+      ellipse 130% 72% at 50% -24%,
+      rgba(255, 255, 255, calc(0.34 + 0.4 * var(--e4-layerA-top-shine, 0.5))) 0%,
+      rgba(255, 255, 255, calc(0.08 + 0.18 * var(--e4-layerA-top-shine, 0.5))) 38%,
+      transparent 62%
+    ),
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, calc(0.78 * var(--e4-layerA-rim-strength))) 0%,
-      rgba(255, 255, 255, calc(0.28 * var(--e4-layerA-rim-strength))) 12%,
-      transparent 30%
+      rgba(255, 255, 255, calc(0.5 + 0.4 * var(--e4-layerA-rim-strength, 0.3))) 0%,
+      rgba(255, 255, 255, calc(0.18 + 0.22 * var(--e4-layerA-rim-strength, 0.3))) 6%,
+      transparent 18%
     ),
     linear-gradient(
       0deg,
-      rgba(0, 100, 210, calc(0.12 * var(--e4-layerA-depth-strength))) 0%,
-      transparent 16%
+      rgba(0, 100, 210, calc(0.1 + 0.14 * var(--e4-layerA-depth-strength, 0.5))) 0%,
+      transparent 20%
     );
+}
+
+/* Continuous rounded perimeter rim that follows the corners (gradient border via
+   mask). Bright white at the top, cooling to aero blue toward the base. */
+.experiment-four-layer-a__bezel-rim::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: var(--e4-layerA-bezel-ring-px, 1.6px);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(228, 248, 255, 0.86) 16%,
+    rgba(168, 222, 255, 0.55) 52%,
+    rgba(74, 156, 232, 0.66) 100%
+  );
+  opacity: calc(0.6 + 0.4 * var(--e4-layerA-rim-border, 0.5));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Specular hotline hugging the top edge and upper corners. */
+.experiment-four-layer-a__bezel-rim::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(
+      ellipse 68% 24% at 50% 0%,
+      rgba(255, 255, 255, calc(0.4 + 0.45 * var(--e4-layerA-top-shine, 0.5))) 0%,
+      transparent 72%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, transparent 4%);
 }
 
 .experiment-four-layer-a__bezel-rim-edge {
@@ -1106,11 +1162,42 @@
   -webkit-backdrop-filter: blur(var(--e4-layerB-frost)) saturate(var(--e4-layerB-saturate))
     brightness(var(--e4-layerB-brightness));
 
+  /* Matching wet-glass bevel for the frosted inner sheet — subtler than A. */
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, calc(0.72 * var(--e4-layerB-rim-strength))),
-    inset 0 -20px 36px rgba(0, 68, 170, calc(var(--e4-layerB-inner-depth) * var(--e4-layerB-depth-strength))),
-    inset 0 0 0 1px rgba(255, 255, 255, calc(0.22 * var(--e4-layerB-rim-strength))),
-    0 8px 24px rgba(0, 38, 100, calc(var(--e4-layerB-outer-shadow) * var(--e4-layerB-depth-strength) * 0.35));
+    inset 0 1.5px 0 rgba(255, 255, 255, calc(0.5 + 0.4 * var(--e4-layerB-rim-strength, 0.3))),
+    inset 0 3px 6px rgba(255, 255, 255, calc(0.12 + 0.26 * var(--e4-layerB-rim-strength, 0.3))),
+    inset 0 -20px 34px rgba(0, 68, 170, calc(0.08 + var(--e4-layerB-inner-depth, 0.2) * var(--e4-layerB-depth-strength, 0.5) * 0.85)),
+    inset 0 0 0 1px rgba(255, 255, 255, calc(0.14 + 0.24 * var(--e4-layerB-rim-strength, 0.3))),
+    0 2px 5px rgba(0, 28, 78, calc(0.1 + var(--e4-layerB-outer-shadow, 0.3) * var(--e4-layerB-depth-strength, 0.5) * 0.28)),
+    0 12px 30px rgba(0, 38, 100, calc(0.08 + var(--e4-layerB-outer-shadow, 0.3) * var(--e4-layerB-depth-strength, 0.5) * 0.45)),
+    0 0 38px rgba(90, 200, 255, calc(0.05 + var(--e4-layerB-glow, 0.18) * var(--e4-layerB-depth-strength, 0.5) * 0.7));
+}
+
+/* Continuous rounded rim for layer B — thinner and a touch softer than A. */
+.experiment-four-layer-b::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 1;
+  padding: var(--e4-layerB-bezel-ring-px, 1.1px);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.94) 0%,
+    rgba(222, 245, 255, 0.74) 20%,
+    rgba(176, 224, 255, 0.46) 58%,
+    rgba(112, 184, 236, 0.54) 100%
+  );
+  opacity: calc(0.55 + 0.4 * var(--e4-layerB-rim-border, 0.4));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .experiment-four-layer-b__shine {
@@ -1121,19 +1208,26 @@
   z-index: 1;
   opacity: var(--e4-layerB-shine-opacity);
   mix-blend-mode: screen;
+  /* Crisp bright band right under the top edge + a broad wet top glow. */
   background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, calc(0.32 + 0.5 * var(--e4-layerB-top-shine, 0.5))) 0%,
+      rgba(255, 255, 255, calc(0.08 + 0.2 * var(--e4-layerB-top-shine, 0.5))) 7%,
+      transparent 20%
+    ),
     linear-gradient(
       115deg,
       transparent 30%,
       rgba(255, 255, 255, 0.1) 42%,
-      rgba(255, 255, 255, calc(var(--e4-layerB-diagonal-gloss) * var(--e4-layerB-rim-strength))) 48%,
+      rgba(255, 255, 255, calc(0.12 + var(--e4-layerB-diagonal-gloss, 0.4) * var(--e4-layerB-rim-strength, 0.3))) 48%,
       rgba(255, 255, 255, 0.14) 54%,
       transparent 66%
     ),
     radial-gradient(
-      ellipse 100% 55% at 50% -8%,
-      rgba(255, 255, 255, calc(var(--e4-layerB-top-shine) * var(--e4-layerB-rim-strength))),
-      transparent 70%
+      ellipse 110% 58% at 50% -10%,
+      rgba(255, 255, 255, calc(0.2 + 0.6 * var(--e4-layerB-top-shine, 0.5))),
+      transparent 72%
     );
 }
 
