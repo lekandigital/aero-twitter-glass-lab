@@ -17,6 +17,7 @@ import {
 import {
   DEFAULT_EXPERIMENT_VISIBILITY,
   normalizeExperimentVisibility,
+  type ExperimentId,
   type ExperimentVisibility,
 } from './experimentVisibility';
 
@@ -31,6 +32,8 @@ export type ExperimentSetOneSession = {
   inspectMode: boolean;
   experimentVisible: ExperimentVisibility;
   referenceWallpaper: boolean;
+  activeExperiment?: ExperimentId;
+  selectedSaveIdByExperiment?: Partial<Record<ExperimentId, number | null>>;
   cornerPresetVersion?: number;
 };
 
@@ -44,6 +47,8 @@ export function defaultSession(): ExperimentSetOneSession {
     inspectMode: true,
     experimentVisible: DEFAULT_EXPERIMENT_VISIBILITY,
     referenceWallpaper: false,
+    activeExperiment: 'four',
+    selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: null },
     cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
   };
 }
@@ -92,6 +97,15 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       inspectMode: parsed.inspectMode !== false,
       experimentVisible: normalizeExperimentVisibility(parsed.experimentVisible),
       referenceWallpaper: Boolean(parsed.referenceWallpaper),
+      activeExperiment:
+        parsed.activeExperiment === 'one' ||
+        parsed.activeExperiment === 'two' ||
+        parsed.activeExperiment === 'three' ||
+        parsed.activeExperiment === 'four' ||
+        parsed.activeExperiment === 'five'
+          ? parsed.activeExperiment
+          : 'four',
+      selectedSaveIdByExperiment: parsed.selectedSaveIdByExperiment ?? undefined,
       cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
     };
     if (cornerPresetVersion < REFERENCE_CORNER_PRESET_VERSION) {

@@ -8,13 +8,12 @@ import {
   sheetPrefixedKey,
   sheetSectionLabel,
   type E2SheetMaterialKeys,
+  type E2SheetSection,
 } from '../experiment-set-two/sheetMaterial';
 import type { E3MaterialSettings } from '../experiment-set-three/materialSettings';
 import { buildInitialE3Settings } from '../experiment-set-three/materialSettings';
 import { loadExperimentSetOneSaves } from '../experiment-set-one/savedConfigs';
 
-export const E4_CORNERS_SECTION_A = 'Layer A · Corners';
-export const E4_CORNERS_SECTION_B = 'Layer B · Corners';
 export const E4_BEZEL_SECTION = 'Layer A · Bezel layout';
 
 /** 0 off · 1 top-left + bottom-right · 2 top-right + bottom-left · 3 each corner */
@@ -39,10 +38,11 @@ export const E4_SECTION_ORDER = [
   ...LAYER_A_SHEET_SECTIONS.slice(0, layerAShapeSectionIndex + 1),
   E4_BEZEL_SECTION,
   ...LAYER_A_SHEET_SECTIONS.slice(layerAShapeSectionIndex + 1),
-  E4_CORNERS_SECTION_A,
   ...E2_SHEET_SECTION_ORDER.map((s) => sheetSectionLabel('Layer B', s)),
-  E4_CORNERS_SECTION_B,
 ] as const;
+
+const LAYER_A_BORDER_SECTION = sheetSectionLabel('Layer A', 'Border' as E2SheetSection);
+const LAYER_B_BORDER_SECTION = sheetSectionLabel('Layer B', 'Border' as E2SheetSection);
 
 export type E4RadialCornerId = 'Tl' | 'Tr' | 'Bl' | 'Br';
 
@@ -820,10 +820,10 @@ function buildBezelLayoutFields(): E4SettingField[] {
 }
 
 const BEZEL_LAYOUT_FIELDS = buildBezelLayoutFields();
-const CORNER_FIELDS_A = buildGlassReflexFields('layerA', E4_CORNERS_SECTION_A);
-const RADIAL_FIELDS_A = buildRadialFields('layerA', E4_CORNERS_SECTION_A);
-const CORNER_FIELDS_B = buildGlassReflexFields('layerB', E4_CORNERS_SECTION_B);
-const RADIAL_FIELDS_B = buildRadialFields('layerB', E4_CORNERS_SECTION_B);
+const CORNER_FIELDS_A = buildGlassReflexFields('layerA', LAYER_A_BORDER_SECTION);
+const RADIAL_FIELDS_A = buildRadialFields('layerA', LAYER_A_BORDER_SECTION);
+const CORNER_FIELDS_B = buildGlassReflexFields('layerB', LAYER_B_BORDER_SECTION);
+const RADIAL_FIELDS_B = buildRadialFields('layerB', LAYER_B_BORDER_SECTION);
 
 export const E4_SETTING_FIELDS: E4SettingField[] = [
   ...PALETTE_FIELDS,
