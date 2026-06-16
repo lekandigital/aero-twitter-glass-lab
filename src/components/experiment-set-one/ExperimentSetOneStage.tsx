@@ -15,18 +15,21 @@ import {
   ExperimentFourDraggableLayerA,
   ExperimentFourDraggableLayerB,
 } from '../experiment-set-four/primitives';
-import { EXPERIMENT_SET_ONE_POSITION_KEYS } from './dragPositions';
+import { ExperimentFiveDraggableLayerA } from '../experiment-set-five/primitives';
+import { EXPERIMENT_SET_ONE_POSITION_KEYS, loadDragPosition } from './dragPositions';
 import { useExperimentSetOne } from './combinedSettings';
 
 /** Draggable panels for Experiment Set 1 — positions persist across refresh. */
 export function ExperimentSetOneStage() {
-  const { layoutResetVersion, experimentVisible, e4 } = useExperimentSetOne();
+  const { layoutResetVersion, activeExperiment, experimentVisible, e4 } = useExperimentSetOne();
   const nestedB = e4.layerBNestedInA;
+  const show = (id: keyof typeof experimentVisible) => id === activeExperiment;
+  const e5Position = loadDragPosition(EXPERIMENT_SET_ONE_POSITION_KEYS.layerA4) ?? { x: 40, y: 48 };
 
   return (
     <main className="experiment-set-one-stage" aria-label="Experiment Set 1 panel stage">
       <div className="experiment-set-one-stage__canvas">
-        {experimentVisible.one && (
+        {show('one') && (
           <ExperimentOneDraggablePanel
             initialPosition={{ x: 40, y: 40 }}
             persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.panelOne}
@@ -44,7 +47,7 @@ export function ExperimentSetOneStage() {
           </ExperimentOneDraggablePanel>
         )}
 
-        {experimentVisible.two && (
+        {show('two') && (
           <>
             <ExperimentTwoDraggableSheet
               initialPosition={{ x: 520, y: 200 }}
@@ -67,7 +70,7 @@ export function ExperimentSetOneStage() {
           </>
         )}
 
-        {experimentVisible.three && (
+        {show('three') && (
           <>
             <ExperimentThreeDraggableLayerA
               initialPosition={{ x: 120, y: 320 }}
@@ -82,7 +85,7 @@ export function ExperimentSetOneStage() {
           </>
         )}
 
-        {experimentVisible.four && (
+        {show('four') && (
           <>
             <ExperimentFourDraggableLayerA
               initialPosition={{ x: 40, y: 48 }}
@@ -98,6 +101,13 @@ export function ExperimentSetOneStage() {
               />
             )}
           </>
+        )}
+
+        {show('five') && (
+          <ExperimentFiveDraggableLayerA
+            initialPosition={e5Position}
+            layoutResetVersion={layoutResetVersion}
+          />
         )}
       </div>
     </main>
