@@ -386,7 +386,7 @@
   height: auto;
   border-radius: 0;
   width: min(10%, 28px);
-  overflow: hidden;
+  overflow: visible;
   /* Corner PwzzovO stack uses diagonal inset shadows — never reuse on vertical edges */
   box-shadow: none;
 }
@@ -396,11 +396,110 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: var(--pwzzovO-edge-backdrop-tint, transparent);
-  -webkit-mask-image: var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, #000 0%, #000 100%));
-  mask-image: var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, #000 0%, #000 100%));
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
   mix-blend-mode: screen;
-  opacity: calc((0.2 + var(--pwzzovO-edge-backdrop-color-gain, 0) * 0.8) * (0.5 + var(--glass-reflex-light, 1) * 0.5));
+  opacity: 0;
+}
+
+.experiment-four-layer-a__pwzzovO-glass-edge-tint--active,
+.experiment-four-layer-b__pwzzovO-glass-edge-tint--active {
+  opacity: calc((0.08 + var(--pwzzovO-edge-backdrop-color-gain, 0) * 0.42) * (0.5 + var(--glass-reflex-light, 1) * 0.5));
+}
+
+.experiment-four-layer-a__pwzzovO-glass--left.experiment-four-layer-a__pwzzovO-glass--backdrop-spots,
+.experiment-four-layer-b__pwzzovO-glass--left.experiment-four-layer-b__pwzzovO-glass--backdrop-spots {
+  -webkit-mask-image:
+    linear-gradient(
+      to right,
+      #000 0%,
+      #000 var(--e4-layerA-reflex-left-edge-mask-reach, 26%),
+      transparent var(--e4-layerA-reflex-left-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-spot-mask);
+  mask-image:
+    linear-gradient(
+      to right,
+      #000 0%,
+      #000 var(--e4-layerA-reflex-left-edge-mask-reach, 26%),
+      transparent var(--e4-layerA-reflex-left-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-spot-mask);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  -webkit-mask-size: auto, 100% 100%;
+  mask-size: auto, 100% 100%;
+}
+
+.experiment-four-layer-b__pwzzovO-glass--left.experiment-four-layer-b__pwzzovO-glass--backdrop-spots {
+  -webkit-mask-image:
+    linear-gradient(
+      to right,
+      #000 0%,
+      #000 var(--e4-layerB-reflex-left-edge-mask-reach, 26%),
+      transparent var(--e4-layerB-reflex-left-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-spot-mask);
+  mask-image:
+    linear-gradient(
+      to right,
+      #000 0%,
+      #000 var(--e4-layerB-reflex-left-edge-mask-reach, 26%),
+      transparent var(--e4-layerB-reflex-left-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-spot-mask);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  -webkit-mask-size: auto, 100% 100%;
+  mask-size: auto, 100% 100%;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--right.experiment-four-layer-a__pwzzovO-glass--backdrop-spots,
+.experiment-four-layer-b__pwzzovO-glass--right.experiment-four-layer-b__pwzzovO-glass--backdrop-spots {
+  -webkit-mask-image:
+    linear-gradient(
+      to left,
+      #000 0%,
+      #000 var(--e4-layerA-reflex-right-edge-mask-reach, 26%),
+      transparent var(--e4-layerA-reflex-right-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-spot-mask);
+  mask-image:
+    linear-gradient(
+      to left,
+      #000 0%,
+      #000 var(--e4-layerA-reflex-right-edge-mask-reach, 26%),
+      transparent var(--e4-layerA-reflex-right-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-spot-mask);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  -webkit-mask-size: auto, 100% 100%;
+  mask-size: auto, 100% 100%;
+}
+
+.experiment-four-layer-b__pwzzovO-glass--right.experiment-four-layer-b__pwzzovO-glass--backdrop-spots {
+  -webkit-mask-image:
+    linear-gradient(
+      to left,
+      #000 0%,
+      #000 var(--e4-layerB-reflex-right-edge-mask-reach, 26%),
+      transparent var(--e4-layerB-reflex-right-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-spot-mask);
+  mask-image:
+    linear-gradient(
+      to left,
+      #000 0%,
+      #000 var(--e4-layerB-reflex-right-edge-mask-reach, 26%),
+      transparent var(--e4-layerB-reflex-right-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-spot-mask);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  -webkit-mask-size: auto, 100% 100%;
+  mask-size: auto, 100% 100%;
 }
 
 .experiment-four-layer-a__pwzzovO-glass--left,
@@ -422,37 +521,29 @@
   --pwzzovO-corner-light: var(--e4-layerA-reflex-left-light, 0);
   --pwzzovO-corner-dark: var(--e4-layerA-reflex-left-dark, 0);
   --reflex-edge-glow: var(--e4-layerA-reflex-left-glow, 0.22);
-  -webkit-mask-image:
-    linear-gradient(
-      to right,
-      #000 0%,
-      #000 var(--e4-layerA-reflex-left-edge-mask-reach, 26%),
-      transparent var(--e4-layerA-reflex-left-edge-mask-fade, 62%)
-    ),
-    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, #000 0%, #000 100%));
-  mask-image:
-    linear-gradient(
-      to right,
-      #000 0%,
-      #000 var(--e4-layerA-reflex-left-edge-mask-reach, 26%),
-      transparent var(--e4-layerA-reflex-left-edge-mask-fade, 62%)
-    ),
-    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, #000 0%, #000 100%));
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-left-edge-mask-reach, 26%),
+    transparent var(--e4-layerA-reflex-left-edge-mask-fade, 62%)
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-left-edge-mask-reach, 26%),
+    transparent var(--e4-layerA-reflex-left-edge-mask-fade, 62%)
+  );
   box-shadow:
     inset 1px 0 0 var(--pwzzovO-rim-px, 1px)
       color-mix(
         in srgb,
-        var(--pwzzovO-edge-rim-color, var(--c-light))
-          calc(var(--glass-reflex-light) * (14% + var(--pwzzovO-edge-backdrop-color-gain, 0) * 34%)),
+        var(--c-light) calc(var(--glass-reflex-light) * 14%),
         transparent
       ),
     inset 4px 0 calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow)))
       color-mix(
         in srgb,
-        var(--pwzzovO-edge-rim-color, var(--c-light))
-          calc(var(--glass-reflex-light) * (38% + var(--pwzzovO-edge-backdrop-color-gain, 0) * 52%) * var(--reflex-edge-glow)),
+        var(--c-light) calc(var(--glass-reflex-light) * 30% * var(--reflex-edge-glow)),
         transparent
       ),
     inset -2px 0 calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow)))
@@ -466,37 +557,29 @@
   --pwzzovO-corner-light: var(--e4-layerA-reflex-right-light, 0);
   --pwzzovO-corner-dark: var(--e4-layerA-reflex-right-dark, 0);
   --reflex-edge-glow: var(--e4-layerA-reflex-right-glow, 0.22);
-  -webkit-mask-image:
-    linear-gradient(
-      to left,
-      #000 0%,
-      #000 var(--e4-layerA-reflex-right-edge-mask-reach, 26%),
-      transparent var(--e4-layerA-reflex-right-edge-mask-fade, 62%)
-    ),
-    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, #000 0%, #000 100%));
-  mask-image:
-    linear-gradient(
-      to left,
-      #000 0%,
-      #000 var(--e4-layerA-reflex-right-edge-mask-reach, 26%),
-      transparent var(--e4-layerA-reflex-right-edge-mask-fade, 62%)
-    ),
-    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, #000 0%, #000 100%));
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+  -webkit-mask-image: linear-gradient(
+    to left,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-right-edge-mask-reach, 26%),
+    transparent var(--e4-layerA-reflex-right-edge-mask-fade, 62%)
+  );
+  mask-image: linear-gradient(
+    to left,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-right-edge-mask-reach, 26%),
+    transparent var(--e4-layerA-reflex-right-edge-mask-fade, 62%)
+  );
   box-shadow:
     inset -1px 0 0 var(--pwzzovO-rim-px, 1px)
       color-mix(
         in srgb,
-        var(--pwzzovO-edge-rim-color, var(--c-light))
-          calc(var(--glass-reflex-light) * (14% + var(--pwzzovO-edge-backdrop-color-gain, 0) * 34%)),
+        var(--c-light) calc(var(--glass-reflex-light) * 14%),
         transparent
       ),
     inset -4px 0 calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow)))
       color-mix(
         in srgb,
-        var(--pwzzovO-edge-rim-color, var(--c-light))
-          calc(var(--glass-reflex-light) * (38% + var(--pwzzovO-edge-backdrop-color-gain, 0) * 52%) * var(--reflex-edge-glow)),
+        var(--c-light) calc(var(--glass-reflex-light) * 30% * var(--reflex-edge-glow)),
         transparent
       ),
     inset 2px 0 calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow)))
@@ -510,37 +593,29 @@
   --pwzzovO-corner-light: var(--e4-layerB-reflex-left-light, 0);
   --pwzzovO-corner-dark: var(--e4-layerB-reflex-left-dark, 0);
   --reflex-edge-glow: var(--e4-layerB-reflex-left-glow, 0.22);
-  -webkit-mask-image:
-    linear-gradient(
-      to right,
-      #000 0%,
-      #000 var(--e4-layerB-reflex-left-edge-mask-reach, 26%),
-      transparent var(--e4-layerB-reflex-left-edge-mask-fade, 62%)
-    ),
-    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, #000 0%, #000 100%));
-  mask-image:
-    linear-gradient(
-      to right,
-      #000 0%,
-      #000 var(--e4-layerB-reflex-left-edge-mask-reach, 26%),
-      transparent var(--e4-layerB-reflex-left-edge-mask-fade, 62%)
-    ),
-    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, #000 0%, #000 100%));
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-left-edge-mask-reach, 26%),
+    transparent var(--e4-layerB-reflex-left-edge-mask-fade, 62%)
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-left-edge-mask-reach, 26%),
+    transparent var(--e4-layerB-reflex-left-edge-mask-fade, 62%)
+  );
   box-shadow:
     inset 1px 0 0 var(--pwzzovO-rim-px, 1px)
       color-mix(
         in srgb,
-        var(--pwzzovO-edge-rim-color, var(--c-light))
-          calc(var(--glass-reflex-light) * (14% + var(--pwzzovO-edge-backdrop-color-gain, 0) * 34%)),
+        var(--c-light) calc(var(--glass-reflex-light) * 14%),
         transparent
       ),
     inset 4px 0 calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow)))
       color-mix(
         in srgb,
-        var(--pwzzovO-edge-rim-color, var(--c-light))
-          calc(var(--glass-reflex-light) * (38% + var(--pwzzovO-edge-backdrop-color-gain, 0) * 52%) * var(--reflex-edge-glow)),
+        var(--c-light) calc(var(--glass-reflex-light) * 30% * var(--reflex-edge-glow)),
         transparent
       ),
     inset -2px 0 calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow)))
@@ -554,37 +629,29 @@
   --pwzzovO-corner-light: var(--e4-layerB-reflex-right-light, 0);
   --pwzzovO-corner-dark: var(--e4-layerB-reflex-right-dark, 0);
   --reflex-edge-glow: var(--e4-layerB-reflex-right-glow, 0.22);
-  -webkit-mask-image:
-    linear-gradient(
-      to left,
-      #000 0%,
-      #000 var(--e4-layerB-reflex-right-edge-mask-reach, 26%),
-      transparent var(--e4-layerB-reflex-right-edge-mask-fade, 62%)
-    ),
-    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, #000 0%, #000 100%));
-  mask-image:
-    linear-gradient(
-      to left,
-      #000 0%,
-      #000 var(--e4-layerB-reflex-right-edge-mask-reach, 26%),
-      transparent var(--e4-layerB-reflex-right-edge-mask-fade, 62%)
-    ),
-    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, #000 0%, #000 100%));
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+  -webkit-mask-image: linear-gradient(
+    to left,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-right-edge-mask-reach, 26%),
+    transparent var(--e4-layerB-reflex-right-edge-mask-fade, 62%)
+  );
+  mask-image: linear-gradient(
+    to left,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-right-edge-mask-reach, 26%),
+    transparent var(--e4-layerB-reflex-right-edge-mask-fade, 62%)
+  );
   box-shadow:
     inset -1px 0 0 var(--pwzzovO-rim-px, 1px)
       color-mix(
         in srgb,
-        var(--pwzzovO-edge-rim-color, var(--c-light))
-          calc(var(--glass-reflex-light) * (14% + var(--pwzzovO-edge-backdrop-color-gain, 0) * 34%)),
+        var(--c-light) calc(var(--glass-reflex-light) * 14%),
         transparent
       ),
     inset -4px 0 calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow)))
       color-mix(
         in srgb,
-        var(--pwzzovO-edge-rim-color, var(--c-light))
-          calc(var(--glass-reflex-light) * (38% + var(--pwzzovO-edge-backdrop-color-gain, 0) * 52%) * var(--reflex-edge-glow)),
+        var(--c-light) calc(var(--glass-reflex-light) * 30% * var(--reflex-edge-glow)),
         transparent
       ),
     inset 2px 0 calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow)))
