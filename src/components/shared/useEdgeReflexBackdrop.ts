@@ -1,13 +1,19 @@
 import { useEffect, useState, type RefObject } from 'react';
 import {
   invalidateEdgeReflexBackdropCache,
+  sampleCornerReflexBackdrop,
   sampleEdgeReflexBackdrop,
+  type CornerReflexBackdropProfile,
   type EdgeReflexBackdropProfile,
 } from './edgeReflexBackdrop';
 
 type EdgeReflexBackdropProfiles = {
   left: EdgeReflexBackdropProfile;
   right: EdgeReflexBackdropProfile;
+  tl: CornerReflexBackdropProfile;
+  tr: CornerReflexBackdropProfile;
+  bl: CornerReflexBackdropProfile;
+  br: CornerReflexBackdropProfile;
 };
 
 const FALLBACK_PROFILE: EdgeReflexBackdropProfile = {
@@ -21,9 +27,18 @@ const FALLBACK_PROFILE: EdgeReflexBackdropProfile = {
   rimColor: '#ffffff',
 };
 
+const FALLBACK_CORNER_PROFILE: CornerReflexBackdropProfile = {
+  horizontal: FALLBACK_PROFILE,
+  vertical: FALLBACK_PROFILE,
+};
+
 const INITIAL_PROFILES: EdgeReflexBackdropProfiles = {
   left: FALLBACK_PROFILE,
   right: FALLBACK_PROFILE,
+  tl: FALLBACK_CORNER_PROFILE,
+  tr: FALLBACK_CORNER_PROFILE,
+  bl: FALLBACK_CORNER_PROFILE,
+  br: FALLBACK_CORNER_PROFILE,
 };
 
 export function useEdgeReflexBackdrop(
@@ -34,12 +49,20 @@ export function useEdgeReflexBackdrop(
     enabled,
     leftLight,
     rightLight,
+    tlLight,
+    trLight,
+    blLight,
+    brLight,
   }: {
     gapTop: number;
     gapBottom: number;
     enabled: boolean;
     leftLight: number;
     rightLight: number;
+    tlLight: number;
+    trLight: number;
+    blLight: number;
+    brLight: number;
   },
 ): EdgeReflexBackdropProfiles {
   const [profiles, setProfiles] = useState<EdgeReflexBackdropProfiles>(INITIAL_PROFILES);
@@ -60,6 +83,10 @@ export function useEdgeReflexBackdrop(
       setProfiles({
         left: sampleEdgeReflexBackdrop(element, 'left', gapTop, gapBottom, leftLight),
         right: sampleEdgeReflexBackdrop(element, 'right', gapTop, gapBottom, rightLight),
+        tl: sampleCornerReflexBackdrop(element, 'tl', gapTop, gapBottom, tlLight),
+        tr: sampleCornerReflexBackdrop(element, 'tr', gapTop, gapBottom, trLight),
+        bl: sampleCornerReflexBackdrop(element, 'bl', gapTop, gapBottom, blLight),
+        br: sampleCornerReflexBackdrop(element, 'br', gapTop, gapBottom, brLight),
       });
     };
 
@@ -116,7 +143,18 @@ export function useEdgeReflexBackdrop(
       window.removeEventListener('scroll', schedule, true);
       resizeObserver?.disconnect();
     };
-  }, [enabled, gapTop, gapBottom, leftLight, rightLight, rootRef]);
+  }, [
+    enabled,
+    gapTop,
+    gapBottom,
+    leftLight,
+    rightLight,
+    tlLight,
+    trLight,
+    blLight,
+    brLight,
+    rootRef,
+  ]);
 
   return profiles;
 }

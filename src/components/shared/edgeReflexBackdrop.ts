@@ -1,4 +1,12 @@
 export type EdgeReflexBackdropSide = 'left' | 'right';
+export type CornerReflexBackdropRegion = 'tl' | 'tr' | 'bl' | 'br';
+
+export type CornerReflexBackdropProfile = {
+  horizontal: EdgeReflexBackdropProfile;
+  vertical: EdgeReflexBackdropProfile;
+};
+
+type GradientAxis = 'to bottom' | 'to top' | 'to right' | 'to left';
 
 export type EdgeReflexBackdropProfile = {
   maskGradient: string;
@@ -28,6 +36,7 @@ const LUMA_CEIL = 0.52;
 const LOCAL_LIFT_FLOOR = 0.012;
 const LOCAL_LIFT_CEIL = 0.1;
 const MIN_PEAK_LUMA = 0.07;
+const CORNER_AXIS_SPAN_RATIO = 0.42;
 const RIM_PEAK_HALF_SPAN_RATIO = 0.038;
 const REFLEX_PEAK_HALF_SPAN_RATIO = 0.068;
 const REFLEX_FAR_FLOOR = 0.2;
@@ -214,6 +223,109 @@ function sampleEdgeColumn(
     });
   }
   return samples;
+}
+
+function sampleEdgeColumnSegment(
+  sampler: WallpaperSampler,
+  rect: DOMRect,
+  side: EdgeReflexBackdropSide,
+  yStart: number,
+  yEnd: number,
+): RgbSample[] {
+  const spanHeight = Math.max(1, yEnd - yStart);
+  const sampleCount = computeSampleCount(spanHeight);
+  const edgeX = side === 'left' ? rect.left : rect.right;
+  const horizontalSign = side === 'left' ? -1 : 1;
+
+  const samples: RgbSample[] = [];
+  for (let i = 0; i < sampleCount; i += 1) {
+    const t = i / Math.max(1, sampleCount - 1);
+    const y = yStart + spanHeight * t;
+
+    let rSum = 0;
+    let gSum = 0;
+    let bSum = 0;
+    let lumaSum = 0;
+    let weightSum = 0;
+
+    for (const offset of HORIZONTAL_OFFSETS_PX) {
+      const sampleX = edgeX + horizontalSign * (SAMPLE_OFFSET_PX + offset);
+      const sample = sampler.sampleAt(sampleX, y);
+      if (!sample) continue;
+      const weight = Math.exp(-(offset * offset) / 36);
+      rSum += sample.r * weight;
+      gSum += sample.g * weight;
+      bSum += sample.b * weight;
+      lumaSum += sample.luma * weight;
+      weightSum += weight;
+    }
+
+    if (weightSum <= 0) {
+      samples.push({ r: 0, g: 0, b: 0, luma: 0 });
+      continue;
+    }
+
+    samples.push({
+      r: rSum / weightSum,
+      g: gSum / weightSum,
+      b: bSum / weightSum,
+      luma: lumaSum / weightSum,
+    });
+  }
+  return samples;
+}
+
+function sampleEdgeRowSegment(
+  sampler: WallpaperSampler,
+  edgeY: number,
+  xStart: number,
+  xEnd: number,
+  outside: 'top' | 'bottom',
+): RgbSample[] {
+  const spanWidth = Math.max(1, xEnd - xStart);
+  const sampleCount = computeSampleCount(spanWidth);
+  const verticalSign = outside === 'top' ? -1 : 1;
+
+  const samples: RgbSample[] = [];
+  for (let i = 0; i < sampleCount; i += 1) {
+    const t = i / Math.max(1, sampleCount - 1);
+    const x = xStart + spanWidth * t;
+
+    let rSum = 0;
+    let gSum = 0;
+    let bSum = 0;
+    let lumaSum = 0;
+    let weightSum = 0;
+
+    for (const offset of HORIZONTAL_OFFSETS_PX) {
+      const sampleY = edgeY + verticalSign * (SAMPLE_OFFSET_PX + offset);
+      const sample = sampler.sampleAt(x, sampleY);
+      if (!sample) continue;
+      const weight = Math.exp(-(offset * offset) / 36);
+      rSum += sample.r * weight;
+      gSum += sample.g * weight;
+      bSum += sample.b * weight;
+      lumaSum += sample.luma * weight;
+      weightSum += weight;
+    }
+
+    if (weightSum <= 0) {
+      samples.push({ r: 0, g: 0, b: 0, luma: 0 });
+      continue;
+    }
+
+    samples.push({
+      r: rSum / weightSum,
+      g: gSum / weightSum,
+      b: bSum / weightSum,
+      luma: lumaSum / weightSum,
+    });
+  }
+  return samples;
+}
+
+function linearGradient(axis: GradientAxis, stops: string[]): string {
+  return `linear-gradient(${axis}, ${stops.join(', ')})`;
 }
 
 function sharpenGate(alpha: number): number {
@@ -412,7 +524,11 @@ function buildRimColorStops(
   });
 }
 
-function buildProfileFromSamples(samples: RgbSample[], lightStrength: number): EdgeReflexBackdropProfile {
+function buildProfileFromSamples(
+  samples: RgbSample[],
+  lightStrength: number,
+  axis: GradientAxis = 'to bottom',
+): EdgeReflexBackdropProfile {
   const lumas = samples.map((sample) => sample.luma);
   const smoothedLumas = blur1d(lumas, 1);
 
@@ -455,15 +571,53 @@ function buildProfileFromSamples(samples: RgbSample[], lightStrength: number): E
   const rim = sampleColor(brightest.sample, Math.min(1, 0.3 + rimPeakAlpha * 0.6));
 
   return {
-    maskGradient: `linear-gradient(to bottom, ${maskStops.join(', ')})`,
-    rimMaskGradient: `linear-gradient(to bottom, ${rimMaskStops.join(', ')})`,
-    reflexMaskGradient: `linear-gradient(to bottom, ${reflexMaskStops.join(', ')})`,
-    tintGradient: `linear-gradient(to bottom, ${tintStops.join(', ')})`,
-    rimGradient: `linear-gradient(to bottom, ${rimStops.join(', ')})`,
+    maskGradient: linearGradient(axis, maskStops),
+    rimMaskGradient: linearGradient(axis, rimMaskStops),
+    reflexMaskGradient: linearGradient(axis, reflexMaskStops),
+    tintGradient: linearGradient(axis, tintStops),
+    rimGradient: linearGradient(axis, rimStops),
     peakAlpha,
     colorGain: Math.min(1, peakAlpha * (0.45 + Math.min(2, lightStrength) * 0.45)),
     rimColor: `rgb(${rim.r}, ${rim.g}, ${rim.b})`,
   };
+}
+
+function emptyAxisProfile(axis: GradientAxis): EdgeReflexBackdropProfile {
+  return {
+    maskGradient: linearGradient(axis, ['transparent 0%', 'transparent 100%']),
+    rimMaskGradient: linearGradient(axis, ['transparent 0%', 'transparent 100%']),
+    reflexMaskGradient: linearGradient(axis, ['#000 0%', '#000 100%']),
+    tintGradient: linearGradient(axis, ['transparent 0%', 'transparent 100%']),
+    rimGradient: linearGradient(axis, ['transparent 0%', 'transparent 100%']),
+    peakAlpha: 0,
+    colorGain: 0,
+    rimColor: '#ffffff',
+  };
+}
+
+function fullAxisProfile(axis: GradientAxis): EdgeReflexBackdropProfile {
+  return {
+    maskGradient: linearGradient(axis, ['#000 0%', '#000 100%']),
+    rimMaskGradient: linearGradient(axis, ['#000 0%', '#000 100%']),
+    reflexMaskGradient: linearGradient(axis, ['#000 0%', '#000 100%']),
+    tintGradient: linearGradient(axis, ['transparent 0%', 'transparent 100%']),
+    rimGradient: linearGradient(axis, ['transparent 0%', 'transparent 100%']),
+    peakAlpha: 1,
+    colorGain: 1,
+    rimColor: '#ffffff',
+  };
+}
+
+function buildAxisProfileFromSamples(
+  samples: RgbSample[],
+  lightStrength: number,
+  axis: GradientAxis,
+): EdgeReflexBackdropProfile {
+  const peakLuma = Math.max(...blur1d(samples.map((sample) => sample.luma), 2));
+  if (peakLuma < MIN_PEAK_LUMA) {
+    return emptyAxisProfile(axis);
+  }
+  return buildProfileFromSamples(samples, lightStrength, axis);
 }
 
 const FULL_EDGE_PROFILE: EdgeReflexBackdropProfile = {
@@ -510,4 +664,116 @@ export function sampleEdgeReflexBackdrop(
   }
 
   return buildProfileFromSamples(samples, lightStrength);
+}
+
+export function sampleCornerReflexBackdrop(
+  element: HTMLElement,
+  corner: CornerReflexBackdropRegion,
+  gapTop: number,
+  gapBottom: number,
+  lightStrength: number,
+): CornerReflexBackdropProfile {
+  const cornerAxes: Record<
+    CornerReflexBackdropRegion,
+    { hAxis: GradientAxis; vAxis: GradientAxis }
+  > = {
+    tl: { hAxis: 'to right', vAxis: 'to bottom' },
+    tr: { hAxis: 'to left', vAxis: 'to bottom' },
+    bl: { hAxis: 'to right', vAxis: 'to top' },
+    br: { hAxis: 'to left', vAxis: 'to top' },
+  };
+  const { hAxis, vAxis } = cornerAxes[corner];
+
+  if (lightStrength <= 0) {
+    return {
+      horizontal: emptyAxisProfile(hAxis),
+      vertical: emptyAxisProfile(vAxis),
+    };
+  }
+
+  const sampler = getWallpaperSampler();
+  if (!sampler) {
+    return {
+      horizontal: fullAxisProfile(hAxis),
+      vertical: fullAxisProfile(vAxis),
+    };
+  }
+
+  const rect = element.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) {
+    return {
+      horizontal: fullAxisProfile(hAxis),
+      vertical: fullAxisProfile(vAxis),
+    };
+  }
+
+  const cornerSpan = Math.min(rect.width, rect.height) * CORNER_AXIS_SPAN_RATIO;
+  let hSamples: RgbSample[];
+  let vSamples: RgbSample[];
+
+  switch (corner) {
+    case 'tl':
+      vSamples = sampleEdgeColumnSegment(
+        sampler,
+        rect,
+        'left',
+        rect.top + gapTop,
+        rect.top + gapTop + cornerSpan,
+      );
+      hSamples = sampleEdgeRowSegment(sampler, rect.top, rect.left, rect.left + cornerSpan, 'top');
+      break;
+    case 'tr':
+      vSamples = sampleEdgeColumnSegment(
+        sampler,
+        rect,
+        'right',
+        rect.top + gapTop,
+        rect.top + gapTop + cornerSpan,
+      );
+      hSamples = sampleEdgeRowSegment(
+        sampler,
+        rect.top,
+        rect.right - cornerSpan,
+        rect.right,
+        'top',
+      );
+      break;
+    case 'bl':
+      vSamples = sampleEdgeColumnSegment(
+        sampler,
+        rect,
+        'left',
+        rect.bottom - gapBottom - cornerSpan,
+        rect.bottom - gapBottom,
+      );
+      hSamples = sampleEdgeRowSegment(
+        sampler,
+        rect.bottom,
+        rect.left,
+        rect.left + cornerSpan,
+        'bottom',
+      );
+      break;
+    case 'br':
+      vSamples = sampleEdgeColumnSegment(
+        sampler,
+        rect,
+        'right',
+        rect.bottom - gapBottom - cornerSpan,
+        rect.bottom - gapBottom,
+      );
+      hSamples = sampleEdgeRowSegment(
+        sampler,
+        rect.bottom,
+        rect.right - cornerSpan,
+        rect.right,
+        'bottom',
+      );
+      break;
+  }
+
+  return {
+    horizontal: buildAxisProfileFromSamples(hSamples, lightStrength, hAxis),
+    vertical: buildAxisProfileFromSamples(vSamples, lightStrength, vAxis),
+  };
 }
