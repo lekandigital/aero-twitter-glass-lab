@@ -10,9 +10,30 @@ function layerEdgeReflexEnabled(
   leftDark: number,
   rightLight: number,
   rightDark: number,
+  tlLight: number,
+  tlDark: number,
+  trLight: number,
+  trDark: number,
+  blLight: number,
+  blDark: number,
+  brLight: number,
+  brDark: number,
 ): boolean {
   if (mode !== 3) return false;
-  return leftLight > 0 || leftDark > 0 || rightLight > 0 || rightDark > 0;
+  return (
+    leftLight > 0 ||
+    leftDark > 0 ||
+    rightLight > 0 ||
+    rightDark > 0 ||
+    tlLight > 0 ||
+    tlDark > 0 ||
+    trLight > 0 ||
+    trDark > 0 ||
+    blLight > 0 ||
+    blDark > 0 ||
+    brLight > 0 ||
+    brDark > 0
+  );
 }
 
 function LayerCopy({
@@ -67,11 +88,23 @@ function ExperimentFiveLayerBSheet() {
           e5.layerBGlassReflexLeftDark,
           e5.layerBGlassReflexRightLight,
           e5.layerBGlassReflexRightDark,
+          e5.layerBGlassReflexTlLight,
+          e5.layerBGlassReflexTlDark,
+          e5.layerBGlassReflexTrLight,
+          e5.layerBGlassReflexTrDark,
+          e5.layerBGlassReflexBlLight,
+          e5.layerBGlassReflexBlDark,
+          e5.layerBGlassReflexBrLight,
+          e5.layerBGlassReflexBrDark,
         )}
         rimSideGapTop={e5.layerBRimSideGapTop}
         rimSideGapBottom={e5.layerBRimSideGapBottom}
         leftLight={e5.layerBGlassReflexLeftLight}
         rightLight={e5.layerBGlassReflexRightLight}
+        tlLight={e5.layerBGlassReflexTlLight}
+        trLight={e5.layerBGlassReflexTrLight}
+        blLight={e5.layerBGlassReflexBlLight}
+        brLight={e5.layerBGlassReflexBrLight}
       />
       <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--a" aria-hidden="true" />
       <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--b" aria-hidden="true" />
@@ -123,11 +156,23 @@ function ExperimentFiveLayerASheet() {
           e5.layerAGlassReflexLeftDark,
           e5.layerAGlassReflexRightLight,
           e5.layerAGlassReflexRightDark,
+          e5.layerAGlassReflexTlLight,
+          e5.layerAGlassReflexTlDark,
+          e5.layerAGlassReflexTrLight,
+          e5.layerAGlassReflexTrDark,
+          e5.layerAGlassReflexBlLight,
+          e5.layerAGlassReflexBlDark,
+          e5.layerAGlassReflexBrLight,
+          e5.layerAGlassReflexBrDark,
         )}
         rimSideGapTop={e5.layerARimSideGapTop}
         rimSideGapBottom={e5.layerARimSideGapBottom}
         leftLight={e5.layerAGlassReflexLeftLight}
         rightLight={e5.layerAGlassReflexRightLight}
+        tlLight={e5.layerAGlassReflexTlLight}
+        trLight={e5.layerAGlassReflexTrLight}
+        blLight={e5.layerAGlassReflexBlLight}
+        brLight={e5.layerAGlassReflexBrLight}
       />
       <div className="experiment-four-layer-a__bezel-inset">
         <ExperimentFiveLayerBSheet />

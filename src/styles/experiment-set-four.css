@@ -445,6 +445,142 @@
     linear-gradient(to left, #000 0%, #000 18%, transparent 88%);
 }
 
+.experiment-four-layer-a__pwzzovO-glass-corner-rim-h,
+.experiment-four-layer-b__pwzzovO-glass-corner-rim-h {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  pointer-events: none;
+  background: var(--pwzzovO-corner-backdrop-rim-h, transparent);
+  -webkit-mask-image: var(--pwzzovO-corner-backdrop-rim-mask-h, linear-gradient(to right, transparent 0%, transparent 100%));
+  mask-image: var(--pwzzovO-corner-backdrop-rim-mask-h, linear-gradient(to right, transparent 0%, transparent 100%));
+  mix-blend-mode: plus-lighter;
+  opacity: calc((0.62 + var(--pwzzovO-corner-backdrop-color-gain, 0) * 0.38) * (0.5 + var(--glass-reflex-light, 1) * 0.5));
+}
+
+.experiment-four-layer-a__pwzzovO-glass-corner-rim-v,
+.experiment-four-layer-b__pwzzovO-glass-corner-rim-v {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  pointer-events: none;
+  background: var(--pwzzovO-corner-backdrop-rim-v, transparent);
+  -webkit-mask-image: var(--pwzzovO-corner-backdrop-rim-mask-v, linear-gradient(to bottom, transparent 0%, transparent 100%));
+  mask-image: var(--pwzzovO-corner-backdrop-rim-mask-v, linear-gradient(to bottom, transparent 0%, transparent 100%));
+  mix-blend-mode: plus-lighter;
+  opacity: calc((0.62 + var(--pwzzovO-corner-backdrop-color-gain, 0) * 0.38) * (0.5 + var(--glass-reflex-light, 1) * 0.5));
+}
+
+.experiment-four-layer-a__pwzzovO-glass-corner-tint-h,
+.experiment-four-layer-b__pwzzovO-glass-corner-tint-h {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--pwzzovO-corner-backdrop-tint-h, transparent);
+  mix-blend-mode: plus-lighter;
+  opacity: calc((0.22 + var(--pwzzovO-corner-backdrop-color-gain, 0) * 0.62) * (0.5 + var(--glass-reflex-light, 1) * 0.5));
+}
+
+.experiment-four-layer-a__pwzzovO-glass-corner-tint-v,
+.experiment-four-layer-b__pwzzovO-glass-corner-tint-v {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--pwzzovO-corner-backdrop-tint-v, transparent);
+  mix-blend-mode: plus-lighter;
+  opacity: calc((0.22 + var(--pwzzovO-corner-backdrop-color-gain, 0) * 0.62) * (0.5 + var(--glass-reflex-light, 1) * 0.5));
+}
+
+.experiment-four-layer-a__pwzzovO-glass--tl .experiment-four-layer-a__pwzzovO-glass-corner-rim-h,
+.experiment-four-layer-b__pwzzovO-glass--tl .experiment-four-layer-b__pwzzovO-glass-corner-rim-h,
+.experiment-four-layer-a__pwzzovO-glass--tr .experiment-four-layer-a__pwzzovO-glass-corner-rim-h,
+.experiment-four-layer-b__pwzzovO-glass--tr .experiment-four-layer-b__pwzzovO-glass-corner-rim-h {
+  top: 0;
+  bottom: auto;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--bl .experiment-four-layer-a__pwzzovO-glass-corner-rim-h,
+.experiment-four-layer-b__pwzzovO-glass--bl .experiment-four-layer-b__pwzzovO-glass-corner-rim-h,
+.experiment-four-layer-a__pwzzovO-glass--br .experiment-four-layer-a__pwzzovO-glass-corner-rim-h,
+.experiment-four-layer-b__pwzzovO-glass--br .experiment-four-layer-b__pwzzovO-glass-corner-rim-h {
+  top: auto;
+  bottom: 0;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--tl .experiment-four-layer-a__pwzzovO-glass-corner-rim-v,
+.experiment-four-layer-b__pwzzovO-glass--tl .experiment-four-layer-b__pwzzovO-glass-corner-rim-v,
+.experiment-four-layer-a__pwzzovO-glass--bl .experiment-four-layer-a__pwzzovO-glass-corner-rim-v,
+.experiment-four-layer-b__pwzzovO-glass--bl .experiment-four-layer-b__pwzzovO-glass-corner-rim-v {
+  left: 0;
+  right: auto;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--tr .experiment-four-layer-a__pwzzovO-glass-corner-rim-v,
+.experiment-four-layer-b__pwzzovO-glass--tr .experiment-four-layer-b__pwzzovO-glass-corner-rim-v,
+.experiment-four-layer-a__pwzzovO-glass--br .experiment-four-layer-a__pwzzovO-glass-corner-rim-v,
+.experiment-four-layer-b__pwzzovO-glass--br .experiment-four-layer-b__pwzzovO-glass-corner-rim-v {
+  left: auto;
+  right: 0;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--tl .experiment-four-layer-a__pwzzovO-glass-corner-tint-h,
+.experiment-four-layer-b__pwzzovO-glass--tl .experiment-four-layer-b__pwzzovO-glass-corner-tint-h,
+.experiment-four-layer-a__pwzzovO-glass--tr .experiment-four-layer-a__pwzzovO-glass-corner-tint-h,
+.experiment-four-layer-b__pwzzovO-glass--tr .experiment-four-layer-b__pwzzovO-glass-corner-tint-h {
+  -webkit-mask-image:
+    var(--pwzzovO-corner-backdrop-mask-h, linear-gradient(to right, transparent 0%, transparent 100%)),
+    linear-gradient(to bottom, #000 0%, #000 18%, transparent 88%);
+  mask-image:
+    var(--pwzzovO-corner-backdrop-mask-h, linear-gradient(to right, transparent 0%, transparent 100%)),
+    linear-gradient(to bottom, #000 0%, #000 18%, transparent 88%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--bl .experiment-four-layer-a__pwzzovO-glass-corner-tint-h,
+.experiment-four-layer-b__pwzzovO-glass--bl .experiment-four-layer-b__pwzzovO-glass-corner-tint-h,
+.experiment-four-layer-a__pwzzovO-glass--br .experiment-four-layer-a__pwzzovO-glass-corner-tint-h,
+.experiment-four-layer-b__pwzzovO-glass--br .experiment-four-layer-b__pwzzovO-glass-corner-tint-h {
+  -webkit-mask-image:
+    var(--pwzzovO-corner-backdrop-mask-h, linear-gradient(to right, transparent 0%, transparent 100%)),
+    linear-gradient(to top, #000 0%, #000 18%, transparent 88%);
+  mask-image:
+    var(--pwzzovO-corner-backdrop-mask-h, linear-gradient(to right, transparent 0%, transparent 100%)),
+    linear-gradient(to top, #000 0%, #000 18%, transparent 88%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--tl .experiment-four-layer-a__pwzzovO-glass-corner-tint-v,
+.experiment-four-layer-b__pwzzovO-glass--tl .experiment-four-layer-b__pwzzovO-glass-corner-tint-v,
+.experiment-four-layer-a__pwzzovO-glass--bl .experiment-four-layer-a__pwzzovO-glass-corner-tint-v,
+.experiment-four-layer-b__pwzzovO-glass--bl .experiment-four-layer-b__pwzzovO-glass-corner-tint-v {
+  -webkit-mask-image:
+    var(--pwzzovO-corner-backdrop-mask-v, linear-gradient(to bottom, transparent 0%, transparent 100%)),
+    linear-gradient(to right, #000 0%, #000 18%, transparent 88%);
+  mask-image:
+    var(--pwzzovO-corner-backdrop-mask-v, linear-gradient(to bottom, transparent 0%, transparent 100%)),
+    linear-gradient(to right, #000 0%, #000 18%, transparent 88%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--tr .experiment-four-layer-a__pwzzovO-glass-corner-tint-v,
+.experiment-four-layer-b__pwzzovO-glass--tr .experiment-four-layer-b__pwzzovO-glass-corner-tint-v,
+.experiment-four-layer-a__pwzzovO-glass--br .experiment-four-layer-a__pwzzovO-glass-corner-tint-v,
+.experiment-four-layer-b__pwzzovO-glass--br .experiment-four-layer-b__pwzzovO-glass-corner-tint-v {
+  -webkit-mask-image:
+    var(--pwzzovO-corner-backdrop-mask-v, linear-gradient(to bottom, transparent 0%, transparent 100%)),
+    linear-gradient(to left, #000 0%, #000 18%, transparent 88%);
+  mask-image:
+    var(--pwzzovO-corner-backdrop-mask-v, linear-gradient(to bottom, transparent 0%, transparent 100%)),
+    linear-gradient(to left, #000 0%, #000 18%, transparent 88%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
 .experiment-four-layer-a__pwzzovO-glass--left,
 .experiment-four-layer-b__pwzzovO-glass--left {
   left: 0;

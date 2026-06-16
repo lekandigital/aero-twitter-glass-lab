@@ -10,9 +10,30 @@ function layerEdgeReflexEnabled(
   leftDark: number,
   rightLight: number,
   rightDark: number,
+  tlLight: number,
+  tlDark: number,
+  trLight: number,
+  trDark: number,
+  blLight: number,
+  blDark: number,
+  brLight: number,
+  brDark: number,
 ): boolean {
   if (mode !== 3) return false;
-  return leftLight > 0 || leftDark > 0 || rightLight > 0 || rightDark > 0;
+  return (
+    leftLight > 0 ||
+    leftDark > 0 ||
+    rightLight > 0 ||
+    rightDark > 0 ||
+    tlLight > 0 ||
+    tlDark > 0 ||
+    trLight > 0 ||
+    trDark > 0 ||
+    blLight > 0 ||
+    blDark > 0 ||
+    brLight > 0 ||
+    brDark > 0
+  );
 }
 
 function LayerCopy({
@@ -67,11 +88,23 @@ export function ExperimentFourLayerBSheet({ nested = false }: { nested?: boolean
           e4.layerBGlassReflexLeftDark,
           e4.layerBGlassReflexRightLight,
           e4.layerBGlassReflexRightDark,
+          e4.layerBGlassReflexTlLight,
+          e4.layerBGlassReflexTlDark,
+          e4.layerBGlassReflexTrLight,
+          e4.layerBGlassReflexTrDark,
+          e4.layerBGlassReflexBlLight,
+          e4.layerBGlassReflexBlDark,
+          e4.layerBGlassReflexBrLight,
+          e4.layerBGlassReflexBrDark,
         )}
         rimSideGapTop={e4.layerBRimSideGapTop}
         rimSideGapBottom={e4.layerBRimSideGapBottom}
         leftLight={e4.layerBGlassReflexLeftLight}
         rightLight={e4.layerBGlassReflexRightLight}
+        tlLight={e4.layerBGlassReflexTlLight}
+        trLight={e4.layerBGlassReflexTrLight}
+        blLight={e4.layerBGlassReflexBlLight}
+        brLight={e4.layerBGlassReflexBrLight}
       />
       <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--a" aria-hidden="true" />
       <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--b" aria-hidden="true" />
@@ -127,11 +160,23 @@ export function ExperimentFourLayerASheet({ nestedB = false }: { nestedB?: boole
           e4.layerAGlassReflexLeftDark,
           e4.layerAGlassReflexRightLight,
           e4.layerAGlassReflexRightDark,
+          e4.layerAGlassReflexTlLight,
+          e4.layerAGlassReflexTlDark,
+          e4.layerAGlassReflexTrLight,
+          e4.layerAGlassReflexTrDark,
+          e4.layerAGlassReflexBlLight,
+          e4.layerAGlassReflexBlDark,
+          e4.layerAGlassReflexBrLight,
+          e4.layerAGlassReflexBrDark,
         )}
         rimSideGapTop={e4.layerARimSideGapTop}
         rimSideGapBottom={e4.layerARimSideGapBottom}
         leftLight={e4.layerAGlassReflexLeftLight}
         rightLight={e4.layerAGlassReflexRightLight}
+        tlLight={e4.layerAGlassReflexTlLight}
+        trLight={e4.layerAGlassReflexTrLight}
+        blLight={e4.layerAGlassReflexBlLight}
+        brLight={e4.layerAGlassReflexBrLight}
       />
       {nestedB && (
         <div className="experiment-four-layer-a__bezel-inset">

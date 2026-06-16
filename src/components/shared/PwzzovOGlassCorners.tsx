@@ -1,8 +1,12 @@
 import { useRef, type CSSProperties } from 'react';
 import { e4InspectAttrs } from '../experiment-set-four/materialSettings';
-import { useEdgeReflexBackdrop } from './useEdgeReflexBackdrop';
+import {
+  useEdgeReflexBackdrop,
+} from './useEdgeReflexBackdrop';
+import type { CornerReflexBackdropProfile, EdgeReflexBackdropProfile } from './edgeReflexBackdrop';
 
 const PWZZOV_REFLEX_REGIONS = ['tl', 'tr', 'bl', 'br', 'left', 'right'] as const;
+const CORNER_REGIONS = ['tl', 'tr', 'bl', 'br'] as const;
 
 type PwzzovOGlassCornersProps = {
   layerClass: 'experiment-four-layer-a' | 'experiment-four-layer-b';
@@ -12,18 +16,13 @@ type PwzzovOGlassCornersProps = {
   rimSideGapBottom: number;
   leftLight: number;
   rightLight: number;
+  tlLight: number;
+  trLight: number;
+  blLight: number;
+  brLight: number;
 };
 
-function edgeBackdropStyle(profile: {
-  maskGradient: string;
-  rimMaskGradient: string;
-  reflexMaskGradient: string;
-  tintGradient: string;
-  rimGradient: string;
-  peakAlpha: number;
-  colorGain: number;
-  rimColor: string;
-}): CSSProperties {
+function edgeBackdropStyle(profile: EdgeReflexBackdropProfile): CSSProperties {
   return {
     '--pwzzovO-edge-backdrop-mask': profile.maskGradient,
     '--pwzzovO-edge-backdrop-rim-mask': profile.rimMaskGradient,
@@ -36,6 +35,22 @@ function edgeBackdropStyle(profile: {
   } as CSSProperties;
 }
 
+function cornerBackdropStyle(profile: CornerReflexBackdropProfile): CSSProperties {
+  const colorGain = Math.max(profile.horizontal.colorGain, profile.vertical.colorGain);
+  return {
+    '--pwzzovO-corner-backdrop-mask-h': profile.horizontal.maskGradient,
+    '--pwzzovO-corner-backdrop-rim-mask-h': profile.horizontal.rimMaskGradient,
+    '--pwzzovO-corner-backdrop-tint-h': profile.horizontal.tintGradient,
+    '--pwzzovO-corner-backdrop-rim-h': profile.horizontal.rimGradient,
+    '--pwzzovO-corner-backdrop-mask-v': profile.vertical.maskGradient,
+    '--pwzzovO-corner-backdrop-rim-mask-v': profile.vertical.rimMaskGradient,
+    '--pwzzovO-corner-backdrop-tint-v': profile.vertical.tintGradient,
+    '--pwzzovO-corner-backdrop-rim-v': profile.vertical.rimGradient,
+    '--pwzzovO-corner-backdrop-color-gain': String(colorGain),
+    '--pwzzovO-edge-rim-color': profile.vertical.rimColor,
+  } as CSSProperties;
+}
+
 export function PwzzovOGlassCorners({
   layerClass,
   inspectTarget,
@@ -44,6 +59,10 @@ export function PwzzovOGlassCorners({
   rimSideGapBottom,
   leftLight,
   rightLight,
+  tlLight,
+  trLight,
+  blLight,
+  brLight,
 }: PwzzovOGlassCornersProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const backdrop = useEdgeReflexBackdrop(wrapRef, {
@@ -52,27 +71,42 @@ export function PwzzovOGlassCorners({
     gapBottom: rimSideGapBottom,
     leftLight,
     rightLight,
+    tlLight,
+    trLight,
+    blLight,
+    brLight,
   });
 
   return (
     <div ref={wrapRef} className={`${layerClass}__pwzzovO-glass-wrap`} {...e4InspectAttrs(inspectTarget)}>
       {PWZZOV_REFLEX_REGIONS.map((region) => {
         const isEdge = region === 'left' || region === 'right';
-        const edgeStyle = isEdge
+        const isCorner = (CORNER_REGIONS as readonly string[]).includes(region);
+        const regionStyle = isEdge
           ? edgeBackdropStyle(region === 'left' ? backdrop.left : backdrop.right)
-          : undefined;
+          : isCorner
+            ? cornerBackdropStyle(backdrop[region])
+            : undefined;
 
         return (
           <span
             key={region}
             className={`${layerClass}__pwzzovO-glass ${layerClass}__pwzzovO-glass--${region}`}
-            style={edgeStyle}
+            style={regionStyle}
             aria-hidden="true"
           >
             {isEdge && (
               <>
                 <span className={`${layerClass}__pwzzovO-glass-edge-rim`} aria-hidden="true" />
                 <span className={`${layerClass}__pwzzovO-glass-edge-tint`} aria-hidden="true" />
+              </>
+            )}
+            {isCorner && (
+              <>
+                <span className={`${layerClass}__pwzzovO-glass-corner-rim-h`} aria-hidden="true" />
+                <span className={`${layerClass}__pwzzovO-glass-corner-rim-v`} aria-hidden="true" />
+                <span className={`${layerClass}__pwzzovO-glass-corner-tint-h`} aria-hidden="true" />
+                <span className={`${layerClass}__pwzzovO-glass-corner-tint-v`} aria-hidden="true" />
               </>
             )}
           </span>
