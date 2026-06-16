@@ -131,6 +131,7 @@ type ExperimentSetOneContextValue = {
   resetAll: () => void;
   saves: ExperimentSetOneSnapshot[];
   saveCurrent: () => void;
+  refreshSaves: () => void;
   loadSave: (id: number) => void;
   layoutResetVersion: number;
   resetLayoutPositions: () => void;
@@ -275,6 +276,10 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
     setSaves(loadExperimentSetOneSaves());
     downloadExperimentSetOneConfig(e1, e2, e3, activeExperiment === 'five' ? e5 : e4);
   }, [e1, e2, e3, e4, e5, selection, activeExperiment]);
+
+  const refreshSaves = useCallback(() => {
+    setSaves(loadExperimentSetOneSaves());
+  }, []);
 
   const applyE5Overrides = useCallback(
     (raw: E4MaterialSettings) => applyE5OverridesStatic(raw),
@@ -480,6 +485,7 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
       resetAll,
       saves,
       saveCurrent,
+      refreshSaves,
       loadSave,
       layoutResetVersion,
       resetLayoutPositions,
@@ -497,7 +503,7 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
       referenceWallpaper,
       toggleReferenceWallpaper,
     }),
-    [e1, e2, e3, e4, e5, setE1, setE2, setE3, setE4, setE5, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selection, clearSelection, referenceWallpaper, toggleReferenceWallpaper],
+    [e1, e2, e3, e4, e5, setE1, setE2, setE3, setE4, setE5, resetAll, saves, saveCurrent, refreshSaves, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selection, clearSelection, referenceWallpaper, toggleReferenceWallpaper],
   );
 
   return (
@@ -644,19 +650,23 @@ export function ExperimentSetOneSettingsDock() {
     clearSelection,
     referenceWallpaper,
     toggleReferenceWallpaper,
+    refreshSaves,
   } = useExperimentSetOne();
   const [open, setOpen] = useState(true);
   const [layerEditMode, setLayerEditMode] = useState<LayerEditMode>(
     () => loadExperimentSetOneSession()?.layerEditMode ?? 'both',
   );
+
+  useEffect(() => {
+    if (open) refreshSaves();
+  }, [open, refreshSaves]);
   const saveScope = selection ? selection.experiment : activeExperiment;
-  const scopedSaves = useMemo(
-    () =>
-      saveScope === 'five'
-        ? saves.filter((s) => s.scope === 'four' || s.scope === 'five' || s.cornersOnly)
-        : saves.filter((s) => s.scope === saveScope || s.cornersOnly),
-    [saves, saveScope],
-  );
+  const scopedSaves = useMemo(() => {
+    const all = loadExperimentSetOneSaves();
+    return saveScope === 'five'
+      ? all.filter((s) => s.scope === 'four' || s.scope === 'five' || s.cornersOnly)
+      : all.filter((s) => s.scope === saveScope || s.cornersOnly);
+  }, [saveScope, saves]);
   const dockExperiment = selection ? selection.experiment : activeExperiment;
 
   const e1Highlight = useMemo(() => e1Highlighted(selection), [selection]);

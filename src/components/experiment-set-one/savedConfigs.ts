@@ -16,6 +16,7 @@ import {
 import { SAVE_20_ID, builtInSave20 } from './builtInSave20';
 import { SAVE_21_ID, builtInSave21 } from './builtInSave21';
 import { SAVE_22_ID, builtInSave22 } from './builtInSave22';
+import { SAVE_29_ID, builtInSave29 } from './builtInSave29';
 
 // Earliest exported config in ~/Downloads that includes Experiment Four.
 // Used only as a one-time migration heuristic for older saves.
@@ -144,7 +145,13 @@ function withNormalizedE4(save: ExperimentSetOneSnapshot): ExperimentSetOneSnaps
 }
 
 function isReservedSaveId(id: number): boolean {
-  return id === REFERENCE_CORNER_SAVE_ID || id === SAVE_20_ID || id === SAVE_21_ID || id === SAVE_22_ID;
+  return (
+    id === REFERENCE_CORNER_SAVE_ID ||
+    id === SAVE_20_ID ||
+    id === SAVE_21_ID ||
+    id === SAVE_22_ID ||
+    id === SAVE_29_ID
+  );
 }
 
 function nextAvailableSaveId(existingIds: Set<number>): number {
@@ -167,6 +174,7 @@ export function loadExperimentSetOneSaves(): ExperimentSetOneSnapshot[] {
       withNormalizedE4(builtInSave20()),
       withNormalizedE4(builtInSave21()),
       withNormalizedE4(builtInSave22()),
+      withNormalizedE4(builtInSave29()),
     ];
   }
   const before = storage.slice(0, idx19 + 1);
@@ -177,6 +185,7 @@ export function loadExperimentSetOneSaves(): ExperimentSetOneSnapshot[] {
     withNormalizedE4(builtInSave20()),
     withNormalizedE4(builtInSave21()),
     withNormalizedE4(builtInSave22()),
+    withNormalizedE4(builtInSave29()),
     ...after,
   ];
 }
