@@ -28,8 +28,8 @@ const LUMA_CEIL = 0.52;
 const LOCAL_LIFT_FLOOR = 0.012;
 const LOCAL_LIFT_CEIL = 0.1;
 const MIN_PEAK_LUMA = 0.07;
-const RIM_PEAK_HALF_SPAN_RATIO = 0.028;
-const REFLEX_PEAK_HALF_SPAN_RATIO = 0.052;
+const RIM_PEAK_HALF_SPAN_RATIO = 0.038;
+const REFLEX_PEAK_HALF_SPAN_RATIO = 0.068;
 const REFLEX_FAR_FLOOR = 0.2;
 
 let wallpaperSampler: WallpaperSampler | null = null;
