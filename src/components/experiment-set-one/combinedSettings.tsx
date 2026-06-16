@@ -70,7 +70,7 @@ import {
   type ExperimentSetOneSnapshot,
 } from './savedConfigs';
 import { applyReferenceCornerLighting, REFERENCE_CORNER_PRESET_VERSION } from '../experiment-set-four/referenceCornerLighting';
-import { clearAllExperimentSetOnePositions, EXPERIMENT_SET_ONE_POSITION_KEYS } from './dragPositions';
+import { clearAllExperimentSetOnePositions, EXPERIMENT_SET_ONE_POSITION_KEYS, loadDragPosition } from './dragPositions';
 import {
   defaultSession,
   loadExperimentSetOneSession,
@@ -83,6 +83,8 @@ import {
 } from './experimentVisibility';
 import { clearInspectFlash, flashInspectElement } from '../shared/inspectFlash';
 import { useReferenceWallpaper } from '../shared/useReferenceWallpaper';
+import { buildExperimentSetOneConfigText } from './exportConfig';
+import { downloadTextFile } from '../../utils/downloadTextFile';
 
 const E1_SECTION_ORDER = [
   'Palette',
@@ -127,6 +129,7 @@ type ExperimentSetOneContextValue = {
   toggleExperimentVisible: (id: ExperimentId) => void;
   activeExperiment: ExperimentId;
   setActiveExperiment: (id: ExperimentId) => void;
+  selectedSaveIdByExperiment: Record<ExperimentId, number | null>;
   selection: ExperimentSelection | null;
   clearSelection: () => void;
   referenceWallpaper: boolean;
@@ -157,6 +160,13 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
   const { referenceWallpaper, toggleReferenceWallpaper } = useReferenceWallpaper();
   const [layoutResetVersion, setLayoutResetVersion] = useState(0);
   const [activeExperiment, setActiveExperiment] = useState<ExperimentId>('four');
+  const [selectedSaveIdByExperiment, setSelectedSaveIdByExperiment] = useState<Record<ExperimentId, number | null>>({
+    one: null,
+    two: null,
+    three: null,
+    four: null,
+    five: null,
+  });
   const [selection, setSelection] = useState<ExperimentSelection | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   const selectedElRef = useRef<HTMLElement | null>(null);
@@ -234,6 +244,7 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
   );
 
   const loadSave = useCallback((id: number) => {
+    setSelectedSaveIdByExperiment((prev) => ({ ...prev, [activeExperiment]: id }));
     const snapshot = loadExperimentSetOneSaves().find((save) => save.id === id);
     if (!snapshot) return;
     if (snapshot.cornersOnly) {
@@ -270,6 +281,25 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
     setE3State(snapshot.e3);
     if (snapshot.e4) setE4State(normalizeE4MaterialSettings(snapshot.e4));
   }, [activeExperiment, applyE5Overrides]);
+
+  useEffect(() => {
+    if (activeExperiment !== 'five') return;
+    const key = 'exp-set-1:e5-download-all-v1';
+    try {
+      if (localStorage.getItem(key) === '1') return;
+      localStorage.setItem(key, '1');
+    } catch {
+      // If storage is blocked, still proceed once per session.
+    }
+
+    const e4Saves = loadExperimentSetOneSaves().filter((s) => s.scope === 'four' && !s.cornersOnly && s.e4);
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    for (const save of e4Saves) {
+      const e5Material = applyE5Overrides(normalizeE4MaterialSettings(save.e4!));
+      const filename = `experiment-set-1-e5-${stamp}-${save.label.replace(/\s+/g, '-').toLowerCase()}.txt`;
+      downloadTextFile(filename, buildExperimentSetOneConfigText(e1, e2, e3, e5Material));
+    }
+  }, [activeExperiment, applyE5Overrides, e1, e2, e3]);
 
   const resetLayoutPositions = useCallback(() => {
     clearAllExperimentSetOnePositions();
@@ -406,12 +436,13 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
       toggleExperimentVisible,
       activeExperiment,
       setActiveExperiment,
+      selectedSaveIdByExperiment,
       selection,
       clearSelection,
       referenceWallpaper,
       toggleReferenceWallpaper,
     }),
-    [e1, e2, e3, e4, e5, setE1, setE2, setE3, setE4, setE5, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, experimentVisible, toggleExperimentVisible, activeExperiment, selection, clearSelection, referenceWallpaper, toggleReferenceWallpaper],
+    [e1, e2, e3, e4, e5, setE1, setE2, setE3, setE4, setE5, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selection, clearSelection, referenceWallpaper, toggleReferenceWallpaper],
   );
 
   return (
@@ -478,6 +509,26 @@ function experimentTitle(experiment: ExperimentSelection['experiment'] | Experim
   return 'Experiment Five';
 }
 
+function selectionPersistKey(selection: ExperimentSelection) {
+  if (selection.experiment === 'one') return EXPERIMENT_SET_ONE_POSITION_KEYS.panelOne;
+  if (selection.experiment === 'two') {
+    return selection.target === 'trans-sheet'
+      ? EXPERIMENT_SET_ONE_POSITION_KEYS.transSheet
+      : EXPERIMENT_SET_ONE_POSITION_KEYS.frostSheet;
+  }
+  if (selection.experiment === 'three') {
+    return selection.target === 'layer-a' || selection.target === 'layer-a-rim'
+      ? EXPERIMENT_SET_ONE_POSITION_KEYS.layerA
+      : EXPERIMENT_SET_ONE_POSITION_KEYS.layerB;
+  }
+  if (selection.experiment === 'four') {
+    return selection.target.startsWith('layer-a')
+      ? EXPERIMENT_SET_ONE_POSITION_KEYS.layerA4
+      : EXPERIMENT_SET_ONE_POSITION_KEYS.layerB4;
+  }
+  return EXPERIMENT_SET_ONE_POSITION_KEYS.layerA4;
+}
+
 function fieldsForSelection<T extends { id: string; section: string }>(
   allFields: T[],
   highlight: Set<string> | null,
@@ -533,6 +584,7 @@ export function ExperimentSetOneSettingsDock() {
     setHidePanelText,
     activeExperiment,
     setActiveExperiment,
+    selectedSaveIdByExperiment,
     selection,
     clearSelection,
     referenceWallpaper,
@@ -698,24 +750,6 @@ export function ExperimentSetOneSettingsDock() {
                 {label}
               </button>
             ))}
-            <button
-              type="button"
-              className="experiment-one-settings-dock__toggle"
-              onClick={saveCurrent}
-            >
-              Save
-            </button>
-            {scopedSaves.map((save) => (
-              <button
-                key={save.id}
-                type="button"
-                className="experiment-one-settings-dock__toggle experiment-one-settings-dock__toggle--save"
-                onClick={() => loadSave(save.id)}
-                title={`Restore ${save.label} from ${new Date(save.savedAt).toLocaleString()}`}
-              >
-                {save.label}
-              </button>
-            ))}
             <button type="button" className="experiment-one-settings-dock__toggle" onClick={collapseAll}>
               Collapse
             </button>
@@ -736,22 +770,51 @@ export function ExperimentSetOneSettingsDock() {
 
         {open && (
           <div className="experiment-one-settings-dock__body">
-            {selection ? (
-              <div className="experiment-one-settings-dock__selection">
-                <span className="experiment-one-settings-dock__selection-label">Inspecting</span>
-                <strong className="experiment-one-settings-dock__selection-name">{selection.label}</strong>
-                <span className="experiment-one-settings-dock__selection-meta">
-                  {relatedCount} settings for this layer
-                </span>
+            <div className="experiment-one-settings-dock__saves">
+              <div className="experiment-one-settings-dock__saves-head">
+                <span className="experiment-one-settings-dock__saves-title">Saves</span>
+                <button type="button" className="experiment-one-settings-dock__toggle" onClick={saveCurrent}>
+                  Save
+                </button>
               </div>
-            ) : (
-              <p className="experiment-one-settings-dock__hint">
-                {inspectMode
-                  ? 'Click a panel or layer to show only its settings here.'
-                  : 'Enable Inspect, then click a panel or layer.'}
-              </p>
-            )}
-            {note && <p className="experiment-one-settings-dock__note">{note}</p>}
+              <div className="experiment-one-settings-dock__saves-list" role="group" aria-label="Experiment saves">
+                {scopedSaves.map((save) => (
+                  <button
+                    key={save.id}
+                    type="button"
+                    className={`experiment-one-settings-dock__toggle experiment-one-settings-dock__toggle--save${selectedSaveIdByExperiment[dockExperiment] === save.id ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
+                    onClick={() => loadSave(save.id)}
+                    title={`Restore ${save.label} from ${new Date(save.savedAt).toLocaleString()}`}
+                  >
+                    {save.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="experiment-one-settings-dock__settings-scroll">
+              {selection ? (
+                <div className="experiment-one-settings-dock__selection">
+                  <span className="experiment-one-settings-dock__selection-label">Inspecting</span>
+                  <strong className="experiment-one-settings-dock__selection-name">{selection.label}</strong>
+                  <span className="experiment-one-settings-dock__selection-meta">
+                    {relatedCount} settings for this layer
+                    {(() => {
+                      const key = selectionPersistKey(selection);
+                      const pos = loadDragPosition(key);
+                      if (!pos) return null;
+                      return ` · x ${Math.round(pos.x)} · y ${Math.round(pos.y)}`;
+                    })()}
+                  </span>
+                </div>
+              ) : (
+                <p className="experiment-one-settings-dock__hint">
+                  {inspectMode
+                    ? 'Click a panel or layer to show only its settings here.'
+                    : 'Enable Inspect, then click a panel or layer.'}
+                </p>
+              )}
+              {note && <p className="experiment-one-settings-dock__note">{note}</p>}
 
             {dockExperiment === 'one' && visibleE1Fields.length > 0 && (
             <section className="experiment-set-one-dock__experiment">
@@ -996,6 +1059,7 @@ export function ExperimentSetOneSettingsDock() {
               })}
             </section>
             )}
+            </div>
           </div>
         )}
       </div>
