@@ -14,6 +14,7 @@ import {
 import {
   ExperimentFourDraggableLayerA,
   ExperimentFourDraggableLayerB,
+  ExperimentFourRefractionFilterDefs,
 } from '../experiment-set-four/primitives';
 import { ExperimentFiveDraggableLayerA } from '../experiment-set-five/primitives';
 import { EXPERIMENT_SET_ONE_POSITION_KEYS, loadDragPosition } from './dragPositions';
@@ -28,6 +29,7 @@ export function ExperimentSetOneStage() {
 
   return (
     <main className="experiment-set-one-stage" aria-label="Experiment Set 1 panel stage">
+      <ExperimentFourRefractionFilterDefs />
       <div className="experiment-set-one-stage__canvas">
         {show('one') && (
           <ExperimentOneDraggablePanel

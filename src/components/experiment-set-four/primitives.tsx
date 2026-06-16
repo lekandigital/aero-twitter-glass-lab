@@ -5,6 +5,36 @@ import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 import type { E4MaterialSettings } from '../experiment-set-four/materialSettings';
 import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/PwzzovOGlassCorners';
 
+/**
+ * Subtle SVG displacement filter used by the Layer A/B refraction edge glint
+ * (`.experiment-four-layer-*::before`). Mounted once per stage so the
+ * `url(#e4-glass-refract)` reference resolves for Experiments Four and Five.
+ */
+export function ExperimentFourRefractionFilterDefs() {
+  return (
+    <svg
+      className="experiment-four-svg-filters"
+      aria-hidden="true"
+      width="0"
+      height="0"
+      style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}
+    >
+      <defs>
+        <filter id="e4-glass-refract" x="-6%" y="-6%" width="112%" height="112%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.016" numOctaves="2" seed="7" result="noise" />
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="noise"
+            scale="3.2"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
+
 function layerBackdropLights(prefix: 'layerA' | 'layerB', settings: E4MaterialSettings) {
   return {
     tlLight: settings[`${prefix}GlassReflexTlLight`],
