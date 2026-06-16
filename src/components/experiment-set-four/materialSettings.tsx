@@ -421,12 +421,21 @@ function e3BaseToE4(e3: E3MaterialSettings): E4MaterialSettings {
   } as E4MaterialSettings;
 }
 
+/** Reference-matched outer/inner frame strength (bright top gloss + crisp rim). */
+const E4_REFERENCE_FRAME_DEFAULTS = {
+  layerABorderWidth: 58,
+  layerABorderOpacity: 74,
+  layerBBorderWidth: 44,
+  layerBBorderOpacity: 54,
+} as const;
+
 export function buildE4MasterDefaultSettings(): E4MaterialSettings {
   return syncE4LayerBLayoutFromBezel({
     ...e3BaseToE4(resolveSave2E3()),
     ...REFERENCE_LEFT_PANEL_SIZES,
     ...E4_CORNER_DEFAULTS,
     ...E4_BEZEL_DEFAULTS,
+    ...E4_REFERENCE_FRAME_DEFAULTS,
   });
 }
 
