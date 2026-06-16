@@ -11,6 +11,13 @@ import {
   type E2SheetMaterialKeys,
   type E2SheetSection,
 } from '../experiment-set-two/sheetMaterial';
+import {
+  buildFrostSurfaceProfileFields,
+  frostSurfaceProfileCssVars,
+  frostSurfaceProfileDefaults,
+  frostSurfaceProfileFieldIds,
+  pickFrostSurfaceProfile,
+} from '../shared/frostSurfaceFinish';
 
 export const E3_SECTION_ORDER = [
   'Palette',
@@ -31,6 +38,9 @@ const layerADefaults: E2SheetMaterialKeys = {
   height: 400,
   transparency: 95,
   frost: 0,
+  frostMatte: 0,
+  frostMatteTexture: 160,
+  frostGloss: 0,
   saturate: 112,
   brightness: 103,
   cornerRadius: 26,
@@ -52,6 +62,7 @@ const layerADefaults: E2SheetMaterialKeys = {
   shadowSpread: 48,
   glow: 22,
   refraction: 6,
+  ...frostSurfaceProfileDefaults(),
 };
 
 const layerBDefaults: E2SheetMaterialKeys = {
@@ -59,6 +70,15 @@ const layerBDefaults: E2SheetMaterialKeys = {
   height: 352,
   transparency: 40,
   frost: 20,
+  frostMatte: 0,
+  frostMatteTexture: 160,
+  frostGloss: 0,
+  frostSurfaceRegion: 1,
+  frostSurfaceSpread: 10,
+  frostSurfaceFadeEnd: 50,
+  frostSurfaceSoftness: 68,
+  frostSurfaceDirection: 0,
+  frostSurfacePeak: 8,
   saturate: 162,
   brightness: 110,
   cornerRadius: 20,
@@ -108,7 +128,9 @@ export function buildInitialE3Settings(): E3MaterialSettings {
 
 export type E3InspectTarget = 'layer-a' | 'layer-a-rim' | 'layer-b' | 'layer-b-shine';
 
-type SettingField = MaterialFieldBase<string>;
+type SettingField = MaterialFieldBase<string> & {
+  when?: (settings: Record<string, unknown>) => boolean;
+};
 
 const PALETTE_FIELDS: SettingField[] = [
   { id: 'colorCyan', label: 'Cyan accent', dataType: 'color', section: 'Palette' },
@@ -118,9 +140,17 @@ const PALETTE_FIELDS: SettingField[] = [
 
 export const E3_SETTING_FIELDS: SettingField[] = [
   ...PALETTE_FIELDS,
-  ...buildSheetFields('layerA', 'Layer A'),
-  ...buildSheetFields('layerB', 'Layer B'),
+  ...injectFrostSurfaceFields('layerA', 'Layer A', buildSheetFields('layerA', 'Layer A')),
+  ...injectFrostSurfaceFields('layerB', 'Layer B', buildSheetFields('layerB', 'Layer B')),
 ];
+
+function injectFrostSurfaceFields(prefix: string, label: string, fields: SettingField[]): SettingField[] {
+  const bgSection = sheetSectionLabel(label, 'Background');
+  const profileFields = buildFrostSurfaceProfileFields(prefix, bgSection) as SettingField[];
+  const idx = fields.findIndex((field) => field.id === `${prefix}FrostGloss`);
+  if (idx === -1) return [...fields, ...profileFields];
+  return [...fields.slice(0, idx + 1), ...profileFields, ...fields.slice(idx + 1)];
+}
 
 const palette = ['colorCyan', 'colorBlue', 'colorDeep'] as const;
 
@@ -134,6 +164,9 @@ function layerInspectFields(prefix: 'layerA' | 'layerB'): string[] {
     'height',
     'transparency',
     'frost',
+    'frostMatte',
+    'frostMatteTexture',
+    'frostGloss',
     'saturate',
     'brightness',
     'cornerRadius',
@@ -149,7 +182,7 @@ function layerInspectFields(prefix: 'layerA' | 'layerB'): string[] {
     'shadowSpread',
     'glow',
   ];
-  return keys.map((key) => prefixed(prefix, key));
+  return [...keys.map((key) => prefixed(prefix, key)), ...frostSurfaceProfileFieldIds(prefix)];
 }
 
 export const E3_INSPECT_CATALOG: Record<
@@ -209,6 +242,15 @@ function extractLayer(s: E3MaterialSettings, prefix: 'layerA' | 'layerB'): E2She
     height: s[prefixed(prefix, 'height') as keyof E3MaterialSettings] as number,
     transparency: s[prefixed(prefix, 'transparency') as keyof E3MaterialSettings] as number,
     frost: s[prefixed(prefix, 'frost') as keyof E3MaterialSettings] as number,
+    frostMatte: s[prefixed(prefix, 'frostMatte') as keyof E3MaterialSettings] as number,
+    frostMatteTexture: s[prefixed(prefix, 'frostMatteTexture') as keyof E3MaterialSettings] as number,
+    frostGloss: s[prefixed(prefix, 'frostGloss') as keyof E3MaterialSettings] as number,
+    frostSurfaceRegion: s[prefixed(prefix, 'frostSurfaceRegion') as keyof E3MaterialSettings] as number,
+    frostSurfacePeak: s[prefixed(prefix, 'frostSurfacePeak') as keyof E3MaterialSettings] as number,
+    frostSurfaceSpread: s[prefixed(prefix, 'frostSurfaceSpread') as keyof E3MaterialSettings] as number,
+    frostSurfaceFadeEnd: s[prefixed(prefix, 'frostSurfaceFadeEnd') as keyof E3MaterialSettings] as number,
+    frostSurfaceSoftness: s[prefixed(prefix, 'frostSurfaceSoftness') as keyof E3MaterialSettings] as number,
+    frostSurfaceDirection: s[prefixed(prefix, 'frostSurfaceDirection') as keyof E3MaterialSettings] as number,
     saturate: s[prefixed(prefix, 'saturate') as keyof E3MaterialSettings] as number,
     brightness: s[prefixed(prefix, 'brightness') as keyof E3MaterialSettings] as number,
     cornerRadius: s[prefixed(prefix, 'cornerRadius') as keyof E3MaterialSettings] as number,
@@ -242,6 +284,7 @@ function layerToCssVars(prefix: 'layerA' | 'layerB', sheet: E2SheetMaterialKeys)
     [`${p}-radius`]: `${sheet.cornerRadius}px`,
     [`${p}-transparency`]: fillOpacity,
     [`${p}-frost`]: `${sheet.frost}px`,
+    ...frostSurfaceProfileCssVars(pickFrostSurfaceProfile(sheet as Record<string, unknown>, ''), p),
     [`${p}-saturate`]: `${sheet.saturate}%`,
     [`${p}-brightness`]: `${sheet.brightness}%`,
     [`${p}-fill-top`]: pct(sheet.fillTop),

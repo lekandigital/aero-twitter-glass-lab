@@ -2,6 +2,12 @@
 
 import type { CSSProperties } from 'react';
 import type { MaterialFieldBase } from '../shared/MaterialSettingControl';
+import {
+  buildFrostSurfaceProfileFields,
+  frostSurfaceProfileCssVars,
+  frostSurfaceProfileDefaults,
+  pickFrostSurfaceProfile,
+} from '../shared/frostSurfaceFinish';
 
 export const E2_SECTION_ORDER = [
   'Palette',
@@ -50,6 +56,15 @@ export type E2MaterialSettings = {
   frostOuterShadow: number;
   frostShadowSpread: number;
   frostGlow: number;
+  frostMatte: number;
+  frostMatteTexture: number;
+  frostGloss: number;
+  frostSurfaceRegion: number;
+  frostSurfacePeak: number;
+  frostSurfaceSpread: number;
+  frostSurfaceFadeEnd: number;
+  frostSurfaceSoftness: number;
+  frostSurfaceDirection: number;
 };
 
 export const E2_DEFAULT_SETTINGS: E2MaterialSettings = {
@@ -93,11 +108,17 @@ export const E2_DEFAULT_SETTINGS: E2MaterialSettings = {
   frostOuterShadow: 34,
   frostShadowSpread: 44,
   frostGlow: 22,
+  frostMatte: 0,
+  frostMatteTexture: 160,
+  frostGloss: 0,
+  ...frostSurfaceProfileDefaults(),
 };
 
 export type E2InspectTarget = 'trans-sheet' | 'trans-shine' | 'frost-sheet' | 'frost-shine';
 
-type SettingField = MaterialFieldBase<keyof E2MaterialSettings>;
+type SettingField = MaterialFieldBase<keyof E2MaterialSettings> & {
+  when?: (settings: Record<string, unknown>) => boolean;
+};
 
 export const E2_SETTING_FIELDS: SettingField[] = [
   { id: 'colorCyan', label: 'Cyan accent', dataType: 'color', section: 'Palette' },
@@ -129,6 +150,10 @@ export const E2_SETTING_FIELDS: SettingField[] = [
   { id: 'frostRadius', label: 'Corner radius', dataType: 'number', section: 'Frost sheet', min: 8, max: 48, step: 1, unit: 'px' },
   { id: 'frostOpacity', label: 'Fill opacity', dataType: 'number', section: 'Frost sheet', min: 0, max: 100, step: 1, unit: '%' },
   { id: 'frostBlur', label: 'Frost blur', dataType: 'number', section: 'Frost sheet', min: 0, max: 48, step: 1, unit: 'px' },
+  { id: 'frostMatte', label: 'Frost matte', dataType: 'number', section: 'Frost sheet', min: 0, max: 100, step: 1, unit: '%' },
+  { id: 'frostMatteTexture', label: 'Matte texture', dataType: 'number', section: 'Frost sheet', min: 80, max: 320, step: 4, unit: 'px' },
+  { id: 'frostGloss', label: 'Frost gloss', dataType: 'number', section: 'Frost sheet', min: 0, max: 100, step: 1, unit: '%' },
+  ...(buildFrostSurfaceProfileFields('', 'Frost sheet') as SettingField[]),
   { id: 'frostSaturate', label: 'Saturation', dataType: 'number', section: 'Frost sheet', min: 80, max: 220, step: 1, unit: '%' },
   { id: 'frostBrightness', label: 'Brightness', dataType: 'number', section: 'Frost sheet', min: 80, max: 140, step: 1, unit: '%' },
   { id: 'frostBorder', label: 'Border opacity', dataType: 'number', section: 'Frost sheet', min: 0, max: 100, step: 1, unit: '%' },
@@ -171,6 +196,9 @@ const transMaterial: (keyof E2MaterialSettings)[] = [
 const frostMaterial: (keyof E2MaterialSettings)[] = [
   'frostOpacity',
   'frostBlur',
+  'frostMatte',
+  'frostMatteTexture',
+  'frostGloss',
   'frostSaturate',
   'frostBrightness',
   'frostBorder',
@@ -255,6 +283,7 @@ export function e2SettingsToCssVars(s: E2MaterialSettings): CSSProperties {
     '--e2-frost-radius': `${s.frostRadius}px`,
     '--e2-frost-alpha': frostAlpha,
     '--e2-frost-blur': `${s.frostBlur}px`,
+    ...frostSurfaceProfileCssVars(pickFrostSurfaceProfile(s as Record<string, unknown>, ''), '--e2'),
     '--e2-frost-saturate': `${s.frostSaturate}%`,
     '--e2-frost-brightness': `${s.frostBrightness}%`,
     '--e2-frost-border': pct(s.frostBorder),

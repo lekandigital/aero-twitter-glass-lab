@@ -1,6 +1,7 @@
 import { useRef, type ReactNode } from 'react';
 import { e2InspectAttrs } from './materialSettings';
 import { useHoldDrag } from '../shared/useHoldDrag';
+import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 
 type SheetContentProps = {
   eyebrow: string;
@@ -52,6 +53,7 @@ export function ExperimentTwoFrostSheet() {
       aria-label="Experiment Two frost sheet"
       {...e2InspectAttrs('frost-sheet')}
     >
+      <GlassFrostSurface />
       <span className="experiment-two-sheet__shine" aria-hidden="true" {...e2InspectAttrs('frost-shine')} />
       <div className="experiment-two-sheet__content">
         <SheetContent

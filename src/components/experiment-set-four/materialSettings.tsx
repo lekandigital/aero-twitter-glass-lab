@@ -12,8 +12,12 @@ import {
 } from '../experiment-set-two/sheetMaterial';
 import type { E3MaterialSettings } from '../experiment-set-three/materialSettings';
 import { buildInitialE3Settings } from '../experiment-set-three/materialSettings';
-import { loadExperimentSetOneSaves } from '../experiment-set-one/savedConfigs';
-
+import {
+  buildFrostSurfaceProfileFields,
+  frostSurfaceProfileCssVars,
+  frostSurfaceProfileFieldIds,
+  pickFrostSurfaceProfile,
+} from '../shared/frostSurfaceFinish';
 export const E4_BEZEL_SECTION = 'Layer A · Bezel layout';
 
 /** 0 off · 1 top-left + bottom-right · 2 top-right + bottom-left · 3 each corner */
@@ -28,7 +32,29 @@ export const E4_RADIAL_MODE_OPTIONS: MaterialSelectOption[] = [
 
 /** Shared layout options for glass reflex and radial corners */
 export const E4_CORNER_LAYOUT_OPTIONS = E4_RADIAL_MODE_OPTIONS;
+
+/** Glass reflex mode 3 also exposes left/right vertical edge reflex */
+export const E4_GLASS_REFLEX_MODE_OPTIONS: MaterialSelectOption[] = E4_RADIAL_MODE_OPTIONS.map((option) =>
+  option.value === 3 ? { ...option, label: 'Each corner + edges' } : option,
+);
 export type E4CornerLayoutMode = E4RadialCornerMode;
+
+/** 0 all edges share Rim strength + Border opacity · 1 per-edge strength/opacity */
+export const E4_BORDER_EDGE_OPTIONS: MaterialSelectOption[] = [
+  { value: 0, label: 'All edges' },
+  { value: 1, label: 'Each edge' },
+];
+export type E4BorderEdgeMode = 0 | 1;
+
+const BORDER_EDGE_IDS = ['Top', 'Bottom', 'Left', 'Right'] as const;
+type E4BorderEdgeId = (typeof BORDER_EDGE_IDS)[number];
+
+const BORDER_EDGE_LABELS: Record<E4BorderEdgeId, string> = {
+  Top: 'Top',
+  Bottom: 'Bottom',
+  Left: 'Left',
+  Right: 'Right',
+};
 
 const LAYER_A_SHEET_SECTIONS = E2_SHEET_SECTION_ORDER.map((s) => sheetSectionLabel('Layer A', s));
 const layerAShapeSectionIndex = LAYER_A_SHEET_SECTIONS.indexOf('Layer A · Shape');
@@ -58,6 +84,12 @@ export type E4MaterialSettings = E3MaterialSettings & {
   layerAGlassReflexBlDark: number;
   layerAGlassReflexBrLight: number;
   layerAGlassReflexBrDark: number;
+  layerAGlassReflexLeftLight: number;
+  layerAGlassReflexLeftDark: number;
+  layerAGlassReflexLeftSpread: number;
+  layerAGlassReflexRightLight: number;
+  layerAGlassReflexRightDark: number;
+  layerAGlassReflexRightSpread: number;
   layerAGlassReflexLightColor: string;
   layerAGlassReflexDarkColor: string;
   layerAGlassReflexRimPx: number;
@@ -94,6 +126,12 @@ export type E4MaterialSettings = E3MaterialSettings & {
   layerBGlassReflexBlDark: number;
   layerBGlassReflexBrLight: number;
   layerBGlassReflexBrDark: number;
+  layerBGlassReflexLeftLight: number;
+  layerBGlassReflexLeftDark: number;
+  layerBGlassReflexLeftSpread: number;
+  layerBGlassReflexRightLight: number;
+  layerBGlassReflexRightDark: number;
+  layerBGlassReflexRightSpread: number;
   layerBGlassReflexLightColor: string;
   layerBGlassReflexDarkColor: string;
   layerBGlassReflexRimPx: number;
@@ -119,6 +157,24 @@ export type E4MaterialSettings = E3MaterialSettings & {
   layerBRadialSecondaryMid: number;
   layerBRadialSecondaryMidStop: number;
   layerBRadialSecondaryFadeStop: number;
+  layerABorderEdgeMode: E4BorderEdgeMode;
+  layerABorderTopStrength: number;
+  layerABorderTopOpacity: number;
+  layerABorderBottomStrength: number;
+  layerABorderBottomOpacity: number;
+  layerABorderLeftStrength: number;
+  layerABorderLeftOpacity: number;
+  layerABorderRightStrength: number;
+  layerABorderRightOpacity: number;
+  layerBBorderEdgeMode: E4BorderEdgeMode;
+  layerBBorderTopStrength: number;
+  layerBBorderTopOpacity: number;
+  layerBBorderBottomStrength: number;
+  layerBBorderBottomOpacity: number;
+  layerBBorderLeftStrength: number;
+  layerBBorderLeftOpacity: number;
+  layerBBorderRightStrength: number;
+  layerBBorderRightOpacity: number;
   /** Horizontal inset of layer B within layer A (reference left-panel bezel). */
   layerABezelInsetX: number;
   /** Vertical inset of layer B within layer A. */
@@ -129,10 +185,22 @@ export type E4MaterialSettings = E3MaterialSettings & {
   layerARimSideGapTop: number;
   /** Gap from bottom before the vertical side highlight ends (layer A). */
   layerARimSideGapBottom: number;
+  /** Vertical rim side line thickness in px (layer A). */
+  layerARimSideWidthPx: number;
+  /** Vertical rim side line shadow strength percent (layer A). */
+  layerARimSideShadowStrength: number;
+  /** Vertical rim side line shadow blur in px (layer A). */
+  layerARimSideShadowBlurPx: number;
   /** Inner frost vertical side highlight inset from top (layer B). */
   layerBRimSideGapTop: number;
   /** Inner frost vertical side highlight inset from bottom (layer B). */
   layerBRimSideGapBottom: number;
+  /** Vertical rim side line thickness in px (layer B). */
+  layerBRimSideWidthPx: number;
+  /** Vertical rim side line shadow strength percent (layer B). */
+  layerBRimSideShadowStrength: number;
+  /** Vertical rim side line shadow blur in px (layer B). */
+  layerBRimSideShadowBlurPx: number;
   /** When true, layer B renders inside layer A and only A is draggable. */
   layerBNestedInA: boolean;
 };
@@ -154,8 +222,14 @@ const E4_BEZEL_DEFAULTS = {
   layerARimBorderPx: 2,
   layerARimSideGapTop: 12,
   layerARimSideGapBottom: 12,
+  layerARimSideWidthPx: 1,
+  layerARimSideShadowStrength: 0,
+  layerARimSideShadowBlurPx: 10,
   layerBRimSideGapTop: 10,
   layerBRimSideGapBottom: 10,
+  layerBRimSideWidthPx: 1,
+  layerBRimSideShadowStrength: 0,
+  layerBRimSideShadowBlurPx: 10,
   layerBNestedInA: false,
 } as const;
 
@@ -179,6 +253,22 @@ const GLASS_REFLEX_PER_CORNER_DEFAULTS = {
   BlDark: 0,
   BrLight: 1,
   BrDark: 1,
+} as const;
+
+const GLASS_REFLEX_EDGE_IDS = ['Left', 'Right'] as const;
+
+const GLASS_REFLEX_EDGE_LABELS: Record<(typeof GLASS_REFLEX_EDGE_IDS)[number], string> = {
+  Left: 'Left edge',
+  Right: 'Right edge',
+};
+
+const GLASS_REFLEX_EDGE_DEFAULTS = {
+  LeftLight: 0,
+  LeftDark: 0,
+  LeftSpread: 22,
+  RightLight: 0,
+  RightDark: 0,
+  RightSpread: 22,
 } as const;
 
 function glassReflexAppearanceDefaults(prefix: 'layerA' | 'layerB') {
@@ -216,6 +306,12 @@ function glassReflexDefaultsForLayer(prefix: 'layerA' | 'layerB') {
         value,
       ]),
     ),
+    ...Object.fromEntries(
+      (Object.entries(GLASS_REFLEX_EDGE_DEFAULTS) as [string, number][]).map(([key, value]) => [
+        `${prefix}GlassReflex${key}`,
+        value,
+      ]),
+    ),
     ...glassReflexAppearanceDefaults(prefix),
   } as Record<string, number | string>;
 }
@@ -235,16 +331,31 @@ function radialDefaultsForLayer(prefix: 'layerA' | 'layerB') {
   } as Record<string, number | string>;
 }
 
+function borderEdgeDefaultsForLayer(prefix: 'layerA' | 'layerB') {
+  return {
+    [`${prefix}BorderEdgeMode`]: 0,
+    [`${prefix}BorderTopStrength`]: 25,
+    [`${prefix}BorderTopOpacity`]: 68,
+    [`${prefix}BorderBottomStrength`]: 25,
+    [`${prefix}BorderBottomOpacity`]: 68,
+    [`${prefix}BorderLeftStrength`]: 25,
+    [`${prefix}BorderLeftOpacity`]: 68,
+    [`${prefix}BorderRightStrength`]: 25,
+    [`${prefix}BorderRightOpacity`]: 68,
+  } as Record<string, number>;
+}
+
 const E4_CORNER_DEFAULTS = {
   ...glassReflexDefaultsForLayer('layerA'),
   ...glassReflexDefaultsForLayer('layerB'),
   ...radialDefaultsForLayer('layerA'),
   ...radialDefaultsForLayer('layerB'),
+  ...borderEdgeDefaultsForLayer('layerA'),
+  ...borderEdgeDefaultsForLayer('layerB'),
 };
 
 function resolveSave2E3(): E3MaterialSettings {
-  const save2 = loadExperimentSetOneSaves().find((save) => save.id === 2);
-  return save2?.e3 ?? SAVE2_FALLBACK_E3;
+  return SAVE2_FALLBACK_E3;
 }
 
 function e3BaseToE4(e3: E3MaterialSettings): E4MaterialSettings {
@@ -391,6 +502,18 @@ function glassReflexIndividual(prefix: 'layerA' | 'layerB') {
 
 function glassReflexActive(prefix: 'layerA' | 'layerB') {
   return (s: E4MaterialSettings) => glassReflexMode(prefix, s) !== 0;
+}
+
+function borderEdgeMode(prefix: 'layerA' | 'layerB', settings: E4MaterialSettings): E4BorderEdgeMode {
+  return (settings[`${prefix}BorderEdgeMode` as keyof E4MaterialSettings] as E4BorderEdgeMode) ?? 0;
+}
+
+function borderEdgeUnified(prefix: 'layerA' | 'layerB') {
+  return (s: E4MaterialSettings) => borderEdgeMode(prefix, s) === 0;
+}
+
+function borderEdgeIndividual(prefix: 'layerA' | 'layerB') {
+  return (s: E4MaterialSettings) => borderEdgeMode(prefix, s) === 1;
 }
 
 function radialActive(prefix: 'layerA' | 'layerB') {
@@ -593,6 +716,48 @@ function buildPerCornerGlassReflexFields(prefix: 'layerA' | 'layerB', section: s
   });
 }
 
+function buildPerEdgeGlassReflexFields(prefix: 'layerA' | 'layerB', section: string): E4SettingField[] {
+  return GLASS_REFLEX_EDGE_IDS.flatMap((edge) => {
+    const idBase = `${prefix}GlassReflex${edge}`;
+    return [
+      {
+        id: `${idBase}Light`,
+        label: `${GLASS_REFLEX_EDGE_LABELS[edge]} · reflex light`,
+        dataType: 'number',
+        section,
+        min: 0,
+        max: 2,
+        step: 0.1,
+        when: glassReflexIndividual(prefix),
+        hint: `PwzzovO highlight on the ${GLASS_REFLEX_EDGE_LABELS[edge].toLowerCase()} vertical border. 0 turns this edge off.`,
+      },
+      {
+        id: `${idBase}Dark`,
+        label: `${GLASS_REFLEX_EDGE_LABELS[edge]} · reflex dark`,
+        dataType: 'number',
+        section,
+        min: 0,
+        max: 2,
+        step: 0.1,
+        when: glassReflexIndividual(prefix),
+        hint: `PwzzovO shadow on the ${GLASS_REFLEX_EDGE_LABELS[edge].toLowerCase()} vertical border.`,
+      },
+      {
+        id: `${idBase}Spread`,
+        label: `${GLASS_REFLEX_EDGE_LABELS[edge]} · reflex spread`,
+        dataType: 'number',
+        section,
+        min: 0,
+        max: 100,
+        step: 1,
+        unit: '%',
+        when: glassReflexIndividual(prefix),
+        hint: `How far the edge reflex blooms away from the line. 0 = crisp rim only; lower values cut diffuse glow.`,
+      },
+    ] satisfies E4SettingField[];
+  });
+}
+
 function buildGlassReflexFields(prefix: 'layerA' | 'layerB', section: string): E4SettingField[] {
   return [
     {
@@ -600,8 +765,8 @@ function buildGlassReflexFields(prefix: 'layerA' | 'layerB', section: string): E
       label: 'Reflex layout',
       dataType: 'select',
       section,
-      options: E4_CORNER_LAYOUT_OPTIONS,
-      hint: 'Which corners receive the PwzzovO inset shadow reflex. Off removes it; paired modes share settings; Each corner sets light/dark per corner.',
+      options: E4_GLASS_REFLEX_MODE_OPTIONS,
+      hint: 'Which regions receive the PwzzovO inset shadow reflex. Off removes it; paired modes share settings; Each corner + edges sets light/dark per corner and per vertical side.',
     },
     {
       id: `${prefix}GlassReflexLight`,
@@ -627,6 +792,7 @@ function buildGlassReflexFields(prefix: 'layerA' | 'layerB', section: string): E
     },
     ...buildGlassReflexAppearanceFields(prefix, section),
     ...buildPerCornerGlassReflexFields(prefix, section),
+    ...buildPerEdgeGlassReflexFields(prefix, section),
   ];
 }
 
@@ -723,11 +889,73 @@ const PALETTE_FIELDS: SettingField[] = [
 ];
 
 function buildE4SheetFields(prefix: 'layerA' | 'layerB', label: string): E4SettingField[] {
-  return buildSheetFields(prefix, label).map((field) => {
+  const borderSection = sheetSectionLabel(label, 'Border' as E2SheetSection);
+  const fields = buildSheetFields(prefix, label).map((field) => {
     if (field.id === `${prefix}Height`) return { ...field, max: 920 };
     if (prefix === 'layerA' && field.id === `${prefix}Width`) return { ...field, max: 320 };
+    if (field.id === `${prefix}BorderWidth` || field.id === `${prefix}BorderOpacity`) {
+      return { ...field, when: borderEdgeUnified(prefix) };
+    }
     return field;
   });
+  const borderEdge = buildBorderEdgeFields(prefix, borderSection);
+  const withBorder = (() => {
+    const widthIdx = fields.findIndex((f) => f.id === `${prefix}BorderWidth`);
+    if (widthIdx === -1) return [...fields, ...borderEdge];
+    return [...fields.slice(0, widthIdx), ...borderEdge, ...fields.slice(widthIdx)];
+  })();
+  return injectFrostSurfaceProfileFields(prefix, label, withBorder);
+}
+
+function injectFrostSurfaceProfileFields(
+  prefix: 'layerA' | 'layerB',
+  label: string,
+  fields: E4SettingField[],
+): E4SettingField[] {
+  const bgSection = sheetSectionLabel(label, 'Background');
+  const profileFields = buildFrostSurfaceProfileFields(prefix, bgSection) as E4SettingField[];
+  const idx = fields.findIndex((field) => field.id === `${prefix}FrostGloss`);
+  if (idx === -1) return [...fields, ...profileFields];
+  return [...fields.slice(0, idx + 1), ...profileFields, ...fields.slice(idx + 1)];
+}
+
+function buildBorderEdgeFields(prefix: 'layerA' | 'layerB', section: string): E4SettingField[] {
+  return [
+    {
+      id: `${prefix}BorderEdgeMode`,
+      label: 'Border edge layout',
+      dataType: 'select',
+      section,
+      options: E4_BORDER_EDGE_OPTIONS,
+      hint: 'All edges — one Rim strength + Border opacity for every side. Each edge — separate strength and opacity for top, bottom, left, and right.',
+    },
+    ...BORDER_EDGE_IDS.flatMap((edge) => [
+      {
+        id: `${prefix}Border${edge}Strength`,
+        label: `${BORDER_EDGE_LABELS[edge]} · border strength`,
+        dataType: 'number' as const,
+        section,
+        min: 0,
+        max: 100,
+        step: 1,
+        unit: '%',
+        when: borderEdgeIndividual(prefix),
+        hint: `Rim highlight intensity on the ${BORDER_EDGE_LABELS[edge].toLowerCase()} edge.`,
+      },
+      {
+        id: `${prefix}Border${edge}Opacity`,
+        label: `${BORDER_EDGE_LABELS[edge]} · border opacity`,
+        dataType: 'number' as const,
+        section,
+        min: 0,
+        max: 100,
+        step: 1,
+        unit: '%',
+        when: borderEdgeIndividual(prefix),
+        hint: `Opacity of the ${BORDER_EDGE_LABELS[edge].toLowerCase()} border line.`,
+      },
+    ]),
+  ];
 }
 
 function buildBezelLayoutFields(): E4SettingField[] {
@@ -795,6 +1023,39 @@ function buildBezelLayoutFields(): E4SettingField[] {
       hint: 'Vertical side highlights end this far above the bottom corner.',
     },
     {
+      id: 'layerARimSideWidthPx',
+      label: 'Side line thickness',
+      dataType: 'number',
+      section: E4_BEZEL_SECTION,
+      min: 0.5,
+      max: 6,
+      step: 0.5,
+      unit: 'px',
+      hint: 'Thickness of the vertical bezel edge lines on layer A.',
+    },
+    {
+      id: 'layerARimSideShadowStrength',
+      label: 'Side line shadow',
+      dataType: 'number',
+      section: E4_BEZEL_SECTION,
+      min: 0,
+      max: 100,
+      step: 1,
+      unit: '%',
+      hint: 'Adds a soft shadow behind the vertical bezel edge lines (layer A).',
+    },
+    {
+      id: 'layerARimSideShadowBlurPx',
+      label: 'Side line shadow blur',
+      dataType: 'number',
+      section: E4_BEZEL_SECTION,
+      min: 0,
+      max: 40,
+      step: 1,
+      unit: 'px',
+      hint: 'Shadow blur radius for the vertical bezel edge lines (layer A).',
+    },
+    {
       id: 'layerBRimSideGapTop',
       label: 'Inner side line gap (top)',
       dataType: 'number',
@@ -815,6 +1076,39 @@ function buildBezelLayoutFields(): E4SettingField[] {
       step: 1,
       unit: 'px',
       hint: 'Layer B frost body — vertical edge highlight inset from bottom.',
+    },
+    {
+      id: 'layerBRimSideWidthPx',
+      label: 'Inner side thickness',
+      dataType: 'number',
+      section: E4_BEZEL_SECTION,
+      min: 0.5,
+      max: 6,
+      step: 0.5,
+      unit: 'px',
+      hint: 'Thickness of the vertical edge lines on layer B.',
+    },
+    {
+      id: 'layerBRimSideShadowStrength',
+      label: 'Inner side shadow',
+      dataType: 'number',
+      section: E4_BEZEL_SECTION,
+      min: 0,
+      max: 100,
+      step: 1,
+      unit: '%',
+      hint: 'Adds a soft shadow behind the vertical edge lines (layer B).',
+    },
+    {
+      id: 'layerBRimSideShadowBlurPx',
+      label: 'Inner side shadow blur',
+      dataType: 'number',
+      section: E4_BEZEL_SECTION,
+      min: 0,
+      max: 40,
+      step: 1,
+      unit: 'px',
+      hint: 'Shadow blur radius for the vertical edge lines (layer B).',
     },
   ];
 }
@@ -852,6 +1146,9 @@ function layerInspectFields(prefix: 'layerA' | 'layerB'): string[] {
     'height',
     'transparency',
     'frost',
+    'frostMatte',
+    'frostMatteTexture',
+    'frostGloss',
     'saturate',
     'brightness',
     'cornerRadius',
@@ -867,7 +1164,7 @@ function layerInspectFields(prefix: 'layerA' | 'layerB'): string[] {
     'shadowSpread',
     'glow',
   ];
-  return keys.map((key) => prefixed(prefix, key));
+  return [...keys.map((key) => prefixed(prefix, key)), ...frostSurfaceProfileFieldIds(prefix)];
 }
 
 function glassReflexFieldIds(prefix: 'layerA' | 'layerB'): string[] {
@@ -883,6 +1180,11 @@ function glassReflexFieldIds(prefix: 'layerA' | 'layerB'): string[] {
     ...RADIAL_CORNER_IDS.flatMap((corner) => [
       `${prefix}GlassReflex${corner}Light`,
       `${prefix}GlassReflex${corner}Dark`,
+    ]),
+    ...GLASS_REFLEX_EDGE_IDS.flatMap((edge) => [
+      `${prefix}GlassReflex${edge}Light`,
+      `${prefix}GlassReflex${edge}Dark`,
+      `${prefix}GlassReflex${edge}Spread`,
     ]),
   ];
 }
@@ -934,13 +1236,15 @@ export const E4_INSPECT_CATALOG: Record<
   'layer-a-rim': {
     label: 'Layer A — rim highlight',
     fields: [
-      prefixed('layerA', 'borderWidth'),
-      prefixed('layerA', 'borderOpacity'),
+      ...borderEdgeFieldIds('layerA'),
       prefixed('layerA', 'topRadial'),
       prefixed('layerA', 'depth'),
       'layerARimBorderPx',
       'layerARimSideGapTop',
       'layerARimSideGapBottom',
+      'layerARimSideWidthPx',
+      'layerARimSideShadowStrength',
+      'layerARimSideShadowBlurPx',
       'layerABezelInsetX',
       'layerABezelInsetY',
       ...palette,
@@ -1011,6 +1315,15 @@ function extractLayer(s: E4MaterialSettings, prefix: 'layerA' | 'layerB'): E2She
     height: s[prefixed(prefix, 'height') as keyof E4MaterialSettings] as number,
     transparency: s[prefixed(prefix, 'transparency') as keyof E4MaterialSettings] as number,
     frost: s[prefixed(prefix, 'frost') as keyof E4MaterialSettings] as number,
+    frostMatte: s[prefixed(prefix, 'frostMatte') as keyof E4MaterialSettings] as number,
+    frostMatteTexture: s[prefixed(prefix, 'frostMatteTexture') as keyof E4MaterialSettings] as number,
+    frostGloss: s[prefixed(prefix, 'frostGloss') as keyof E4MaterialSettings] as number,
+    frostSurfaceRegion: s[prefixed(prefix, 'frostSurfaceRegion') as keyof E4MaterialSettings] as number,
+    frostSurfacePeak: s[prefixed(prefix, 'frostSurfacePeak') as keyof E4MaterialSettings] as number,
+    frostSurfaceSpread: s[prefixed(prefix, 'frostSurfaceSpread') as keyof E4MaterialSettings] as number,
+    frostSurfaceFadeEnd: s[prefixed(prefix, 'frostSurfaceFadeEnd') as keyof E4MaterialSettings] as number,
+    frostSurfaceSoftness: s[prefixed(prefix, 'frostSurfaceSoftness') as keyof E4MaterialSettings] as number,
+    frostSurfaceDirection: s[prefixed(prefix, 'frostSurfaceDirection') as keyof E4MaterialSettings] as number,
     saturate: s[prefixed(prefix, 'saturate') as keyof E4MaterialSettings] as number,
     brightness: s[prefixed(prefix, 'brightness') as keyof E4MaterialSettings] as number,
     cornerRadius: s[prefixed(prefix, 'cornerRadius') as keyof E4MaterialSettings] as number,
@@ -1044,6 +1357,7 @@ function layerToCssVars(prefix: 'layerA' | 'layerB', sheet: E2SheetMaterialKeys)
     [`${p}-radius`]: `${sheet.cornerRadius}px`,
     [`${p}-transparency`]: fillOpacity,
     [`${p}-frost`]: `${sheet.frost}px`,
+    ...frostSurfaceProfileCssVars(pickFrostSurfaceProfile(sheet as Record<string, unknown>, ''), p),
     [`${p}-saturate`]: `${sheet.saturate}%`,
     [`${p}-brightness`]: `${sheet.brightness}%`,
     [`${p}-fill-top`]: pct(sheet.fillTop),
@@ -1193,6 +1507,62 @@ function glassReflexToCssVars(prefix: 'layerA' | 'layerB', s: E4MaterialSettings
     vars[`${p}-reflex-${key}-opacity`] = opacity;
   }
 
+  for (const edge of GLASS_REFLEX_EDGE_IDS) {
+    const key = edge.toLowerCase();
+    let light = 0;
+    let dark = 0;
+    let opacity = 0;
+    let spread = 0;
+
+    if (mode === 3) {
+      light = s[`${prefix}GlassReflex${edge}Light` as keyof E4MaterialSettings] as number;
+      dark = s[`${prefix}GlassReflex${edge}Dark` as keyof E4MaterialSettings] as number;
+      spread = s[`${prefix}GlassReflex${edge}Spread` as keyof E4MaterialSettings] as number;
+      opacity = light > 0 || dark > 0 ? 1 : 0;
+    }
+
+    const glow = spread / 100;
+    vars[`${p}-reflex-${key}-light`] = light;
+    vars[`${p}-reflex-${key}-dark`] = dark;
+    vars[`${p}-reflex-${key}-opacity`] = opacity;
+    vars[`${p}-reflex-${key}-glow`] = glow;
+    vars[`${p}-reflex-${key}-edge-mask-reach`] = `${12 + glow * 20}%`;
+    vars[`${p}-reflex-${key}-edge-mask-fade`] = `${34 + glow * 34}%`;
+  }
+
+  return vars;
+}
+
+function borderEdgeFieldIds(prefix: 'layerA' | 'layerB'): string[] {
+  return [
+    `${prefix}BorderEdgeMode`,
+    `${prefix}BorderWidth`,
+    `${prefix}BorderOpacity`,
+    ...BORDER_EDGE_IDS.flatMap((edge) => [`${prefix}Border${edge}Strength`, `${prefix}Border${edge}Opacity`]),
+  ];
+}
+
+function resolveBorderEdgeValue(
+  s: E4MaterialSettings,
+  prefix: 'layerA' | 'layerB',
+  edge: E4BorderEdgeId,
+  kind: 'Strength' | 'Opacity',
+): number {
+  const unifiedKey = kind === 'Strength' ? `${prefix}BorderWidth` : `${prefix}BorderOpacity`;
+  if (borderEdgeMode(prefix, s) === 0) {
+    return s[unifiedKey as keyof E4MaterialSettings] as number;
+  }
+  return s[`${prefix}Border${edge}${kind}` as keyof E4MaterialSettings] as number;
+}
+
+function borderEdgeToCssVars(prefix: 'layerA' | 'layerB', s: E4MaterialSettings): Record<string, string | number> {
+  const p = `--e4-${prefix}`;
+  const vars: Record<string, string | number> = {};
+  for (const edge of BORDER_EDGE_IDS) {
+    const key = edge.toLowerCase();
+    vars[`${p}-rim-${key}-strength`] = pct(resolveBorderEdgeValue(s, prefix, edge, 'Strength'));
+    vars[`${p}-rim-${key}-border`] = pct(resolveBorderEdgeValue(s, prefix, edge, 'Opacity'));
+  }
   return vars;
 }
 
@@ -1203,8 +1573,16 @@ function bezelToCssVars(s: E4MaterialSettings): Record<string, string | number> 
     '--e4-layerA-rim-border-px': `${s.layerARimBorderPx}px`,
     '--e4-layerA-rim-side-gap-top': `${s.layerARimSideGapTop}px`,
     '--e4-layerA-rim-side-gap-bottom': `${s.layerARimSideGapBottom}px`,
+    '--e4-layerA-rim-side-width-px': `${s.layerARimSideWidthPx}px`,
+    '--e4-layerA-rim-side-shadow-strength': `${s.layerARimSideShadowStrength / 100}`,
+    '--e4-layerA-rim-side-shadow-blur-px': `${s.layerARimSideShadowBlurPx}px`,
     '--e4-layerB-rim-side-gap-top': `${s.layerBRimSideGapTop}px`,
     '--e4-layerB-rim-side-gap-bottom': `${s.layerBRimSideGapBottom}px`,
+    '--e4-layerB-rim-side-width-px': `${s.layerBRimSideWidthPx}px`,
+    '--e4-layerB-rim-side-shadow-strength': `${s.layerBRimSideShadowStrength / 100}`,
+    '--e4-layerB-rim-side-shadow-blur-px': `${s.layerBRimSideShadowBlurPx}px`,
+    ...borderEdgeToCssVars('layerA', s),
+    ...borderEdgeToCssVars('layerB', s),
   };
 }
 
@@ -1259,9 +1637,26 @@ export function normalizeE4MaterialSettings(raw: Partial<E4MaterialSettings> | u
   const layerAMode = migrateRadialMode('layerA');
   const layerBMode = migrateRadialMode('layerB');
 
+  function migrateBorderEdges(source: Partial<E4MaterialSettings>, prefix: 'layerA' | 'layerB') {
+    const width = (source[`${prefix}BorderWidth` as keyof E4MaterialSettings] as number | undefined) ?? (base[`${prefix}BorderWidth` as keyof E4MaterialSettings] as number);
+    const opacity = (source[`${prefix}BorderOpacity` as keyof E4MaterialSettings] as number | undefined) ?? (base[`${prefix}BorderOpacity` as keyof E4MaterialSettings] as number);
+    const out: Record<string, number> = {
+      [`${prefix}BorderEdgeMode`]: (source[`${prefix}BorderEdgeMode` as keyof E4MaterialSettings] as number | undefined) ?? (base[`${prefix}BorderEdgeMode` as keyof E4MaterialSettings] as number),
+    };
+    for (const edge of BORDER_EDGE_IDS) {
+      out[`${prefix}Border${edge}Strength`] =
+        (source[`${prefix}Border${edge}Strength` as keyof E4MaterialSettings] as number | undefined) ?? width;
+      out[`${prefix}Border${edge}Opacity`] =
+        (source[`${prefix}Border${edge}Opacity` as keyof E4MaterialSettings] as number | undefined) ?? opacity;
+    }
+    return out;
+  }
+
   return {
     ...base,
     ...raw,
+    ...migrateBorderEdges(raw, 'layerA'),
+    ...migrateBorderEdges(raw, 'layerB'),
     layerAGlassReflexLight: raw.layerAGlassReflexLight ?? legacyLightA ?? base.layerAGlassReflexLight,
     layerAGlassReflexDark: raw.layerAGlassReflexDark ?? legacyLightA ?? base.layerAGlassReflexDark,
     layerBGlassReflexLight: raw.layerBGlassReflexLight ?? legacyLightB ?? base.layerBGlassReflexLight,

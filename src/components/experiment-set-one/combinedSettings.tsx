@@ -60,7 +60,7 @@ import { ExperimentOneDraggableShell } from '../experiment-one/primitives';
 import { MaterialSettingCollapsibleSection } from '../shared/MaterialSettingCollapsibleSection';
 import { MaterialSettingFieldRow } from '../shared/MaterialSettingControl';
 import { consumeClickAfterHoldDrag } from '../shared/useHoldDrag';
-import { orderedSections } from '../shared/materialSettingGroups';
+import { orderedSections, filterFieldsWhen } from '../shared/materialSettingGroups';
 import { useFoldableSections } from '../shared/useFoldableSections';
 import { downloadExperimentSetOneConfig } from './exportConfig';
 import {
@@ -70,11 +70,16 @@ import {
   type ExperimentSetOneSnapshot,
 } from './savedConfigs';
 import { applyReferenceCornerLighting, REFERENCE_CORNER_PRESET_VERSION } from '../experiment-set-four/referenceCornerLighting';
+import {
+  E5_BORDER_REFINEMENTS_VERSION,
+  refineExperimentFivePanels,
+} from '../experiment-set-five/borderCornerRefinements';
 import { clearAllExperimentSetOnePositions, EXPERIMENT_SET_ONE_POSITION_KEYS, loadDragPosition } from './dragPositions';
 import {
   defaultSession,
   loadExperimentSetOneSession,
   saveExperimentSetOneSession,
+  type ExperimentSetOneSession,
 } from './sessionState';
 import {
   DEFAULT_EXPERIMENT_VISIBILITY,
@@ -144,13 +149,51 @@ export function useExperimentSetOne() {
   return ctx;
 }
 
+function e5LayoutPresetFromSaves() {
+  const all = loadExperimentSetOneSaves();
+  const save19 = all.find((s) => s.id === 19 || s.label === 'Save 19');
+  const e4Settings = save19?.e4;
+  if (!e4Settings) return null;
+  return {
+    layerAWidth: e4Settings.layerAWidth,
+    layerAHeight: e4Settings.layerAHeight,
+    layerABezelInsetX: e4Settings.layerABezelInsetX,
+    layerABezelInsetY: e4Settings.layerABezelInsetY,
+    layerACornerRadius: e4Settings.layerACornerRadius,
+  } as const;
+}
+
+function applyE5OverridesStatic(raw: E4MaterialSettings): E4MaterialSettings {
+  const next = {
+    ...raw,
+    ...(e5LayoutPresetFromSaves() ?? {}),
+    layerBNestedInA: true,
+  } as E4MaterialSettings;
+  return syncE4LayerBLayoutFromBezel(next);
+}
+
+function resolveInitialE5(boot: ExperimentSetOneSession): E4MaterialSettings {
+  if (boot.e5) return normalizeE4MaterialSettings(boot.e5);
+  const selectedSaveId = boot.selectedSaveIdByExperiment?.five;
+  if (selectedSaveId != null) {
+    const snapshot = loadExperimentSetOneSaves().find((save) => save.id === selectedSaveId);
+    if (snapshot?.e4) {
+      return applyE5OverridesStatic(normalizeE4MaterialSettings(snapshot.e4));
+    }
+  }
+  return applyE5OverridesStatic(normalizeE4MaterialSettings(boot.e4));
+}
+
 export function ExperimentSetOneProvider({ children }: { children: ReactNode }) {
   const boot = loadExperimentSetOneSession() ?? defaultSession();
   const [e1, setE1State] = useState<E1MaterialSettings>(boot.e1);
   const [e2, setE2State] = useState<E2MaterialSettings>(boot.e2);
   const [e3, setE3State] = useState<E3MaterialSettings>(boot.e3);
   const [e4, setE4State] = useState<E4MaterialSettings>(() => normalizeE4MaterialSettings(boot.e4));
-  const [e5, setE5State] = useState<E4MaterialSettings>(() => normalizeE4MaterialSettings(boot.e4));
+  const [e5, setE5State] = useState<E4MaterialSettings>(() => resolveInitialE5(boot));
+  const [e5BorderRefinementsVersion, setE5BorderRefinementsVersion] = useState(
+    boot.e5BorderRefinementsVersion ?? 0,
+  );
   const [saves, setSaves] = useState<ExperimentSetOneSnapshot[]>(() => loadExperimentSetOneSaves());
   const [inspectMode, setInspectMode] = useState(boot.inspectMode);
   const [hidePanelText, setHidePanelText] = useState(boot.hidePanelText);
@@ -225,31 +268,17 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
     downloadExperimentSetOneConfig(e1, e2, e3, activeExperiment === 'five' ? e5 : e4);
   }, [e1, e2, e3, e4, e5, selection, activeExperiment]);
 
-  const e5LayoutPreset = useMemo(() => {
-    const all = loadExperimentSetOneSaves();
-    const save19 = all.find((s) => s.id === 19 || s.label === 'Save 19');
-    const e4Settings = save19?.e4;
-    if (!e4Settings) return null;
-    return {
-      layerAWidth: e4Settings.layerAWidth,
-      layerAHeight: e4Settings.layerAHeight,
-      layerABezelInsetX: e4Settings.layerABezelInsetX,
-      layerABezelInsetY: e4Settings.layerABezelInsetY,
-      layerACornerRadius: e4Settings.layerACornerRadius,
-    } as const;
-  }, []);
-
   const applyE5Overrides = useCallback(
-    (raw: E4MaterialSettings) => {
-      const next = {
-        ...raw,
-        ...(e5LayoutPreset ?? {}),
-        layerBNestedInA: true,
-      } as E4MaterialSettings;
-      return syncE4LayerBLayoutFromBezel(next);
-    },
-    [e5LayoutPreset],
+    (raw: E4MaterialSettings) => applyE5OverridesStatic(raw),
+    [],
   );
+
+  useEffect(() => {
+    if (activeExperiment !== 'five') return;
+    if (e5BorderRefinementsVersion >= E5_BORDER_REFINEMENTS_VERSION) return;
+    setE5State((prev) => refineExperimentFivePanels(prev));
+    setE5BorderRefinementsVersion(E5_BORDER_REFINEMENTS_VERSION);
+  }, [activeExperiment, e5BorderRefinementsVersion]);
 
   const loadSave = useCallback((id: number) => {
     setSelectedSaveIdByExperiment((prev) => ({ ...prev, [activeExperiment]: id }));
@@ -290,15 +319,21 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
     if (snapshot.e4) setE4State(normalizeE4MaterialSettings(snapshot.e4));
   }, [activeExperiment, applyE5Overrides]);
 
+  const e5DownloadRanRef = useRef(false);
+
   useEffect(() => {
     if (activeExperiment !== 'five') return;
-    const key = 'exp-set-1:e5-download-all-v1';
+    if (e5DownloadRanRef.current) return;
     try {
-      if (localStorage.getItem(key) === '1') return;
-      localStorage.setItem(key, '1');
+      if (localStorage.getItem('exp-set-1:e5-download-all-v1') === '1') {
+        e5DownloadRanRef.current = true;
+        return;
+      }
+      localStorage.setItem('exp-set-1:e5-download-all-v1', '1');
     } catch {
       // If storage is blocked, still proceed once per session.
     }
+    e5DownloadRanRef.current = true;
 
     const e4Saves = loadExperimentSetOneSaves().filter((s) => s.scope === 'four' && !s.cornersOnly && s.e4);
     const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
@@ -334,6 +369,7 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
       e2,
       e3,
       e4,
+      e5,
       hidePanelText,
       inspectMode,
       experimentVisible,
@@ -341,8 +377,9 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
       activeExperiment,
       selectedSaveIdByExperiment,
       cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
+      e5BorderRefinementsVersion,
     });
-  }, [e1, e2, e3, e4, hidePanelText, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment]);
+  }, [e1, e2, e3, e4, e5, hidePanelText, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment, e5BorderRefinementsVersion]);
 
   useEffect(() => {
     const page = pageRef.current;
@@ -618,16 +655,16 @@ export function ExperimentSetOneSettingsDock() {
   const note = selectionNote(selection);
   const filtering = selection !== null;
   const visibleE1Fields = useMemo(
-    () => fieldsForSelection(E1_SETTING_FIELDS, e1Highlight, selection),
-    [selection, e1Highlight],
+    () => fieldsForSelection(filterFieldsWhen(E1_SETTING_FIELDS, e1), e1Highlight, selection),
+    [selection, e1Highlight, e1],
   );
   const visibleE2Fields = useMemo(
-    () => fieldsForSelection(E2_SETTING_FIELDS, e2Highlight, selection),
-    [selection, e2Highlight],
+    () => fieldsForSelection(filterFieldsWhen(E2_SETTING_FIELDS, e2), e2Highlight, selection),
+    [selection, e2Highlight, e2],
   );
   const visibleE3Fields = useMemo(
-    () => fieldsForSelection(E3_SETTING_FIELDS, e3Highlight, selection),
-    [selection, e3Highlight],
+    () => fieldsForSelection(filterFieldsWhen(E3_SETTING_FIELDS, e3), e3Highlight, selection),
+    [selection, e3Highlight, e3],
   );
   const contextualE4Fields = useMemo(() => e4FieldsVisibleForSettings(e4), [e4]);
   const visibleE4Fields = useMemo(
