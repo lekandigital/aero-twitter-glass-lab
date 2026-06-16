@@ -16,6 +16,7 @@ type PwzzovOGlassCornersProps = {
 
 function edgeBackdropStyle(profile: {
   maskGradient: string;
+  rimMaskGradient: string;
   tintGradient: string;
   rimGradient: string;
   peakAlpha: number;
@@ -24,6 +25,7 @@ function edgeBackdropStyle(profile: {
 }): CSSProperties {
   return {
     '--pwzzovO-edge-backdrop-mask': profile.maskGradient,
+    '--pwzzovO-edge-backdrop-rim-mask': profile.rimMaskGradient,
     '--pwzzovO-edge-backdrop-tint': profile.tintGradient,
     '--pwzzovO-edge-backdrop-rim': profile.rimGradient,
     '--pwzzovO-edge-backdrop-peak': String(profile.peakAlpha),
