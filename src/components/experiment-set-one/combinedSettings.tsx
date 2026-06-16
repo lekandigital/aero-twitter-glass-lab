@@ -159,17 +159,25 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
   );
   const { referenceWallpaper, toggleReferenceWallpaper } = useReferenceWallpaper();
   const [layoutResetVersion, setLayoutResetVersion] = useState(0);
-  const [activeExperiment, setActiveExperiment] = useState<ExperimentId>('four');
+  const [activeExperiment, setActiveExperiment] = useState<ExperimentId>(boot.activeExperiment ?? 'four');
   const [selectedSaveIdByExperiment, setSelectedSaveIdByExperiment] = useState<Record<ExperimentId, number | null>>({
-    one: null,
-    two: null,
-    three: null,
-    four: null,
-    five: null,
+    one: boot.selectedSaveIdByExperiment?.one ?? null,
+    two: boot.selectedSaveIdByExperiment?.two ?? null,
+    three: boot.selectedSaveIdByExperiment?.three ?? null,
+    four: boot.selectedSaveIdByExperiment?.four ?? null,
+    five: boot.selectedSaveIdByExperiment?.five ?? null,
   });
   const [selection, setSelection] = useState<ExperimentSelection | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   const selectedElRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
 
   const style = useMemo(
     () =>
@@ -330,9 +338,11 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
       inspectMode,
       experimentVisible,
       referenceWallpaper,
+      activeExperiment,
+      selectedSaveIdByExperiment,
       cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
     });
-  }, [e1, e2, e3, e4, hidePanelText, inspectMode, experimentVisible, referenceWallpaper]);
+  }, [e1, e2, e3, e4, hidePanelText, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment]);
 
   useEffect(() => {
     const page = pageRef.current;
