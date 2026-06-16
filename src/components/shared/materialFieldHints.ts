@@ -39,16 +39,42 @@ const E1_HINTS: Record<string, string> = {
 };
 
 const E4_PWZZOV_HINTS: Record<string, string> = {
-  layerAOppositeCornerEnabled:
-    'Applies the PwzzovO inset box-shadow stack — simulates curved-glass edge catch light on opposite corners via layered inset shadows (not a gradient).',
+  layerAGlassReflexMode:
+    'PwzzovO inset shadow stack — pick which corners get the glass edge reflex: off, a diagonal pair (TL+BR or TR+BL), or each corner independently.',
   layerAGlassReflexLight:
-    'Scales white inset highlights in the PwzzovO stack (--glass-reflex-light). Higher = brighter corner catch on the lit diagonal.',
+    'Paired modes — scales white inset highlights in the PwzzovO shadow stack. 1 matches the CodePen default; 0 removes the lit side.',
   layerAGlassReflexDark:
-    'Scales dark inset shadows in the PwzzovO stack (--glass-reflex-dark). Higher = deeper opposing-corner shade.',
-  layerBOppositeCornerEnabled: 'Same PwzzovO inset reflex on the frost body (layer B).',
-  layerBGlassReflexLight: 'PwzzovO light reflex multiplier on layer B.',
-  layerBGlassReflexDark: 'PwzzovO dark reflex multiplier on layer B.',
+    'Paired modes — scales dark inset shadows opposing the highlights. Adds depth on the opposite diagonal of the pair.',
+  layerBGlassReflexMode:
+    'Glass reflex layout on layer B frost body — same options as layer A: off, diagonal pair, or per-corner light/dark.',
+  layerBGlassReflexLight:
+    'Paired-mode light reflex multiplier on layer B. Scales PwzzovO white inset bands on the active diagonal.',
+  layerBGlassReflexDark:
+    'Paired-mode dark reflex multiplier on layer B. Scales opposing inset shadows for corner depth.',
 };
+
+const GLASS_REFLEX_CORNER_HINTS: Record<string, string> = {
+  TlLight: 'Each-corner mode — PwzzovO light reflex at top-left. 0 disables that corner.',
+  TlDark: 'Each-corner mode — PwzzovO dark reflex at top-left.',
+  TrLight: 'Each-corner mode — light reflex at top-right.',
+  TrDark: 'Each-corner mode — dark reflex at top-right.',
+  BlLight: 'Each-corner mode — light reflex at bottom-left.',
+  BlDark: 'Each-corner mode — dark reflex at bottom-left.',
+  BrLight: 'Each-corner mode — light reflex at bottom-right.',
+  BrDark: 'Each-corner mode — dark reflex at bottom-right.',
+};
+
+function e4GlassReflexCornerHints(): Record<string, string> {
+  const hints: Record<string, string> = {};
+  for (const prefix of ['layerA', 'layerB'] as const) {
+    for (const [suffix, text] of Object.entries(GLASS_REFLEX_CORNER_HINTS)) {
+      hints[`${prefix}GlassReflex${suffix}`] = text;
+    }
+  }
+  return hints;
+}
+
+const E4_GLASS_REFLEX_CORNER_HINTS = e4GlassReflexCornerHints();
 
 const E4_RADIAL_HINTS: Record<string, string> = {
   layerARadialCornerMode:
@@ -57,9 +83,12 @@ const E4_RADIAL_HINTS: Record<string, string> = {
     'Paired modes only — master opacity of both diagonal blooms. Applied as layer opacity over two fixed radial gradients (screen blend).',
   layerARadialCornerSize:
     'Paired modes only — ellipse radius in px for both corner blooms. Larger = softer, wider corner glow.',
-  layerBRadialCornerMode: 'Radial layout for layer B — same options as layer A.',
-  layerBRadialCornerStrength: 'Paired-mode bloom opacity on layer B.',
-  layerBRadialCornerSize: 'Paired-mode bloom radius on layer B.',
+  layerBRadialCornerMode:
+    'Radial bloom layout on layer B — off, TL+BR, TR+BL, or independent per-corner strength and size.',
+  layerBRadialCornerStrength:
+    'Paired modes — master opacity of both diagonal blooms on layer B (screen-blended radial gradients).',
+  layerBRadialCornerSize:
+    'Paired modes — ellipse radius in px for both layer B corner blooms. Larger = wider, softer glow.',
 };
 
 const RADIAL_CORNER_HINTS: Record<string, string> = {
@@ -95,6 +124,7 @@ function sheetKeyFromId(id: string): string | null {
 export function resolveFieldHint(field: MaterialFieldBase): string | undefined {
   if (field.hint) return field.hint;
   if (E4_PWZZOV_HINTS[field.id]) return E4_PWZZOV_HINTS[field.id];
+  if (E4_GLASS_REFLEX_CORNER_HINTS[field.id]) return E4_GLASS_REFLEX_CORNER_HINTS[field.id];
   if (E4_RADIAL_HINTS[field.id]) return E4_RADIAL_HINTS[field.id];
   if (E4_PER_CORNER_HINTS[field.id]) return E4_PER_CORNER_HINTS[field.id];
   if (E1_HINTS[field.id]) return E1_HINTS[field.id];

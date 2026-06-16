@@ -18,6 +18,7 @@ import {
 import { MaterialSettingCollapsibleSection } from '../shared/MaterialSettingCollapsibleSection';
 import { MaterialSettingFieldRow, type MaterialFieldBase } from '../shared/MaterialSettingControl';
 import { consumeClickAfterHoldDrag, useHoldDrag } from '../shared/useHoldDrag';
+import { useReferenceWallpaper } from '../shared/useReferenceWallpaper';
 import { orderedSections, sectionFieldCount } from '../shared/materialSettingGroups';
 import { useFoldableSections } from '../shared/useFoldableSections';
 
@@ -372,6 +373,7 @@ function highlightedFieldIds(selection: { target: A1InspectTarget; label: string
 export function A1MaterialSettingsDock() {
   const { settings, setSetting, resetSettings, inspectMode, setInspectMode, selection, clearSelection } =
     useA1MaterialSettings();
+  const { referenceWallpaper, toggleReferenceWallpaper } = useReferenceWallpaper();
   const [open, setOpen] = useState(true);
   const boundsRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
@@ -428,6 +430,15 @@ export function A1MaterialSettingsDock() {
                   Clear
                 </button>
               )}
+              <button
+                type="button"
+                className={`a1-settings-dock__btn${referenceWallpaper ? ' a1-settings-dock__btn--active' : ''}`}
+                onClick={toggleReferenceWallpaper}
+                aria-pressed={referenceWallpaper}
+                title="Overlay reference.png on aero-bg at matched scale"
+              >
+                Reference bg
+              </button>
               <button type="button" className="a1-settings-dock__btn" onClick={collapseAll}>
                 Collapse
               </button>

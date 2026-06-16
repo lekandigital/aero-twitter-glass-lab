@@ -1,12 +1,18 @@
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 import { AeroWallpaper } from './AeroWallpaper';
 import { RouteSwitcher } from './RouteSwitcher';
+import { applyReferenceWallpaperDom, readReferenceWallpaperPreference } from '../shared/workspaceWallpaper';
 
 type WorkspaceShellProps = {
   children: ReactNode;
 };
 
 export function WorkspaceShell({ children }: WorkspaceShellProps) {
+  useEffect(() => {
+    applyReferenceWallpaperDom(readReferenceWallpaperPreference());
+  }, []);
+
   return (
     <>
       <AeroWallpaper />

@@ -4,11 +4,21 @@ import type { E3MaterialSettings } from '../experiment-set-three/materialSetting
 import type { E4MaterialSettings } from '../experiment-set-four/materialSettings';
 import { normalizeE4MaterialSettings } from '../experiment-set-four/materialSettings';
 import {
+  applyReferenceCornerLighting,
+  REFERENCE_CORNER_PRESET_VERSION,
+} from '../experiment-set-four/referenceCornerLighting';
+import {
   E1_MASTER_DEFAULT,
   E2_MASTER_DEFAULT,
   E3_MASTER_DEFAULT,
   E4_MASTER_DEFAULT,
 } from './masterDefaults';
+
+import {
+  DEFAULT_EXPERIMENT_VISIBILITY,
+  normalizeExperimentVisibility,
+  type ExperimentVisibility,
+} from './experimentVisibility';
 
 const SESSION_KEY = 'experiment-set-1-session';
 
@@ -19,6 +29,9 @@ export type ExperimentSetOneSession = {
   e4: E4MaterialSettings;
   hidePanelText: boolean;
   inspectMode: boolean;
+  experimentVisible: ExperimentVisibility;
+  referenceWallpaper: boolean;
+  cornerPresetVersion?: number;
 };
 
 export function defaultSession(): ExperimentSetOneSession {
@@ -26,10 +39,37 @@ export function defaultSession(): ExperimentSetOneSession {
     e1: E1_MASTER_DEFAULT,
     e2: E2_MASTER_DEFAULT,
     e3: E3_MASTER_DEFAULT,
-    e4: E4_MASTER_DEFAULT,
+    e4: applyReferenceCornerLighting(E4_MASTER_DEFAULT),
     hidePanelText: false,
     inspectMode: true,
+    experimentVisible: DEFAULT_EXPERIMENT_VISIBILITY,
+    referenceWallpaper: false,
+    cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
   };
+}
+
+export function readSessionReferenceWallpaper(): boolean | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<ExperimentSetOneSession>;
+    return typeof parsed.referenceWallpaper === 'boolean' ? parsed.referenceWallpaper : null;
+  } catch {
+    return null;
+  }
+}
+
+export function patchSessionReferenceWallpaper(enabled: boolean) {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw) as Partial<ExperimentSetOneSession>;
+    if (parsed.referenceWallpaper === enabled) return;
+    parsed.referenceWallpaper = enabled;
+    localStorage.setItem(SESSION_KEY, JSON.stringify(parsed));
+  } catch {
+    /* ignore */
+  }
 }
 
 export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
@@ -38,14 +78,26 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<ExperimentSetOneSession>;
     if (!parsed?.e1 || !parsed?.e2 || !parsed?.e3) return null;
-    return {
+    let e4 = normalizeE4MaterialSettings(parsed.e4);
+    const cornerPresetVersion = parsed.cornerPresetVersion ?? 0;
+    if (cornerPresetVersion < REFERENCE_CORNER_PRESET_VERSION) {
+      e4 = applyReferenceCornerLighting(e4);
+    }
+    const session: ExperimentSetOneSession = {
       e1: parsed.e1,
       e2: parsed.e2,
       e3: parsed.e3,
-      e4: normalizeE4MaterialSettings(parsed.e4),
+      e4,
       hidePanelText: Boolean(parsed.hidePanelText),
       inspectMode: parsed.inspectMode !== false,
+      experimentVisible: normalizeExperimentVisibility(parsed.experimentVisible),
+      referenceWallpaper: Boolean(parsed.referenceWallpaper),
+      cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
     };
+    if (cornerPresetVersion < REFERENCE_CORNER_PRESET_VERSION) {
+      saveExperimentSetOneSession(session);
+    }
+    return session;
   } catch {
     return null;
   }
