@@ -34,9 +34,12 @@
     ),
     rgba(255, 255, 255, calc(var(--e4-layerA-body-tint) * var(--e4-layerA-transparency)));
 
-  backdrop-filter: blur(var(--e4-layerA-frost)) saturate(var(--e4-layerA-saturate)) brightness(var(--e4-layerA-brightness));
-  -webkit-backdrop-filter: blur(var(--e4-layerA-frost)) saturate(var(--e4-layerA-saturate))
-    brightness(var(--e4-layerA-brightness));
+  /* refraction adds contrast + extra saturation so the wallpaper bends and pops through the glass */
+  backdrop-filter: blur(var(--e4-layerA-frost)) saturate(calc(var(--e4-layerA-saturate) + var(--e4-layerA-refraction) * 60%))
+    brightness(var(--e4-layerA-brightness)) contrast(calc(100% + var(--e4-layerA-refraction) * 42%));
+  -webkit-backdrop-filter: blur(var(--e4-layerA-frost))
+    saturate(calc(var(--e4-layerA-saturate) + var(--e4-layerA-refraction) * 60%))
+    brightness(var(--e4-layerA-brightness)) contrast(calc(100% + var(--e4-layerA-refraction) * 42%));
 
   box-shadow:
     /* crisp bright top bevel edge */
@@ -1118,9 +1121,12 @@
     ),
     rgba(210, 240, 255, calc(var(--e4-layerB-body-tint) * var(--e4-layerB-transparency)));
 
-  backdrop-filter: blur(var(--e4-layerB-frost)) saturate(var(--e4-layerB-saturate)) brightness(var(--e4-layerB-brightness));
-  -webkit-backdrop-filter: blur(var(--e4-layerB-frost)) saturate(var(--e4-layerB-saturate))
-    brightness(var(--e4-layerB-brightness));
+  /* refraction adds contrast + extra saturation so the wallpaper bends and pops through the glass */
+  backdrop-filter: blur(var(--e4-layerB-frost)) saturate(calc(var(--e4-layerB-saturate) + var(--e4-layerB-refraction) * 60%))
+    brightness(var(--e4-layerB-brightness)) contrast(calc(100% + var(--e4-layerB-refraction) * 42%));
+  -webkit-backdrop-filter: blur(var(--e4-layerB-frost))
+    saturate(calc(var(--e4-layerB-saturate) + var(--e4-layerB-refraction) * 60%))
+    brightness(var(--e4-layerB-brightness)) contrast(calc(100% + var(--e4-layerB-refraction) * 42%));
 
   box-shadow:
     /* crisp top bevel edge (softer than layer A) */
