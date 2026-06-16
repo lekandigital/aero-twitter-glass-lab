@@ -35,7 +35,9 @@ export function builtInSave31(): ExperimentSetOneSnapshot {
       ...(base.e4 ?? {}),
 
       // ── Layer A (clear bezel frame) ──────────────────────────────────────
-      // Background: keep the frame clear, just a touch cooler/brighter.
+      // Background: keep the frame clear, just a touch brighter. Saturation
+      // pulled to ~neutral so the frame doesn't amplify the sky into a cast.
+      layerASaturate: 98,
       layerABrightness: 104,
       layerAFillTop: 4,
       layerAFillMid: 2,
@@ -67,14 +69,16 @@ export function builtInSave31(): ExperimentSetOneSnapshot {
 
       // ── Layer B (frosted inner sheet / body) ─────────────────────────────
       // Background: bright milky crown, clearer cool base so grass reads.
+      // Saturation pulled below neutral so the transmitted sky reads as a
+      // neutral white-glass (no blue tinge); the wallpaper still supplies hue.
       layerBTransparency: 78,
       layerBFrost: 36,
-      layerBSaturate: 150,
+      layerBSaturate: 92,
       layerBBrightness: 132,
       layerBFillTop: 70,
       layerBFillMid: 16,
       layerBFillBottom: 44,
-      layerBBodyTint: 16,
+      layerBBodyTint: 8,
       // Surface: stronger top-biased wet gloss + light matte tooth.
       layerBFrostMatte: 6,
       layerBFrostMatteTexture: 150,
