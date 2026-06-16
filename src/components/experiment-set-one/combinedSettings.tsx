@@ -59,6 +59,9 @@ import {
 import { ExperimentOneDraggableShell } from '../experiment-one/primitives';
 import { MaterialSettingCollapsibleSection } from '../shared/MaterialSettingCollapsibleSection';
 import { MaterialSettingFieldRow } from '../shared/MaterialSettingControl';
+import { ExperimentMultiLayerSettings } from '../shared/ExperimentMultiLayerSettings';
+import { LayerEditModeToggle } from '../shared/LayerEditModeToggle';
+import { sectionsForLayerMode, type LayerEditMode } from '../shared/layerEditMode';
 import { consumeClickAfterHoldDrag } from '../shared/useHoldDrag';
 import { orderedSections, filterFieldsWhen } from '../shared/materialSettingGroups';
 import { useFoldableSections } from '../shared/useFoldableSections';
@@ -638,6 +641,9 @@ export function ExperimentSetOneSettingsDock() {
     toggleReferenceWallpaper,
   } = useExperimentSetOne();
   const [open, setOpen] = useState(true);
+  const [layerEditMode, setLayerEditMode] = useState<LayerEditMode>(
+    () => loadExperimentSetOneSession()?.layerEditMode ?? 'both',
+  );
   const saveScope = selection ? selection.experiment : activeExperiment;
   const scopedSaves = useMemo(
     () =>
@@ -684,17 +690,17 @@ export function ExperimentSetOneSettingsDock() {
     () => sectionsForFields(E2_SECTION_ORDER, visibleE2Fields),
     [visibleE2Fields],
   );
-  const visibleE3Sections = useMemo(
-    () => sectionsForFields(E3_SECTION_ORDER, visibleE3Fields),
-    [visibleE3Fields],
+  const visibleE3SectionsForMode = useMemo(
+    () => sectionsForLayerMode(visibleE3Fields, E3_SECTION_ORDER, layerEditMode),
+    [visibleE3Fields, layerEditMode],
   );
-  const visibleE4Sections = useMemo(
-    () => sectionsForFields(E4_SECTION_ORDER, visibleE4Fields),
-    [visibleE4Fields],
+  const visibleE4SectionsForMode = useMemo(
+    () => sectionsForLayerMode(visibleE4Fields, E4_SECTION_ORDER, layerEditMode),
+    [visibleE4Fields, layerEditMode],
   );
-  const visibleE5Sections = useMemo(
-    () => sectionsForFields(E4_SECTION_ORDER, visibleE5Fields),
-    [visibleE5Fields],
+  const visibleE5SectionsForMode = useMemo(
+    () => sectionsForLayerMode(visibleE5Fields, E4_SECTION_ORDER, layerEditMode),
+    [visibleE5Fields, layerEditMode],
   );
   const totalCount =
     E1_SETTING_FIELDS.length + E2_SETTING_FIELDS.length + E3_SETTING_FIELDS.length + E4_SETTING_FIELDS.length;
@@ -715,13 +721,21 @@ export function ExperimentSetOneSettingsDock() {
     () => [
       ...visibleE1Sections.map((s) => `e1-${s}`),
       ...visibleE2Sections.map((s) => `e2-${s}`),
-      ...visibleE3Sections.map((s) => `e3-${s}`),
-      ...visibleE4Sections.map((s) => `e4-${s}`),
-      ...visibleE5Sections.map((s) => `e5-${s}`),
+      ...visibleE3SectionsForMode.map((s) => `e3-${s}`),
+      ...visibleE4SectionsForMode.map((s) => `e4-${s}`),
+      ...visibleE5SectionsForMode.map((s) => `e5-${s}`),
     ],
-    [visibleE1Sections, visibleE2Sections, visibleE3Sections, visibleE4Sections, visibleE5Sections],
+    [visibleE1Sections, visibleE2Sections, visibleE3SectionsForMode, visibleE4SectionsForMode, visibleE5SectionsForMode],
   );
   const { isOpen, toggle, openAll, collapseAll } = useFoldableSections(foldableSectionIds, false);
+
+  useEffect(() => {
+    const session = loadExperimentSetOneSession();
+    if (!session) return;
+    saveExperimentSetOneSession({ ...session, layerEditMode });
+  }, [layerEditMode]);
+
+  const showLayerEditToggle = dockExperiment === 'three' || dockExperiment === 'four' || dockExperiment === 'five';
 
   return (
     <ExperimentOneDraggableShell
@@ -862,6 +876,9 @@ export function ExperimentSetOneSettingsDock() {
                 </p>
               )}
               {note && <p className="experiment-one-settings-dock__note">{note}</p>}
+              {showLayerEditToggle && (
+                <LayerEditModeToggle value={layerEditMode} onChange={setLayerEditMode} />
+              )}
 
             {dockExperiment === 'one' && visibleE1Fields.length > 0 && (
             <section className="experiment-set-one-dock__experiment">
@@ -885,10 +902,11 @@ export function ExperimentSetOneSettingsDock() {
                   titleClassName="experiment-one-settings-dock__section-title"
                   fieldsClassName="experiment-one-settings-dock__fields"
                 >
-                  {sectionFields.map((field) => (
+                  {sectionFields.map((field, index) => (
                     <MaterialSettingFieldRow
                       key={`e1-${field.id}`}
                       field={field}
+                      fieldIndex={index + 1}
                       value={e1[field.id]}
                       onChange={(v) => setE1(field.id, v as E1MaterialSettings[typeof field.id])}
                       defaultValue={E1_MASTER_DEFAULT[field.id]}
@@ -933,10 +951,11 @@ export function ExperimentSetOneSettingsDock() {
                   titleClassName="experiment-one-settings-dock__section-title"
                   fieldsClassName="experiment-one-settings-dock__fields"
                 >
-                  {sectionFields.map((field) => (
+                  {sectionFields.map((field, index) => (
                     <MaterialSettingFieldRow
                       key={`e2-${field.id}`}
                       field={field}
+                      fieldIndex={index + 1}
                       value={e2[field.id]}
                       onChange={(v) => setE2(field.id, v as E2MaterialSettings[typeof field.id])}
                       defaultValue={E2_MASTER_DEFAULT[field.id]}
@@ -957,154 +976,76 @@ export function ExperimentSetOneSettingsDock() {
             </section>
             )}
 
-            {dockExperiment === 'three' && visibleE3Fields.length > 0 && (
-            <section className="experiment-set-one-dock__experiment">
-              {!filtering && (
-                <>
-                  <h2 className="experiment-set-one-dock__experiment-title">Experiment Three</h2>
-                  <p className="experiment-set-one-dock__experiment-desc">
-                    Layer A ultra-clear bezel frame, Layer B frosted body inset inside.
-                  </p>
-                </>
-              )}
-              {visibleE3Sections.map((section) => {
-                const sectionFields = visibleE3Fields.filter((field) => field.section === section);
-                if (sectionFields.length === 0) return null;
-                return (
-                <MaterialSettingCollapsibleSection
-                  key={`e3-${section}`}
-                  id={`e3-${section}`}
-                  title={section}
-                  count={sectionFields.length}
-                  open={isOpen(`e3-${section}`)}
-                  onToggle={toggle}
-                  titleClassName="experiment-one-settings-dock__section-title"
-                  fieldsClassName="experiment-one-settings-dock__fields"
-                >
-                  {sectionFields.map((field) => (
-                    <MaterialSettingFieldRow
-                      key={`e3-${field.id}`}
-                      field={field}
-                      value={e3[field.id as keyof E3MaterialSettings]}
-                      onChange={(v) => setE3(field.id as keyof E3MaterialSettings, v as E3MaterialSettings[keyof E3MaterialSettings])}
-                      defaultValue={E3_MASTER_DEFAULT[field.id as keyof E3MaterialSettings]}
-                      resetTargets={fieldResetTargets(
-                        E3_MASTER_DEFAULT[field.id as keyof E3MaterialSettings],
-                        'three',
-                        field.id,
-                        scopedSaves,
-                      )}
-                      onResetTo={(v) =>
-                        setE3(field.id as keyof E3MaterialSettings, v as E3MaterialSettings[keyof E3MaterialSettings])
-                      }
-                      classPrefix="e2"
-                      highlighted={false}
-                    />
-                  ))}
-                </MaterialSettingCollapsibleSection>
-                );
-              })}
-            </section>
+            {dockExperiment === 'three' && (
+              <ExperimentMultiLayerSettings
+                experimentKey="e3"
+                title="Experiment Three"
+                description="Layer A ultra-clear bezel frame, Layer B frosted body inset inside."
+                filtering={filtering}
+                fields={visibleE3Fields}
+                sectionOrder={E3_SECTION_ORDER}
+                settings={e3}
+                masterDefault={E3_MASTER_DEFAULT}
+                layerEditMode={layerEditMode}
+                onChange={(id, value) => setE3(id as keyof E3MaterialSettings, value as E3MaterialSettings[keyof E3MaterialSettings])}
+                onPairedChange={(suffix, value) => {
+                  setE3(`layerA${suffix}` as keyof E3MaterialSettings, value as E3MaterialSettings[keyof E3MaterialSettings]);
+                  setE3(`layerB${suffix}` as keyof E3MaterialSettings, value as E3MaterialSettings[keyof E3MaterialSettings]);
+                }}
+                resetTargets={fieldResetTargets}
+                scopedSaves={scopedSaves}
+                saveExperiment="three"
+                isOpen={isOpen}
+                onToggle={toggle}
+              />
             )}
 
-            {dockExperiment === 'four' && visibleE4Fields.length > 0 && (
-            <section className="experiment-set-one-dock__experiment">
-              {!filtering && (
-                <>
-                  <h2 className="experiment-set-one-dock__experiment-title">Experiment Four</h2>
-                  <p className="experiment-set-one-dock__experiment-desc">
-                    Save 2 materials + reference left-panel sizing with diagonal opposite-corner highlights.
-                  </p>
-                </>
-              )}
-              {visibleE4Sections.map((section) => {
-                const sectionFields = visibleE4Fields.filter((field) => field.section === section);
-                if (sectionFields.length === 0) return null;
-                return (
-                <MaterialSettingCollapsibleSection
-                  key={`e4-${section}`}
-                  id={`e4-${section}`}
-                  title={section}
-                  count={sectionFields.length}
-                  open={isOpen(`e4-${section}`)}
-                  onToggle={toggle}
-                  titleClassName="experiment-one-settings-dock__section-title"
-                  fieldsClassName="experiment-one-settings-dock__fields"
-                >
-                  {sectionFields.map((field) => (
-                    <MaterialSettingFieldRow
-                      key={`e4-${field.id}`}
-                      field={field}
-                      value={e4[field.id as keyof E4MaterialSettings]}
-                      onChange={(v) => setE4(field.id as keyof E4MaterialSettings, v as E4MaterialSettings[keyof E4MaterialSettings])}
-                      defaultValue={E4_MASTER_DEFAULT[field.id as keyof E4MaterialSettings]}
-                      resetTargets={fieldResetTargets(
-                        E4_MASTER_DEFAULT[field.id as keyof E4MaterialSettings],
-                        'four',
-                        field.id,
-                        scopedSaves,
-                      )}
-                      onResetTo={(v) =>
-                        setE4(field.id as keyof E4MaterialSettings, v as E4MaterialSettings[keyof E4MaterialSettings])
-                      }
-                      classPrefix="e2"
-                      highlighted={false}
-                    />
-                  ))}
-                </MaterialSettingCollapsibleSection>
-                );
-              })}
-            </section>
+            {dockExperiment === 'four' && (
+              <ExperimentMultiLayerSettings
+                experimentKey="e4"
+                title="Experiment Four"
+                description="Save 2 materials + reference left-panel sizing with diagonal opposite-corner highlights."
+                filtering={filtering}
+                fields={visibleE4Fields}
+                sectionOrder={E4_SECTION_ORDER}
+                settings={e4}
+                masterDefault={E4_MASTER_DEFAULT}
+                layerEditMode={layerEditMode}
+                onChange={(id, value) => setE4(id as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings])}
+                onPairedChange={(suffix, value) => {
+                  setE4(`layerA${suffix}` as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings]);
+                  setE4(`layerB${suffix}` as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings]);
+                }}
+                resetTargets={fieldResetTargets}
+                scopedSaves={scopedSaves}
+                saveExperiment="four"
+                isOpen={isOpen}
+                onToggle={toggle}
+              />
             )}
 
-            {dockExperiment === 'five' && visibleE5Fields.length > 0 && (
-            <section className="experiment-set-one-dock__experiment">
-              {!filtering && (
-                <>
-                  <h2 className="experiment-set-one-dock__experiment-title">Experiment Five</h2>
-                  <p className="experiment-set-one-dock__experiment-desc">
-                    Copy of Experiment Four saves with forced nested bezel + Save 19 layout footprint.
-                  </p>
-                </>
-              )}
-              {visibleE5Sections.map((section) => {
-                const sectionFields = visibleE5Fields.filter((field) => field.section === section);
-                if (sectionFields.length === 0) return null;
-                return (
-                <MaterialSettingCollapsibleSection
-                  key={`e5-${section}`}
-                  id={`e5-${section}`}
-                  title={section}
-                  count={sectionFields.length}
-                  open={isOpen(`e5-${section}`)}
-                  onToggle={toggle}
-                  titleClassName="experiment-one-settings-dock__section-title"
-                  fieldsClassName="experiment-one-settings-dock__fields"
-                >
-                  {sectionFields.map((field) => (
-                    <MaterialSettingFieldRow
-                      key={`e5-${field.id}`}
-                      field={field}
-                      value={e5[field.id as keyof E4MaterialSettings]}
-                      onChange={(v) => setE5(field.id as keyof E4MaterialSettings, v as E4MaterialSettings[keyof E4MaterialSettings])}
-                      defaultValue={E4_MASTER_DEFAULT[field.id as keyof E4MaterialSettings]}
-                      resetTargets={fieldResetTargets(
-                        E4_MASTER_DEFAULT[field.id as keyof E4MaterialSettings],
-                        'four',
-                        field.id,
-                        scopedSaves,
-                      )}
-                      onResetTo={(v) =>
-                        setE5(field.id as keyof E4MaterialSettings, v as E4MaterialSettings[keyof E4MaterialSettings])
-                      }
-                      classPrefix="e2"
-                      highlighted={false}
-                    />
-                  ))}
-                </MaterialSettingCollapsibleSection>
-                );
-              })}
-            </section>
+            {dockExperiment === 'five' && (
+              <ExperimentMultiLayerSettings
+                experimentKey="e5"
+                title="Experiment Five"
+                description="Copy of Experiment Four saves with forced nested bezel + Save 19 layout footprint."
+                filtering={filtering}
+                fields={visibleE5Fields}
+                sectionOrder={E4_SECTION_ORDER}
+                settings={e5}
+                masterDefault={E4_MASTER_DEFAULT}
+                layerEditMode={layerEditMode}
+                onChange={(id, value) => setE5(id as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings])}
+                onPairedChange={(suffix, value) => {
+                  setE5(`layerA${suffix}` as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings]);
+                  setE5(`layerB${suffix}` as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings]);
+                }}
+                resetTargets={fieldResetTargets}
+                scopedSaves={scopedSaves}
+                saveExperiment="four"
+                isOpen={isOpen}
+                onToggle={toggle}
+              />
             )}
             </div>
           </div>

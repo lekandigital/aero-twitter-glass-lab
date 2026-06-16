@@ -21,6 +21,8 @@ import {
   type ExperimentVisibility,
 } from './experimentVisibility';
 
+import type { LayerEditMode } from '../shared/layerEditMode';
+
 const SESSION_KEY = 'experiment-set-1-session';
 let memorySessionFallback: ExperimentSetOneSession | null = null;
 
@@ -39,6 +41,7 @@ export type ExperimentSetOneSession = {
   selectedSaveIdByExperiment?: Partial<Record<ExperimentId, number | null>>;
   cornerPresetVersion?: number;
   e5BorderRefinementsVersion?: number;
+  layerEditMode?: LayerEditMode;
 };
 
 export function defaultSession(): ExperimentSetOneSession {
@@ -54,6 +57,7 @@ export function defaultSession(): ExperimentSetOneSession {
     activeExperiment: 'four',
     selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: null },
     cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
+    layerEditMode: 'both',
   };
 }
 
@@ -113,6 +117,10 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       selectedSaveIdByExperiment: parsed.selectedSaveIdByExperiment ?? undefined,
       cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
       e5BorderRefinementsVersion: parsed.e5BorderRefinementsVersion,
+      layerEditMode:
+        parsed.layerEditMode === 'layerA' || parsed.layerEditMode === 'layerB' || parsed.layerEditMode === 'both'
+          ? parsed.layerEditMode
+          : 'both',
     };
     if (cornerPresetVersion < REFERENCE_CORNER_PRESET_VERSION) {
       saveExperimentSetOneSession(session);
