@@ -128,9 +128,8 @@
     const sourceUrl = item.sourceUrl || '';
     const localPath = item.localSourcePath || '';
     const itemRepo = githubRepoKey(sourceUrl);
-    const sorted = [...runners].sort((a, b) => b.id.length - a.id.length);
 
-    return sorted.find((r) => {
+    const matches = runners.filter((r) => {
       const rid = r.id.toLowerCase();
       const ridSlug = rid.replace(/[^a-z0-9]+/g, '');
       if (r.sourceUrl && item.sourceUrl && normalizeUrl(item.sourceUrl) === normalizeUrl(r.sourceUrl)) return true;
@@ -139,7 +138,22 @@
       if (itemRepo && runnerRepo && itemRepo === runnerRepo) return true;
       if (itemRepo && (itemRepo === rid || itemRepo.replace(/[^a-z0-9]+/g, '') === ridSlug)) return true;
       return false;
-    }) ?? null;
+    });
+
+    return matches.find((r) => !r.variantOf) ?? matches[0] ?? null;
+  }
+
+  function runnerById(id) {
+    return runners.find((r) => r.id === id) ?? null;
+  }
+
+  function siblingVariants(runner) {
+    const baseId = runner.variantOf ?? runner.id;
+    return runners.filter((r) => r.id !== runner.id && r.variantOf === baseId);
+  }
+
+  function effectiveRunnerStatus(runner) {
+    return runnerLiveStatus(runner);
   }
 
   function runnerLiveStatus(runner) {
@@ -153,7 +167,7 @@
     const runnerPath = runner?.runnerPath || null;
     const hasLocalDemoPage = item.previewMode === 'local-page' && Boolean(item.localDemoUrl);
     const hasRunnerCandidate = Boolean(runner?.runnable);
-    const runnerStatusVal = runner ? runnerLiveStatus(runner) : null;
+    const runnerStatusVal = runner ? effectiveRunnerStatus(runner) : null;
     const isRunnerRunning = hasRunnerCandidate && runnerStatusVal === 'running';
     const isRunnerNotRunning = hasRunnerCandidate && runnerStatusVal !== 'running';
     const hasLocalSourceOnly = Boolean(localSourcePath) && !hasLocalDemoPage && !isRunnerRunning;
@@ -297,16 +311,16 @@
     const pseudo = {
       id: `runner-${runner.id}`,
       title: runner.title || runner.id,
-      group: 'Package runners',
+      group: runner.variantOf ? 'Additional demos' : 'Package runners',
       runtime: runner.runnerType === 'static' ? 'vanilla-js' : 'unknown',
       previewMode: 'source-only',
-      catalogLabel: 'source-only',
+      catalogLabel: runner.variantOf ? 'local-demo' : 'source-only',
       sourceUrl: runner.sourceUrl,
       localSourcePath: runner.sourcePath,
-      localDemoUrl: null,
+      localDemoUrl: runner.localDevUrl ?? null,
       notes: runner.notes,
-      tags: ['runner', 'github'],
-      usefulnessScore: 70,
+      tags: runner.variantOf ? ['runner', 'demo-variant', 'github'] : ['runner', 'github'],
+      usefulnessScore: runner.variantOf ? 75 : 70,
     };
     const flags = computeFlags(pseudo, runner);
     const health = mergeHealth(pseudo, runner, flags);
@@ -320,6 +334,10 @@
       enriched.filter((i) => i.runner).map((i) => i.runner.id),
     );
     for (const runner of runners) {
+      if (runner.variantOf) {
+        enriched.push(enrichRunnerOnlyCard(runner));
+        continue;
+      }
       if (!matchedRunnerIds.has(runner.id) && (runner.runnable || runner.sourcePath)) {
         enriched.push(enrichRunnerOnlyCard(runner));
       }
@@ -538,25 +556,61 @@
     ).join('') + '</div>';
   }
 
+  function variantLinksHtml(runner) {
+    const variants = siblingVariants(runner).filter((v) => v.id !== runner.id);
+    if (!variants.length) return '';
+
+    let html = '<div class="rrl-runner__variants"><div class="rrl-runner__variants-label">Additional demos</div><ul class="rrl-runner__variants-list">';
+    for (const variant of variants) {
+      const status = effectiveRunnerStatus(variant);
+      const label = esc(variant.variantLabel || variant.title || variant.id);
+      if (status === 'running' && variant.localDevUrl) {
+        html += '<li><a href="' + esc(variant.localDevUrl) + '" target="_blank" rel="noopener noreferrer">' + label + '</a>';
+        html += ' <span class="rrl-runner__variant-url">' + esc(variant.localDevUrl) + '</span></li>';
+      } else {
+        const startCmd = 'node scripts/start-reference-runners.mjs --id ' + variant.id;
+        html += '<li><span class="rrl-runner__variant-label">' + label + '</span>';
+        html += ' <code class="rrl-runner__cmd">' + esc(startCmd) + '</code>';
+        html += ' <button type="button" class="rrl-btn rrl-btn--compact" data-action="copy-start-cmd" data-cmd="' + esc(startCmd) + '">Copy start</button></li>';
+      }
+    }
+    html += '</ul></div>';
+    return html;
+  }
+
   function runnerBlockHtml(runner, item) {
-    const status = item.runnerStatusVal ?? runnerLiveStatus(runner);
+    const status = item.runnerStatusVal ?? effectiveRunnerStatus(runner);
     const startCmd = 'node scripts/start-reference-runners.mjs --id ' + runner.id;
     let html = '<div class="rrl-runner">';
-    html += '<div class="rrl-runner__meta">Runner · port ' + esc(String(runner.port)) + ' · ' + esc(runner.runnerType) + '</div>';
+    const headline = runner.variantLabel
+      ? 'Demo variant · ' + esc(runner.variantLabel)
+      : 'Runner · port ' + esc(String(runner.port)) + ' · ' + esc(runner.runnerType);
+    html += '<div class="rrl-runner__meta">' + headline + '</div>';
 
-    if (status === 'running') {
-      html += '<a class="rrl-btn rrl-btn--primary" href="' + esc(runner.localDevUrl) + '" target="_blank" rel="noopener noreferrer">Open local dev server</a>';
+    if (status === 'running' && runner.localDevUrl) {
+      html += '<a class="rrl-btn rrl-btn--primary" href="' + esc(runner.localDevUrl) + '" target="_blank" rel="noopener noreferrer">' + esc(runner.openButtonLabel || 'Open local dev server') + '</a>';
       html += '<div class="rrl-runner__url">' + esc(runner.localDevUrl) + '</div>';
     } else {
       html += '<div class="rrl-runner__status">Not running · ' + esc(status) + '</div>';
       html += '<code class="rrl-runner__cmd">' + esc(startCmd) + '</code>';
       html += '<button type="button" class="rrl-btn" data-action="copy-start-cmd" data-cmd="' + esc(startCmd) + '">Copy start command</button>';
     }
+
+    if (!runner.variantOf) {
+      html += variantLinksHtml(runner);
+    }
+
     if (runner.sourcePath) {
       html += '<div class="rrl-card__meta">Vault: ' + esc(runner.sourcePath) + '</div>';
     }
     if (runner.runnerPath) {
       html += '<div class="rrl-card__meta">Runner path: ' + esc(runner.runnerPath) + '</div>';
+    }
+    if (runner.htmlRelPath) {
+      html += '<div class="rrl-card__meta">HTML: ' + esc(runner.htmlRelPath) + '</div>';
+    }
+    if (runner.demoCwd) {
+      html += '<div class="rrl-card__meta">Demo: ' + esc(runner.demoCwd) + '</div>';
     }
     html += '</div>';
     return html;

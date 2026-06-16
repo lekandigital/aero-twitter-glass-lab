@@ -13,6 +13,8 @@ import { ReferenceLab } from './routes/ReferenceLab';
 import { ReferenceDemo } from './routes/ReferenceDemo';
 import { ApproachOne } from './routes/ApproachOne';
 import { ApproachTwo } from './routes/ApproachTwo';
+import { ExperimentOne } from './routes/ExperimentOne';
+import { GlassComponentShowcase } from './routes/GlassComponentShowcase';
 
 function App() {
   return (
@@ -29,6 +31,9 @@ function App() {
         <Route path="/hybrid" element={<ApproachHybridFinal />} />
         <Route path="/approach-1" element={<ApproachOne />} />
         <Route path="/approach-2" element={<ApproachTwo />} />
+        <Route path="/experiment-set-1" element={<ExperimentOne />} />
+        <Route path="/experiment-1" element={<Navigate to="/experiment-set-1" replace />} />
+        <Route path="/showcase" element={<GlassComponentShowcase />} />
         <Route path="/references" element={<ReferencesStatus />} />
         <Route path="/reference-lab" element={<ReferenceLab />} />
         <Route path="/reference-lab/:id" element={<ReferenceDemo />} />

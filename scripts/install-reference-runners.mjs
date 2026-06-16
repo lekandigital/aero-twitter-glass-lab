@@ -15,6 +15,7 @@ import {
   readJson,
   readPackageJson,
   runPackageInstall,
+  runnerRepoId,
   writeJson,
 } from './lib/reference-runners-shared.mjs';
 
@@ -37,6 +38,7 @@ async function main() {
   let attempted = 0;
   let passed = 0;
   let failed = 0;
+  const installedRepos = new Set();
 
   console.log('Reference runner install');
   console.log('────────────────────────');
@@ -55,7 +57,12 @@ async function main() {
   }
 
   for (const runner of runnable) {
-    const repoPath = join(RUNNERS_REPOS, runner.id);
+    const repoId = runnerRepoId(runner);
+    if (installedRepos.has(repoId)) {
+      console.log(`  ✓ ${runner.id} — already installed (${repoId})`);
+      continue;
+    }
+    const repoPath = join(RUNNERS_REPOS, repoId);
     const pkg = await readPackageJson(repoPath);
     if (!pkg) continue;
 
@@ -68,9 +75,11 @@ async function main() {
     const needsInstall = await shouldInstall(repoPath, force);
     if (!needsInstall) {
       console.log(`  ✓ ${runner.id} — already installed`);
+      installedRepos.add(repoId);
       results.push({
         id: runner.id,
-        repoPath: `.raw-reference-runners/repos/${runner.id}`,
+        repoId,
+        repoPath: `.raw-reference-runners/repos/${repoId}`,
         packageManager: pm,
         installCommand,
         installed: true,
@@ -89,6 +98,7 @@ async function main() {
     const ok = result.exitCode === 0;
     if (ok) {
       passed += 1;
+      installedRepos.add(repoId);
       console.log(`    ✓ installed (${result.durationMs}ms)`);
     } else {
       failed += 1;
@@ -97,7 +107,8 @@ async function main() {
 
     results.push({
       id: runner.id,
-      repoPath: `.raw-reference-runners/repos/${runner.id}`,
+      repoId,
+      repoPath: `.raw-reference-runners/repos/${repoId}`,
       packageManager: pm,
       installCommand,
       installed: ok,

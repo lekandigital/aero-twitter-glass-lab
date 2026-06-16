@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { a1InspectAttrs } from './inspectCatalog';
 import {
   AeroBadge,
   AeroButton,
+  AeroChip,
   AeroComposer,
   AeroFeedCard,
   AeroHighlight,
@@ -126,7 +128,7 @@ export function ComponentGallery() {
           <Specimen label="Compact profile card">
             <AeroPanel variant="clear" widget>
               <div className="a1-profile-compact">
-                <div className="a1-avatar" />
+                <div className="a1-avatar" {...a1InspectAttrs('avatar')} />
                 <div>
                   <div className="a1-card-title" style={{ margin: 0 }}>Glass User</div>
                   <div className="a1-card-text">@aero.demo</div>
@@ -155,12 +157,12 @@ export function ComponentGallery() {
             <AeroComposer />
           </Specimen>
           <Specimen label="Filter chip">
-            <button type="button" className="a1-chip">
+            <AeroChip>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
               </svg>
               Filter: Recent
-            </button>
+            </AeroChip>
           </Specimen>
         </div>
       </section>
@@ -192,10 +194,10 @@ export function ComponentGallery() {
           </Specimen>
           <Specimen label="Bubble layer">
             <div className="a1-overlay-demo a1-overlay-demo--bubbles">
-              <div className="a1-bubble-layer">
-                <span className="a1-bubble" style={{ left: '20%', top: '20%', width: 36, height: 36 }} />
-                <span className="a1-bubble" style={{ left: '55%', top: '40%', width: 24, height: 24 }} />
-                <span className="a1-bubble" style={{ left: '70%', top: '15%', width: 44, height: 44 }} />
+              <div className="a1-bubble-layer" {...a1InspectAttrs('bubble', 'Bubble layer')}>
+                <span className="a1-bubble" style={{ left: '20%', top: '20%', width: 36, height: 36 }} {...a1InspectAttrs('bubble')} />
+                <span className="a1-bubble" style={{ left: '55%', top: '40%', width: 24, height: 24 }} {...a1InspectAttrs('bubble')} />
+                <span className="a1-bubble" style={{ left: '70%', top: '15%', width: 44, height: 44 }} {...a1InspectAttrs('bubble')} />
               </div>
             </div>
           </Specimen>

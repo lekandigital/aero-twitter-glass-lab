@@ -1,0 +1,377 @@
+/* Shared material settings — typed controls (number / boolean / color) */
+
+.mat-setting-field__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.mat-setting-field__label-row {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.mat-setting-field__label-row .a1-settings-dock__field-label,
+.mat-setting-field__label-row .e1-settings-dock__field-label,
+.mat-setting-field__label-row .e2-settings-dock__field-label,
+.mat-setting-field__label-row .experiment-one-settings-dock__field-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.e1-settings-dock__field {
+  display: grid;
+  grid-template-columns: minmax(9rem, 10.5rem) 1fr;
+  align-items: start;
+  gap: 0.55rem;
+}
+
+.mat-setting-reset {
+  flex-shrink: 0;
+  width: 1.35rem;
+  height: 1.35rem;
+  padding: 0;
+  font-family: inherit;
+  font-size: 0.82rem;
+  line-height: 1;
+  color: rgba(170, 215, 255, 0.88);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
+}
+
+.mat-setting-reset:hover:not(:disabled) {
+  color: #fff;
+  background: rgba(60, 160, 255, 0.22);
+  border-color: rgba(126, 232, 255, 0.45);
+}
+
+.mat-setting-reset:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.mat-setting-reset-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.mat-setting-reset-menu {
+  position: absolute;
+  top: calc(100% + 0.2rem);
+  right: 0;
+  z-index: 30;
+  min-width: 8.5rem;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  border-radius: 8px;
+  background: rgba(8, 22, 48, 0.96);
+  border: 1px solid rgba(126, 232, 255, 0.28);
+  box-shadow: 0 10px 28px rgba(0, 16, 40, 0.45);
+}
+
+.mat-setting-reset-menu__item {
+  display: block;
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-align: left;
+  color: rgba(210, 235, 255, 0.92);
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.mat-setting-reset-menu__item:hover:not(:disabled) {
+  background: rgba(60, 160, 255, 0.2);
+}
+
+.mat-setting-reset-menu__item:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.mat-setting-type {
+  display: inline-block;
+  width: fit-content;
+  padding: 0.1rem 0.38rem;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(160, 210, 255, 0.85);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+.mat-setting-control--number {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.mat-setting-range {
+  width: 100%;
+  height: 4px;
+  accent-color: #7ee8ff;
+  cursor: pointer;
+}
+
+.mat-setting-switch {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 1.65rem;
+  padding: 0.2rem 0.55rem 0.2rem 0.3rem;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(180, 210, 240, 0.8);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.mat-setting-switch--on {
+  color: #e8f8ff;
+  background: rgba(60, 160, 255, 0.2);
+  border-color: rgba(126, 232, 255, 0.4);
+}
+
+.mat-setting-switch__thumb {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  background: rgba(200, 220, 240, 0.7);
+  box-shadow: 0 1px 3px rgba(0, 20, 50, 0.35);
+  transition: transform 0.15s, background 0.15s;
+}
+
+.mat-setting-switch--on .mat-setting-switch__thumb {
+  background: #fff;
+  box-shadow: 0 0 8px rgba(126, 232, 255, 0.55);
+}
+
+.mat-setting-switch__text {
+  flex: 1;
+  text-align: center;
+}
+
+.mat-setting-hex {
+  flex: 1;
+  min-width: 0;
+  padding: 0.32rem 0.45rem;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.72rem;
+  color: #f4faff;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 7px;
+  outline: none;
+}
+
+.mat-setting-hex:focus {
+  border-color: rgba(126, 232, 255, 0.55);
+}
+
+.mat-setting-select {
+  width: 100%;
+  padding: 0.38rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.74rem;
+  color: #f4faff;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 7px;
+  outline: none;
+  cursor: pointer;
+}
+
+.mat-setting-select:focus {
+  border-color: rgba(255, 140, 66, 0.55);
+}
+
+.mat-setting-control--select {
+  grid-column: 2;
+}
+
+.mat-setting-field {
+  position: relative;
+  align-items: start;
+  padding: 0.35rem 0.4rem;
+  margin: -0.35rem -0.4rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.mat-setting-field__tooltip {
+  position: absolute;
+  left: 0.4rem;
+  right: 0.4rem;
+  bottom: calc(100% + 0.35rem);
+  z-index: 40;
+  padding: 0.45rem 0.55rem;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: rgba(235, 248, 255, 0.96);
+  background: rgba(8, 22, 48, 0.97);
+  border: 1px solid rgba(255, 140, 66, 0.42);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 16, 40, 0.45);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.mat-setting-field[data-has-hint='true']:hover .mat-setting-field__tooltip,
+.mat-setting-field[data-has-hint='true']:focus-within .mat-setting-field__tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mat-setting-field--highlight {
+  background: rgba(126, 232, 255, 0.08);
+  border-color: rgba(126, 232, 255, 0.28);
+}
+
+.mat-setting-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.55rem 0.5rem 0.65rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.mat-setting-section--collapsible:not(.mat-setting-section--open) {
+  padding-bottom: 0.55rem;
+}
+
+.mat-setting-section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.mat-setting-section__head--toggle {
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 0.1rem 0.15rem;
+  margin: -0.1rem -0.15rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: background 0.15s;
+}
+
+.mat-setting-section__head--toggle:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mat-setting-section__head--toggle:focus-visible {
+  outline: 2px solid rgba(126, 232, 255, 0.55);
+  outline-offset: 2px;
+}
+
+.mat-setting-section__head-text {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.mat-setting-section__chevron {
+  flex-shrink: 0;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-right: 0.15rem;
+  border-right: 2px solid rgba(126, 232, 255, 0.75);
+  border-bottom: 2px solid rgba(126, 232, 255, 0.75);
+  transform: rotate(-45deg);
+  transition: transform 0.2s ease;
+}
+
+.mat-setting-section--open .mat-setting-section__chevron {
+  transform: rotate(45deg);
+}
+
+.mat-setting-section__title {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(126, 232, 255, 0.85);
+}
+
+.mat-setting-section__body {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.mat-setting-section__head-text .experiment-one-settings-dock__section-title,
+.mat-setting-section__head-text .a1-settings-dock__section-title,
+.mat-setting-section__head-text .e2-settings-dock__section-title {
+  margin: 0;
+}
+
+.mat-setting-section__count {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(160, 200, 240, 0.55);
+}
+
+.a1-settings-dock__title,
+.experiment-one-settings-dock__title,
+.e2-settings-dock__title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  line-height: 1.2;
+}
+
+.a1-settings-dock__title-meta,
+.experiment-one-settings-dock__title-meta,
+.e2-settings-dock__title-meta {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(150, 190, 230, 0.55);
+}
+
+@media (max-width: 640px) {
+  .mat-setting-field {
+    gap: 0.35rem;
+  }
+}

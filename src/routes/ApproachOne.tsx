@@ -1,3 +1,4 @@
+import { A1MaterialSettingsDock, A1MaterialSettingsProvider } from '../components/approach-one/materialSettings';
 import { AeroBackgroundLayer } from '../components/approach-one/primitives';
 import { CompositionDemo } from '../components/approach-one/CompositionDemo';
 import { ComponentGallery } from '../components/approach-one/ComponentGallery';
@@ -6,14 +7,15 @@ import { LayoutVariations } from '../components/approach-one/LayoutVariations';
 /** Approach 1 — Aero Component Composition Lab */
 export function ApproachOne() {
   return (
-    <div className="a1-lab">
+    <A1MaterialSettingsProvider>
+      <A1MaterialSettingsDock />
       <AeroBackgroundLayer />
 
       <header className="a1-lab-header">
         <h1>Approach 1 — Aero Component Composition Lab</h1>
         <p>
-          Design implementation playground for Frutiger Aero glass UI. Compare panels, buttons, cards,
-          overlays, and layout shells before choosing what ships in the final app.
+          Design implementation playground for Frutiger Aero glass UI. Click any glass element to inspect and edit
+          its material settings in the dock.
         </p>
       </header>
 
@@ -27,6 +29,6 @@ export function ApproachOne() {
 
       <ComponentGallery />
       <LayoutVariations />
-    </div>
+    </A1MaterialSettingsProvider>
   );
 }

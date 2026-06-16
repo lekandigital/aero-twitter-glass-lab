@@ -271,6 +271,56 @@ body::after {
   word-break: break-all;
 }
 
+.rrl-runner__variants {
+  margin-top: 0.65rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(255, 200, 80, 0.18);
+}
+
+.rrl-runner__variants-label {
+  font-size: 0.68rem;
+  color: var(--rrl-muted);
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rrl-runner__variants-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.rrl-runner__variants-list li {
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+.rrl-runner__variants-list a {
+  color: var(--rrl-accent);
+  text-decoration: none;
+}
+
+.rrl-runner__variants-list a:hover {
+  text-decoration: underline;
+}
+
+.rrl-runner__variant-url,
+.rrl-runner__variant-note {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--rrl-muted);
+  font-family: ui-monospace, monospace;
+}
+
+.rrl-btn--compact {
+  font-size: 0.68rem;
+  padding: 0.15rem 0.45rem;
+  margin-left: 0.25rem;
+}
+
 .rrl-badges {
   display: flex;
   flex-wrap: wrap;
