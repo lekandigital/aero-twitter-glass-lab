@@ -2,17 +2,41 @@ import { e4InspectAttrs, e4LayerADimensionStyle, e4LayerBDimensionStyle } from '
 import { useExperimentSetOne } from '../experiment-set-one/combinedSettings';
 import { ExperimentTwoDraggableSheet } from '../experiment-set-two/primitives';
 import { GlassFrostSurface } from '../shared/GlassFrostSurface';
-import { PwzzovOGlassCorners } from '../shared/PwzzovOGlassCorners';
+import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/PwzzovOGlassCorners';
+import type { E4MaterialSettings } from '../experiment-set-four/materialSettings';
 
-function layerEdgeReflexEnabled(
-  mode: number,
-  leftLight: number,
-  leftDark: number,
-  rightLight: number,
-  rightDark: number,
-): boolean {
-  if (mode !== 3) return false;
-  return leftLight > 0 || leftDark > 0 || rightLight > 0 || rightDark > 0;
+function layerBackdropLights(prefix: 'layerA' | 'layerB', settings: E4MaterialSettings) {
+  return {
+    tlLight: settings[`${prefix}GlassReflexTlLight`],
+    trLight: settings[`${prefix}GlassReflexTrLight`],
+    blLight: settings[`${prefix}GlassReflexBlLight`],
+    brLight: settings[`${prefix}GlassReflexBrLight`],
+    topLight: settings[`${prefix}GlassReflexTopLight`],
+    bottomLight: settings[`${prefix}GlassReflexBottomLight`],
+    leftLight: settings[`${prefix}GlassReflexLeftLight`],
+    rightLight: settings[`${prefix}GlassReflexRightLight`],
+  };
+}
+
+function layerBackdropReflexEnabled(prefix: 'layerA' | 'layerB', settings: E4MaterialSettings): boolean {
+  return pwzzovBackdropReflexEnabled(settings[`${prefix}GlassReflexMode`], [
+    settings[`${prefix}GlassReflexTlLight`],
+    settings[`${prefix}GlassReflexTlDark`],
+    settings[`${prefix}GlassReflexTrLight`],
+    settings[`${prefix}GlassReflexTrDark`],
+    settings[`${prefix}GlassReflexBlLight`],
+    settings[`${prefix}GlassReflexBlDark`],
+    settings[`${prefix}GlassReflexBrLight`],
+    settings[`${prefix}GlassReflexBrDark`],
+    settings[`${prefix}GlassReflexTopLight`],
+    settings[`${prefix}GlassReflexTopDark`],
+    settings[`${prefix}GlassReflexBottomLight`],
+    settings[`${prefix}GlassReflexBottomDark`],
+    settings[`${prefix}GlassReflexLeftLight`],
+    settings[`${prefix}GlassReflexLeftDark`],
+    settings[`${prefix}GlassReflexRightLight`],
+    settings[`${prefix}GlassReflexRightDark`],
+  ]);
 }
 
 function LayerCopy({
@@ -61,17 +85,10 @@ function ExperimentFiveLayerBSheet() {
       <PwzzovOGlassCorners
         layerClass="experiment-four-layer-b"
         inspectTarget="layer-b-corners"
-        edgeReflexEnabled={layerEdgeReflexEnabled(
-          e5.layerBGlassReflexMode,
-          e5.layerBGlassReflexLeftLight,
-          e5.layerBGlassReflexLeftDark,
-          e5.layerBGlassReflexRightLight,
-          e5.layerBGlassReflexRightDark,
-        )}
+        edgeReflexEnabled={layerBackdropReflexEnabled('layerB', e5)}
         rimSideGapTop={e5.layerBRimSideGapTop}
         rimSideGapBottom={e5.layerBRimSideGapBottom}
-        leftLight={e5.layerBGlassReflexLeftLight}
-        rightLight={e5.layerBGlassReflexRightLight}
+        backdropLights={layerBackdropLights('layerB', e5)}
       />
       <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--a" aria-hidden="true" />
       <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--b" aria-hidden="true" />
@@ -117,17 +134,10 @@ function ExperimentFiveLayerASheet() {
       <PwzzovOGlassCorners
         layerClass="experiment-four-layer-a"
         inspectTarget="layer-a-corners"
-        edgeReflexEnabled={layerEdgeReflexEnabled(
-          e5.layerAGlassReflexMode,
-          e5.layerAGlassReflexLeftLight,
-          e5.layerAGlassReflexLeftDark,
-          e5.layerAGlassReflexRightLight,
-          e5.layerAGlassReflexRightDark,
-        )}
+        edgeReflexEnabled={layerBackdropReflexEnabled('layerA', e5)}
         rimSideGapTop={e5.layerARimSideGapTop}
         rimSideGapBottom={e5.layerARimSideGapBottom}
-        leftLight={e5.layerAGlassReflexLeftLight}
-        rightLight={e5.layerAGlassReflexRightLight}
+        backdropLights={layerBackdropLights('layerA', e5)}
       />
       <div className="experiment-four-layer-a__bezel-inset">
         <ExperimentFiveLayerBSheet />

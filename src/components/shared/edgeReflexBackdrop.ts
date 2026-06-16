@@ -1,5 +1,33 @@
 export type EdgeReflexBackdropSide = 'left' | 'right';
 
+export type EdgeReflexBackdropRegion =
+  | EdgeReflexBackdropSide
+  | 'top'
+  | 'bottom'
+  | 'tl'
+  | 'tr'
+  | 'bl'
+  | 'br';
+
+type GradientDirection =
+  | 'to bottom'
+  | 'to right'
+  | 'to bottom right'
+  | 'to bottom left'
+  | 'to top right'
+  | 'to top left';
+
+const REGION_GRADIENT: Record<EdgeReflexBackdropRegion, GradientDirection> = {
+  left: 'to bottom',
+  right: 'to bottom',
+  top: 'to right',
+  bottom: 'to right',
+  tl: 'to bottom right',
+  tr: 'to bottom left',
+  bl: 'to top right',
+  br: 'to top left',
+};
+
 export type EdgeReflexBackdropProfile = {
   maskGradient: string;
   rimMaskGradient: string;
@@ -23,6 +51,9 @@ const MAX_SAMPLE_COUNT = 140;
 const SAMPLE_SPACING_PX = 3;
 const SAMPLE_OFFSET_PX = 5;
 const HORIZONTAL_OFFSETS_PX = [0, 3, 7, 12];
+const VERTICAL_OFFSETS_PX = [0, 3, 7, 12];
+const CORNER_MAX_SPAN_PX = 96;
+const CORNER_MIN_SAMPLE_COUNT = 36;
 const LUMA_FLOOR = 0.1;
 const LUMA_CEIL = 0.52;
 const LOCAL_LIFT_FLOOR = 0.012;
@@ -60,8 +91,12 @@ function blur1d(values: number[], radius: number): number[] {
   });
 }
 
-function computeSampleCount(spanHeight: number): number {
-  return Math.min(MAX_SAMPLE_COUNT, Math.max(MIN_SAMPLE_COUNT, Math.round(spanHeight / SAMPLE_SPACING_PX)));
+function computeSampleCount(spanPx: number): number {
+  return Math.min(MAX_SAMPLE_COUNT, Math.max(MIN_SAMPLE_COUNT, Math.round(spanPx / SAMPLE_SPACING_PX)));
+}
+
+function computeCornerSampleCount(spanPx: number): number {
+  return Math.min(MAX_SAMPLE_COUNT, Math.max(CORNER_MIN_SAMPLE_COUNT, Math.round(spanPx / SAMPLE_SPACING_PX)));
 }
 
 function sampleImageBilinear(
@@ -192,6 +227,115 @@ function sampleEdgeColumn(
     for (const offset of HORIZONTAL_OFFSETS_PX) {
       const sampleX = edgeX + horizontalSign * (SAMPLE_OFFSET_PX + offset);
       const sample = sampler.sampleAt(sampleX, y);
+      if (!sample) continue;
+      const weight = Math.exp(-(offset * offset) / 36);
+      rSum += sample.r * weight;
+      gSum += sample.g * weight;
+      bSum += sample.b * weight;
+      lumaSum += sample.luma * weight;
+      weightSum += weight;
+    }
+
+    if (weightSum <= 0) {
+      samples.push({ r: 0, g: 0, b: 0, luma: 0 });
+      continue;
+    }
+
+    samples.push({
+      r: rSum / weightSum,
+      g: gSum / weightSum,
+      b: bSum / weightSum,
+      luma: lumaSum / weightSum,
+    });
+  }
+  return samples;
+}
+
+function sampleEdgeRow(
+  sampler: WallpaperSampler,
+  rect: DOMRect,
+  side: 'top' | 'bottom',
+  gapLeft: number,
+  gapRight: number,
+): RgbSample[] {
+  const spanLeft = rect.left + gapLeft;
+  const spanWidth = Math.max(1, rect.width - gapLeft - gapRight);
+  const sampleCount = computeSampleCount(spanWidth);
+  const edgeY = side === 'top' ? rect.top : rect.bottom;
+  const verticalSign = side === 'top' ? -1 : 1;
+
+  const samples: RgbSample[] = [];
+  for (let i = 0; i < sampleCount; i += 1) {
+    const t = i / Math.max(1, sampleCount - 1);
+    const x = spanLeft + spanWidth * t;
+
+    let rSum = 0;
+    let gSum = 0;
+    let bSum = 0;
+    let lumaSum = 0;
+    let weightSum = 0;
+
+    for (const offset of VERTICAL_OFFSETS_PX) {
+      const sampleY = edgeY + verticalSign * (SAMPLE_OFFSET_PX + offset);
+      const sample = sampler.sampleAt(x, sampleY);
+      if (!sample) continue;
+      const weight = Math.exp(-(offset * offset) / 36);
+      rSum += sample.r * weight;
+      gSum += sample.g * weight;
+      bSum += sample.b * weight;
+      lumaSum += sample.luma * weight;
+      weightSum += weight;
+    }
+
+    if (weightSum <= 0) {
+      samples.push({ r: 0, g: 0, b: 0, luma: 0 });
+      continue;
+    }
+
+    samples.push({
+      r: rSum / weightSum,
+      g: gSum / weightSum,
+      b: bSum / weightSum,
+      luma: lumaSum / weightSum,
+    });
+  }
+  return samples;
+}
+
+function sampleCornerBisector(
+  sampler: WallpaperSampler,
+  rect: DOMRect,
+  corner: 'tl' | 'tr' | 'bl' | 'br',
+): RgbSample[] {
+  const cornerPoints = {
+    tl: { x: rect.left, y: rect.top, ux: -1 / Math.SQRT2, uy: -1 / Math.SQRT2 },
+    tr: { x: rect.right, y: rect.top, ux: 1 / Math.SQRT2, uy: -1 / Math.SQRT2 },
+    bl: { x: rect.left, y: rect.bottom, ux: -1 / Math.SQRT2, uy: 1 / Math.SQRT2 },
+    br: { x: rect.right, y: rect.bottom, ux: 1 / Math.SQRT2, uy: 1 / Math.SQRT2 },
+  } as const;
+  const { x, y, ux, uy } = cornerPoints[corner];
+  const spanLen = Math.min(CORNER_MAX_SPAN_PX, rect.width * 0.22, rect.height * 0.22);
+  const sampleCount = computeCornerSampleCount(spanLen);
+  const perpX = -uy;
+  const perpY = ux;
+
+  const samples: RgbSample[] = [];
+  for (let i = 0; i < sampleCount; i += 1) {
+    const t = i / Math.max(1, sampleCount - 1);
+    const dist = SAMPLE_OFFSET_PX + spanLen * t;
+    const centerX = x + ux * dist;
+    const centerY = y + uy * dist;
+
+    let rSum = 0;
+    let gSum = 0;
+    let bSum = 0;
+    let lumaSum = 0;
+    let weightSum = 0;
+
+    for (const offset of HORIZONTAL_OFFSETS_PX) {
+      const sampleX = centerX + perpX * offset;
+      const sampleY = centerY + perpY * offset;
+      const sample = sampler.sampleAt(sampleX, sampleY);
       if (!sample) continue;
       const weight = Math.exp(-(offset * offset) / 36);
       rSum += sample.r * weight;
@@ -412,7 +556,15 @@ function buildRimColorStops(
   });
 }
 
-function buildProfileFromSamples(samples: RgbSample[], lightStrength: number): EdgeReflexBackdropProfile {
+function linearGradient(direction: GradientDirection, stops: string[]): string {
+  return `linear-gradient(${direction}, ${stops.join(', ')})`;
+}
+
+function buildProfileFromSamples(
+  samples: RgbSample[],
+  lightStrength: number,
+  gradientDirection: GradientDirection = 'to bottom',
+): EdgeReflexBackdropProfile {
   const lumas = samples.map((sample) => sample.luma);
   const smoothedLumas = blur1d(lumas, 1);
 
@@ -455,59 +607,72 @@ function buildProfileFromSamples(samples: RgbSample[], lightStrength: number): E
   const rim = sampleColor(brightest.sample, Math.min(1, 0.3 + rimPeakAlpha * 0.6));
 
   return {
-    maskGradient: `linear-gradient(to bottom, ${maskStops.join(', ')})`,
-    rimMaskGradient: `linear-gradient(to bottom, ${rimMaskStops.join(', ')})`,
-    reflexMaskGradient: `linear-gradient(to bottom, ${reflexMaskStops.join(', ')})`,
-    tintGradient: `linear-gradient(to bottom, ${tintStops.join(', ')})`,
-    rimGradient: `linear-gradient(to bottom, ${rimStops.join(', ')})`,
+    maskGradient: linearGradient(gradientDirection, maskStops),
+    rimMaskGradient: linearGradient(gradientDirection, rimMaskStops),
+    reflexMaskGradient: linearGradient(gradientDirection, reflexMaskStops),
+    tintGradient: linearGradient(gradientDirection, tintStops),
+    rimGradient: linearGradient(gradientDirection, rimStops),
     peakAlpha,
     colorGain: Math.min(1, peakAlpha * (0.45 + Math.min(2, lightStrength) * 0.45)),
     rimColor: `rgb(${rim.r}, ${rim.g}, ${rim.b})`,
   };
 }
 
-const FULL_EDGE_PROFILE: EdgeReflexBackdropProfile = {
-  maskGradient: 'linear-gradient(to bottom, #000 0%, #000 100%)',
-  rimMaskGradient: 'linear-gradient(to bottom, #000 0%, #000 100%)',
-  reflexMaskGradient: 'linear-gradient(to bottom, #000 0%, #000 100%)',
-  tintGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
-  rimGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
-  peakAlpha: 1,
-  colorGain: 1,
-  rimColor: '#ffffff',
-};
+function fullEdgeProfile(direction: GradientDirection): EdgeReflexBackdropProfile {
+  return {
+    maskGradient: linearGradient(direction, ['#000 0%', '#000 100%']),
+    rimMaskGradient: linearGradient(direction, ['#000 0%', '#000 100%']),
+    reflexMaskGradient: linearGradient(direction, ['#000 0%', '#000 100%']),
+    tintGradient: linearGradient(direction, ['transparent 0%', 'transparent 100%']),
+    rimGradient: linearGradient(direction, ['transparent 0%', 'transparent 100%']),
+    peakAlpha: 1,
+    colorGain: 1,
+    rimColor: '#ffffff',
+  };
+}
 
-const EMPTY_EDGE_PROFILE: EdgeReflexBackdropProfile = {
-  maskGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
-  rimMaskGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
-  reflexMaskGradient: 'linear-gradient(to bottom, #000 0%, #000 100%)',
-  tintGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
-  rimGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
-  peakAlpha: 0,
-  colorGain: 0,
-  rimColor: '#ffffff',
-};
+function emptyEdgeProfile(direction: GradientDirection): EdgeReflexBackdropProfile {
+  return {
+    maskGradient: linearGradient(direction, ['transparent 0%', 'transparent 100%']),
+    rimMaskGradient: linearGradient(direction, ['transparent 0%', 'transparent 100%']),
+    reflexMaskGradient: linearGradient(direction, ['#000 0%', '#000 100%']),
+    tintGradient: linearGradient(direction, ['transparent 0%', 'transparent 100%']),
+    rimGradient: linearGradient(direction, ['transparent 0%', 'transparent 100%']),
+    peakAlpha: 0,
+    colorGain: 0,
+    rimColor: '#ffffff',
+  };
+}
 
 export function sampleEdgeReflexBackdrop(
   element: HTMLElement,
-  side: EdgeReflexBackdropSide,
-  gapTop: number,
-  gapBottom: number,
+  region: EdgeReflexBackdropRegion,
+  gapStart: number,
+  gapEnd: number,
   lightStrength: number,
 ): EdgeReflexBackdropProfile {
-  if (lightStrength <= 0) return EMPTY_EDGE_PROFILE;
+  const gradientDirection = REGION_GRADIENT[region];
+  if (lightStrength <= 0) return emptyEdgeProfile(gradientDirection);
 
   const sampler = getWallpaperSampler();
-  if (!sampler) return FULL_EDGE_PROFILE;
+  if (!sampler) return fullEdgeProfile(gradientDirection);
 
   const rect = element.getBoundingClientRect();
-  if (rect.width <= 0 || rect.height <= 0) return FULL_EDGE_PROFILE;
+  if (rect.width <= 0 || rect.height <= 0) return fullEdgeProfile(gradientDirection);
 
-  const samples = sampleEdgeColumn(sampler, rect, side, gapTop, gapBottom);
-  const peakLuma = Math.max(...blur1d(samples.map((sample) => sample.luma), 2));
-  if (peakLuma < MIN_PEAK_LUMA) {
-    return EMPTY_EDGE_PROFILE;
+  let samples: RgbSample[];
+  if (region === 'left' || region === 'right') {
+    samples = sampleEdgeColumn(sampler, rect, region, gapStart, gapEnd);
+  } else if (region === 'top' || region === 'bottom') {
+    samples = sampleEdgeRow(sampler, rect, region, gapStart, gapEnd);
+  } else {
+    samples = sampleCornerBisector(sampler, rect, region);
   }
 
-  return buildProfileFromSamples(samples, lightStrength);
+  const peakLuma = Math.max(...blur1d(samples.map((sample) => sample.luma), 2));
+  if (peakLuma < MIN_PEAK_LUMA) {
+    return emptyEdgeProfile(gradientDirection);
+  }
+
+  return buildProfileFromSamples(samples, lightStrength, gradientDirection);
 }

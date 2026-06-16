@@ -1,8 +1,24 @@
 import { useRef, type CSSProperties } from 'react';
 import { e4InspectAttrs } from '../experiment-set-four/materialSettings';
-import { useEdgeReflexBackdrop } from './useEdgeReflexBackdrop';
+import { useEdgeReflexBackdrop, type EdgeReflexBackdropProfiles } from './useEdgeReflexBackdrop';
+import type { EdgeReflexBackdropProfile } from './edgeReflexBackdrop';
 
-const PWZZOV_REFLEX_REGIONS = ['tl', 'tr', 'bl', 'br', 'left', 'right'] as const;
+const PWZZOV_CORNER_REGIONS = ['tl', 'tr', 'bl', 'br'] as const;
+const PWZZOV_LINEAR_EDGE_REGIONS = ['top', 'bottom', 'left', 'right'] as const;
+const PWZZOV_REFLEX_REGIONS = [...PWZZOV_CORNER_REGIONS, ...PWZZOV_LINEAR_EDGE_REGIONS] as const;
+
+type PwzzovLinearEdgeRegion = (typeof PWZZOV_LINEAR_EDGE_REGIONS)[number];
+
+export type PwzzovBackdropLightSettings = {
+  tlLight: number;
+  trLight: number;
+  blLight: number;
+  brLight: number;
+  topLight: number;
+  bottomLight: number;
+  leftLight: number;
+  rightLight: number;
+};
 
 type PwzzovOGlassCornersProps = {
   layerClass: 'experiment-four-layer-a' | 'experiment-four-layer-b';
@@ -10,24 +26,15 @@ type PwzzovOGlassCornersProps = {
   edgeReflexEnabled: boolean;
   rimSideGapTop: number;
   rimSideGapBottom: number;
-  leftLight: number;
-  rightLight: number;
+  backdropLights: PwzzovBackdropLightSettings;
 };
 
-function edgeBackdropStyle(profile: {
-  maskGradient: string;
-  rimMaskGradient: string;
-  reflexMaskGradient: string;
-  tintGradient: string;
-  rimGradient: string;
-  peakAlpha: number;
-  colorGain: number;
-  rimColor: string;
-}): CSSProperties {
+const BACKDROP_VISIBLE_PEAK = 0.04;
+
+function edgeBackdropStyle(profile: EdgeReflexBackdropProfile): CSSProperties {
   return {
     '--pwzzovO-edge-backdrop-mask': profile.maskGradient,
     '--pwzzovO-edge-backdrop-rim-mask': profile.rimMaskGradient,
-    '--pwzzovO-edge-backdrop-reflex-mask': profile.reflexMaskGradient,
     '--pwzzovO-edge-backdrop-tint': profile.tintGradient,
     '--pwzzovO-edge-backdrop-rim': profile.rimGradient,
     '--pwzzovO-edge-backdrop-peak': String(profile.peakAlpha),
@@ -36,48 +43,79 @@ function edgeBackdropStyle(profile: {
   } as CSSProperties;
 }
 
+function edgeReflexMaskStyle(profile: EdgeReflexBackdropProfile): CSSProperties {
+  return {
+    '--pwzzovO-edge-backdrop-reflex-mask': profile.reflexMaskGradient,
+    '--pwzzovO-edge-backdrop-peak': String(profile.peakAlpha),
+    '--pwzzovO-edge-backdrop-color-gain': String(profile.colorGain),
+  } as CSSProperties;
+}
+
+function profileForLinearEdge(
+  region: PwzzovLinearEdgeRegion,
+  backdrop: EdgeReflexBackdropProfiles,
+): EdgeReflexBackdropProfile {
+  return backdrop[region];
+}
+
+function backdropIsVisible(profile: EdgeReflexBackdropProfile): boolean {
+  return profile.peakAlpha > BACKDROP_VISIBLE_PEAK && profile.colorGain > 0;
+}
+
+export function pwzzovBackdropReflexEnabled(mode: number, reflexValues: number[]): boolean {
+  if (mode !== 3) return false;
+  return reflexValues.some((value) => value > 0);
+}
+
 export function PwzzovOGlassCorners({
   layerClass,
   inspectTarget,
   edgeReflexEnabled,
-  rimSideGapTop,
-  rimSideGapBottom,
-  leftLight,
-  rightLight,
+  backdropLights,
 }: PwzzovOGlassCornersProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const backdrop = useEdgeReflexBackdrop(wrapRef, {
     enabled: edgeReflexEnabled,
-    gapTop: rimSideGapTop,
-    gapBottom: rimSideGapBottom,
-    leftLight,
-    rightLight,
+    topLight: backdropLights.topLight,
+    bottomLight: backdropLights.bottomLight,
+    leftLight: backdropLights.leftLight,
+    rightLight: backdropLights.rightLight,
   });
 
   return (
     <div ref={wrapRef} className={`${layerClass}__pwzzovO-glass-wrap`} {...e4InspectAttrs(inspectTarget)}>
       {PWZZOV_REFLEX_REGIONS.map((region) => {
-        const isEdge = region === 'left' || region === 'right';
-        const edgeStyle = isEdge
-          ? edgeBackdropStyle(region === 'left' ? backdrop.left : backdrop.right)
-          : undefined;
+        const isLinearEdge = PWZZOV_LINEAR_EDGE_REGIONS.includes(region as PwzzovLinearEdgeRegion);
+        const profile = isLinearEdge ? profileForLinearEdge(region as PwzzovLinearEdgeRegion, backdrop) : null;
+        const showReflexMask = profile !== null && backdropIsVisible(profile);
 
         return (
           <span
             key={region}
             className={`${layerClass}__pwzzovO-glass ${layerClass}__pwzzovO-glass--${region}`}
-            style={edgeStyle}
+            style={showReflexMask && profile ? edgeReflexMaskStyle(profile) : undefined}
             aria-hidden="true"
-          >
-            {isEdge && (
-              <>
-                <span className={`${layerClass}__pwzzovO-glass-edge-rim`} aria-hidden="true" />
-                <span className={`${layerClass}__pwzzovO-glass-edge-tint`} aria-hidden="true" />
-              </>
-            )}
-          </span>
+          />
         );
       })}
+
+      <div className={`${layerClass}__pwzzovO-backdrop-band`} aria-hidden="true">
+        {PWZZOV_LINEAR_EDGE_REGIONS.map((region) => {
+          const profile = profileForLinearEdge(region, backdrop);
+          if (!backdropIsVisible(profile)) return null;
+
+          return (
+            <span
+              key={`backdrop-${region}`}
+              className={`${layerClass}__pwzzovO-backdrop-edge ${layerClass}__pwzzovO-backdrop-edge--${region}`}
+              style={edgeBackdropStyle(profile)}
+            >
+              <span className={`${layerClass}__pwzzovO-glass-edge-rim`} aria-hidden="true" />
+              <span className={`${layerClass}__pwzzovO-glass-edge-tint`} aria-hidden="true" />
+            </span>
+          );
+        })}
+      </div>
     </div>
   );
 }

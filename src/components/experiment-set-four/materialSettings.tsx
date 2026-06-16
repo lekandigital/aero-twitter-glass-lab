@@ -90,6 +90,12 @@ export type E4MaterialSettings = E3MaterialSettings & {
   layerAGlassReflexRightLight: number;
   layerAGlassReflexRightDark: number;
   layerAGlassReflexRightSpread: number;
+  layerAGlassReflexTopLight: number;
+  layerAGlassReflexTopDark: number;
+  layerAGlassReflexTopSpread: number;
+  layerAGlassReflexBottomLight: number;
+  layerAGlassReflexBottomDark: number;
+  layerAGlassReflexBottomSpread: number;
   layerAGlassReflexLightColor: string;
   layerAGlassReflexDarkColor: string;
   layerAGlassReflexRimPx: number;
@@ -132,6 +138,12 @@ export type E4MaterialSettings = E3MaterialSettings & {
   layerBGlassReflexRightLight: number;
   layerBGlassReflexRightDark: number;
   layerBGlassReflexRightSpread: number;
+  layerBGlassReflexTopLight: number;
+  layerBGlassReflexTopDark: number;
+  layerBGlassReflexTopSpread: number;
+  layerBGlassReflexBottomLight: number;
+  layerBGlassReflexBottomDark: number;
+  layerBGlassReflexBottomSpread: number;
   layerBGlassReflexLightColor: string;
   layerBGlassReflexDarkColor: string;
   layerBGlassReflexRimPx: number;
@@ -255,11 +267,13 @@ const GLASS_REFLEX_PER_CORNER_DEFAULTS = {
   BrDark: 0.72,
 } as const;
 
-const GLASS_REFLEX_EDGE_IDS = ['Left', 'Right'] as const;
+const GLASS_REFLEX_EDGE_IDS = ['Left', 'Right', 'Top', 'Bottom'] as const;
 
 const GLASS_REFLEX_EDGE_LABELS: Record<(typeof GLASS_REFLEX_EDGE_IDS)[number], string> = {
   Left: 'Left edge',
   Right: 'Right edge',
+  Top: 'Top edge',
+  Bottom: 'Bottom edge',
 };
 
 const GLASS_REFLEX_EDGE_DEFAULTS = {
@@ -269,6 +283,12 @@ const GLASS_REFLEX_EDGE_DEFAULTS = {
   RightLight: 0.76,
   RightDark: 0.38,
   RightSpread: 24,
+  TopLight: 0.78,
+  TopDark: 0.36,
+  TopSpread: 24,
+  BottomLight: 0.62,
+  BottomDark: 0.42,
+  BottomSpread: 22,
 } as const;
 
 function glassReflexAppearanceDefaults(prefix: 'layerA' | 'layerB') {
@@ -320,6 +340,12 @@ function glassReflexEdgeDefaults(prefix: 'layerA' | 'layerB') {
       RightLight: 0.7,
       RightDark: 0.34,
       RightSpread: 22,
+      TopLight: 0.68,
+      TopDark: 0.34,
+      TopSpread: 22,
+      BottomLight: 0.56,
+      BottomDark: 0.4,
+      BottomSpread: 20,
     } as const;
   }
   return GLASS_REFLEX_EDGE_DEFAULTS;
@@ -759,7 +785,7 @@ function buildPerEdgeGlassReflexFields(prefix: 'layerA' | 'layerB', section: str
         max: 2,
         step: 0.1,
         when: glassReflexIndividual(prefix),
-        hint: `PwzzovO highlight on the ${GLASS_REFLEX_EDGE_LABELS[edge].toLowerCase()} vertical border. 0 turns this edge off.`,
+        hint: `PwzzovO highlight on the ${GLASS_REFLEX_EDGE_LABELS[edge].toLowerCase()} border. 0 turns this edge off.`,
       },
       {
         id: `${idBase}Dark`,
@@ -770,7 +796,7 @@ function buildPerEdgeGlassReflexFields(prefix: 'layerA' | 'layerB', section: str
         max: 2,
         step: 0.1,
         when: glassReflexIndividual(prefix),
-        hint: `PwzzovO shadow on the ${GLASS_REFLEX_EDGE_LABELS[edge].toLowerCase()} vertical border.`,
+        hint: `PwzzovO shadow on the ${GLASS_REFLEX_EDGE_LABELS[edge].toLowerCase()} border.`,
       },
       {
         id: `${idBase}Spread`,

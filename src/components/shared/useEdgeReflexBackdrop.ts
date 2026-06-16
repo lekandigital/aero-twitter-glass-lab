@@ -5,10 +5,11 @@ import {
   type EdgeReflexBackdropProfile,
 } from './edgeReflexBackdrop';
 
-type EdgeReflexBackdropProfiles = {
-  left: EdgeReflexBackdropProfile;
-  right: EdgeReflexBackdropProfile;
-};
+export type EdgeReflexBackdropLinearRegion = 'top' | 'bottom' | 'left' | 'right';
+
+export type EdgeReflexBackdropProfiles = Record<EdgeReflexBackdropLinearRegion, EdgeReflexBackdropProfile>;
+
+const LINEAR_EDGE_REGIONS: EdgeReflexBackdropLinearRegion[] = ['top', 'bottom', 'left', 'right'];
 
 const FALLBACK_PROFILE: EdgeReflexBackdropProfile = {
   maskGradient: 'linear-gradient(to bottom, #000 0%, #000 100%)',
@@ -21,23 +22,22 @@ const FALLBACK_PROFILE: EdgeReflexBackdropProfile = {
   rimColor: '#ffffff',
 };
 
-const INITIAL_PROFILES: EdgeReflexBackdropProfiles = {
-  left: FALLBACK_PROFILE,
-  right: FALLBACK_PROFILE,
-};
+const INITIAL_PROFILES = Object.fromEntries(
+  LINEAR_EDGE_REGIONS.map((region) => [region, FALLBACK_PROFILE]),
+) as EdgeReflexBackdropProfiles;
 
 export function useEdgeReflexBackdrop(
   rootRef: RefObject<HTMLElement | null>,
   {
-    gapTop,
-    gapBottom,
     enabled,
+    topLight,
+    bottomLight,
     leftLight,
     rightLight,
   }: {
-    gapTop: number;
-    gapBottom: number;
     enabled: boolean;
+    topLight: number;
+    bottomLight: number;
     leftLight: number;
     rightLight: number;
   },
@@ -50,6 +50,13 @@ export function useEdgeReflexBackdrop(
       return;
     }
 
+    const lights: Record<EdgeReflexBackdropLinearRegion, number> = {
+      top: topLight,
+      bottom: bottomLight,
+      left: leftLight,
+      right: rightLight,
+    };
+
     let frame = 0;
     let disposed = false;
     let dragShell: Element | null = null;
@@ -57,10 +64,12 @@ export function useEdgeReflexBackdrop(
     const update = () => {
       const element = rootRef.current;
       if (!element || disposed) return;
-      setProfiles({
-        left: sampleEdgeReflexBackdrop(element, 'left', gapTop, gapBottom, leftLight),
-        right: sampleEdgeReflexBackdrop(element, 'right', gapTop, gapBottom, rightLight),
-      });
+
+      const next = {} as EdgeReflexBackdropProfiles;
+      for (const region of LINEAR_EDGE_REGIONS) {
+        next[region] = sampleEdgeReflexBackdrop(element, region, 0, 0, lights[region]);
+      }
+      setProfiles(next);
     };
 
     const bindDragShell = () => {
@@ -116,7 +125,7 @@ export function useEdgeReflexBackdrop(
       window.removeEventListener('scroll', schedule, true);
       resizeObserver?.disconnect();
     };
-  }, [enabled, gapTop, gapBottom, leftLight, rightLight, rootRef]);
+  }, [enabled, topLight, bottomLight, leftLight, rightLight, rootRef]);
 
   return profiles;
 }
