@@ -13,6 +13,7 @@ type EdgeReflexBackdropProfiles = {
 const FALLBACK_PROFILE: EdgeReflexBackdropProfile = {
   maskGradient: 'linear-gradient(to bottom, #000 0%, #000 100%)',
   tintGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
+  rimGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
   peakAlpha: 1,
   colorGain: 1,
   rimColor: '#ffffff',

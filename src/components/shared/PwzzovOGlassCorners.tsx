@@ -17,6 +17,7 @@ type PwzzovOGlassCornersProps = {
 function edgeBackdropStyle(profile: {
   maskGradient: string;
   tintGradient: string;
+  rimGradient: string;
   peakAlpha: number;
   colorGain: number;
   rimColor: string;
@@ -24,6 +25,7 @@ function edgeBackdropStyle(profile: {
   return {
     '--pwzzovO-edge-backdrop-mask': profile.maskGradient,
     '--pwzzovO-edge-backdrop-tint': profile.tintGradient,
+    '--pwzzovO-edge-backdrop-rim': profile.rimGradient,
     '--pwzzovO-edge-backdrop-peak': String(profile.peakAlpha),
     '--pwzzovO-edge-backdrop-color-gain': String(profile.colorGain),
     '--pwzzovO-edge-rim-color': profile.rimColor,
@@ -63,7 +65,12 @@ export function PwzzovOGlassCorners({
             style={edgeStyle}
             aria-hidden="true"
           >
-            {isEdge && <span className={`${layerClass}__pwzzovO-glass-edge-tint`} aria-hidden="true" />}
+            {isEdge && (
+              <>
+                <span className={`${layerClass}__pwzzovO-glass-edge-rim`} aria-hidden="true" />
+                <span className={`${layerClass}__pwzzovO-glass-edge-tint`} aria-hidden="true" />
+              </>
+            )}
           </span>
         );
       })}
