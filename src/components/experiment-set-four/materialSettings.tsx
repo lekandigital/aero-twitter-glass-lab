@@ -429,6 +429,48 @@ const E4_REFERENCE_FRAME_DEFAULTS = {
   layerBBorderOpacity: 54,
 } as const;
 
+/** Reference-matched body, surface finish, refraction, and depth — clear glossy Aero glass. */
+const E4_REFERENCE_SURFACE_DEFAULTS = {
+  layerATransparency: 94,
+  layerAFrost: 3,
+  layerASaturate: 130,
+  layerABrightness: 108,
+  layerAFillTop: 5,
+  layerAFillMid: 2,
+  layerAFillBottom: 3,
+  layerABodyTint: 0,
+  layerAFrostMatte: 10,
+  layerAFrostMatteTexture: 150,
+  layerAFrostGloss: 36,
+  layerARefraction: 16,
+  layerADepth: 42,
+  layerAInnerDepth: 12,
+  layerAOuterShadow: 34,
+  layerAShadowSpread: 52,
+  layerAGlow: 24,
+  layerBTransparency: 88,
+  layerBFrost: 8,
+  layerBSaturate: 138,
+  layerBBrightness: 110,
+  layerBFillTop: 12,
+  layerBFillMid: 6,
+  layerBFillBottom: 14,
+  layerBBodyTint: 8,
+  layerBFrostMatte: 14,
+  layerBFrostMatteTexture: 150,
+  layerBFrostGloss: 42,
+  layerBRefraction: 18,
+  layerBDepth: 70,
+  layerBInnerDepth: 10,
+  layerBOuterShadow: 28,
+  layerBShadowSpread: 44,
+  layerBGlow: 18,
+  layerBTopShine: 70,
+  layerBTopRadial: 54,
+  layerBDiagonalGloss: 46,
+  layerBShineOpacity: 86,
+} as const;
+
 export function buildE4MasterDefaultSettings(): E4MaterialSettings {
   return syncE4LayerBLayoutFromBezel({
     ...e3BaseToE4(resolveSave2E3()),
@@ -436,6 +478,7 @@ export function buildE4MasterDefaultSettings(): E4MaterialSettings {
     ...E4_CORNER_DEFAULTS,
     ...E4_BEZEL_DEFAULTS,
     ...E4_REFERENCE_FRAME_DEFAULTS,
+    ...E4_REFERENCE_SURFACE_DEFAULTS,
   });
 }
 

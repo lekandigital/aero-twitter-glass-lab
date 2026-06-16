@@ -70,10 +70,59 @@ const REFERENCE_GLASS_REFLEX_OVERRIDES = {
   layerBGlassReflexDarkColor: '#123A5C',
 } as const satisfies Partial<E4MaterialSettings>;
 
-/** Shape, bezel, rim lines, and glass reflex — never touches radial corner settings. */
+/**
+ * Body, surface finish, refraction, and depth — clear glossy Aero glass that lets the
+ * wallpaper read through while picking up a frosted tooth, gloss sheen, and soft float.
+ */
+const REFERENCE_GLASS_SURFACE_OVERRIDES = {
+  // Layer A — outer frame: very clear, light frost, vivid refraction.
+  layerATransparency: 94,
+  layerAFrost: 3,
+  layerASaturate: 130,
+  layerABrightness: 108,
+  layerAFillTop: 5,
+  layerAFillMid: 2,
+  layerAFillBottom: 3,
+  layerABodyTint: 0,
+  layerAFrostMatte: 10,
+  layerAFrostMatteTexture: 150,
+  layerAFrostGloss: 36,
+  layerARefraction: 16,
+  layerADepth: 42,
+  layerAInnerDepth: 12,
+  layerAOuterShadow: 34,
+  layerAShadowSpread: 52,
+  layerAGlow: 24,
+
+  // Layer B — inner body: a touch more frost + gloss, still clearly see-through.
+  layerBTransparency: 88,
+  layerBFrost: 8,
+  layerBSaturate: 138,
+  layerBBrightness: 110,
+  layerBFillTop: 12,
+  layerBFillMid: 6,
+  layerBFillBottom: 14,
+  layerBBodyTint: 8,
+  layerBFrostMatte: 14,
+  layerBFrostMatteTexture: 150,
+  layerBFrostGloss: 42,
+  layerBRefraction: 18,
+  layerBDepth: 70,
+  layerBInnerDepth: 10,
+  layerBOuterShadow: 28,
+  layerBShadowSpread: 44,
+  layerBGlow: 18,
+  layerBTopShine: 70,
+  layerBTopRadial: 54,
+  layerBDiagonalGloss: 46,
+  layerBShineOpacity: 86,
+} as const satisfies Partial<E4MaterialSettings>;
+
+/** Shape, bezel, rim lines, glass reflex, surface, refraction, depth — no radial corner changes. */
 export const REFERENCE_CORNER_LIGHTING_OVERRIDES = {
   ...REFERENCE_LEFT_PANEL_SHAPE_OVERRIDES,
   ...REFERENCE_GLASS_REFLEX_OVERRIDES,
+  ...REFERENCE_GLASS_SURFACE_OVERRIDES,
 } as const satisfies Partial<E4MaterialSettings>;
 
 export function applyReferenceCornerLighting(e4: E4MaterialSettings): E4MaterialSettings {
