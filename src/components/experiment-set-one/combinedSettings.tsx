@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -44,6 +45,7 @@ import {
   e4SettingsToCssVars,
   isE4InspectTarget,
   normalizeE4MaterialSettings,
+  patchE4LayoutField,
   type E4InspectTarget,
   type E4MaterialSettings,
 } from '../experiment-set-four/materialSettings';
@@ -66,13 +68,20 @@ import {
   loadExperimentSetOneSaves,
   type ExperimentSetOneSnapshot,
 } from './savedConfigs';
+import { applyReferenceCornerLighting, REFERENCE_CORNER_PRESET_VERSION } from '../experiment-set-four/referenceCornerLighting';
 import { clearAllExperimentSetOnePositions, EXPERIMENT_SET_ONE_POSITION_KEYS } from './dragPositions';
 import {
   defaultSession,
   loadExperimentSetOneSession,
   saveExperimentSetOneSession,
 } from './sessionState';
+import {
+  DEFAULT_EXPERIMENT_VISIBILITY,
+  type ExperimentId,
+  type ExperimentVisibility,
+} from './experimentVisibility';
 import { clearInspectFlash, flashInspectElement } from '../shared/inspectFlash';
+import { useReferenceWallpaper } from '../shared/useReferenceWallpaper';
 
 const E1_SECTION_ORDER = [
   'Palette',
@@ -110,8 +119,12 @@ type ExperimentSetOneContextValue = {
   setInspectMode: (on: boolean) => void;
   hidePanelText: boolean;
   setHidePanelText: (on: boolean) => void;
+  experimentVisible: ExperimentVisibility;
+  toggleExperimentVisible: (id: ExperimentId) => void;
   selection: ExperimentSelection | null;
   clearSelection: () => void;
+  referenceWallpaper: boolean;
+  toggleReferenceWallpaper: () => void;
 };
 
 const ExperimentSetOneContext = createContext<ExperimentSetOneContextValue | null>(null);
@@ -131,6 +144,10 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
   const [saves, setSaves] = useState<ExperimentSetOneSnapshot[]>(() => loadExperimentSetOneSaves());
   const [inspectMode, setInspectMode] = useState(boot.inspectMode);
   const [hidePanelText, setHidePanelText] = useState(boot.hidePanelText);
+  const [experimentVisible, setExperimentVisible] = useState<ExperimentVisibility>(
+    boot.experimentVisible ?? DEFAULT_EXPERIMENT_VISIBILITY,
+  );
+  const { referenceWallpaper, toggleReferenceWallpaper } = useReferenceWallpaper();
   const [layoutResetVersion, setLayoutResetVersion] = useState(0);
   const [selection, setSelection] = useState<ExperimentSelection | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
@@ -160,7 +177,7 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
   }, []);
 
   const setE4 = useCallback(<K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => {
-    setE4State((prev) => ({ ...prev, [id]: value }));
+    setE4State((prev) => patchE4LayoutField(prev, id, value));
   }, []);
 
   const resetAll = useCallback(() => {
@@ -179,6 +196,10 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
   const loadSave = useCallback((id: number) => {
     const snapshot = loadExperimentSetOneSaves().find((save) => save.id === id);
     if (!snapshot) return;
+    if (snapshot.cornersOnly) {
+      setE4State((prev) => applyReferenceCornerLighting(prev));
+      return;
+    }
     setE1State(snapshot.e1);
     setE2State(snapshot.e2);
     setE3State(snapshot.e3);
@@ -196,9 +217,26 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
     setSelection(null);
   }, []);
 
-  useEffect(() => {
-    saveExperimentSetOneSession({ e1, e2, e3, e4, hidePanelText, inspectMode });
-  }, [e1, e2, e3, e4, hidePanelText, inspectMode]);
+  const toggleExperimentVisible = useCallback((id: ExperimentId) => {
+    setExperimentVisible((prev) => ({ ...prev, [id]: !prev[id] }));
+    setSelection((prev) => (prev?.experiment === id ? null : prev));
+    clearInspectFlash();
+    selectedElRef.current = null;
+  }, []);
+
+  useLayoutEffect(() => {
+    saveExperimentSetOneSession({
+      e1,
+      e2,
+      e3,
+      e4,
+      hidePanelText,
+      inspectMode,
+      experimentVisible,
+      referenceWallpaper,
+      cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
+    });
+  }, [e1, e2, e3, e4, hidePanelText, inspectMode, experimentVisible, referenceWallpaper]);
 
   useEffect(() => {
     const page = pageRef.current;
@@ -292,10 +330,14 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
       setInspectMode,
       hidePanelText,
       setHidePanelText,
+      experimentVisible,
+      toggleExperimentVisible,
       selection,
       clearSelection,
+      referenceWallpaper,
+      toggleReferenceWallpaper,
     }),
-    [e1, e2, e3, e4, setE1, setE2, setE3, setE4, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, selection, clearSelection],
+    [e1, e2, e3, e4, setE1, setE2, setE3, setE4, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, experimentVisible, toggleExperimentVisible, selection, clearSelection, referenceWallpaper, toggleReferenceWallpaper],
   );
 
   return (
@@ -307,10 +349,13 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
         data-e1-show-sparkles={e1.showSparkles}
         data-e3-layerB-show-sparkles={e3.layerBShowSparkles}
         data-e4-layerB-show-sparkles={e4.layerBShowSparkles}
-        data-e4-layerA-pwzzovO={e4.layerAOppositeCornerEnabled}
-        data-e4-layerB-pwzzovO={e4.layerBOppositeCornerEnabled}
+        data-e4-layerB-nested={e4.layerBNestedInA}
         data-e4-layerA-radial-layout={e4RadialLayoutAttr(e4.layerARadialCornerMode)}
         data-e4-layerB-radial-layout={e4RadialLayoutAttr(e4.layerBRadialCornerMode)}
+        data-e1-visible={experimentVisible.one}
+        data-e2-visible={experimentVisible.two}
+        data-e3-visible={experimentVisible.three}
+        data-e4-visible={experimentVisible.four}
         data-e1-inspect-mode={inspectMode}
         data-e2-inspect-mode={inspectMode}
         data-e3-inspect-mode={inspectMode}
@@ -409,8 +454,12 @@ export function ExperimentSetOneSettingsDock() {
     setInspectMode,
     hidePanelText,
     setHidePanelText,
+    experimentVisible,
+    toggleExperimentVisible,
     selection,
     clearSelection,
+    referenceWallpaper,
+    toggleReferenceWallpaper,
   } = useExperimentSetOne();
   const [open, setOpen] = useState(true);
 
@@ -523,6 +572,34 @@ export function ExperimentSetOneSettingsDock() {
             </button>
             <button
               type="button"
+              className={`experiment-one-settings-dock__toggle${referenceWallpaper ? ' experiment-one-settings-dock__toggle--active' : ''}`}
+              onClick={toggleReferenceWallpaper}
+              aria-pressed={referenceWallpaper}
+              title="Overlay reference.png on aero-bg at matched scale"
+            >
+              Reference bg
+            </button>
+            {(
+              [
+                ['one', 'E1'],
+                ['two', 'E2'],
+                ['three', 'E3'],
+                ['four', 'E4'],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className={`experiment-one-settings-dock__toggle${experimentVisible[id] ? ' experiment-one-settings-dock__toggle--active' : ''}`}
+                onClick={() => toggleExperimentVisible(id)}
+                aria-pressed={experimentVisible[id]}
+                title={experimentVisible[id] ? `Hide ${label} panels` : `Show ${label} panels`}
+              >
+                {label}
+              </button>
+            ))}
+            <button
+              type="button"
               className="experiment-one-settings-dock__toggle"
               onClick={saveCurrent}
             >
@@ -576,7 +653,7 @@ export function ExperimentSetOneSettingsDock() {
             )}
             {note && <p className="experiment-one-settings-dock__note">{note}</p>}
 
-            {(!filtering || selection.experiment === 'one') && visibleE1Fields.length > 0 && (
+            {experimentVisible.one && (!filtering || selection.experiment === 'one') && visibleE1Fields.length > 0 && (
             <section className="experiment-set-one-dock__experiment">
               {!filtering && (
                 <>
@@ -600,7 +677,7 @@ export function ExperimentSetOneSettingsDock() {
                 >
                   {sectionFields.map((field) => (
                     <MaterialSettingFieldRow
-                      key={field.id}
+                      key={`e1-${field.id}`}
                       field={field}
                       value={e1[field.id]}
                       onChange={(v) => setE1(field.id, v as E1MaterialSettings[typeof field.id])}
@@ -622,7 +699,7 @@ export function ExperimentSetOneSettingsDock() {
             </section>
             )}
 
-            {(!filtering || selection.experiment === 'two') && visibleE2Fields.length > 0 && (
+            {experimentVisible.two && (!filtering || selection.experiment === 'two') && visibleE2Fields.length > 0 && (
             <section className="experiment-set-one-dock__experiment">
               {!filtering && (
                 <>
@@ -648,7 +725,7 @@ export function ExperimentSetOneSettingsDock() {
                 >
                   {sectionFields.map((field) => (
                     <MaterialSettingFieldRow
-                      key={field.id}
+                      key={`e2-${field.id}`}
                       field={field}
                       value={e2[field.id]}
                       onChange={(v) => setE2(field.id, v as E2MaterialSettings[typeof field.id])}
@@ -670,7 +747,7 @@ export function ExperimentSetOneSettingsDock() {
             </section>
             )}
 
-            {(!filtering || selection.experiment === 'three') && visibleE3Fields.length > 0 && (
+            {experimentVisible.three && (!filtering || selection.experiment === 'three') && visibleE3Fields.length > 0 && (
             <section className="experiment-set-one-dock__experiment">
               {!filtering && (
                 <>
@@ -696,7 +773,7 @@ export function ExperimentSetOneSettingsDock() {
                 >
                   {sectionFields.map((field) => (
                     <MaterialSettingFieldRow
-                      key={field.id}
+                      key={`e3-${field.id}`}
                       field={field}
                       value={e3[field.id as keyof E3MaterialSettings]}
                       onChange={(v) => setE3(field.id as keyof E3MaterialSettings, v as E3MaterialSettings[keyof E3MaterialSettings])}
@@ -720,7 +797,7 @@ export function ExperimentSetOneSettingsDock() {
             </section>
             )}
 
-            {(!filtering || selection.experiment === 'four') && visibleE4Fields.length > 0 && (
+            {experimentVisible.four && (!filtering || selection.experiment === 'four') && visibleE4Fields.length > 0 && (
             <section className="experiment-set-one-dock__experiment">
               {!filtering && (
                 <>
@@ -746,7 +823,7 @@ export function ExperimentSetOneSettingsDock() {
                 >
                   {sectionFields.map((field) => (
                     <MaterialSettingFieldRow
-                      key={field.id}
+                      key={`e4-${field.id}`}
                       field={field}
                       value={e4[field.id as keyof E4MaterialSettings]}
                       onChange={(v) => setE4(field.id as keyof E4MaterialSettings, v as E4MaterialSettings[keyof E4MaterialSettings])}

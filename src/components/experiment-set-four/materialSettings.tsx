@@ -17,6 +17,7 @@ export const E4_CORNER_SECTION_A = 'Layer A · Corner glass';
 export const E4_CORNER_SECTION_B = 'Layer B · Corner glass';
 export const E4_RADIAL_SECTION_A = 'Layer A · Radial corners';
 export const E4_RADIAL_SECTION_B = 'Layer B · Radial corners';
+export const E4_BEZEL_SECTION = 'Layer A · Bezel layout';
 
 /** 0 off · 1 top-left + bottom-right · 2 top-right + bottom-left · 3 each corner */
 export type E4RadialCornerMode = 0 | 1 | 2 | 3;
@@ -32,9 +33,14 @@ export const E4_RADIAL_MODE_OPTIONS: MaterialSelectOption[] = [
 export const E4_CORNER_LAYOUT_OPTIONS = E4_RADIAL_MODE_OPTIONS;
 export type E4CornerLayoutMode = E4RadialCornerMode;
 
+const LAYER_A_SHEET_SECTIONS = E2_SHEET_SECTION_ORDER.map((s) => sheetSectionLabel('Layer A', s));
+const layerAShapeSectionIndex = LAYER_A_SHEET_SECTIONS.indexOf('Layer A · Shape');
+
 export const E4_SECTION_ORDER = [
   'Palette',
-  ...E2_SHEET_SECTION_ORDER.map((s) => sheetSectionLabel('Layer A', s)),
+  ...LAYER_A_SHEET_SECTIONS.slice(0, layerAShapeSectionIndex + 1),
+  E4_BEZEL_SECTION,
+  ...LAYER_A_SHEET_SECTIONS.slice(layerAShapeSectionIndex + 1),
   E4_CORNER_SECTION_A,
   E4_RADIAL_SECTION_A,
   ...E2_SHEET_SECTION_ORDER.map((s) => sheetSectionLabel('Layer B', s)),
@@ -45,9 +51,22 @@ export const E4_SECTION_ORDER = [
 export type E4RadialCornerId = 'Tl' | 'Tr' | 'Bl' | 'Br';
 
 export type E4MaterialSettings = E3MaterialSettings & {
-  layerAOppositeCornerEnabled: boolean;
+  layerAGlassReflexMode: E4CornerLayoutMode;
   layerAGlassReflexLight: number;
   layerAGlassReflexDark: number;
+  layerAGlassReflexTlLight: number;
+  layerAGlassReflexTlDark: number;
+  layerAGlassReflexTrLight: number;
+  layerAGlassReflexTrDark: number;
+  layerAGlassReflexBlLight: number;
+  layerAGlassReflexBlDark: number;
+  layerAGlassReflexBrLight: number;
+  layerAGlassReflexBrDark: number;
+  layerAGlassReflexLightColor: string;
+  layerAGlassReflexDarkColor: string;
+  layerAGlassReflexRimPx: number;
+  layerAGlassReflexMaskReach: number;
+  layerAGlassReflexMaskFade: number;
   layerARadialCornerMode: E4RadialCornerMode;
   layerARadialCornerStrength: number;
   layerARadialCornerSize: number;
@@ -59,9 +78,31 @@ export type E4MaterialSettings = E3MaterialSettings & {
   layerARadialBlSize: number;
   layerARadialBrStrength: number;
   layerARadialBrSize: number;
-  layerBOppositeCornerEnabled: boolean;
+  layerARadialGlowColor: string;
+  layerARadialPeakOpacity: number;
+  layerARadialMidOpacity: number;
+  layerARadialMidStop: number;
+  layerARadialFadeStop: number;
+  layerARadialSecondaryPeak: number;
+  layerARadialSecondaryMid: number;
+  layerARadialSecondaryMidStop: number;
+  layerARadialSecondaryFadeStop: number;
+  layerBGlassReflexMode: E4CornerLayoutMode;
   layerBGlassReflexLight: number;
   layerBGlassReflexDark: number;
+  layerBGlassReflexTlLight: number;
+  layerBGlassReflexTlDark: number;
+  layerBGlassReflexTrLight: number;
+  layerBGlassReflexTrDark: number;
+  layerBGlassReflexBlLight: number;
+  layerBGlassReflexBlDark: number;
+  layerBGlassReflexBrLight: number;
+  layerBGlassReflexBrDark: number;
+  layerBGlassReflexLightColor: string;
+  layerBGlassReflexDarkColor: string;
+  layerBGlassReflexRimPx: number;
+  layerBGlassReflexMaskReach: number;
+  layerBGlassReflexMaskFade: number;
   layerBRadialCornerMode: E4RadialCornerMode;
   layerBRadialCornerStrength: number;
   layerBRadialCornerSize: number;
@@ -73,17 +114,53 @@ export type E4MaterialSettings = E3MaterialSettings & {
   layerBRadialBlSize: number;
   layerBRadialBrStrength: number;
   layerBRadialBrSize: number;
+  layerBRadialGlowColor: string;
+  layerBRadialPeakOpacity: number;
+  layerBRadialMidOpacity: number;
+  layerBRadialMidStop: number;
+  layerBRadialFadeStop: number;
+  layerBRadialSecondaryPeak: number;
+  layerBRadialSecondaryMid: number;
+  layerBRadialSecondaryMidStop: number;
+  layerBRadialSecondaryFadeStop: number;
+  /** Horizontal inset of layer B within layer A (reference left-panel bezel). */
+  layerABezelInsetX: number;
+  /** Vertical inset of layer B within layer A. */
+  layerABezelInsetY: number;
+  /** Outer rim stroke thickness in px (layer A). */
+  layerARimBorderPx: number;
+  /** Gap from top before the vertical side highlight starts (layer A). */
+  layerARimSideGapTop: number;
+  /** Gap from bottom before the vertical side highlight ends (layer A). */
+  layerARimSideGapBottom: number;
+  /** Inner frost vertical side highlight inset from top (layer B). */
+  layerBRimSideGapTop: number;
+  /** Inner frost vertical side highlight inset from bottom (layer B). */
+  layerBRimSideGapBottom: number;
+  /** When true, layer B renders inside layer A and only A is draggable. */
+  layerBNestedInA: boolean;
 };
 
 /** Fallback when Save 2 is not in localStorage yet. */
 const SAVE2_FALLBACK_E3: E3MaterialSettings = buildInitialE3Settings();
 
-/** Reference PNG left sidebar — tall narrow footprint, equal layer heights, bezel inset. */
+/** Reference PNG left sidebar — tall narrow footprint (~3.45:1 aspect at 210px width). */
 const REFERENCE_LEFT_PANEL_SIZES = {
   layerAWidth: 210,
-  layerAHeight: 420,
-  layerBWidth: 186,
-  layerBHeight: 420,
+  layerAHeight: 726,
+  layerBWidth: 188,
+  layerBHeight: 704,
+} as const;
+
+const E4_BEZEL_DEFAULTS = {
+  layerABezelInsetX: 12,
+  layerABezelInsetY: 12,
+  layerARimBorderPx: 2,
+  layerARimSideGapTop: 12,
+  layerARimSideGapBottom: 12,
+  layerBRimSideGapTop: 10,
+  layerBRimSideGapBottom: 10,
+  layerBNestedInA: false,
 } as const;
 
 const RADIAL_PER_CORNER_DEFAULTS = {
@@ -97,6 +174,56 @@ const RADIAL_PER_CORNER_DEFAULTS = {
   BrSize: 88,
 } as const;
 
+const GLASS_REFLEX_PER_CORNER_DEFAULTS = {
+  TlLight: 1,
+  TlDark: 1,
+  TrLight: 0,
+  TrDark: 0,
+  BlLight: 0,
+  BlDark: 0,
+  BrLight: 1,
+  BrDark: 1,
+} as const;
+
+function glassReflexAppearanceDefaults(prefix: 'layerA' | 'layerB') {
+  return {
+    [`${prefix}GlassReflexLightColor`]: '#ffffff',
+    [`${prefix}GlassReflexDarkColor`]: '#000000',
+    [`${prefix}GlassReflexRimPx`]: 1,
+    [`${prefix}GlassReflexMaskReach`]: 44,
+    [`${prefix}GlassReflexMaskFade`]: 74,
+  } as Record<string, number | string>;
+}
+
+function radialAppearanceDefaults(prefix: 'layerA' | 'layerB') {
+  return {
+    [`${prefix}RadialGlowColor`]: '#ffffff',
+    [`${prefix}RadialPeakOpacity`]: 88,
+    [`${prefix}RadialMidOpacity`]: 28,
+    [`${prefix}RadialMidStop`]: 36,
+    [`${prefix}RadialFadeStop`]: 72,
+    [`${prefix}RadialSecondaryPeak`]: 78,
+    [`${prefix}RadialSecondaryMid`]: 22,
+    [`${prefix}RadialSecondaryMidStop`]: 38,
+    [`${prefix}RadialSecondaryFadeStop`]: 74,
+  } as Record<string, number | string>;
+}
+
+function glassReflexDefaultsForLayer(prefix: 'layerA' | 'layerB') {
+  return {
+    [`${prefix}GlassReflexMode`]: 1,
+    [`${prefix}GlassReflexLight`]: 1,
+    [`${prefix}GlassReflexDark`]: 1,
+    ...Object.fromEntries(
+      (Object.entries(GLASS_REFLEX_PER_CORNER_DEFAULTS) as [string, number][]).map(([key, value]) => [
+        `${prefix}GlassReflex${key}`,
+        value,
+      ]),
+    ),
+    ...glassReflexAppearanceDefaults(prefix),
+  } as Record<string, number | string>;
+}
+
 function radialDefaultsForLayer(prefix: 'layerA' | 'layerB') {
   return {
     [`${prefix}RadialCornerMode`]: 0,
@@ -108,19 +235,16 @@ function radialDefaultsForLayer(prefix: 'layerA' | 'layerB') {
         value,
       ]),
     ),
-  } as Record<string, number>;
+    ...radialAppearanceDefaults(prefix),
+  } as Record<string, number | string>;
 }
 
 const E4_CORNER_DEFAULTS = {
-  layerAOppositeCornerEnabled: true,
-  layerAGlassReflexLight: 1,
-  layerAGlassReflexDark: 1,
-  layerBOppositeCornerEnabled: true,
-  layerBGlassReflexLight: 1,
-  layerBGlassReflexDark: 1,
+  ...glassReflexDefaultsForLayer('layerA'),
+  ...glassReflexDefaultsForLayer('layerB'),
   ...radialDefaultsForLayer('layerA'),
   ...radialDefaultsForLayer('layerB'),
-} as E4MaterialSettings;
+};
 
 function resolveSave2E3(): E3MaterialSettings {
   const save2 = loadExperimentSetOneSaves().find((save) => save.id === 2);
@@ -135,11 +259,98 @@ function e3BaseToE4(e3: E3MaterialSettings): E4MaterialSettings {
 }
 
 export function buildE4MasterDefaultSettings(): E4MaterialSettings {
-  return {
+  return syncE4LayerBLayoutFromBezel({
     ...e3BaseToE4(resolveSave2E3()),
     ...REFERENCE_LEFT_PANEL_SIZES,
     ...E4_CORNER_DEFAULTS,
+    ...E4_BEZEL_DEFAULTS,
+  });
+}
+
+/** Keep layer B width/height concentric inside layer A bezel. */
+export function syncE4LayerBDimensionsFromBezel(s: E4MaterialSettings): E4MaterialSettings {
+  const insetX = s.layerABezelInsetX as number;
+  const insetY = s.layerABezelInsetY as number;
+  const outerW = s.layerAWidth as number;
+  const outerH = s.layerAHeight as number;
+  return {
+    ...s,
+    layerBWidth: outerW - insetX * 2,
+    layerBHeight: outerH - insetY * 2,
   };
+}
+
+/** Match layer B corner radius to layer A minus horizontal inset. */
+export function syncE4LayerBCornerRadiusFromBezel(s: E4MaterialSettings): E4MaterialSettings {
+  const insetX = s.layerABezelInsetX as number;
+  const outerR = s.layerACornerRadius as number;
+  return {
+    ...s,
+    layerBCornerRadius: Math.max(4, outerR - insetX),
+  };
+}
+
+/** Full bezel sync — used for defaults and reference preset application only. */
+export function syncE4LayerBLayoutFromBezel(s: E4MaterialSettings): E4MaterialSettings {
+  return syncE4LayerBCornerRadiusFromBezel(syncE4LayerBDimensionsFromBezel(s));
+}
+
+const LAYOUT_SYNC_RESIZE_B = new Set([
+  'layerAWidth',
+  'layerAHeight',
+  'layerABezelInsetX',
+  'layerABezelInsetY',
+]);
+
+/** Apply width/height/inset edits and keep layers A + B proportional. */
+export function patchE4LayoutField(
+  s: E4MaterialSettings,
+  id: keyof E4MaterialSettings,
+  value: E4MaterialSettings[keyof E4MaterialSettings],
+): E4MaterialSettings {
+  const next = { ...s, [id]: value } as E4MaterialSettings;
+
+  if (id === 'layerACornerRadius') {
+    return syncE4LayerBCornerRadiusFromBezel(next);
+  }
+
+  if (LAYOUT_SYNC_RESIZE_B.has(id)) {
+    const synced = syncE4LayerBDimensionsFromBezel(next);
+    return id === 'layerABezelInsetX' ? syncE4LayerBCornerRadiusFromBezel(synced) : synced;
+  }
+
+  if (id === 'layerBWidth' || id === 'layerBHeight') {
+    const outerW = next.layerAWidth as number;
+    const outerH = next.layerAHeight as number;
+    const innerW = id === 'layerBWidth' ? (value as number) : (next.layerBWidth as number);
+    const innerH = id === 'layerBHeight' ? (value as number) : (next.layerBHeight as number);
+    const insetX = Math.max(4, Math.round((outerW - innerW) / 2));
+    const insetY = Math.max(4, Math.round((outerH - innerH) / 2));
+    return {
+      ...next,
+      layerBWidth: innerW,
+      layerBHeight: innerH,
+      layerABezelInsetX: insetX,
+      layerABezelInsetY: insetY,
+    };
+  }
+
+  return next;
+}
+
+export function e4LayerADimensionStyle(s: E4MaterialSettings): CSSProperties {
+  const width = s.layerAWidth as number;
+  const height = s.layerAHeight as number;
+  return { width, height, minHeight: height };
+}
+
+export function e4LayerBDimensionStyle(s: E4MaterialSettings, nested: boolean): CSSProperties {
+  if (nested) {
+    return { width: '100%', height: '100%', minHeight: 0 };
+  }
+  const width = s.layerBWidth as number;
+  const height = s.layerBHeight as number;
+  return { width, height, minHeight: height };
 }
 
 export type E4InspectTarget =
@@ -166,6 +377,262 @@ const RADIAL_CORNER_LABELS: Record<E4RadialCornerId, string> = {
   Bl: 'Bottom left',
   Br: 'Bottom right',
 };
+
+function glassReflexMode(prefix: 'layerA' | 'layerB', settings: E4MaterialSettings): E4CornerLayoutMode {
+  return settings[`${prefix}GlassReflexMode` as keyof E4MaterialSettings] as E4CornerLayoutMode;
+}
+
+function glassReflexPaired(prefix: 'layerA' | 'layerB') {
+  return (s: E4MaterialSettings) => {
+    const mode = glassReflexMode(prefix, s);
+    return mode === 1 || mode === 2;
+  };
+}
+
+function glassReflexIndividual(prefix: 'layerA' | 'layerB') {
+  return (s: E4MaterialSettings) => glassReflexMode(prefix, s) === 3;
+}
+
+function glassReflexActive(prefix: 'layerA' | 'layerB') {
+  return (s: E4MaterialSettings) => glassReflexMode(prefix, s) !== 0;
+}
+
+function radialActive(prefix: 'layerA' | 'layerB') {
+  return (s: E4MaterialSettings) => radialMode(prefix, s) !== 0;
+}
+
+function buildGlassReflexAppearanceFields(prefix: 'layerA' | 'layerB', section: string): E4SettingField[] {
+  return [
+    {
+      id: `${prefix}GlassReflexLightColor`,
+      label: 'Highlight color',
+      dataType: 'color',
+      section,
+      when: glassReflexActive(prefix),
+      hint: 'Color mixed into PwzzovO inset highlights (--c-light). Default white catches overhead light on the glass lip.',
+    },
+    {
+      id: `${prefix}GlassReflexDarkColor`,
+      label: 'Shadow color',
+      dataType: 'color',
+      section,
+      when: glassReflexActive(prefix),
+      hint: 'Color mixed into inset shadow bands (--c-dark). Default black adds depth opposing the highlights.',
+    },
+    {
+      id: `${prefix}GlassReflexRimPx`,
+      label: 'Rim thickness',
+      dataType: 'number',
+      section,
+      min: 0,
+      max: 4,
+      step: 0.25,
+      unit: 'px',
+      when: glassReflexActive(prefix),
+      hint: 'Thickness of the inner rim stroke (first inset shadow). Default 1px — the hairline edge in the PwzzovO stack.',
+    },
+    {
+      id: `${prefix}GlassReflexMaskReach`,
+      label: 'Corner reach',
+      dataType: 'number',
+      section,
+      min: 20,
+      max: 70,
+      step: 1,
+      unit: '%',
+      when: glassReflexActive(prefix),
+      hint: 'How far the corner mask extends from the anchor before fading. Default 44% — controls reflex footprint size.',
+    },
+    {
+      id: `${prefix}GlassReflexMaskFade`,
+      label: 'Corner fade',
+      dataType: 'number',
+      section,
+      min: 50,
+      max: 95,
+      step: 1,
+      unit: '%',
+      when: glassReflexActive(prefix),
+      hint: 'Where the corner mask becomes fully transparent. Default 74% — higher = softer, wider falloff.',
+    },
+  ];
+}
+
+function buildRadialAppearanceFields(prefix: 'layerA' | 'layerB', section: string): E4SettingField[] {
+  return [
+    {
+      id: `${prefix}RadialGlowColor`,
+      label: 'Glow color',
+      dataType: 'color',
+      section,
+      when: radialActive(prefix),
+      hint: 'Tint of the radial bloom. Default white, screen-blended over the glass.',
+    },
+    {
+      id: `${prefix}RadialPeakOpacity`,
+      label: 'Peak opacity',
+      dataType: 'number',
+      section,
+      min: 0,
+      max: 100,
+      step: 1,
+      unit: '%',
+      when: radialActive(prefix),
+      hint: 'Brightness at the gradient center for top/leading corners. Default 88%.',
+    },
+    {
+      id: `${prefix}RadialMidOpacity`,
+      label: 'Mid ring opacity',
+      dataType: 'number',
+      section,
+      min: 0,
+      max: 100,
+      step: 1,
+      unit: '%',
+      when: radialActive(prefix),
+      hint: 'Opacity at the mid stop of the bloom. Default 28%.',
+    },
+    {
+      id: `${prefix}RadialMidStop`,
+      label: 'Mid stop',
+      dataType: 'number',
+      section,
+      min: 10,
+      max: 60,
+      step: 1,
+      unit: '%',
+      when: radialActive(prefix),
+      hint: 'Gradient position of the mid ring. Default 36%.',
+    },
+    {
+      id: `${prefix}RadialFadeStop`,
+      label: 'Fade stop',
+      dataType: 'number',
+      section,
+      min: 50,
+      max: 100,
+      step: 1,
+      unit: '%',
+      when: radialActive(prefix),
+      hint: 'Where the bloom becomes transparent for top/leading corners. Default 72%.',
+    },
+    {
+      id: `${prefix}RadialSecondaryPeak`,
+      label: 'Secondary peak',
+      dataType: 'number',
+      section,
+      min: 0,
+      max: 100,
+      step: 1,
+      unit: '%',
+      when: radialActive(prefix),
+      hint: 'Center brightness for bottom/trailing corners in a pair. Default 78%.',
+    },
+    {
+      id: `${prefix}RadialSecondaryMid`,
+      label: 'Secondary mid',
+      dataType: 'number',
+      section,
+      min: 0,
+      max: 100,
+      step: 1,
+      unit: '%',
+      when: radialActive(prefix),
+      hint: 'Mid-ring opacity for secondary corners. Default 22%.',
+    },
+    {
+      id: `${prefix}RadialSecondaryMidStop`,
+      label: 'Secondary mid stop',
+      dataType: 'number',
+      section,
+      min: 10,
+      max: 60,
+      step: 1,
+      unit: '%',
+      when: radialActive(prefix),
+      hint: 'Mid stop for secondary corners. Default 38%.',
+    },
+    {
+      id: `${prefix}RadialSecondaryFadeStop`,
+      label: 'Secondary fade',
+      dataType: 'number',
+      section,
+      min: 50,
+      max: 100,
+      step: 1,
+      unit: '%',
+      when: radialActive(prefix),
+      hint: 'Fade-out for secondary corners. Default 74%.',
+    },
+  ];
+}
+
+function buildPerCornerGlassReflexFields(prefix: 'layerA' | 'layerB', section: string): E4SettingField[] {
+  return RADIAL_CORNER_IDS.flatMap((corner) => {
+    const idBase = `${prefix}GlassReflex${corner}`;
+    return [
+      {
+        id: `${idBase}Light`,
+        label: `${RADIAL_CORNER_LABELS[corner]} · reflex light`,
+        dataType: 'number',
+        section,
+        min: 0,
+        max: 2,
+        step: 0.1,
+        when: glassReflexIndividual(prefix),
+        hint: `PwzzovO highlight multiplier at ${RADIAL_CORNER_LABELS[corner].toLowerCase()}. Scales white inset shadows; 0 turns this corner off.`,
+      },
+      {
+        id: `${idBase}Dark`,
+        label: `${RADIAL_CORNER_LABELS[corner]} · reflex dark`,
+        dataType: 'number',
+        section,
+        min: 0,
+        max: 2,
+        step: 0.1,
+        when: glassReflexIndividual(prefix),
+        hint: `PwzzovO shadow multiplier at ${RADIAL_CORNER_LABELS[corner].toLowerCase()}. Deepens inset shade on that corner.`,
+      },
+    ] satisfies E4SettingField[];
+  });
+}
+
+function buildGlassReflexFields(prefix: 'layerA' | 'layerB', section: string): E4SettingField[] {
+  return [
+    {
+      id: `${prefix}GlassReflexMode`,
+      label: 'Layout',
+      dataType: 'select',
+      section,
+      options: E4_CORNER_LAYOUT_OPTIONS,
+      hint: 'Which corners receive the PwzzovO inset shadow reflex. Off removes it; paired modes share settings; Each corner sets light/dark per corner.',
+    },
+    {
+      id: `${prefix}GlassReflexLight`,
+      label: 'Reflex light',
+      dataType: 'number',
+      section,
+      min: 0,
+      max: 2,
+      step: 0.1,
+      when: glassReflexPaired(prefix),
+      hint: 'Multiplier on white inset highlights in the paired diagonal. 1 = PwzzovO default; 0 kills the lit side.',
+    },
+    {
+      id: `${prefix}GlassReflexDark`,
+      label: 'Reflex dark',
+      dataType: 'number',
+      section,
+      min: 0,
+      max: 2,
+      step: 0.1,
+      when: glassReflexPaired(prefix),
+      hint: 'Multiplier on dark inset shadows in the paired diagonal. Adds opposing-corner depth.',
+    },
+    ...buildGlassReflexAppearanceFields(prefix, section),
+    ...buildPerCornerGlassReflexFields(prefix, section),
+  ];
+}
 
 function radialMode(prefix: 'layerA' | 'layerB', settings: E4MaterialSettings): E4RadialCornerMode {
   return settings[`${prefix}RadialCornerMode` as keyof E4MaterialSettings] as E4RadialCornerMode;
@@ -196,6 +663,7 @@ function buildPerCornerRadialFields(prefix: 'layerA' | 'layerB', section: string
         step: 1,
         unit: '%',
         when: radialIndividual(prefix),
+        hint: `Bloom opacity at ${RADIAL_CORNER_LABELS[corner].toLowerCase()}. Multiplies the radial gradient; 0 hides this corner.`,
       },
       {
         id: `${idBase}Size`,
@@ -207,6 +675,7 @@ function buildPerCornerRadialFields(prefix: 'layerA' | 'layerB', section: string
         step: 2,
         unit: 'px',
         when: radialIndividual(prefix),
+        hint: `Ellipse radius at ${RADIAL_CORNER_LABELS[corner].toLowerCase()} in px. Larger = softer spread from the corner.`,
       },
     ] satisfies E4SettingField[];
   });
@@ -220,6 +689,7 @@ function buildRadialFields(prefix: 'layerA' | 'layerB', section: string): E4Sett
       dataType: 'select',
       section,
       options: E4_RADIAL_MODE_OPTIONS,
+      hint: 'Which corners get a soft radial bloom (separate from PwzzovO). Paired modes share size/strength; Each corner sets per-corner strength and size.',
     },
     {
       id: `${prefix}RadialCornerStrength`,
@@ -231,6 +701,7 @@ function buildRadialFields(prefix: 'layerA' | 'layerB', section: string): E4Sett
       step: 1,
       unit: '%',
       when: radialPaired(prefix),
+      hint: 'Master opacity for both blooms in a diagonal pair. Applied as layer opacity over the gradient stack.',
     },
     {
       id: `${prefix}RadialCornerSize`,
@@ -242,7 +713,9 @@ function buildRadialFields(prefix: 'layerA' | 'layerB', section: string): E4Sett
       step: 2,
       unit: 'px',
       when: radialPaired(prefix),
+      hint: 'Ellipse radius in px for both paired blooms. Default 88px.',
     },
+    ...buildRadialAppearanceFields(prefix, section),
     ...buildPerCornerRadialFields(prefix, section),
   ];
 }
@@ -253,70 +726,116 @@ const PALETTE_FIELDS: SettingField[] = [
   { id: 'colorDeep', label: 'Deep blue', dataType: 'color', section: 'Palette' },
 ];
 
-const CORNER_FIELDS_A: E4SettingField[] = [
-  {
-    id: 'layerAOppositeCornerEnabled',
-    label: 'PwzzovO glass reflex',
-    dataType: 'boolean',
-    section: E4_CORNER_SECTION_A,
-  },
-  {
-    id: 'layerAGlassReflexLight',
-    label: 'Glass reflex light',
-    dataType: 'number',
-    section: E4_CORNER_SECTION_A,
-    min: 0,
-    max: 2,
-    step: 0.1,
-  },
-  {
-    id: 'layerAGlassReflexDark',
-    label: 'Glass reflex dark',
-    dataType: 'number',
-    section: E4_CORNER_SECTION_A,
-    min: 0,
-    max: 2,
-    step: 0.1,
-  },
-];
+function buildE4SheetFields(prefix: 'layerA' | 'layerB', label: string): E4SettingField[] {
+  return buildSheetFields(prefix, label).map((field) => {
+    if (field.id === `${prefix}Height`) return { ...field, max: 920 };
+    if (prefix === 'layerA' && field.id === `${prefix}Width`) return { ...field, max: 320 };
+    return field;
+  });
+}
 
+function buildBezelLayoutFields(): E4SettingField[] {
+  return [
+    {
+      id: 'layerBNestedInA',
+      label: 'Nest layer B inside A',
+      dataType: 'boolean',
+      section: E4_BEZEL_SECTION,
+      hint: 'Off — drag layer A and B independently (default). On — single composite panel like the reference left nav.',
+    },
+    {
+      id: 'layerABezelInsetX',
+      label: 'Bezel inset (horizontal)',
+      dataType: 'number',
+      section: E4_BEZEL_SECTION,
+      min: 4,
+      max: 40,
+      step: 1,
+      unit: 'px',
+      hint: 'How far layer B sits inside layer A on left and right — sets the visible outer bezel width.',
+    },
+    {
+      id: 'layerABezelInsetY',
+      label: 'Bezel inset (vertical)',
+      dataType: 'number',
+      section: E4_BEZEL_SECTION,
+      min: 4,
+      max: 40,
+      step: 1,
+      unit: 'px',
+      hint: 'Top and bottom inset of layer B inside layer A — matches reference gap above/below the frost body.',
+    },
+    {
+      id: 'layerARimBorderPx',
+      label: 'Outer rim thickness',
+      dataType: 'number',
+      section: E4_BEZEL_SECTION,
+      min: 1,
+      max: 4,
+      step: 0.5,
+      unit: 'px',
+      hint: 'Stroke width of the outer bezel border. Reference left panel uses a 1px hairline.',
+    },
+    {
+      id: 'layerARimSideGapTop',
+      label: 'Side line gap (top)',
+      dataType: 'number',
+      section: E4_BEZEL_SECTION,
+      min: 0,
+      max: 80,
+      step: 1,
+      unit: 'px',
+      hint: 'Vertical side highlights start this far below the top — keeps lines from running into the corner curve.',
+    },
+    {
+      id: 'layerARimSideGapBottom',
+      label: 'Side line gap (bottom)',
+      dataType: 'number',
+      section: E4_BEZEL_SECTION,
+      min: 0,
+      max: 80,
+      step: 1,
+      unit: 'px',
+      hint: 'Vertical side highlights end this far above the bottom corner.',
+    },
+    {
+      id: 'layerBRimSideGapTop',
+      label: 'Inner side line gap (top)',
+      dataType: 'number',
+      section: E4_BEZEL_SECTION,
+      min: 0,
+      max: 80,
+      step: 1,
+      unit: 'px',
+      hint: 'Layer B frost body — vertical edge highlight inset from top.',
+    },
+    {
+      id: 'layerBRimSideGapBottom',
+      label: 'Inner side line gap (bottom)',
+      dataType: 'number',
+      section: E4_BEZEL_SECTION,
+      min: 0,
+      max: 80,
+      step: 1,
+      unit: 'px',
+      hint: 'Layer B frost body — vertical edge highlight inset from bottom.',
+    },
+  ];
+}
+
+const BEZEL_LAYOUT_FIELDS = buildBezelLayoutFields();
+const CORNER_FIELDS_A = buildGlassReflexFields('layerA', E4_CORNER_SECTION_A);
 const RADIAL_FIELDS_A = buildRadialFields('layerA', E4_RADIAL_SECTION_A);
-
-const CORNER_FIELDS_B: E4SettingField[] = [
-  {
-    id: 'layerBOppositeCornerEnabled',
-    label: 'PwzzovO glass reflex',
-    dataType: 'boolean',
-    section: E4_CORNER_SECTION_B,
-  },
-  {
-    id: 'layerBGlassReflexLight',
-    label: 'Glass reflex light',
-    dataType: 'number',
-    section: E4_CORNER_SECTION_B,
-    min: 0,
-    max: 2,
-    step: 0.1,
-  },
-  {
-    id: 'layerBGlassReflexDark',
-    label: 'Glass reflex dark',
-    dataType: 'number',
-    section: E4_CORNER_SECTION_B,
-    min: 0,
-    max: 2,
-    step: 0.1,
-  },
-];
-
+const CORNER_FIELDS_B = buildGlassReflexFields('layerB', E4_CORNER_SECTION_B);
 const RADIAL_FIELDS_B = buildRadialFields('layerB', E4_RADIAL_SECTION_B);
 
 export const E4_SETTING_FIELDS: E4SettingField[] = [
   ...PALETTE_FIELDS,
-  ...buildSheetFields('layerA', 'Layer A'),
+  ...buildE4SheetFields('layerA', 'Layer A'),
+  ...BEZEL_LAYOUT_FIELDS,
   ...CORNER_FIELDS_A,
   ...RADIAL_FIELDS_A,
-  ...buildSheetFields('layerB', 'Layer B'),
+  ...buildE4SheetFields('layerB', 'Layer B'),
   ...CORNER_FIELDS_B,
   ...RADIAL_FIELDS_B,
 ];
@@ -355,11 +874,37 @@ function layerInspectFields(prefix: 'layerA' | 'layerB'): string[] {
   return keys.map((key) => prefixed(prefix, key));
 }
 
+function glassReflexFieldIds(prefix: 'layerA' | 'layerB'): string[] {
+  return [
+    `${prefix}GlassReflexMode`,
+    `${prefix}GlassReflexLight`,
+    `${prefix}GlassReflexDark`,
+    `${prefix}GlassReflexLightColor`,
+    `${prefix}GlassReflexDarkColor`,
+    `${prefix}GlassReflexRimPx`,
+    `${prefix}GlassReflexMaskReach`,
+    `${prefix}GlassReflexMaskFade`,
+    ...RADIAL_CORNER_IDS.flatMap((corner) => [
+      `${prefix}GlassReflex${corner}Light`,
+      `${prefix}GlassReflex${corner}Dark`,
+    ]),
+  ];
+}
+
 function radialFieldIds(prefix: 'layerA' | 'layerB'): string[] {
   return [
     `${prefix}RadialCornerMode`,
     `${prefix}RadialCornerStrength`,
     `${prefix}RadialCornerSize`,
+    `${prefix}RadialGlowColor`,
+    `${prefix}RadialPeakOpacity`,
+    `${prefix}RadialMidOpacity`,
+    `${prefix}RadialMidStop`,
+    `${prefix}RadialFadeStop`,
+    `${prefix}RadialSecondaryPeak`,
+    `${prefix}RadialSecondaryMid`,
+    `${prefix}RadialSecondaryMidStop`,
+    `${prefix}RadialSecondaryFadeStop`,
     ...RADIAL_CORNER_IDS.flatMap((corner) => [
       `${prefix}Radial${corner}Strength`,
       `${prefix}Radial${corner}Size`,
@@ -367,17 +912,8 @@ function radialFieldIds(prefix: 'layerA' | 'layerB'): string[] {
   ];
 }
 
-const pwzzovFieldsA = [
-  'layerAOppositeCornerEnabled',
-  'layerAGlassReflexLight',
-  'layerAGlassReflexDark',
-] as const;
-
-const pwzzovFieldsB = [
-  'layerBOppositeCornerEnabled',
-  'layerBGlassReflexLight',
-  'layerBGlassReflexDark',
-] as const;
+const pwzzovFieldsA = glassReflexFieldIds('layerA');
+const pwzzovFieldsB = glassReflexFieldIds('layerB');
 
 const radialFieldsA = radialFieldIds('layerA');
 const radialFieldsB = radialFieldIds('layerB');
@@ -389,7 +925,15 @@ export const E4_INSPECT_CATALOG: Record<
   'layer-a': {
     label: 'Layer A — bezel frame',
     note: 'Reference left-panel proportions — ultra-clear bezel with opposite-corner highlights.',
-    fields: [...layerInspectFields('layerA'), ...pwzzovFieldsA, ...radialFieldsA, ...palette],
+    fields: [
+      ...layerInspectFields('layerA'),
+      'layerBNestedInA',
+      'layerABezelInsetX',
+      'layerABezelInsetY',
+      ...pwzzovFieldsA,
+      ...radialFieldsA,
+      ...palette,
+    ],
   },
   'layer-a-rim': {
     label: 'Layer A — rim highlight',
@@ -398,6 +942,11 @@ export const E4_INSPECT_CATALOG: Record<
       prefixed('layerA', 'borderOpacity'),
       prefixed('layerA', 'topRadial'),
       prefixed('layerA', 'depth'),
+      'layerARimBorderPx',
+      'layerARimSideGapTop',
+      'layerARimSideGapBottom',
+      'layerABezelInsetX',
+      'layerABezelInsetY',
       ...palette,
     ],
   },
@@ -413,8 +962,16 @@ export const E4_INSPECT_CATALOG: Record<
   },
   'layer-b': {
     label: 'Layer B — frost body',
-    note: 'Frosted inner sheet — same height as layer A, inset to match reference bezel.',
-    fields: [...layerInspectFields('layerB'), ...pwzzovFieldsB, ...radialFieldsB, ...palette],
+    note: 'Frosted inner sheet — nested inside layer A bezel with matching reference inset.',
+    fields: [
+      ...layerInspectFields('layerB'),
+      'layerBNestedInA',
+      'layerABezelInsetX',
+      'layerABezelInsetY',
+      ...pwzzovFieldsB,
+      ...radialFieldsB,
+      ...palette,
+    ],
   },
   'layer-b-shine': {
     label: 'Layer B — shine layer',
@@ -556,7 +1113,9 @@ function radialPairedPositions(mode: E4RadialCornerMode): { a: string; b: string
 function radialToCssVars(prefix: 'layerA' | 'layerB', s: E4MaterialSettings): Record<string, string | number> {
   const mode = radialMode(prefix, s);
   const p = `--e4-${prefix}`;
-  const vars: Record<string, string | number> = {};
+  const vars: Record<string, string | number> = {
+    ...radialAppearanceVars(prefix, s),
+  };
 
   if (mode === 1 || mode === 2) {
     const positions = radialPairedPositions(mode);
@@ -580,12 +1139,83 @@ function radialToCssVars(prefix: 'layerA' | 'layerB', s: E4MaterialSettings): Re
   return vars;
 }
 
+function glassReflexAppearanceVars(prefix: 'layerA' | 'layerB', s: E4MaterialSettings): Record<string, string | number> {
+  const p = `--e4-${prefix}`;
+  return {
+    [`${p}-reflex-light-color`]: s[`${prefix}GlassReflexLightColor` as keyof E4MaterialSettings] as string,
+    [`${p}-reflex-dark-color`]: s[`${prefix}GlassReflexDarkColor` as keyof E4MaterialSettings] as string,
+    [`${p}-reflex-rim-px`]: `${s[`${prefix}GlassReflexRimPx` as keyof E4MaterialSettings] as number}px`,
+    [`${p}-reflex-mask-reach`]: `${s[`${prefix}GlassReflexMaskReach` as keyof E4MaterialSettings] as number}%`,
+    [`${p}-reflex-mask-fade`]: `${s[`${prefix}GlassReflexMaskFade` as keyof E4MaterialSettings] as number}%`,
+  };
+}
+
+function radialAppearanceVars(prefix: 'layerA' | 'layerB', s: E4MaterialSettings): Record<string, string | number> {
+  const p = `--e4-${prefix}`;
+  return {
+    [`${p}-radial-color`]: s[`${prefix}RadialGlowColor` as keyof E4MaterialSettings] as string,
+    [`${p}-radial-peak`]: pct(s[`${prefix}RadialPeakOpacity` as keyof E4MaterialSettings] as number),
+    [`${p}-radial-mid`]: pct(s[`${prefix}RadialMidOpacity` as keyof E4MaterialSettings] as number),
+    [`${p}-radial-mid-stop`]: `${s[`${prefix}RadialMidStop` as keyof E4MaterialSettings] as number}%`,
+    [`${p}-radial-fade-stop`]: `${s[`${prefix}RadialFadeStop` as keyof E4MaterialSettings] as number}%`,
+    [`${p}-radial-sec-peak`]: pct(s[`${prefix}RadialSecondaryPeak` as keyof E4MaterialSettings] as number),
+    [`${p}-radial-sec-mid`]: pct(s[`${prefix}RadialSecondaryMid` as keyof E4MaterialSettings] as number),
+    [`${p}-radial-sec-mid-stop`]: `${s[`${prefix}RadialSecondaryMidStop` as keyof E4MaterialSettings] as number}%`,
+    [`${p}-radial-sec-fade-stop`]: `${s[`${prefix}RadialSecondaryFadeStop` as keyof E4MaterialSettings] as number}%`,
+  };
+}
+
+function glassReflexToCssVars(prefix: 'layerA' | 'layerB', s: E4MaterialSettings): Record<string, string | number> {
+  const mode = glassReflexMode(prefix, s);
+  const p = `--e4-${prefix}`;
+  const vars: Record<string, string | number> = {
+    ...glassReflexAppearanceVars(prefix, s),
+  };
+
+  for (const corner of RADIAL_CORNER_IDS) {
+    const key = corner.toLowerCase();
+    let light = 0;
+    let dark = 0;
+    let opacity = 0;
+
+    if (mode === 1 && (corner === 'Tl' || corner === 'Br')) {
+      light = s[`${prefix}GlassReflexLight` as keyof E4MaterialSettings] as number;
+      dark = s[`${prefix}GlassReflexDark` as keyof E4MaterialSettings] as number;
+      opacity = light > 0 || dark > 0 ? 1 : 0;
+    } else if (mode === 2 && (corner === 'Tr' || corner === 'Bl')) {
+      light = s[`${prefix}GlassReflexLight` as keyof E4MaterialSettings] as number;
+      dark = s[`${prefix}GlassReflexDark` as keyof E4MaterialSettings] as number;
+      opacity = light > 0 || dark > 0 ? 1 : 0;
+    } else if (mode === 3) {
+      light = s[`${prefix}GlassReflex${corner}Light` as keyof E4MaterialSettings] as number;
+      dark = s[`${prefix}GlassReflex${corner}Dark` as keyof E4MaterialSettings] as number;
+      opacity = light > 0 || dark > 0 ? 1 : 0;
+    }
+
+    vars[`${p}-reflex-${key}-light`] = light;
+    vars[`${p}-reflex-${key}-dark`] = dark;
+    vars[`${p}-reflex-${key}-opacity`] = opacity;
+  }
+
+  return vars;
+}
+
+function bezelToCssVars(s: E4MaterialSettings): Record<string, string | number> {
+  return {
+    '--e4-bezel-inset-x': `${s.layerABezelInsetX}px`,
+    '--e4-bezel-inset-y': `${s.layerABezelInsetY}px`,
+    '--e4-layerA-rim-border-px': `${s.layerARimBorderPx}px`,
+    '--e4-layerA-rim-side-gap-top': `${s.layerARimSideGapTop}px`,
+    '--e4-layerA-rim-side-gap-bottom': `${s.layerARimSideGapBottom}px`,
+    '--e4-layerB-rim-side-gap-top': `${s.layerBRimSideGapTop}px`,
+    '--e4-layerB-rim-side-gap-bottom': `${s.layerBRimSideGapBottom}px`,
+  };
+}
+
 function cornerToCssVars(s: E4MaterialSettings): Record<string, string | number> {
   return {
-    '--e4-layerA-glass-reflex-light': s.layerAOppositeCornerEnabled ? s.layerAGlassReflexLight : 0,
-    '--e4-layerA-glass-reflex-dark': s.layerAOppositeCornerEnabled ? s.layerAGlassReflexDark : 0,
-    '--e4-layerB-glass-reflex-light': s.layerBOppositeCornerEnabled ? s.layerBGlassReflexLight : 0,
-    '--e4-layerB-glass-reflex-dark': s.layerBOppositeCornerEnabled ? s.layerBGlassReflexDark : 0,
+    ...glassReflexToCssVars('layerA', s),
+    ...glassReflexToCssVars('layerB', s),
     ...radialToCssVars('layerA', s),
     ...radialToCssVars('layerB', s),
   };
@@ -601,6 +1231,13 @@ export function normalizeE4MaterialSettings(raw: Partial<E4MaterialSettings> | u
     typeof legacy.layerAOppositeCornerStrength === 'number' ? legacy.layerAOppositeCornerStrength / 100 : undefined;
   const legacyLightB =
     typeof legacy.layerBOppositeCornerStrength === 'number' ? legacy.layerBOppositeCornerStrength / 100 : undefined;
+
+  function migrateGlassReflexMode(prefix: 'layerA' | 'layerB'): E4CornerLayoutMode {
+    const modeKey = `${prefix}GlassReflexMode`;
+    if (typeof legacy[modeKey] === 'number') return legacy[modeKey] as E4CornerLayoutMode;
+    if (legacy[`${prefix}OppositeCornerEnabled`] === false) return 0;
+    return 1;
+  }
 
   function migrateRadialMode(prefix: 'layerA' | 'layerB'): E4RadialCornerMode {
     const modeKey = `${prefix}RadialCornerMode`;
@@ -621,6 +1258,8 @@ export function normalizeE4MaterialSettings(raw: Partial<E4MaterialSettings> | u
     return undefined;
   }
 
+  const layerAGlassMode = migrateGlassReflexMode('layerA');
+  const layerBGlassMode = migrateGlassReflexMode('layerB');
   const layerAMode = migrateRadialMode('layerA');
   const layerBMode = migrateRadialMode('layerB');
 
@@ -631,6 +1270,8 @@ export function normalizeE4MaterialSettings(raw: Partial<E4MaterialSettings> | u
     layerAGlassReflexDark: raw.layerAGlassReflexDark ?? legacyLightA ?? base.layerAGlassReflexDark,
     layerBGlassReflexLight: raw.layerBGlassReflexLight ?? legacyLightB ?? base.layerBGlassReflexLight,
     layerBGlassReflexDark: raw.layerBGlassReflexDark ?? legacyLightB ?? base.layerBGlassReflexDark,
+    layerAGlassReflexMode: layerAGlassMode,
+    layerBGlassReflexMode: layerBGlassMode,
     layerARadialCornerMode: layerAMode,
     layerBRadialCornerMode: layerBMode,
     layerARadialTlStrength: migrateCornerStrength('layerA', 'Tl') ?? raw.layerARadialTlStrength ?? base.layerARadialTlStrength,
@@ -651,6 +1292,7 @@ export function e4SettingsToCssVars(s: E4MaterialSettings): CSSProperties {
     '--e4-deep': s.colorDeep,
     ...layerToCssVars('layerA', extractLayer(s, 'layerA')),
     ...layerToCssVars('layerB', extractLayer(s, 'layerB')),
+    ...bezelToCssVars(s),
     ...cornerToCssVars(s),
   } as CSSProperties;
 }

@@ -22,8 +22,8 @@ export type E3MaterialSettings = {
   colorCyan: string;
   colorBlue: string;
   colorDeep: string;
-  [key: `layerA${string}`]: number | boolean;
-  [key: `layerB${string}`]: number | boolean;
+  [key: `layerA${string}`]: number | boolean | string;
+  [key: `layerB${string}`]: number | boolean | string;
 };
 
 const layerADefaults: E2SheetMaterialKeys = {

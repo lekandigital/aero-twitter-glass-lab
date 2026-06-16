@@ -508,7 +508,8 @@
   min-width: 0;
 }
 
-.e2-settings-dock__field-input input[type='number'] {
+.e2-settings-dock__field-input input[type='number'],
+.e2-settings-dock__field-input input.mat-setting-number-input {
   width: 100%;
   min-width: 0;
   padding: 0.32rem 0.45rem;

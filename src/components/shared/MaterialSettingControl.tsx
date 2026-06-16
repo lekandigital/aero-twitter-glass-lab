@@ -67,6 +67,126 @@ function settingValuesEqual(a: unknown, b: unknown) {
   return a === b;
 }
 
+function isValidNumberDraft(raw: string, min: number) {
+  if (raw === '') return true;
+  if (min < 0) return /^-?\d*\.?\d*$/.test(raw);
+  return /^\d*\.?\d*$/.test(raw);
+}
+
+function formatNumberValue(value: number) {
+  return String(value);
+}
+
+type MaterialNumberControlProps<TValue> = {
+  field: MaterialFieldBase;
+  value: number;
+  onChange: (value: TValue) => void;
+  classPrefix: 'a1' | 'e1' | 'e2';
+};
+
+function MaterialNumberControl<TValue>({
+  field,
+  value,
+  onChange,
+  classPrefix,
+}: MaterialNumberControlProps<TValue>) {
+  const p = (suffix: string) => `${classPrefix}-settings-dock__${suffix}`;
+  const stop = (event: { stopPropagation: () => void }) => event.stopPropagation();
+  const min = field.min ?? 0;
+  const max = field.max ?? 100;
+  const [draft, setDraft] = useState(() => formatNumberValue(value));
+  const [editing, setEditing] = useState(false);
+  const valueRef = useRef(value);
+  valueRef.current = value;
+
+  useEffect(() => {
+    if (!editing) setDraft(formatNumberValue(value));
+  }, [value, editing]);
+
+  const commitDraft = () => {
+    const trimmed = draft.trim();
+    if (trimmed === '' || trimmed === '-' || trimmed === '.') {
+      setDraft(formatNumberValue(value));
+      return;
+    }
+    const parsed = Number(trimmed);
+    if (Number.isNaN(parsed)) {
+      setDraft(formatNumberValue(value));
+      return;
+    }
+    onChange(clampNumber(parsed, min, max) as TValue);
+  };
+
+  return (
+    <div className="mat-setting-control mat-setting-control--number" onClick={stop}>
+      <div className={p('stepper')}>
+        <button
+          type="button"
+          className={p('step-btn')}
+          aria-label={`Decrease ${field.label}`}
+          disabled={value <= min}
+          onClick={() => onChange(stepNumber(field, valueRef.current, -1) as TValue)}
+        >
+          −
+        </button>
+        <div className={p('field-input')}>
+          <input
+            type="text"
+            inputMode="decimal"
+            className="mat-setting-number-input"
+            value={editing ? draft : formatNumberValue(value)}
+            aria-label={field.label}
+            onFocus={() => {
+              setEditing(true);
+              setDraft(formatNumberValue(value));
+            }}
+            onChange={(e) => {
+              const next = e.target.value;
+              if (isValidNumberDraft(next, min)) setDraft(next);
+            }}
+            onBlur={() => {
+              setEditing(false);
+              commitDraft();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                commitDraft();
+                (e.currentTarget as HTMLInputElement).blur();
+              }
+              if (e.key === 'Escape') {
+                e.preventDefault();
+                setDraft(formatNumberValue(value));
+                (e.currentTarget as HTMLInputElement).blur();
+              }
+            }}
+          />
+          {field.unit && <span className={p('unit')}>{field.unit}</span>}
+        </div>
+        <button
+          type="button"
+          className={p('step-btn')}
+          aria-label={`Increase ${field.label}`}
+          disabled={value >= max}
+          onClick={() => onChange(stepNumber(field, valueRef.current, 1) as TValue)}
+        >
+          +
+        </button>
+      </div>
+      <input
+        type="range"
+        className="mat-setting-range"
+        min={min}
+        max={max}
+        step={field.step ?? 1}
+        value={value}
+        aria-label={`${field.label} slider`}
+        onChange={(e) => onChange(Number(e.target.value) as TValue)}
+      />
+    </div>
+  );
+}
+
 type MaterialSettingControlProps<TValue> = {
   field: MaterialFieldBase;
   value: TValue;
@@ -172,56 +292,14 @@ export function MaterialSettingControl<TValue>({
   }
 
   const current = value as number;
-  const min = field.min ?? 0;
-  const max = field.max ?? 100;
 
   return (
-    <div className={`mat-setting-control mat-setting-control--number`} onClick={stop}>
-      <div className={p('stepper')}>
-        <button
-          type="button"
-          className={p('step-btn')}
-          aria-label={`Decrease ${field.label}`}
-          disabled={current <= min}
-          onClick={() => onChange(stepNumber(field, current, -1) as TValue)}
-        >
-          −
-        </button>
-        <div className={p('field-input')}>
-          <input
-            type="number"
-            min={min}
-            max={max}
-            step={field.step}
-            value={current}
-            onChange={(e) => {
-              const parsed = Number(e.target.value);
-              if (!Number.isNaN(parsed)) onChange(clampNumber(parsed, min, max) as TValue);
-            }}
-          />
-          {field.unit && <span className={p('unit')}>{field.unit}</span>}
-        </div>
-        <button
-          type="button"
-          className={p('step-btn')}
-          aria-label={`Increase ${field.label}`}
-          disabled={current >= max}
-          onClick={() => onChange(stepNumber(field, current, 1) as TValue)}
-        >
-          +
-        </button>
-      </div>
-      <input
-        type="range"
-        className="mat-setting-range"
-        min={min}
-        max={max}
-        step={field.step ?? 1}
-        value={current}
-        aria-label={`${field.label} slider`}
-        onChange={(e) => onChange(Number(e.target.value) as TValue)}
-      />
-    </div>
+    <MaterialNumberControl
+      field={field}
+      value={current}
+      onChange={onChange}
+      classPrefix={classPrefix}
+    />
   );
 }
 
@@ -265,15 +343,31 @@ export function MaterialSettingFieldRow<TValue>({
   };
 
   const hint = resolveFieldHint(field);
+  const [hintVisible, setHintVisible] = useState(false);
+
+  useEffect(() => {
+    if (!hintVisible) return;
+    const hide = () => setHintVisible(false);
+    window.addEventListener('scroll', hide, true);
+    return () => window.removeEventListener('scroll', hide, true);
+  }, [hintVisible]);
 
   return (
     <div
       className={`${p('field')} mat-setting-field${highlighted ? ' mat-setting-field--highlight' : ''}`}
-      data-has-hint={hint ? 'true' : undefined}
     >
-      {hint && <div className="mat-setting-field__tooltip" role="tooltip">{hint}</div>}
       <div className="mat-setting-field__meta">
-        <div className="mat-setting-field__label-row">
+        <div
+          className="mat-setting-field__hint-anchor"
+          onMouseEnter={() => hint && setHintVisible(true)}
+          onMouseLeave={() => setHintVisible(false)}
+        >
+          {hint && hintVisible && (
+            <div className="mat-setting-field__tooltip" role="tooltip">
+              {hint}
+            </div>
+          )}
+          <div className="mat-setting-field__label-row">
           <span className={p('field-label')}>{field.label}</span>
           {canReset && (
             <div className="mat-setting-reset-wrap" ref={menuRef}>
@@ -320,6 +414,7 @@ export function MaterialSettingFieldRow<TValue>({
               )}
             </div>
           )}
+          </div>
         </div>
         <span className="mat-setting-type" title={`Data type: ${typeLabel}`}>
           {typeLabel}

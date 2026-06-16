@@ -1127,7 +1127,8 @@
   border-color: rgba(126, 232, 255, 0.35);
 }
 
-.a1-settings-dock__field-input input[type='number'] {
+.a1-settings-dock__field-input input[type='number'],
+.a1-settings-dock__field-input input.mat-setting-number-input {
   flex: 1;
   min-width: 0;
   padding: 0.32rem 0.45rem;
@@ -1140,7 +1141,8 @@
   outline: none;
 }
 
-.a1-settings-dock__field-input input[type='number']:focus {
+.a1-settings-dock__field-input input[type='number']:focus,
+.a1-settings-dock__field-input input.mat-setting-number-input:focus {
   border-color: rgba(126, 232, 255, 0.55);
 }
 
