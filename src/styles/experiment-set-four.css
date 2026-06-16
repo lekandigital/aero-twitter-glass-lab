@@ -27,14 +27,22 @@
   outline: 1px solid rgba(255, 255, 255, calc(0.14 * var(--e4-layerA-rim-strength)));
   outline-offset: -3px;
 
+  /* Clear bezel glass: a faint cool sky-catch from above, a near-invisible
+     vertical wash, and a whisper of cool body tint so the frame stays bright
+     but reads as glass (matches the reference frame). */
   background:
-    linear-gradient(
-      168deg,
-      rgba(255, 255, 255, calc(var(--e4-layerA-fill-top) * var(--e4-layerA-transparency))) 0%,
-      rgba(220, 245, 255, calc(var(--e4-layerA-fill-mid) * var(--e4-layerA-transparency))) 30%,
-      rgba(180, 230, 255, calc(var(--e4-layerA-fill-bottom) * var(--e4-layerA-transparency))) 100%
+    radial-gradient(
+      ellipse 112% 42% at 50% -10%,
+      rgba(255, 255, 255, calc(var(--e4-layerA-top-radial) * var(--e4-layerA-transparency) * 0.7)) 0%,
+      transparent 58%
     ),
-    rgba(255, 255, 255, calc(var(--e4-layerA-body-tint) * var(--e4-layerA-transparency)));
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, calc(var(--e4-layerA-fill-top) * var(--e4-layerA-transparency))) 0%,
+      rgba(224, 246, 255, calc(var(--e4-layerA-fill-mid) * var(--e4-layerA-transparency))) 34%,
+      rgba(190, 232, 252, calc(var(--e4-layerA-fill-bottom) * var(--e4-layerA-transparency))) 100%
+    ),
+    rgba(244, 251, 255, calc(var(--e4-layerA-body-tint) * var(--e4-layerA-transparency)));
 
   backdrop-filter: blur(var(--e4-layerA-frost)) saturate(var(--e4-layerA-saturate)) brightness(var(--e4-layerA-brightness));
   -webkit-backdrop-filter: blur(var(--e4-layerA-frost)) saturate(var(--e4-layerA-saturate))
@@ -51,6 +59,41 @@
     0 2px 6px rgba(0, 28, 78, calc(0.12 + var(--e4-layerA-outer-shadow, 0.3) * var(--e4-layerA-depth-strength, 0.5) * 0.3)),
     0 22px var(--e4-layerA-shadow-spread, 56px) rgba(0, 38, 100, calc(0.1 + var(--e4-layerA-outer-shadow, 0.3) * var(--e4-layerA-depth-strength, 0.5) * 0.6)),
     0 0 46px rgba(90, 200, 255, calc(0.06 + var(--e4-layerA-glow, 0.2) * var(--e4-layerA-depth-strength, 0.5) * 0.85));
+}
+
+/* Refraction — a faint highlight ring hugging the rim, warped by an SVG
+   displacement filter (#e4-glass-refract) so the border shimmers like thick
+   glass. Masked transparent through the center so it only touches the edges;
+   opacity scales with each layer's refraction setting (0 = off). */
+.experiment-four-layer-a::before,
+.experiment-four-layer-b::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  filter: url(#e4-glass-refract);
+  background: conic-gradient(
+    from 208deg at 50% 50%,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.34) 36deg,
+    transparent 86deg,
+    rgba(150, 224, 255, 0.24) 166deg,
+    transparent 214deg,
+    rgba(255, 255, 255, 0.26) 300deg,
+    transparent 348deg
+  );
+  -webkit-mask: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 54%, #000 100%);
+  mask: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 54%, #000 100%);
+}
+
+.experiment-four-layer-a::before {
+  opacity: calc(var(--e4-layerA-refraction, 0.06) * 0.9);
+}
+
+.experiment-four-layer-b::before {
+  opacity: calc(var(--e4-layerB-refraction, 0.14) * 0.9);
 }
 
 .experiment-four-layer-a__bezel-rim {
@@ -1144,19 +1187,27 @@
 
   border: none;
 
+  /* Wet frosted body: bright cool-white crown, airy powder-blue midriff, and a
+     clearer cool base so the grass reads through; a broad sky reflection from
+     above and a soft sky-bounce rising from the bottom edge. */
   background:
     linear-gradient(
       180deg,
       rgba(255, 255, 255, calc(var(--e4-layerB-fill-top) * var(--e4-layerB-transparency))) 0%,
-      rgba(235, 248, 255, calc(var(--e4-layerB-fill-mid) * var(--e4-layerB-transparency))) 38%,
-      rgba(200, 235, 255, calc(var(--e4-layerB-fill-bottom) * var(--e4-layerB-transparency) * var(--e4-layerB-depth-strength))) 100%
+      rgba(236, 248, 255, calc(var(--e4-layerB-fill-mid) * var(--e4-layerB-transparency))) 42%,
+      rgba(214, 240, 252, calc(var(--e4-layerB-fill-bottom) * var(--e4-layerB-transparency) * var(--e4-layerB-depth-strength))) 100%
     ),
     radial-gradient(
-      ellipse 90% 50% at 50% 0%,
+      ellipse 96% 52% at 50% -2%,
       rgba(255, 255, 255, calc(var(--e4-layerB-top-radial) * var(--e4-layerB-transparency))),
-      transparent 58%
+      transparent 60%
     ),
-    rgba(210, 240, 255, calc(var(--e4-layerB-body-tint) * var(--e4-layerB-transparency)));
+    radial-gradient(
+      ellipse 122% 30% at 50% 106%,
+      rgba(234, 251, 255, calc(0.1 * var(--e4-layerB-transparency))),
+      transparent 72%
+    ),
+    rgba(212, 240, 252, calc(var(--e4-layerB-body-tint) * var(--e4-layerB-transparency)));
 
   backdrop-filter: blur(var(--e4-layerB-frost)) saturate(var(--e4-layerB-saturate)) brightness(var(--e4-layerB-brightness));
   -webkit-backdrop-filter: blur(var(--e4-layerB-frost)) saturate(var(--e4-layerB-saturate))
@@ -1208,26 +1259,32 @@
   z-index: 1;
   opacity: var(--e4-layerB-shine-opacity);
   mix-blend-mode: screen;
-  /* Crisp bright band right under the top edge + a broad wet top glow. */
+  /* Crisp bright band under the top edge, a soft diagonal wet streak, a broad
+     specular bloom from above, and a faint sky-bounce rising at the base. */
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, calc(0.32 + 0.5 * var(--e4-layerB-top-shine, 0.5))) 0%,
-      rgba(255, 255, 255, calc(0.08 + 0.2 * var(--e4-layerB-top-shine, 0.5))) 7%,
-      transparent 20%
+      rgba(255, 255, 255, calc(0.3 + 0.5 * var(--e4-layerB-top-shine, 0.5))) 0%,
+      rgba(255, 255, 255, calc(0.08 + 0.2 * var(--e4-layerB-top-shine, 0.5))) 8%,
+      transparent 22%
     ),
     linear-gradient(
-      115deg,
-      transparent 30%,
-      rgba(255, 255, 255, 0.1) 42%,
-      rgba(255, 255, 255, calc(0.12 + var(--e4-layerB-diagonal-gloss, 0.4) * var(--e4-layerB-rim-strength, 0.3))) 48%,
-      rgba(255, 255, 255, 0.14) 54%,
-      transparent 66%
+      118deg,
+      transparent 28%,
+      rgba(255, 255, 255, 0.08) 44%,
+      rgba(255, 255, 255, calc(0.1 + var(--e4-layerB-diagonal-gloss, 0.4) * var(--e4-layerB-rim-strength, 0.3))) 49%,
+      rgba(255, 255, 255, 0.1) 55%,
+      transparent 70%
     ),
     radial-gradient(
-      ellipse 110% 58% at 50% -10%,
-      rgba(255, 255, 255, calc(0.2 + 0.6 * var(--e4-layerB-top-shine, 0.5))),
-      transparent 72%
+      ellipse 124% 64% at 50% -14%,
+      rgba(255, 255, 255, calc(0.2 + 0.62 * var(--e4-layerB-top-shine, 0.5))),
+      transparent 74%
+    ),
+    radial-gradient(
+      ellipse 132% 26% at 50% 112%,
+      rgba(236, 252, 255, calc(0.05 + 0.18 * var(--e4-layerB-top-shine, 0.5))),
+      transparent 74%
     );
 }
 
