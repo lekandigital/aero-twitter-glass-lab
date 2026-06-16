@@ -2,6 +2,7 @@ export type EdgeReflexBackdropSide = 'left' | 'right';
 
 export type EdgeReflexBackdropProfile = {
   maskGradient: string;
+  rimMaskGradient: string;
   tintGradient: string;
   rimGradient: string;
   peakAlpha: number;
@@ -241,6 +242,80 @@ function indexToPct(index: number, count: number): number {
   return count <= 1 ? 50 : (index / (count - 1)) * 100;
 }
 
+function rimMaskAlpha(gate: number): number {
+  if (gate < 0.14) return 0;
+  return Math.min(1, Math.pow(gate, 1.5));
+}
+
+function buildHardMaskStops(gates: number[], alphaAt: (gate: number) => number): string[] {
+  if (gates.length <= 1) {
+    const alpha = alphaAt(gates[0] ?? 0).toFixed(3);
+    return [`rgba(0,0,0,${alpha}) 0%`, `rgba(0,0,0,${alpha}) 100%`];
+  }
+
+  return gates.map((gate, index) => {
+    const pct = indexToPct(index, gates.length).toFixed(2);
+    const alpha = alphaAt(gate).toFixed(3);
+    return `rgba(0,0,0,${alpha}) ${pct}%`;
+  });
+}
+
+function applyPeakEnvelopes(gates: number[]): number[] {
+  const halfSpan = Math.max(2, Math.round(gates.length * 0.028));
+  const output = new Array(gates.length).fill(0);
+
+  const peaks: { index: number; strength: number }[] = [];
+  for (let i = 0; i < gates.length; i += 1) {
+    if (gates[i] < 0.12) continue;
+    const prev = gates[i - 1] ?? 0;
+    const next = gates[i + 1] ?? 0;
+    if (gates[i] >= prev && gates[i] >= next) {
+      peaks.push({ index: i, strength: gates[i] });
+    }
+  }
+
+  if (peaks.length === 0) {
+    let bestIndex = 0;
+    for (let i = 1; i < gates.length; i += 1) {
+      if (gates[i] > gates[bestIndex]) bestIndex = i;
+    }
+    if (gates[bestIndex] >= 0.1) {
+      peaks.push({ index: bestIndex, strength: gates[bestIndex] });
+    }
+  }
+
+  for (const peak of peaks) {
+    for (let i = 0; i < gates.length; i += 1) {
+      const dist = Math.abs(i - peak.index);
+      if (dist > halfSpan * 2.4) continue;
+      const envelope = Math.exp(-(dist * dist) / (2 * halfSpan * halfSpan));
+      output[i] = Math.max(output[i], peak.strength * envelope);
+    }
+  }
+
+  return output;
+}
+
+function buildRimGates(lumas: number[]): number[] {
+  const relativeGates = lumas.map((luma, index) => {
+    const localWindow = 8;
+    let localSum = 0;
+    let localCount = 0;
+    for (let offset = -localWindow; offset <= localWindow; offset += 1) {
+      const j = Math.min(lumas.length - 1, Math.max(0, index + offset));
+      localSum += lumas[j];
+      localCount += 1;
+    }
+    const localAvg = localSum / localCount;
+    const lift = luma - localAvg;
+    const relative = smoothstep(LOCAL_LIFT_FLOOR * 1.15, LOCAL_LIFT_CEIL * 0.85, lift);
+    const absoluteCap = smoothstep(0.24, 0.58, luma);
+    return sharpenGate(Math.min(1, relative * absoluteCap * 1.2));
+  });
+
+  return applyPeakEnvelopes(relativeGates);
+}
+
 function buildSmoothMaskStops(gates: number[]): string[] {
   if (gates.length <= 1) {
     const alpha = maskAlpha(gates[0] ?? 0).toFixed(3);
@@ -304,37 +379,22 @@ function buildSmoothTintStops(
   return stops;
 }
 
-function buildSmoothRimStops(
+function buildRimColorStops(
   samples: RgbSample[],
-  gates: number[],
+  rimGates: number[],
   lightStrength: number,
 ): string[] {
-  if (samples.length <= 1) {
-    return ['rgba(0,0,0,0) 0%', 'rgba(0,0,0,0) 100%'];
-  }
-
-  const rimAt = (sample: RgbSample, gate: number, pct: number) => {
+  return samples.map((sample, index) => {
+    const pct = indexToPct(index, samples.length).toFixed(2);
+    const gate = rimGates[index];
     const intensity = colorIntensity(sample.luma, gate, lightStrength);
-    if (intensity <= 0.03 || maskAlpha(gate) <= 0) {
-      return `rgba(0,0,0,0) ${pct.toFixed(2)}%`;
+    if (intensity <= 0.04 || rimMaskAlpha(gate) <= 0) {
+      return `rgba(0,0,0,0) ${pct}%`;
     }
     const { r, g, b } = sampleColor(sample, intensity);
     const alpha = Math.min(1, intensity * 1.22).toFixed(3);
-    return `rgba(${r},${g},${b},${alpha}) ${pct.toFixed(2)}%`;
-  };
-
-  const stops: string[] = [];
-  for (let i = 0; i < samples.length - 1; i += 1) {
-    const pct0 = indexToPct(i, samples.length);
-    const pct1 = indexToPct(i + 1, samples.length);
-    const midPct = (pct0 + pct1) / 2;
-    const midSample = lerpSample(samples[i], samples[i + 1], 0.5);
-    const midGate = (gates[i] + gates[i + 1]) * 0.5;
-    stops.push(rimAt(samples[i], gates[i], pct0));
-    stops.push(rimAt(midSample, midGate, midPct));
-  }
-  stops.push(rimAt(samples[samples.length - 1], gates[gates.length - 1], 100));
-  return stops;
+    return `rgba(${r},${g},${b},${alpha}) ${pct}%`;
+  });
 }
 
 function buildProfileFromSamples(samples: RgbSample[], lightStrength: number): EdgeReflexBackdropProfile {
@@ -360,21 +420,26 @@ function buildProfileFromSamples(samples: RgbSample[], lightStrength: number): E
   });
 
   const peakAlpha = Math.max(...gates.map(maskAlpha));
+  const rimGates = buildRimGates(lumas);
+  const rimPeakAlpha = Math.max(...rimGates.map(rimMaskAlpha));
+
   const maskStops = buildSmoothMaskStops(gates);
+  const rimMaskStops = buildHardMaskStops(rimGates, rimMaskAlpha);
   const tintStops = buildSmoothTintStops(samples, gates, lightStrength);
-  const rimStops = buildSmoothRimStops(samples, gates, lightStrength);
+  const rimStops = buildRimColorStops(samples, rimGates, lightStrength);
 
   const brightest = samples.reduce(
     (best, sample, index) =>
-      maskAlpha(gates[index]) * sample.luma > best.score
-        ? { score: maskAlpha(gates[index]) * sample.luma, sample }
+      rimMaskAlpha(rimGates[index]) * sample.luma > best.score
+        ? { score: rimMaskAlpha(rimGates[index]) * sample.luma, sample }
         : best,
     { score: 0, sample: samples[0] },
   );
-  const rim = sampleColor(brightest.sample, Math.min(1, 0.3 + peakAlpha * 0.6));
+  const rim = sampleColor(brightest.sample, Math.min(1, 0.3 + rimPeakAlpha * 0.6));
 
   return {
     maskGradient: `linear-gradient(to bottom, ${maskStops.join(', ')})`,
+    rimMaskGradient: `linear-gradient(to bottom, ${rimMaskStops.join(', ')})`,
     tintGradient: `linear-gradient(to bottom, ${tintStops.join(', ')})`,
     rimGradient: `linear-gradient(to bottom, ${rimStops.join(', ')})`,
     peakAlpha,
@@ -385,6 +450,7 @@ function buildProfileFromSamples(samples: RgbSample[], lightStrength: number): E
 
 const FULL_EDGE_PROFILE: EdgeReflexBackdropProfile = {
   maskGradient: 'linear-gradient(to bottom, #000 0%, #000 100%)',
+  rimMaskGradient: 'linear-gradient(to bottom, #000 0%, #000 100%)',
   tintGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
   rimGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
   peakAlpha: 1,
@@ -394,6 +460,7 @@ const FULL_EDGE_PROFILE: EdgeReflexBackdropProfile = {
 
 const EMPTY_EDGE_PROFILE: EdgeReflexBackdropProfile = {
   maskGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
+  rimMaskGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
   tintGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
   rimGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
   peakAlpha: 0,
