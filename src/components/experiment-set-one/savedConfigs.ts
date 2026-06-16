@@ -16,6 +16,8 @@ import {
 import { SAVE_20_ID, builtInSave20 } from './builtInSave20';
 import { SAVE_21_ID, builtInSave21 } from './builtInSave21';
 import { SAVE_22_ID, builtInSave22 } from './builtInSave22';
+import { SAVE_44_ID, builtInSave44 } from './builtInSave44';
+import { SAVE_45_ID, builtInSave45 } from './builtInSave45';
 
 // Earliest exported config in ~/Downloads that includes Experiment Four.
 // Used only as a one-time migration heuristic for older saves.
@@ -144,7 +146,14 @@ function withNormalizedE4(save: ExperimentSetOneSnapshot): ExperimentSetOneSnaps
 }
 
 function isReservedSaveId(id: number): boolean {
-  return id === REFERENCE_CORNER_SAVE_ID || id === SAVE_20_ID || id === SAVE_21_ID || id === SAVE_22_ID;
+  return (
+    id === REFERENCE_CORNER_SAVE_ID ||
+    id === SAVE_20_ID ||
+    id === SAVE_21_ID ||
+    id === SAVE_22_ID ||
+    id === SAVE_44_ID ||
+    id === SAVE_45_ID
+  );
 }
 
 function nextAvailableSaveId(existingIds: Set<number>): number {
@@ -155,7 +164,7 @@ function nextAvailableSaveId(existingIds: Set<number>): number {
 
 export function loadExperimentSetOneSaves(): ExperimentSetOneSnapshot[] {
   // Order (for UI): reference corners, then user saves up to and including Save 19,
-  // then built-in Save 20, Save 21, and Save 22, then remaining user saves.
+  // then built-in Save 20, Save 21, Save 22, Save 44, and Save 45, then remaining user saves.
   //
   // This guarantees Save 20/21/22 appear after Save 19 even when Save 19 lives in localStorage.
   const storage = readStorage();
@@ -167,6 +176,8 @@ export function loadExperimentSetOneSaves(): ExperimentSetOneSnapshot[] {
       withNormalizedE4(builtInSave20()),
       withNormalizedE4(builtInSave21()),
       withNormalizedE4(builtInSave22()),
+      withNormalizedE4(builtInSave44()),
+      withNormalizedE4(builtInSave45()),
     ];
   }
   const before = storage.slice(0, idx19 + 1);
@@ -177,6 +188,8 @@ export function loadExperimentSetOneSaves(): ExperimentSetOneSnapshot[] {
     withNormalizedE4(builtInSave20()),
     withNormalizedE4(builtInSave21()),
     withNormalizedE4(builtInSave22()),
+    withNormalizedE4(builtInSave44()),
+    withNormalizedE4(builtInSave45()),
     ...after,
   ];
 }
