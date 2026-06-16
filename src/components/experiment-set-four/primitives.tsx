@@ -2,27 +2,17 @@ import { e4InspectAttrs, e4LayerADimensionStyle, e4LayerBDimensionStyle } from '
 import { useExperimentSetOne } from '../experiment-set-one/combinedSettings';
 import { ExperimentTwoDraggableSheet } from '../experiment-set-two/primitives';
 import { GlassFrostSurface } from '../shared/GlassFrostSurface';
+import { PwzzovOGlassCorners } from '../shared/PwzzovOGlassCorners';
 
-const PWZZOV_REFLEX_REGIONS = ['tl', 'tr', 'bl', 'br', 'left', 'right'] as const;
-
-function PwzzovOGlassCorners({
-  layerClass,
-  inspectTarget,
-}: {
-  layerClass: 'experiment-four-layer-a' | 'experiment-four-layer-b';
-  inspectTarget: 'layer-a-corners' | 'layer-b-corners';
-}) {
-  return (
-    <div className={`${layerClass}__pwzzovO-glass-wrap`} {...e4InspectAttrs(inspectTarget)}>
-      {PWZZOV_REFLEX_REGIONS.map((region) => (
-        <span
-          key={region}
-          className={`${layerClass}__pwzzovO-glass ${layerClass}__pwzzovO-glass--${region}`}
-          aria-hidden="true"
-        />
-      ))}
-    </div>
-  );
+function layerEdgeReflexEnabled(
+  mode: number,
+  leftLight: number,
+  leftDark: number,
+  rightLight: number,
+  rightDark: number,
+): boolean {
+  if (mode !== 3) return false;
+  return leftLight > 0 || leftDark > 0 || rightLight > 0 || rightDark > 0;
 }
 
 function LayerCopy({
@@ -68,7 +58,21 @@ export function ExperimentFourLayerBSheet({ nested = false }: { nested?: boolean
         aria-hidden="true"
         {...e4InspectAttrs('layer-b-radial')}
       />
-      <PwzzovOGlassCorners layerClass="experiment-four-layer-b" inspectTarget="layer-b-corners" />
+      <PwzzovOGlassCorners
+        layerClass="experiment-four-layer-b"
+        inspectTarget="layer-b-corners"
+        edgeReflexEnabled={layerEdgeReflexEnabled(
+          e4.layerBGlassReflexMode,
+          e4.layerBGlassReflexLeftLight,
+          e4.layerBGlassReflexLeftDark,
+          e4.layerBGlassReflexRightLight,
+          e4.layerBGlassReflexRightDark,
+        )}
+        rimSideGapTop={e4.layerBRimSideGapTop}
+        rimSideGapBottom={e4.layerBRimSideGapBottom}
+        leftLight={e4.layerBGlassReflexLeftLight}
+        rightLight={e4.layerBGlassReflexRightLight}
+      />
       <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--a" aria-hidden="true" />
       <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--b" aria-hidden="true" />
       <div className="experiment-four-layer-b__content">
@@ -114,7 +118,21 @@ export function ExperimentFourLayerASheet({ nestedB = false }: { nestedB?: boole
         aria-hidden="true"
         {...e4InspectAttrs('layer-a-radial')}
       />
-      <PwzzovOGlassCorners layerClass="experiment-four-layer-a" inspectTarget="layer-a-corners" />
+      <PwzzovOGlassCorners
+        layerClass="experiment-four-layer-a"
+        inspectTarget="layer-a-corners"
+        edgeReflexEnabled={layerEdgeReflexEnabled(
+          e4.layerAGlassReflexMode,
+          e4.layerAGlassReflexLeftLight,
+          e4.layerAGlassReflexLeftDark,
+          e4.layerAGlassReflexRightLight,
+          e4.layerAGlassReflexRightDark,
+        )}
+        rimSideGapTop={e4.layerARimSideGapTop}
+        rimSideGapBottom={e4.layerARimSideGapBottom}
+        leftLight={e4.layerAGlassReflexLeftLight}
+        rightLight={e4.layerAGlassReflexRightLight}
+      />
       {nestedB && (
         <div className="experiment-four-layer-a__bezel-inset">
           <ExperimentFourLayerBSheet nested />

@@ -2,27 +2,17 @@ import { e4InspectAttrs, e4LayerADimensionStyle, e4LayerBDimensionStyle } from '
 import { useExperimentSetOne } from '../experiment-set-one/combinedSettings';
 import { ExperimentTwoDraggableSheet } from '../experiment-set-two/primitives';
 import { GlassFrostSurface } from '../shared/GlassFrostSurface';
+import { PwzzovOGlassCorners } from '../shared/PwzzovOGlassCorners';
 
-const PWZZOV_REFLEX_REGIONS = ['tl', 'tr', 'bl', 'br', 'left', 'right'] as const;
-
-function PwzzovOGlassCorners({
-  layerClass,
-  inspectTarget,
-}: {
-  layerClass: 'experiment-four-layer-a' | 'experiment-four-layer-b';
-  inspectTarget: 'layer-a-corners' | 'layer-b-corners';
-}) {
-  return (
-    <div className={`${layerClass}__pwzzovO-glass-wrap`} {...e4InspectAttrs(inspectTarget)}>
-      {PWZZOV_REFLEX_REGIONS.map((region) => (
-        <span
-          key={region}
-          className={`${layerClass}__pwzzovO-glass ${layerClass}__pwzzovO-glass--${region}`}
-          aria-hidden="true"
-        />
-      ))}
-    </div>
-  );
+function layerEdgeReflexEnabled(
+  mode: number,
+  leftLight: number,
+  leftDark: number,
+  rightLight: number,
+  rightDark: number,
+): boolean {
+  if (mode !== 3) return false;
+  return leftLight > 0 || leftDark > 0 || rightLight > 0 || rightDark > 0;
 }
 
 function LayerCopy({
@@ -68,7 +58,21 @@ function ExperimentFiveLayerBSheet() {
         aria-hidden="true"
         {...e4InspectAttrs('layer-b-radial')}
       />
-      <PwzzovOGlassCorners layerClass="experiment-four-layer-b" inspectTarget="layer-b-corners" />
+      <PwzzovOGlassCorners
+        layerClass="experiment-four-layer-b"
+        inspectTarget="layer-b-corners"
+        edgeReflexEnabled={layerEdgeReflexEnabled(
+          e5.layerBGlassReflexMode,
+          e5.layerBGlassReflexLeftLight,
+          e5.layerBGlassReflexLeftDark,
+          e5.layerBGlassReflexRightLight,
+          e5.layerBGlassReflexRightDark,
+        )}
+        rimSideGapTop={e5.layerBRimSideGapTop}
+        rimSideGapBottom={e5.layerBRimSideGapBottom}
+        leftLight={e5.layerBGlassReflexLeftLight}
+        rightLight={e5.layerBGlassReflexRightLight}
+      />
       <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--a" aria-hidden="true" />
       <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--b" aria-hidden="true" />
       <div className="experiment-four-layer-b__content">
@@ -110,7 +114,21 @@ function ExperimentFiveLayerASheet() {
         aria-hidden="true"
         {...e4InspectAttrs('layer-a-radial')}
       />
-      <PwzzovOGlassCorners layerClass="experiment-four-layer-a" inspectTarget="layer-a-corners" />
+      <PwzzovOGlassCorners
+        layerClass="experiment-four-layer-a"
+        inspectTarget="layer-a-corners"
+        edgeReflexEnabled={layerEdgeReflexEnabled(
+          e5.layerAGlassReflexMode,
+          e5.layerAGlassReflexLeftLight,
+          e5.layerAGlassReflexLeftDark,
+          e5.layerAGlassReflexRightLight,
+          e5.layerAGlassReflexRightDark,
+        )}
+        rimSideGapTop={e5.layerARimSideGapTop}
+        rimSideGapBottom={e5.layerARimSideGapBottom}
+        leftLight={e5.layerAGlassReflexLeftLight}
+        rightLight={e5.layerAGlassReflexRightLight}
+      />
       <div className="experiment-four-layer-a__bezel-inset">
         <ExperimentFiveLayerBSheet />
       </div>
