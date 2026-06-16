@@ -24,8 +24,6 @@
   cursor: inherit;
 
   border: none;
-  outline: 1px solid rgba(255, 255, 255, calc(0.14 * var(--e4-layerA-rim-strength)));
-  outline-offset: -3px;
 
   background:
     linear-gradient(
@@ -41,11 +39,19 @@
     brightness(var(--e4-layerA-brightness));
 
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, calc(0.92 * var(--e4-layerA-rim-strength))),
-    inset 0 1px 3px rgba(255, 255, 255, calc(0.5 * var(--e4-layerA-rim-strength))),
+    /* crisp bright top bevel edge */
+    inset 0 1.5px 0 0 rgba(255, 255, 255, calc(0.4 + 0.55 * var(--e4-layerA-rim-strength))),
+    /* soft light pooling just under the top bevel */
+    inset 0 6px 12px -5px rgba(255, 255, 255, calc(0.2 + 0.42 * var(--e4-layerA-rim-strength))),
+    /* continuous bright perimeter hairline */
+    inset 0 0 0 1px rgba(255, 255, 255, calc(0.22 + 0.55 * var(--e4-layerA-rim-strength))),
+    /* faint cool glass-thickness ring just inside the rim */
+    inset 0 0 0 3px rgba(198, 232, 255, calc(0.05 + 0.13 * var(--e4-layerA-rim-strength))),
+    /* cool inner depth gathering at the bottom */
     inset 0 -16px 28px rgba(0, 68, 170, calc(var(--e4-layerA-inner-depth) * var(--e4-layerA-depth-strength) * 0.45)),
-    inset 0 0 0 1px rgba(255, 255, 255, calc(0.32 * var(--e4-layerA-rim-strength))),
+    /* float shadow */
     0 18px var(--e4-layerA-shadow-spread) rgba(0, 38, 100, calc(var(--e4-layerA-outer-shadow) * var(--e4-layerA-depth-strength))),
+    /* aqua ambient glow */
     0 0 40px rgba(90, 200, 255, calc(var(--e4-layerA-glow) * var(--e4-layerA-depth-strength)));
 }
 
@@ -56,16 +62,26 @@
   pointer-events: none;
   z-index: 1;
   background:
+    /* center-weighted overhead sheen across the top */
+    radial-gradient(
+      140% 64% at 50% -14%,
+      rgba(255, 255, 255, calc(0.4 + 0.4 * var(--e4-layerA-rim-strength))) 0%,
+      rgba(255, 255, 255, calc(0.12 + 0.2 * var(--e4-layerA-rim-strength))) 30%,
+      transparent 62%
+    ),
+    /* bright top gloss band fading down */
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, calc(0.78 * var(--e4-layerA-rim-strength))) 0%,
-      rgba(255, 255, 255, calc(0.28 * var(--e4-layerA-rim-strength))) 12%,
-      transparent 30%
+      rgba(255, 255, 255, calc(0.52 + 0.4 * var(--e4-layerA-rim-strength))) 0%,
+      rgba(255, 255, 255, calc(0.24 + 0.28 * var(--e4-layerA-rim-strength))) 7%,
+      rgba(255, 255, 255, calc(0.06 + 0.12 * var(--e4-layerA-rim-strength))) 17%,
+      transparent 34%
     ),
+    /* cool up-glow from the bottom edge */
     linear-gradient(
       0deg,
-      rgba(0, 100, 210, calc(0.12 * var(--e4-layerA-depth-strength))) 0%,
-      transparent 16%
+      rgba(6, 96, 205, calc(0.1 + 0.16 * var(--e4-layerA-depth-strength))) 0%,
+      transparent 18%
     );
 }
 
@@ -1107,9 +1123,17 @@
     brightness(var(--e4-layerB-brightness));
 
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, calc(0.72 * var(--e4-layerB-rim-strength))),
+    /* crisp top bevel edge (softer than layer A) */
+    inset 0 1px 0 0 rgba(255, 255, 255, calc(0.32 + 0.5 * var(--e4-layerB-rim-strength))),
+    /* light pooling under the top bevel */
+    inset 0 5px 10px -4px rgba(255, 255, 255, calc(0.14 + 0.34 * var(--e4-layerB-rim-strength))),
+    /* continuous perimeter hairline */
+    inset 0 0 0 1px rgba(255, 255, 255, calc(0.16 + 0.42 * var(--e4-layerB-rim-strength))),
+    /* faint cool glass-thickness ring */
+    inset 0 0 0 2.5px rgba(198, 232, 255, calc(0.04 + 0.1 * var(--e4-layerB-rim-strength))),
+    /* cool inner depth at the bottom */
     inset 0 -20px 36px rgba(0, 68, 170, calc(var(--e4-layerB-inner-depth) * var(--e4-layerB-depth-strength))),
-    inset 0 0 0 1px rgba(255, 255, 255, calc(0.22 * var(--e4-layerB-rim-strength))),
+    /* soft float shadow */
     0 8px 24px rgba(0, 38, 100, calc(var(--e4-layerB-outer-shadow) * var(--e4-layerB-depth-strength) * 0.35));
 }
 
@@ -1131,9 +1155,14 @@
       transparent 66%
     ),
     radial-gradient(
-      ellipse 100% 55% at 50% -8%,
-      rgba(255, 255, 255, calc(var(--e4-layerB-top-shine) * var(--e4-layerB-rim-strength))),
-      transparent 70%
+      ellipse 120% 60% at 50% -10%,
+      rgba(255, 255, 255, calc(0.16 + var(--e4-layerB-top-shine) * var(--e4-layerB-rim-strength))),
+      transparent 66%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, calc(0.18 + 0.28 * var(--e4-layerB-rim-strength))) 0%,
+      transparent 12%
     );
 }
 
