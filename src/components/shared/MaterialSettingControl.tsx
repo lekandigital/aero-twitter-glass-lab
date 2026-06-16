@@ -197,6 +197,8 @@ type MaterialSettingControlProps<TValue> = {
   onReset?: () => void;
   resetTargets?: Array<{ label: string; value: TValue }>;
   onResetTo?: (value: TValue) => void;
+  fieldIndex?: number;
+  outOfSync?: boolean;
 };
 
 export function MaterialSettingControl<TValue>({
@@ -313,6 +315,8 @@ export function MaterialSettingFieldRow<TValue>({
   onReset,
   resetTargets,
   onResetTo,
+  fieldIndex,
+  outOfSync = false,
 }: MaterialSettingControlProps<TValue>) {
   const p = (suffix: string) => `${classPrefix}-settings-dock__${suffix}`;
   const typeLabel = materialTypeLabel(field);
@@ -368,7 +372,17 @@ export function MaterialSettingFieldRow<TValue>({
             </div>
           )}
           <div className="mat-setting-field__label-row">
+          {fieldIndex !== undefined && (
+            <span className="mat-setting-field__index" aria-hidden="true">
+              {fieldIndex}
+            </span>
+          )}
           <span className={p('field-label')}>{field.label}</span>
+          {outOfSync && (
+            <span className="mat-setting-field__out-of-sync" title="Layer A and Layer B differ">
+              ≠
+            </span>
+          )}
           {canReset && (
             <div className="mat-setting-reset-wrap" ref={menuRef}>
               <button
