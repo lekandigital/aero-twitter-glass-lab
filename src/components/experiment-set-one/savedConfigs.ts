@@ -5,12 +5,17 @@ import { E2_DEFAULT_SETTINGS } from '../experiment-set-two/materialSettings';
 import type { E3MaterialSettings } from '../experiment-set-three/materialSettings';
 import { buildInitialE3Settings } from '../experiment-set-three/materialSettings';
 import type { E4MaterialSettings } from '../experiment-set-four/materialSettings';
+import type { ExperimentId } from './experimentVisibility';
 import {
   REFERENCE_CORNER_LIGHTING_OVERRIDES,
   REFERENCE_CORNER_SAVE_AT,
   REFERENCE_CORNER_SAVE_ID,
   REFERENCE_CORNER_SAVE_LABEL,
 } from '../experiment-set-four/referenceCornerLighting';
+
+// Earliest exported config in ~/Downloads that includes Experiment Four.
+// Used only as a one-time migration heuristic for older saves.
+const E4_BEGIN_CUTOFF_ISO = '2026-06-16T00:47:50.565Z';
 
 export type ExperimentSetOneSnapshot = {
   id: number;
@@ -20,6 +25,8 @@ export type ExperimentSetOneSnapshot = {
   e2: E2MaterialSettings;
   e3: E3MaterialSettings;
   e4?: E4MaterialSettings;
+  /** Which experiment this save is meant for (used to filter saves list + load behavior). */
+  scope?: ExperimentId;
   /** When true, loading only merges Experiment Four corner lighting fields. */
   cornersOnly?: boolean;
 };
@@ -34,6 +41,7 @@ function builtInReferenceCornerSave(): ExperimentSetOneSnapshot {
     e1: E1_DEFAULT_SETTINGS,
     e2: E2_DEFAULT_SETTINGS,
     e3: buildInitialE3Settings(),
+    scope: 'four',
     cornersOnly: true,
   };
 }
@@ -70,14 +78,27 @@ function dedupeSnapshots(saves: ExperimentSetOneSnapshot[]) {
   return next;
 }
 
+function migrateSnapshotScope(save: ExperimentSetOneSnapshot): ExperimentSetOneSnapshot {
+  if (save.cornersOnly) return save;
+  if (save.scope) return save;
+
+  const savedAtMs = Date.parse(save.savedAt);
+  const cutoffMs = Date.parse(E4_BEGIN_CUTOFF_ISO);
+  if (!Number.isFinite(savedAtMs) || !Number.isFinite(cutoffMs)) {
+    return { ...save, scope: 'four' };
+  }
+  return { ...save, scope: savedAtMs < cutoffMs ? 'three' : 'four' };
+}
+
 function readStorage(): ExperimentSetOneSnapshot[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as ExperimentSetOneSnapshot[];
     if (!Array.isArray(parsed)) return [];
-    const deduped = dedupeSnapshots(parsed);
-    if (deduped.length !== parsed.length) {
+    const migrated = parsed.map(migrateSnapshotScope);
+    const deduped = dedupeSnapshots(migrated);
+    if (deduped.length !== parsed.length || migrated.some((s, i) => s.scope !== parsed[i]?.scope)) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(deduped));
     }
     return deduped;
@@ -103,6 +124,7 @@ export function addExperimentSetOneSave(
   e2: E2MaterialSettings,
   e3: E3MaterialSettings,
   e4: E4MaterialSettings,
+  scope: ExperimentId,
 ): ExperimentSetOneSnapshot {
   const existing = readStorage();
   const id = existing.length === 0 ? 1 : Math.max(...existing.map((s) => s.id)) + 1;
@@ -114,6 +136,7 @@ export function addExperimentSetOneSave(
     e2,
     e3,
     e4,
+    scope,
   };
   writeStorage([...existing, snapshot]);
   return snapshot;

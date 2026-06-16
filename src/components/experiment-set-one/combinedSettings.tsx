@@ -121,6 +121,8 @@ type ExperimentSetOneContextValue = {
   setHidePanelText: (on: boolean) => void;
   experimentVisible: ExperimentVisibility;
   toggleExperimentVisible: (id: ExperimentId) => void;
+  activeExperiment: ExperimentId;
+  setActiveExperiment: (id: ExperimentId) => void;
   selection: ExperimentSelection | null;
   clearSelection: () => void;
   referenceWallpaper: boolean;
@@ -149,6 +151,7 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
   );
   const { referenceWallpaper, toggleReferenceWallpaper } = useReferenceWallpaper();
   const [layoutResetVersion, setLayoutResetVersion] = useState(0);
+  const [activeExperiment, setActiveExperiment] = useState<ExperimentId>('four');
   const [selection, setSelection] = useState<ExperimentSelection | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   const selectedElRef = useRef<HTMLElement | null>(null);
@@ -188,16 +191,33 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
   }, []);
 
   const saveCurrent = useCallback(() => {
-    addExperimentSetOneSave(e1, e2, e3, e4);
+    const scope = selection ? selection.experiment : activeExperiment;
+    addExperimentSetOneSave(e1, e2, e3, e4, scope);
     setSaves(loadExperimentSetOneSaves());
     downloadExperimentSetOneConfig(e1, e2, e3, e4);
-  }, [e1, e2, e3, e4]);
+  }, [e1, e2, e3, e4, selection, activeExperiment]);
 
   const loadSave = useCallback((id: number) => {
     const snapshot = loadExperimentSetOneSaves().find((save) => save.id === id);
     if (!snapshot) return;
     if (snapshot.cornersOnly) {
       setE4State((prev) => applyReferenceCornerLighting(prev));
+      return;
+    }
+    if (snapshot.scope === 'one') {
+      setE1State(snapshot.e1);
+      return;
+    }
+    if (snapshot.scope === 'two') {
+      setE2State(snapshot.e2);
+      return;
+    }
+    if (snapshot.scope === 'three') {
+      setE3State(snapshot.e3);
+      return;
+    }
+    if (snapshot.scope === 'four') {
+      if (snapshot.e4) setE4State(normalizeE4MaterialSettings(snapshot.e4));
       return;
     }
     setE1State(snapshot.e1);
@@ -220,6 +240,7 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
   const toggleExperimentVisible = useCallback((id: ExperimentId) => {
     setExperimentVisible((prev) => ({ ...prev, [id]: !prev[id] }));
     setSelection((prev) => (prev?.experiment === id ? null : prev));
+    setActiveExperiment(id);
     clearInspectFlash();
     selectedElRef.current = null;
   }, []);
@@ -265,6 +286,7 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
       const e4Target = el.dataset.e4Inspect;
       if (e4Target && isE4InspectTarget(e4Target)) {
         flashInspectElement(el, 'four');
+        setActiveExperiment('four');
         setSelection({
           experiment: 'four',
           target: e4Target,
@@ -276,6 +298,7 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
       const e3Target = el.dataset.e3Inspect;
       if (e3Target && isE3InspectTarget(e3Target)) {
         flashInspectElement(el, 'three');
+        setActiveExperiment('three');
         setSelection({
           experiment: 'three',
           target: e3Target,
@@ -287,6 +310,7 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
       const e2Target = el.dataset.e2Inspect;
       if (e2Target && isE2InspectTarget(e2Target)) {
         flashInspectElement(el, 'two');
+        setActiveExperiment('two');
         setSelection({
           experiment: 'two',
           target: e2Target,
@@ -298,6 +322,7 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
       const e1Target = el.dataset.e1Inspect;
       if (e1Target && isE1InspectTarget(e1Target)) {
         flashInspectElement(el, 'one');
+        setActiveExperiment('one');
         setSelection({
           experiment: 'one',
           target: e1Target,
@@ -332,12 +357,14 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
       setHidePanelText,
       experimentVisible,
       toggleExperimentVisible,
+      activeExperiment,
+      setActiveExperiment,
       selection,
       clearSelection,
       referenceWallpaper,
       toggleReferenceWallpaper,
     }),
-    [e1, e2, e3, e4, setE1, setE2, setE3, setE4, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, experimentVisible, toggleExperimentVisible, selection, clearSelection, referenceWallpaper, toggleReferenceWallpaper],
+    [e1, e2, e3, e4, setE1, setE2, setE3, setE4, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, experimentVisible, toggleExperimentVisible, activeExperiment, selection, clearSelection, referenceWallpaper, toggleReferenceWallpaper],
   );
 
   return (
@@ -454,14 +481,20 @@ export function ExperimentSetOneSettingsDock() {
     setInspectMode,
     hidePanelText,
     setHidePanelText,
-    experimentVisible,
-    toggleExperimentVisible,
+    activeExperiment,
+    setActiveExperiment,
     selection,
     clearSelection,
     referenceWallpaper,
     toggleReferenceWallpaper,
   } = useExperimentSetOne();
   const [open, setOpen] = useState(true);
+  const saveScope = selection ? selection.experiment : activeExperiment;
+  const scopedSaves = useMemo(
+    () => saves.filter((s) => s.scope === saveScope || s.cornersOnly),
+    [saves, saveScope],
+  );
+  const dockExperiment = selection ? selection.experiment : activeExperiment;
 
   const e1Highlight = useMemo(() => e1Highlighted(selection), [selection]);
   const e2Highlight = useMemo(() => e2Highlighted(selection), [selection]);
@@ -590,10 +623,13 @@ export function ExperimentSetOneSettingsDock() {
               <button
                 key={id}
                 type="button"
-                className={`experiment-one-settings-dock__toggle${experimentVisible[id] ? ' experiment-one-settings-dock__toggle--active' : ''}`}
-                onClick={() => toggleExperimentVisible(id)}
-                aria-pressed={experimentVisible[id]}
-                title={experimentVisible[id] ? `Hide ${label} panels` : `Show ${label} panels`}
+                className={`experiment-one-settings-dock__toggle${dockExperiment === id ? ' experiment-one-settings-dock__toggle--active' : ''}`}
+                onClick={() => {
+                  clearSelection();
+                  setActiveExperiment(id);
+                }}
+                aria-pressed={dockExperiment === id}
+                title={`Show ${label} settings`}
               >
                 {label}
               </button>
@@ -605,7 +641,7 @@ export function ExperimentSetOneSettingsDock() {
             >
               Save
             </button>
-            {saves.map((save) => (
+            {scopedSaves.map((save) => (
               <button
                 key={save.id}
                 type="button"
@@ -653,7 +689,7 @@ export function ExperimentSetOneSettingsDock() {
             )}
             {note && <p className="experiment-one-settings-dock__note">{note}</p>}
 
-            {experimentVisible.one && (!filtering || selection.experiment === 'one') && visibleE1Fields.length > 0 && (
+            {dockExperiment === 'one' && visibleE1Fields.length > 0 && (
             <section className="experiment-set-one-dock__experiment">
               {!filtering && (
                 <>
@@ -686,7 +722,7 @@ export function ExperimentSetOneSettingsDock() {
                         E1_MASTER_DEFAULT[field.id],
                         'one',
                         field.id,
-                        saves,
+                        scopedSaves,
                       )}
                       onResetTo={(v) => setE1(field.id, v as E1MaterialSettings[typeof field.id])}
                       classPrefix="e1"
@@ -699,7 +735,7 @@ export function ExperimentSetOneSettingsDock() {
             </section>
             )}
 
-            {experimentVisible.two && (!filtering || selection.experiment === 'two') && visibleE2Fields.length > 0 && (
+            {dockExperiment === 'two' && visibleE2Fields.length > 0 && (
             <section className="experiment-set-one-dock__experiment">
               {!filtering && (
                 <>
@@ -734,7 +770,7 @@ export function ExperimentSetOneSettingsDock() {
                         E2_MASTER_DEFAULT[field.id],
                         'two',
                         field.id,
-                        saves,
+                        scopedSaves,
                       )}
                       onResetTo={(v) => setE2(field.id, v as E2MaterialSettings[typeof field.id])}
                       classPrefix="e2"
@@ -747,7 +783,7 @@ export function ExperimentSetOneSettingsDock() {
             </section>
             )}
 
-            {experimentVisible.three && (!filtering || selection.experiment === 'three') && visibleE3Fields.length > 0 && (
+            {dockExperiment === 'three' && visibleE3Fields.length > 0 && (
             <section className="experiment-set-one-dock__experiment">
               {!filtering && (
                 <>
@@ -782,7 +818,7 @@ export function ExperimentSetOneSettingsDock() {
                         E3_MASTER_DEFAULT[field.id as keyof E3MaterialSettings],
                         'three',
                         field.id,
-                        saves,
+                        scopedSaves,
                       )}
                       onResetTo={(v) =>
                         setE3(field.id as keyof E3MaterialSettings, v as E3MaterialSettings[keyof E3MaterialSettings])
@@ -797,7 +833,7 @@ export function ExperimentSetOneSettingsDock() {
             </section>
             )}
 
-            {experimentVisible.four && (!filtering || selection.experiment === 'four') && visibleE4Fields.length > 0 && (
+            {dockExperiment === 'four' && visibleE4Fields.length > 0 && (
             <section className="experiment-set-one-dock__experiment">
               {!filtering && (
                 <>
@@ -832,7 +868,7 @@ export function ExperimentSetOneSettingsDock() {
                         E4_MASTER_DEFAULT[field.id as keyof E4MaterialSettings],
                         'four',
                         field.id,
-                        saves,
+                        scopedSaves,
                       )}
                       onResetTo={(v) =>
                         setE4(field.id as keyof E4MaterialSettings, v as E4MaterialSettings[keyof E4MaterialSettings])
