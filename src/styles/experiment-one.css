@@ -499,8 +499,50 @@
   flex: 1 1 auto;
   min-height: 0;
   padding: 0.85rem 0.9rem 1rem;
+  overflow: hidden;
+}
+
+.experiment-one-settings-dock__saves {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.6rem 0.65rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(126, 232, 255, 0.18);
+}
+
+.experiment-one-settings-dock__saves-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.experiment-one-settings-dock__saves-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(190, 230, 255, 0.85);
+}
+
+.experiment-one-settings-dock__saves-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  overflow: visible;
+}
+
+.experiment-one-settings-dock__settings-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .experiment-one-settings-dock__fields {
@@ -533,6 +575,13 @@
   color: rgba(190, 245, 220, 0.95);
   background: rgba(40, 140, 90, 0.18);
   border-color: rgba(100, 220, 160, 0.35);
+}
+
+.experiment-one-settings-dock__toggle--selected {
+  color: #fff;
+  background: rgba(40, 160, 100, 0.32);
+  border-color: rgba(120, 240, 180, 0.62);
+  box-shadow: 0 0 0 1px rgba(170, 255, 210, 0.35), 0 10px 24px rgba(0, 24, 14, 0.35);
 }
 
 .experiment-one-settings-dock__toggle--save:hover {

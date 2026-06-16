@@ -13,10 +13,8 @@ import type { E3MaterialSettings } from '../experiment-set-three/materialSetting
 import { buildInitialE3Settings } from '../experiment-set-three/materialSettings';
 import { loadExperimentSetOneSaves } from '../experiment-set-one/savedConfigs';
 
-export const E4_CORNER_SECTION_A = 'Layer A · Corner glass';
-export const E4_CORNER_SECTION_B = 'Layer B · Corner glass';
-export const E4_RADIAL_SECTION_A = 'Layer A · Radial corners';
-export const E4_RADIAL_SECTION_B = 'Layer B · Radial corners';
+export const E4_CORNERS_SECTION_A = 'Layer A · Corners';
+export const E4_CORNERS_SECTION_B = 'Layer B · Corners';
 export const E4_BEZEL_SECTION = 'Layer A · Bezel layout';
 
 /** 0 off · 1 top-left + bottom-right · 2 top-right + bottom-left · 3 each corner */
@@ -41,11 +39,9 @@ export const E4_SECTION_ORDER = [
   ...LAYER_A_SHEET_SECTIONS.slice(0, layerAShapeSectionIndex + 1),
   E4_BEZEL_SECTION,
   ...LAYER_A_SHEET_SECTIONS.slice(layerAShapeSectionIndex + 1),
-  E4_CORNER_SECTION_A,
-  E4_RADIAL_SECTION_A,
+  E4_CORNERS_SECTION_A,
   ...E2_SHEET_SECTION_ORDER.map((s) => sheetSectionLabel('Layer B', s)),
-  E4_CORNER_SECTION_B,
-  E4_RADIAL_SECTION_B,
+  E4_CORNERS_SECTION_B,
 ] as const;
 
 export type E4RadialCornerId = 'Tl' | 'Tr' | 'Bl' | 'Br';
@@ -601,7 +597,7 @@ function buildGlassReflexFields(prefix: 'layerA' | 'layerB', section: string): E
   return [
     {
       id: `${prefix}GlassReflexMode`,
-      label: 'Layout',
+      label: 'Reflex layout',
       dataType: 'select',
       section,
       options: E4_CORNER_LAYOUT_OPTIONS,
@@ -685,7 +681,7 @@ function buildRadialFields(prefix: 'layerA' | 'layerB', section: string): E4Sett
   return [
     {
       id: `${prefix}RadialCornerMode`,
-      label: 'Layout',
+      label: 'Radial layout',
       dataType: 'select',
       section,
       options: E4_RADIAL_MODE_OPTIONS,
@@ -824,10 +820,10 @@ function buildBezelLayoutFields(): E4SettingField[] {
 }
 
 const BEZEL_LAYOUT_FIELDS = buildBezelLayoutFields();
-const CORNER_FIELDS_A = buildGlassReflexFields('layerA', E4_CORNER_SECTION_A);
-const RADIAL_FIELDS_A = buildRadialFields('layerA', E4_RADIAL_SECTION_A);
-const CORNER_FIELDS_B = buildGlassReflexFields('layerB', E4_CORNER_SECTION_B);
-const RADIAL_FIELDS_B = buildRadialFields('layerB', E4_RADIAL_SECTION_B);
+const CORNER_FIELDS_A = buildGlassReflexFields('layerA', E4_CORNERS_SECTION_A);
+const RADIAL_FIELDS_A = buildRadialFields('layerA', E4_CORNERS_SECTION_A);
+const CORNER_FIELDS_B = buildGlassReflexFields('layerB', E4_CORNERS_SECTION_B);
+const RADIAL_FIELDS_B = buildRadialFields('layerB', E4_CORNERS_SECTION_B);
 
 export const E4_SETTING_FIELDS: E4SettingField[] = [
   ...PALETTE_FIELDS,
