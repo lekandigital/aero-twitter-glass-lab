@@ -23,8 +23,7 @@
   overflow: hidden;
   cursor: inherit;
 
-  border: var(--e4-layerA-rim-border-px, 2px) solid
-    rgba(255, 255, 255, calc(var(--e4-layerA-rim-border) * var(--e4-layerA-rim-strength)));
+  border: none;
   outline: 1px solid rgba(255, 255, 255, calc(0.14 * var(--e4-layerA-rim-strength)));
   outline-offset: -3px;
 
@@ -70,14 +69,34 @@
     );
 }
 
+.experiment-four-layer-a__bezel-rim-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--e4-layerA-rim-border-px, 2px);
+  pointer-events: none;
+  z-index: 2;
+  background: rgba(255, 255, 255, 1);
+}
+
+.experiment-four-layer-a__bezel-rim-edge--top {
+  top: 0;
+  opacity: calc(var(--e4-layerA-rim-top-border) * var(--e4-layerA-rim-top-strength));
+}
+
+.experiment-four-layer-a__bezel-rim-edge--bottom {
+  bottom: 0;
+  opacity: calc(var(--e4-layerA-rim-bottom-border) * var(--e4-layerA-rim-bottom-strength));
+}
+
 .experiment-four-layer-a__bezel-rim-side {
   position: absolute;
   top: var(--e4-layerA-rim-side-gap-top, 12px);
   bottom: var(--e4-layerA-rim-side-gap-bottom, 12px);
-  width: 1px;
+  width: var(--e4-layerA-rim-side-width-px, 1px);
   pointer-events: none;
   z-index: 2;
-  opacity: calc(var(--e4-layerA-rim-border) * var(--e4-layerA-rim-strength) * 0.85);
+  opacity: calc(var(--e4-layerA-rim-left-border) * var(--e4-layerA-rim-left-strength) * 0.85);
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.05) 0%,
@@ -90,11 +109,15 @@
 
 .experiment-four-layer-a__bezel-rim-side--left {
   left: 0;
+  opacity: calc(var(--e4-layerA-rim-left-border) * var(--e4-layerA-rim-left-strength) * 0.85);
+  box-shadow: 0 0 var(--e4-layerA-rim-side-shadow-blur-px, 10px) rgba(0, 0, 0, calc(0.35 * var(--e4-layerA-rim-side-shadow-strength, 0)));
 }
 
 .experiment-four-layer-a__bezel-rim-side--right {
   right: 0;
   transform: scaleX(-1);
+  opacity: calc(var(--e4-layerA-rim-right-border) * var(--e4-layerA-rim-right-strength) * 0.85);
+  box-shadow: 0 0 var(--e4-layerA-rim-side-shadow-blur-px, 10px) rgba(0, 0, 0, calc(0.35 * var(--e4-layerA-rim-side-shadow-strength, 0)));
 }
 
 .experiment-four-layer-a__bezel-inset {
@@ -118,10 +141,10 @@
   position: absolute;
   top: var(--e4-layerB-rim-side-gap-top, 10px);
   bottom: var(--e4-layerB-rim-side-gap-bottom, 10px);
-  width: 1px;
+  width: var(--e4-layerB-rim-side-width-px, 1px);
   pointer-events: none;
   z-index: 2;
-  opacity: calc(var(--e4-layerB-rim-border) * var(--e4-layerB-rim-strength) * 0.7);
+  opacity: calc(var(--e4-layerB-rim-left-border) * var(--e4-layerB-rim-left-strength) * 0.7);
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.04) 0%,
@@ -133,11 +156,35 @@
 
 .experiment-four-layer-b__rim-side--left {
   left: 0;
+  opacity: calc(var(--e4-layerB-rim-left-border) * var(--e4-layerB-rim-left-strength) * 0.7);
+  box-shadow: 0 0 var(--e4-layerB-rim-side-shadow-blur-px, 10px) rgba(0, 0, 0, calc(0.35 * var(--e4-layerB-rim-side-shadow-strength, 0)));
 }
 
 .experiment-four-layer-b__rim-side--right {
   right: 0;
   transform: scaleX(-1);
+  opacity: calc(var(--e4-layerB-rim-right-border) * var(--e4-layerB-rim-right-strength) * 0.7);
+  box-shadow: 0 0 var(--e4-layerB-rim-side-shadow-blur-px, 10px) rgba(0, 0, 0, calc(0.35 * var(--e4-layerB-rim-side-shadow-strength, 0)));
+}
+
+.experiment-four-layer-b__rim-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  pointer-events: none;
+  z-index: 2;
+  background: rgba(255, 255, 255, 1);
+}
+
+.experiment-four-layer-b__rim-edge--top {
+  top: 0;
+  opacity: calc(var(--e4-layerB-rim-top-border) * var(--e4-layerB-rim-top-strength) * 0.85);
+}
+
+.experiment-four-layer-b__rim-edge--bottom {
+  bottom: 0;
+  opacity: calc(var(--e4-layerB-rim-bottom-border) * var(--e4-layerB-rim-bottom-strength) * 0.85);
 }
 
 .experiment-four-layer-a__pwzzovO-glass-wrap,
@@ -331,6 +378,130 @@
   );
 }
 
+.experiment-four-layer-a__pwzzovO-glass--left,
+.experiment-four-layer-b__pwzzovO-glass--left,
+.experiment-four-layer-a__pwzzovO-glass--right,
+.experiment-four-layer-b__pwzzovO-glass--right {
+  inset: auto;
+  height: auto;
+  border-radius: 0;
+  width: min(10%, 28px);
+  /* Corner PwzzovO stack uses diagonal inset shadows — never reuse on vertical edges */
+  box-shadow: none;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--left,
+.experiment-four-layer-b__pwzzovO-glass--left {
+  left: 0;
+  right: auto;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--right,
+.experiment-four-layer-b__pwzzovO-glass--right {
+  left: auto;
+  right: 0;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--left {
+  top: var(--e4-layerA-rim-side-gap-top, 12px);
+  bottom: var(--e4-layerA-rim-side-gap-bottom, 12px);
+  --pwzzovO-corner-opacity: var(--e4-layerA-reflex-left-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerA-reflex-left-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerA-reflex-left-dark, 0);
+  --reflex-edge-glow: var(--e4-layerA-reflex-left-glow, 0.22);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-left-edge-mask-reach, 26%),
+    transparent var(--e4-layerA-reflex-left-edge-mask-fade, 62%)
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-left-edge-mask-reach, 26%),
+    transparent var(--e4-layerA-reflex-left-edge-mask-fade, 62%)
+  );
+  box-shadow:
+    inset 1px 0 0 var(--pwzzovO-rim-px, 1px) color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 14%), transparent),
+    inset 4px 0 calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow))) color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 62% * var(--reflex-edge-glow)), transparent),
+    inset -2px 0 calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow))) color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 22% * var(--reflex-edge-glow)), transparent);
+}
+
+.experiment-four-layer-a__pwzzovO-glass--right {
+  top: var(--e4-layerA-rim-side-gap-top, 12px);
+  bottom: var(--e4-layerA-rim-side-gap-bottom, 12px);
+  --pwzzovO-corner-opacity: var(--e4-layerA-reflex-right-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerA-reflex-right-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerA-reflex-right-dark, 0);
+  --reflex-edge-glow: var(--e4-layerA-reflex-right-glow, 0.22);
+  -webkit-mask-image: linear-gradient(
+    to left,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-right-edge-mask-reach, 26%),
+    transparent var(--e4-layerA-reflex-right-edge-mask-fade, 62%)
+  );
+  mask-image: linear-gradient(
+    to left,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-right-edge-mask-reach, 26%),
+    transparent var(--e4-layerA-reflex-right-edge-mask-fade, 62%)
+  );
+  box-shadow:
+    inset -1px 0 0 var(--pwzzovO-rim-px, 1px) color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 14%), transparent),
+    inset -4px 0 calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow))) color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 62% * var(--reflex-edge-glow)), transparent),
+    inset 2px 0 calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow))) color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 22% * var(--reflex-edge-glow)), transparent);
+}
+
+.experiment-four-layer-b__pwzzovO-glass--left {
+  top: var(--e4-layerB-rim-side-gap-top, 10px);
+  bottom: var(--e4-layerB-rim-side-gap-bottom, 10px);
+  --pwzzovO-corner-opacity: var(--e4-layerB-reflex-left-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerB-reflex-left-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerB-reflex-left-dark, 0);
+  --reflex-edge-glow: var(--e4-layerB-reflex-left-glow, 0.22);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-left-edge-mask-reach, 26%),
+    transparent var(--e4-layerB-reflex-left-edge-mask-fade, 62%)
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-left-edge-mask-reach, 26%),
+    transparent var(--e4-layerB-reflex-left-edge-mask-fade, 62%)
+  );
+  box-shadow:
+    inset 1px 0 0 var(--pwzzovO-rim-px, 1px) color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 14%), transparent),
+    inset 4px 0 calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow))) color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 62% * var(--reflex-edge-glow)), transparent),
+    inset -2px 0 calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow))) color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 22% * var(--reflex-edge-glow)), transparent);
+}
+
+.experiment-four-layer-b__pwzzovO-glass--right {
+  top: var(--e4-layerB-rim-side-gap-top, 10px);
+  bottom: var(--e4-layerB-rim-side-gap-bottom, 10px);
+  --pwzzovO-corner-opacity: var(--e4-layerB-reflex-right-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerB-reflex-right-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerB-reflex-right-dark, 0);
+  --reflex-edge-glow: var(--e4-layerB-reflex-right-glow, 0.22);
+  -webkit-mask-image: linear-gradient(
+    to left,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-right-edge-mask-reach, 26%),
+    transparent var(--e4-layerB-reflex-right-edge-mask-fade, 62%)
+  );
+  mask-image: linear-gradient(
+    to left,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-right-edge-mask-reach, 26%),
+    transparent var(--e4-layerB-reflex-right-edge-mask-fade, 62%)
+  );
+  box-shadow:
+    inset -1px 0 0 var(--pwzzovO-rim-px, 1px) color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 14%), transparent),
+    inset -4px 0 calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow))) color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 62% * var(--reflex-edge-glow)), transparent),
+    inset 2px 0 calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow))) color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 22% * var(--reflex-edge-glow)), transparent);
+}
+
 .experiment-four-layer-a__radial-corners,
 .experiment-four-layer-b__radial-corners {
   position: absolute;
@@ -454,7 +625,7 @@
   overflow: hidden;
   cursor: inherit;
 
-  border: 1px solid rgba(255, 255, 255, calc(var(--e4-layerB-rim-border) * var(--e4-layerB-rim-strength) * 0.85));
+  border: none;
 
   background:
     linear-gradient(

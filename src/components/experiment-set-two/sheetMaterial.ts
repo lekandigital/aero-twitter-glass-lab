@@ -1,5 +1,6 @@
 import type { MaterialFieldBase } from '../shared/MaterialSettingControl';
 import { E1_DEFAULT_SETTINGS, type E1MaterialSettings } from '../experiment-one/materialSettings';
+import { frostSurfaceProfileDefaults } from '../shared/frostSurfaceFinish';
 
 /** Experiment Two sheet material — mirrors Experiment One minus bezel (rim / inner bevel layers). */
 
@@ -21,6 +22,15 @@ export type E2SheetMaterialKeys = {
   height: number;
   transparency: number;
   frost: number;
+  frostMatte: number;
+  frostMatteTexture: number;
+  frostGloss: number;
+  frostSurfaceRegion: number;
+  frostSurfacePeak: number;
+  frostSurfaceSpread: number;
+  frostSurfaceFadeEnd: number;
+  frostSurfaceSoftness: number;
+  frostSurfaceDirection: number;
   saturate: number;
   brightness: number;
   cornerRadius: number;
@@ -68,6 +78,9 @@ const SHEET_FIELD_SPECS: E2SheetFieldSpec[] = [
   { key: 'height', label: 'Height', section: 'Layout', dataType: 'number', min: 160, max: 640, step: 4, unit: 'px' },
   { key: 'transparency', label: 'Transparency', section: 'Background', dataType: 'number', min: 0, max: 100, step: 1, unit: '%' },
   { key: 'frost', label: 'Frost blur', section: 'Background', dataType: 'number', min: 0, max: 40, step: 1, unit: 'px' },
+  { key: 'frostMatte', label: 'Frost matte', section: 'Background', dataType: 'number', min: 0, max: 100, step: 1, unit: '%' },
+  { key: 'frostMatteTexture', label: 'Matte texture', section: 'Background', dataType: 'number', min: 80, max: 320, step: 4, unit: 'px' },
+  { key: 'frostGloss', label: 'Frost gloss', section: 'Background', dataType: 'number', min: 0, max: 100, step: 1, unit: '%' },
   { key: 'saturate', label: 'Saturation', section: 'Background', dataType: 'number', min: 80, max: 220, step: 1, unit: '%' },
   { key: 'brightness', label: 'Brightness', section: 'Background', dataType: 'number', min: 80, max: 140, step: 1, unit: '%' },
   { key: 'cornerRadius', label: 'Corner radius', section: 'Shape', dataType: 'number', min: 8, max: 48, step: 1, unit: 'px' },
@@ -144,6 +157,10 @@ function sheetFromE1(
     height: layout.height,
     transparency: e1.transparency,
     frost: e1.frost,
+    frostMatte: e1.frostMatte,
+    frostMatteTexture: e1.frostMatteTexture,
+    frostGloss: e1.frostGloss,
+    ...frostSurfaceProfileDefaults(),
     saturate: e1.saturate,
     brightness: e1.brightness,
     cornerRadius: e1.cornerRadius,

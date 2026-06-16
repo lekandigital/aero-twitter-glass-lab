@@ -22,12 +22,15 @@ import {
 } from './experimentVisibility';
 
 const SESSION_KEY = 'experiment-set-1-session';
+let memorySessionFallback: ExperimentSetOneSession | null = null;
 
 export type ExperimentSetOneSession = {
   e1: E1MaterialSettings;
   e2: E2MaterialSettings;
   e3: E3MaterialSettings;
   e4: E4MaterialSettings;
+  /** Live Experiment Five working copy — separate from e4 and from saved presets. */
+  e5?: E4MaterialSettings;
   hidePanelText: boolean;
   inspectMode: boolean;
   experimentVisible: ExperimentVisibility;
@@ -35,6 +38,7 @@ export type ExperimentSetOneSession = {
   activeExperiment?: ExperimentId;
   selectedSaveIdByExperiment?: Partial<Record<ExperimentId, number | null>>;
   cornerPresetVersion?: number;
+  e5BorderRefinementsVersion?: number;
 };
 
 export function defaultSession(): ExperimentSetOneSession {
@@ -93,6 +97,7 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       e2: parsed.e2,
       e3: parsed.e3,
       e4,
+      e5: parsed.e5 ? normalizeE4MaterialSettings(parsed.e5) : undefined,
       hidePanelText: Boolean(parsed.hidePanelText),
       inspectMode: parsed.inspectMode !== false,
       experimentVisible: normalizeExperimentVisibility(parsed.experimentVisible),
@@ -107,16 +112,22 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
           : 'four',
       selectedSaveIdByExperiment: parsed.selectedSaveIdByExperiment ?? undefined,
       cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
+      e5BorderRefinementsVersion: parsed.e5BorderRefinementsVersion,
     };
     if (cornerPresetVersion < REFERENCE_CORNER_PRESET_VERSION) {
       saveExperimentSetOneSession(session);
     }
     return session;
   } catch {
-    return null;
+    return memorySessionFallback;
   }
 }
 
 export function saveExperimentSetOneSession(session: ExperimentSetOneSession) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    memorySessionFallback = null;
+  } catch {
+    memorySessionFallback = session;
+  }
 }

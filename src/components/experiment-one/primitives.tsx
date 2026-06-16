@@ -4,6 +4,7 @@ import {
 } from 'react';
 import { e1InspectAttrs } from './materialSettings';
 import { useHoldDrag } from '../shared/useHoldDrag';
+import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 
 /** Main centerpiece glass panel — layered material study */
 export function ExperimentOneGlassPanel({ className = '', children }: { className?: string; children: ReactNode }) {
@@ -15,6 +16,7 @@ export function ExperimentOneGlassPanel({ className = '', children }: { classNam
       {...e1InspectAttrs('panel')}
     >
       <span className="experiment-one-panel__rim" aria-hidden="true" {...e1InspectAttrs('panel-rim')} />
+      <GlassFrostSurface />
       <span className="experiment-one-panel__bevel" aria-hidden="true" {...e1InspectAttrs('panel-bevel')} />
       <span className="experiment-one-panel__shine" aria-hidden="true" {...e1InspectAttrs('panel-shine')} />
       <span className="experiment-one-panel__refraction" aria-hidden="true" {...e1InspectAttrs('panel-refraction')} />

@@ -5,6 +5,7 @@ import { E2_DEFAULT_SETTINGS } from '../experiment-set-two/materialSettings';
 import type { E3MaterialSettings } from '../experiment-set-three/materialSettings';
 import { buildInitialE3Settings } from '../experiment-set-three/materialSettings';
 import type { E4MaterialSettings } from '../experiment-set-four/materialSettings';
+import { normalizeE4MaterialSettings } from '../experiment-set-four/materialSettings';
 import type { ExperimentId } from './experimentVisibility';
 import {
   REFERENCE_CORNER_LIGHTING_OVERRIDES,
@@ -12,6 +13,9 @@ import {
   REFERENCE_CORNER_SAVE_ID,
   REFERENCE_CORNER_SAVE_LABEL,
 } from '../experiment-set-four/referenceCornerLighting';
+import { SAVE_20_ID, builtInSave20 } from './builtInSave20';
+import { SAVE_21_ID, builtInSave21 } from './builtInSave21';
+import { SAVE_22_ID, builtInSave22 } from './builtInSave22';
 
 // Earliest exported config in ~/Downloads that includes Experiment Four.
 // Used only as a one-time migration heuristic for older saves.
@@ -24,7 +28,7 @@ export type ExperimentSetOneSnapshot = {
   e1: E1MaterialSettings;
   e2: E2MaterialSettings;
   e3: E3MaterialSettings;
-  e4?: E4MaterialSettings;
+  e4?: Partial<E4MaterialSettings>;
   /** Which experiment this save is meant for (used to filter saves list + load behavior). */
   scope?: ExperimentId;
   /** When true, loading only merges Experiment Four corner lighting fields. */
@@ -32,6 +36,7 @@ export type ExperimentSetOneSnapshot = {
 };
 
 const STORAGE_KEY = 'experiment-set-1-saved-configs';
+let memoryStorageFallback: ExperimentSetOneSnapshot[] | null = null;
 
 function builtInReferenceCornerSave(): ExperimentSetOneSnapshot {
   return {
@@ -96,23 +101,84 @@ function readStorage(): ExperimentSetOneSnapshot[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw) as ExperimentSetOneSnapshot[];
     if (!Array.isArray(parsed)) return [];
-    const migrated = parsed.map(migrateSnapshotScope);
+    // If older sessions created user saves with ids that are now reserved for built-ins (20/21),
+    // remap them instead of dropping data.
+    const used = new Set<number>();
+    const migrated = parsed.map(migrateSnapshotScope).map((save) => {
+      let next = save;
+      if (isReservedSaveId(next.id)) {
+        const newId = nextAvailableSaveId(new Set([...used, ...parsed.map((s) => s.id)]));
+        next = { ...next, id: newId, label: `Save ${newId}` };
+      }
+      used.add(next.id);
+      return next;
+    });
     const deduped = dedupeSnapshots(migrated);
     if (deduped.length !== parsed.length || migrated.some((s, i) => s.scope !== parsed[i]?.scope)) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(deduped));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(deduped));
+      } catch {
+        memoryStorageFallback = deduped;
+      }
     }
     return deduped;
   } catch {
-    return [];
+    return memoryStorageFallback ?? [];
   }
 }
 
 function writeStorage(saves: ExperimentSetOneSnapshot[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(saves));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(saves));
+    memoryStorageFallback = null;
+  } catch {
+    // If persistent storage is blocked (privacy mode, quota, etc.),
+    // keep saves working for the current tab session.
+    memoryStorageFallback = saves;
+  }
+}
+
+function withNormalizedE4(save: ExperimentSetOneSnapshot): ExperimentSetOneSnapshot {
+  if (!save.e4) return save;
+  return { ...save, e4: normalizeE4MaterialSettings(save.e4) };
+}
+
+function isReservedSaveId(id: number): boolean {
+  return id === REFERENCE_CORNER_SAVE_ID || id === SAVE_20_ID || id === SAVE_21_ID || id === SAVE_22_ID;
+}
+
+function nextAvailableSaveId(existingIds: Set<number>): number {
+  let id = existingIds.size === 0 ? 1 : Math.max(...existingIds) + 1;
+  while (isReservedSaveId(id) || existingIds.has(id)) id += 1;
+  return id;
 }
 
 export function loadExperimentSetOneSaves(): ExperimentSetOneSnapshot[] {
-  return [builtInReferenceCornerSave(), ...readStorage()];
+  // Order (for UI): reference corners, then user saves up to and including Save 19,
+  // then built-in Save 20, Save 21, and Save 22, then remaining user saves.
+  //
+  // This guarantees Save 20/21/22 appear after Save 19 even when Save 19 lives in localStorage.
+  const storage = readStorage();
+  const idx19 = storage.findIndex((s) => s.id === 19 || s.label === 'Save 19');
+  if (idx19 === -1) {
+    return [
+      builtInReferenceCornerSave(),
+      ...storage,
+      withNormalizedE4(builtInSave20()),
+      withNormalizedE4(builtInSave21()),
+      withNormalizedE4(builtInSave22()),
+    ];
+  }
+  const before = storage.slice(0, idx19 + 1);
+  const after = storage.slice(idx19 + 1);
+  return [
+    builtInReferenceCornerSave(),
+    ...before,
+    withNormalizedE4(builtInSave20()),
+    withNormalizedE4(builtInSave21()),
+    withNormalizedE4(builtInSave22()),
+    ...after,
+  ];
 }
 
 export function getBuiltInReferenceCornerSave(): ExperimentSetOneSnapshot {
@@ -127,7 +193,8 @@ export function addExperimentSetOneSave(
   scope: ExperimentId,
 ): ExperimentSetOneSnapshot {
   const existing = readStorage();
-  const id = existing.length === 0 ? 1 : Math.max(...existing.map((s) => s.id)) + 1;
+  const ids = new Set(existing.map((s) => s.id));
+  const id = nextAvailableSaveId(ids);
   const snapshot: ExperimentSetOneSnapshot = {
     id,
     label: `Save ${id}`,

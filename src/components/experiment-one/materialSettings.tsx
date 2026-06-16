@@ -15,6 +15,12 @@ import { MaterialSettingFieldRow, type MaterialFieldBase } from '../shared/Mater
 import { consumeClickAfterHoldDrag } from '../shared/useHoldDrag';
 import { orderedSections, sectionFieldCount } from '../shared/materialSettingGroups';
 import { useFoldableSections } from '../shared/useFoldableSections';
+import {
+  buildFrostSurfaceProfileFields,
+  frostSurfaceProfileCssVars,
+  frostSurfaceProfileDefaults,
+  pickFrostSurfaceProfile,
+} from '../shared/frostSurfaceFinish';
 
 /* Experiment 1 — Material settings */
 
@@ -35,6 +41,15 @@ export type E1MaterialSettings = {
   colorDeep: string;
   transparency: number;
   frost: number;
+  frostMatte: number;
+  frostMatteTexture: number;
+  frostGloss: number;
+  frostSurfaceRegion: number;
+  frostSurfacePeak: number;
+  frostSurfaceSpread: number;
+  frostSurfaceFadeEnd: number;
+  frostSurfaceSoftness: number;
+  frostSurfaceDirection: number;
   saturate: number;
   brightness: number;
   cornerRadius: number;
@@ -65,6 +80,10 @@ export const E1_DEFAULT_SETTINGS: E1MaterialSettings = {
   colorDeep: '#0a4a9a',
   transparency: 68,
   frost: 5,
+  frostMatte: 0,
+  frostMatteTexture: 160,
+  frostGloss: 0,
+  ...frostSurfaceProfileDefaults(),
   saturate: 130,
   brightness: 104,
   cornerRadius: 28,
@@ -97,7 +116,9 @@ export type E1InspectTarget =
   | 'panel-refraction'
   | 'panel-sparkle';
 
-type SettingField = MaterialFieldBase<keyof E1MaterialSettings>;
+type SettingField = MaterialFieldBase<keyof E1MaterialSettings> & {
+  when?: (settings: Record<string, unknown>) => boolean;
+};
 
 export const E1_SETTING_FIELDS: SettingField[] = [
   { id: 'colorCyan', label: 'Cyan accent', dataType: 'color', section: 'Palette' },
@@ -106,6 +127,10 @@ export const E1_SETTING_FIELDS: SettingField[] = [
 
   { id: 'transparency', label: 'Transparency', dataType: 'number', section: 'Background', min: 0, max: 100, step: 1, unit: '%' },
   { id: 'frost', label: 'Frost blur', dataType: 'number', section: 'Background', min: 0, max: 40, step: 1, unit: 'px' },
+  { id: 'frostMatte', label: 'Frost matte', dataType: 'number', section: 'Background', min: 0, max: 100, step: 1, unit: '%', hint: 'Diffuse matte tooth on the frost — dulls the surface without harsh grain.' },
+  { id: 'frostMatteTexture', label: 'Matte texture', dataType: 'number', section: 'Background', min: 80, max: 320, step: 4, unit: 'px', hint: 'Scale of the matte micro-texture. Larger = softer, more velvety.' },
+  { id: 'frostGloss', label: 'Frost gloss', dataType: 'number', section: 'Background', min: 0, max: 100, step: 1, unit: '%', hint: 'Oily specular sheen on the same region — like light on a matte surface wiped with oil.' },
+  ...(buildFrostSurfaceProfileFields('', 'Background') as SettingField[]),
   { id: 'saturate', label: 'Saturation', dataType: 'number', section: 'Background', min: 80, max: 220, step: 1, unit: '%' },
   { id: 'brightness', label: 'Brightness', dataType: 'number', section: 'Background', min: 80, max: 140, step: 1, unit: '%' },
 
@@ -145,7 +170,7 @@ export const E1_INSPECT_CATALOG: Record<
   panel: {
     label: 'Glass panel',
     fields: [
-      'transparency', 'frost', 'saturate', 'brightness', 'cornerRadius',
+      'transparency', 'frost', 'frostMatte', 'frostMatteTexture', 'frostGloss', 'saturate', 'brightness', 'cornerRadius',
       'fillTop', 'fillMid', 'fillBottom', 'bodyTint',
       'rim', 'rimBorder', 'depth', 'innerDepth', 'outerShadow', 'shadowSpread', 'glow',
       ...palette,
@@ -195,6 +220,7 @@ export function e1SettingsToCssVars(s: E1MaterialSettings): CSSProperties {
     '--e1-radius': `${s.cornerRadius}px`,
     '--e1-transparency': fillOpacity,
     '--e1-frost': `${s.frost}px`,
+    ...frostSurfaceProfileCssVars(pickFrostSurfaceProfile(s as Record<string, unknown>, ''), '--e1'),
     '--e1-saturate': `${s.saturate}%`,
     '--e1-brightness': `${s.brightness}%`,
     '--e1-fill-top': pct(s.fillTop),

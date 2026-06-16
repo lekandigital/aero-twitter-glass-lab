@@ -1,8 +1,9 @@
 import { e4InspectAttrs, e4LayerADimensionStyle, e4LayerBDimensionStyle } from './materialSettings';
 import { useExperimentSetOne } from '../experiment-set-one/combinedSettings';
 import { ExperimentTwoDraggableSheet } from '../experiment-set-two/primitives';
+import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 
-const PWZZOV_CORNERS = ['tl', 'tr', 'bl', 'br'] as const;
+const PWZZOV_REFLEX_REGIONS = ['tl', 'tr', 'bl', 'br', 'left', 'right'] as const;
 
 function PwzzovOGlassCorners({
   layerClass,
@@ -13,10 +14,10 @@ function PwzzovOGlassCorners({
 }) {
   return (
     <div className={`${layerClass}__pwzzovO-glass-wrap`} {...e4InspectAttrs(inspectTarget)}>
-      {PWZZOV_CORNERS.map((corner) => (
+      {PWZZOV_REFLEX_REGIONS.map((region) => (
         <span
-          key={corner}
-          className={`${layerClass}__pwzzovO-glass ${layerClass}__pwzzovO-glass--${corner}`}
+          key={region}
+          className={`${layerClass}__pwzzovO-glass ${layerClass}__pwzzovO-glass--${region}`}
           aria-hidden="true"
         />
       ))}
@@ -56,8 +57,11 @@ export function ExperimentFourLayerBSheet({ nested = false }: { nested?: boolean
       style={e4LayerBDimensionStyle(e4, nested)}
       {...e4InspectAttrs('layer-b')}
     >
+      <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />
+      <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--bottom" aria-hidden="true" />
       <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--left" aria-hidden="true" />
       <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--right" aria-hidden="true" />
+      <GlassFrostSurface />
       <span className="experiment-four-layer-b__shine" aria-hidden="true" {...e4InspectAttrs('layer-b-shine')} />
       <span
         className="experiment-four-layer-b__radial-corners"
@@ -94,6 +98,9 @@ export function ExperimentFourLayerASheet({ nestedB = false }: { nestedB?: boole
       {...e4InspectAttrs('layer-a')}
     >
       <span className="experiment-four-layer-a__bezel-rim" aria-hidden="true" {...e4InspectAttrs('layer-a-rim')} />
+      <GlassFrostSurface />
+      <span className="experiment-four-layer-a__bezel-rim-edge experiment-four-layer-a__bezel-rim-edge--top" aria-hidden="true" />
+      <span className="experiment-four-layer-a__bezel-rim-edge experiment-four-layer-a__bezel-rim-edge--bottom" aria-hidden="true" />
       <span
         className="experiment-four-layer-a__bezel-rim-side experiment-four-layer-a__bezel-rim-side--left"
         aria-hidden="true"

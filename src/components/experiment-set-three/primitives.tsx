@@ -1,5 +1,6 @@
 import { e3InspectAttrs } from './materialSettings';
 import { ExperimentTwoDraggableSheet } from '../experiment-set-two/primitives';
+import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 
 function LayerCopy({
   eyebrow,
@@ -33,6 +34,7 @@ export function ExperimentThreeLayerASheet() {
       {...e3InspectAttrs('layer-a')}
     >
       <span className="experiment-three-layer-a__bezel-rim" aria-hidden="true" {...e3InspectAttrs('layer-a-rim')} />
+      <GlassFrostSurface />
       <div className="experiment-three-layer-a__content">
         <LayerCopy
           eyebrow="Reference bezel"
@@ -54,6 +56,7 @@ export function ExperimentThreeLayerBSheet() {
       aria-label="Experiment Three layer B"
       {...e3InspectAttrs('layer-b')}
     >
+      <GlassFrostSurface />
       <span className="experiment-three-layer-b__shine" aria-hidden="true" {...e3InspectAttrs('layer-b-shine')} />
       <span className="experiment-three-layer-b__sparkle experiment-three-layer-b__sparkle--a" aria-hidden="true" />
       <span className="experiment-three-layer-b__sparkle experiment-three-layer-b__sparkle--b" aria-hidden="true" />
