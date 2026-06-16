@@ -39,10 +39,10 @@
     linear-gradient(
       180deg,
       rgba(255, 255, 255, calc(var(--e4-layerA-fill-top) * var(--e4-layerA-transparency))) 0%,
-      rgba(224, 246, 255, calc(var(--e4-layerA-fill-mid) * var(--e4-layerA-transparency))) 34%,
-      rgba(190, 232, 252, calc(var(--e4-layerA-fill-bottom) * var(--e4-layerA-transparency))) 100%
+      rgba(246, 247, 248, calc(var(--e4-layerA-fill-mid) * var(--e4-layerA-transparency))) 34%,
+      rgba(238, 240, 242, calc(var(--e4-layerA-fill-bottom) * var(--e4-layerA-transparency))) 100%
     ),
-    rgba(244, 251, 255, calc(var(--e4-layerA-body-tint) * var(--e4-layerA-transparency)));
+    rgba(249, 250, 251, calc(var(--e4-layerA-body-tint) * var(--e4-layerA-transparency)));
 
   backdrop-filter: blur(var(--e4-layerA-frost)) saturate(var(--e4-layerA-saturate)) brightness(var(--e4-layerA-brightness));
   -webkit-backdrop-filter: blur(var(--e4-layerA-frost)) saturate(var(--e4-layerA-saturate))
@@ -54,11 +54,11 @@
   box-shadow:
     inset 0 1.5px 0 rgba(255, 255, 255, calc(0.6 + 0.4 * var(--e4-layerA-rim-strength, 0.3))),
     inset 0 3px 7px rgba(255, 255, 255, calc(0.16 + 0.34 * var(--e4-layerA-rim-strength, 0.3))),
-    inset 0 -18px 30px rgba(0, 70, 170, calc(0.1 + var(--e4-layerA-inner-depth, 0.2) * var(--e4-layerA-depth-strength, 0.5) * 0.5)),
+    inset 0 -18px 30px rgba(56, 58, 62, calc(0.1 + var(--e4-layerA-inner-depth, 0.2) * var(--e4-layerA-depth-strength, 0.5) * 0.5)),
     inset 0 0 0 1px rgba(255, 255, 255, calc(0.18 + 0.3 * var(--e4-layerA-rim-strength, 0.3))),
-    0 2px 6px rgba(0, 28, 78, calc(0.12 + var(--e4-layerA-outer-shadow, 0.3) * var(--e4-layerA-depth-strength, 0.5) * 0.3)),
-    0 22px var(--e4-layerA-shadow-spread, 56px) rgba(0, 38, 100, calc(0.1 + var(--e4-layerA-outer-shadow, 0.3) * var(--e4-layerA-depth-strength, 0.5) * 0.6)),
-    0 0 46px rgba(90, 200, 255, calc(0.06 + var(--e4-layerA-glow, 0.2) * var(--e4-layerA-depth-strength, 0.5) * 0.85));
+    0 2px 6px rgba(28, 30, 33, calc(0.12 + var(--e4-layerA-outer-shadow, 0.3) * var(--e4-layerA-depth-strength, 0.5) * 0.3)),
+    0 22px var(--e4-layerA-shadow-spread, 56px) rgba(33, 35, 39, calc(0.1 + var(--e4-layerA-outer-shadow, 0.3) * var(--e4-layerA-depth-strength, 0.5) * 0.6)),
+    0 0 46px rgba(218, 220, 222, calc(0.06 + var(--e4-layerA-glow, 0.2) * var(--e4-layerA-depth-strength, 0.5) * 0.85));
 }
 
 /* Refraction — a faint highlight ring hugging the rim, warped by an SVG
@@ -79,7 +79,7 @@
     transparent 0deg,
     rgba(255, 255, 255, 0.34) 36deg,
     transparent 86deg,
-    rgba(150, 224, 255, 0.24) 166deg,
+    rgba(224, 227, 230, 0.22) 166deg,
     transparent 214deg,
     rgba(255, 255, 255, 0.26) 300deg,
     transparent 348deg
@@ -119,13 +119,13 @@
     ),
     linear-gradient(
       0deg,
-      rgba(0, 100, 210, calc(0.1 + 0.14 * var(--e4-layerA-depth-strength, 0.5))) 0%,
+      rgba(176, 184, 196, calc(0.04 + 0.07 * var(--e4-layerA-depth-strength, 0.5))) 0%,
       transparent 20%
     );
 }
 
 /* Continuous rounded perimeter rim that follows the corners (gradient border via
-   mask). Bright white at the top, cooling to aero blue toward the base. */
+   mask). Bright white at the top, cooling to a neutral silver toward the base. */
 .experiment-four-layer-a__bezel-rim::before {
   content: '';
   position: absolute;
@@ -135,9 +135,9 @@
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.98) 0%,
-    rgba(228, 248, 255, 0.86) 16%,
-    rgba(168, 222, 255, 0.55) 52%,
-    rgba(74, 156, 232, 0.66) 100%
+    rgba(246, 247, 248, 0.84) 16%,
+    rgba(228, 231, 234, 0.5) 52%,
+    rgba(206, 210, 214, 0.52) 100%
   );
   opacity: calc(0.6 + 0.4 * var(--e4-layerA-rim-border, 0.5));
   -webkit-mask:
@@ -1194,8 +1194,8 @@
     linear-gradient(
       180deg,
       rgba(255, 255, 255, calc(var(--e4-layerB-fill-top) * var(--e4-layerB-transparency))) 0%,
-      rgba(236, 248, 255, calc(var(--e4-layerB-fill-mid) * var(--e4-layerB-transparency))) 42%,
-      rgba(214, 240, 252, calc(var(--e4-layerB-fill-bottom) * var(--e4-layerB-transparency) * var(--e4-layerB-depth-strength))) 100%
+      rgba(247, 248, 249, calc(var(--e4-layerB-fill-mid) * var(--e4-layerB-transparency))) 42%,
+      rgba(240, 242, 243, calc(var(--e4-layerB-fill-bottom) * var(--e4-layerB-transparency) * var(--e4-layerB-depth-strength))) 100%
     ),
     radial-gradient(
       ellipse 96% 52% at 50% -2%,
@@ -1204,10 +1204,10 @@
     ),
     radial-gradient(
       ellipse 122% 30% at 50% 106%,
-      rgba(234, 251, 255, calc(0.1 * var(--e4-layerB-transparency))),
+      rgba(247, 248, 249, calc(0.1 * var(--e4-layerB-transparency))),
       transparent 72%
     ),
-    rgba(212, 240, 252, calc(var(--e4-layerB-body-tint) * var(--e4-layerB-transparency)));
+    rgba(245, 246, 247, calc(var(--e4-layerB-body-tint) * var(--e4-layerB-transparency)));
 
   backdrop-filter: blur(var(--e4-layerB-frost)) saturate(var(--e4-layerB-saturate)) brightness(var(--e4-layerB-brightness));
   -webkit-backdrop-filter: blur(var(--e4-layerB-frost)) saturate(var(--e4-layerB-saturate))
@@ -1217,11 +1217,11 @@
   box-shadow:
     inset 0 1.5px 0 rgba(255, 255, 255, calc(0.5 + 0.4 * var(--e4-layerB-rim-strength, 0.3))),
     inset 0 3px 6px rgba(255, 255, 255, calc(0.12 + 0.26 * var(--e4-layerB-rim-strength, 0.3))),
-    inset 0 -20px 34px rgba(0, 68, 170, calc(0.08 + var(--e4-layerB-inner-depth, 0.2) * var(--e4-layerB-depth-strength, 0.5) * 0.85)),
+    inset 0 -20px 34px rgba(54, 56, 60, calc(0.08 + var(--e4-layerB-inner-depth, 0.2) * var(--e4-layerB-depth-strength, 0.5) * 0.85)),
     inset 0 0 0 1px rgba(255, 255, 255, calc(0.14 + 0.24 * var(--e4-layerB-rim-strength, 0.3))),
-    0 2px 5px rgba(0, 28, 78, calc(0.1 + var(--e4-layerB-outer-shadow, 0.3) * var(--e4-layerB-depth-strength, 0.5) * 0.28)),
-    0 12px 30px rgba(0, 38, 100, calc(0.08 + var(--e4-layerB-outer-shadow, 0.3) * var(--e4-layerB-depth-strength, 0.5) * 0.45)),
-    0 0 38px rgba(90, 200, 255, calc(0.05 + var(--e4-layerB-glow, 0.18) * var(--e4-layerB-depth-strength, 0.5) * 0.7));
+    0 2px 5px rgba(28, 30, 33, calc(0.1 + var(--e4-layerB-outer-shadow, 0.3) * var(--e4-layerB-depth-strength, 0.5) * 0.28)),
+    0 12px 30px rgba(33, 35, 39, calc(0.08 + var(--e4-layerB-outer-shadow, 0.3) * var(--e4-layerB-depth-strength, 0.5) * 0.45)),
+    0 0 38px rgba(218, 220, 222, calc(0.05 + var(--e4-layerB-glow, 0.18) * var(--e4-layerB-depth-strength, 0.5) * 0.7));
 }
 
 /* Continuous rounded rim for layer B — thinner and a touch softer than A. */
@@ -1235,9 +1235,9 @@
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.94) 0%,
-    rgba(222, 245, 255, 0.74) 20%,
-    rgba(176, 224, 255, 0.46) 58%,
-    rgba(112, 184, 236, 0.54) 100%
+    rgba(244, 245, 246, 0.72) 20%,
+    rgba(226, 229, 232, 0.42) 58%,
+    rgba(204, 208, 213, 0.44) 100%
   );
   opacity: calc(0.55 + 0.4 * var(--e4-layerB-rim-border, 0.4));
   -webkit-mask:
@@ -1283,7 +1283,7 @@
     ),
     radial-gradient(
       ellipse 132% 26% at 50% 112%,
-      rgba(236, 252, 255, calc(0.05 + 0.18 * var(--e4-layerB-top-shine, 0.5))),
+      rgba(246, 250, 252, calc(0.05 + 0.18 * var(--e4-layerB-top-shine, 0.5))),
       transparent 74%
     );
 }
@@ -1303,7 +1303,7 @@
   opacity: var(--e4-layerB-sparkle);
   box-shadow:
     0 0 8px 2px rgba(255, 255, 255, 0.95),
-    0 0 16px 3px rgba(126, 232, 255, 0.5);
+    0 0 16px 3px rgba(214, 224, 232, 0.5);
   animation: e1-sparkle-pulse 3.2s ease-in-out infinite;
 }
 
