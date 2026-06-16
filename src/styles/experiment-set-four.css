@@ -470,14 +470,18 @@
       #000 0%,
       #000 var(--e4-layerA-reflex-left-edge-mask-reach, 26%),
       transparent var(--e4-layerA-reflex-left-edge-mask-fade, 62%)
-    );
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
   mask-image:
     linear-gradient(
       to right,
       #000 0%,
       #000 var(--e4-layerA-reflex-left-edge-mask-reach, 26%),
       transparent var(--e4-layerA-reflex-left-edge-mask-fade, 62%)
-    );
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
   box-shadow:
     inset 1px 0 0 var(--pwzzovO-rim-px, 1px)
       color-mix(
@@ -508,14 +512,18 @@
       #000 0%,
       #000 var(--e4-layerA-reflex-right-edge-mask-reach, 26%),
       transparent var(--e4-layerA-reflex-right-edge-mask-fade, 62%)
-    );
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
   mask-image:
     linear-gradient(
       to left,
       #000 0%,
       #000 var(--e4-layerA-reflex-right-edge-mask-reach, 26%),
       transparent var(--e4-layerA-reflex-right-edge-mask-fade, 62%)
-    );
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
   box-shadow:
     inset -1px 0 0 var(--pwzzovO-rim-px, 1px)
       color-mix(
@@ -546,14 +554,18 @@
       #000 0%,
       #000 var(--e4-layerB-reflex-left-edge-mask-reach, 26%),
       transparent var(--e4-layerB-reflex-left-edge-mask-fade, 62%)
-    );
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
   mask-image:
     linear-gradient(
       to right,
       #000 0%,
       #000 var(--e4-layerB-reflex-left-edge-mask-reach, 26%),
       transparent var(--e4-layerB-reflex-left-edge-mask-fade, 62%)
-    );
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
   box-shadow:
     inset 1px 0 0 var(--pwzzovO-rim-px, 1px)
       color-mix(
@@ -584,14 +596,18 @@
       #000 0%,
       #000 var(--e4-layerB-reflex-right-edge-mask-reach, 26%),
       transparent var(--e4-layerB-reflex-right-edge-mask-fade, 62%)
-    );
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
   mask-image:
     linear-gradient(
       to left,
       #000 0%,
       #000 var(--e4-layerB-reflex-right-edge-mask-reach, 26%),
       transparent var(--e4-layerB-reflex-right-edge-mask-fade, 62%)
-    );
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
   box-shadow:
     inset -1px 0 0 var(--pwzzovO-rim-px, 1px)
       color-mix(

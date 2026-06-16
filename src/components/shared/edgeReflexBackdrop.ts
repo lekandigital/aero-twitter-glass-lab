@@ -3,6 +3,7 @@ export type EdgeReflexBackdropSide = 'left' | 'right';
 export type EdgeReflexBackdropProfile = {
   maskGradient: string;
   rimMaskGradient: string;
+  reflexMaskGradient: string;
   tintGradient: string;
   rimGradient: string;
   peakAlpha: number;
@@ -27,6 +28,9 @@ const LUMA_CEIL = 0.52;
 const LOCAL_LIFT_FLOOR = 0.012;
 const LOCAL_LIFT_CEIL = 0.1;
 const MIN_PEAK_LUMA = 0.07;
+const RIM_PEAK_HALF_SPAN_RATIO = 0.028;
+const REFLEX_PEAK_HALF_SPAN_RATIO = 0.052;
+const REFLEX_FAR_FLOOR = 0.2;
 
 let wallpaperSampler: WallpaperSampler | null = null;
 let wallpaperSamplerSrc = '';
@@ -247,6 +251,11 @@ function rimMaskAlpha(gate: number): number {
   return Math.min(1, Math.pow(gate, 1.5));
 }
 
+function reflexMaskAlpha(gate: number): number {
+  const strength = REFLEX_FAR_FLOOR + gate * (1 - REFLEX_FAR_FLOOR);
+  return Math.min(1, strength);
+}
+
 function buildHardMaskStops(gates: number[], alphaAt: (gate: number) => number): string[] {
   if (gates.length <= 1) {
     const alpha = alphaAt(gates[0] ?? 0).toFixed(3);
@@ -260,8 +269,8 @@ function buildHardMaskStops(gates: number[], alphaAt: (gate: number) => number):
   });
 }
 
-function applyPeakEnvelopes(gates: number[]): number[] {
-  const halfSpan = Math.max(2, Math.round(gates.length * 0.028));
+function applyPeakEnvelopes(gates: number[], halfSpanRatio: number): number[] {
+  const halfSpan = Math.max(2, Math.round(gates.length * halfSpanRatio));
   const output = new Array(gates.length).fill(0);
 
   const peaks: { index: number; strength: number }[] = [];
@@ -296,8 +305,8 @@ function applyPeakEnvelopes(gates: number[]): number[] {
   return output;
 }
 
-function buildRimGates(lumas: number[]): number[] {
-  const relativeGates = lumas.map((luma, index) => {
+function buildRelativeRimGates(lumas: number[]): number[] {
+  return lumas.map((luma, index) => {
     const localWindow = 8;
     let localSum = 0;
     let localCount = 0;
@@ -312,8 +321,14 @@ function buildRimGates(lumas: number[]): number[] {
     const absoluteCap = smoothstep(0.24, 0.58, luma);
     return sharpenGate(Math.min(1, relative * absoluteCap * 1.2));
   });
+}
 
-  return applyPeakEnvelopes(relativeGates);
+function buildRimGates(lumas: number[]): number[] {
+  return applyPeakEnvelopes(buildRelativeRimGates(lumas), RIM_PEAK_HALF_SPAN_RATIO);
+}
+
+function buildReflexGates(lumas: number[]): number[] {
+  return applyPeakEnvelopes(buildRelativeRimGates(lumas), REFLEX_PEAK_HALF_SPAN_RATIO);
 }
 
 function buildSmoothMaskStops(gates: number[]): string[] {
@@ -421,10 +436,12 @@ function buildProfileFromSamples(samples: RgbSample[], lightStrength: number): E
 
   const peakAlpha = Math.max(...gates.map(maskAlpha));
   const rimGates = buildRimGates(lumas);
+  const reflexGates = buildReflexGates(lumas);
   const rimPeakAlpha = Math.max(...rimGates.map(rimMaskAlpha));
 
   const maskStops = buildSmoothMaskStops(gates);
   const rimMaskStops = buildHardMaskStops(rimGates, rimMaskAlpha);
+  const reflexMaskStops = buildHardMaskStops(reflexGates, reflexMaskAlpha);
   const tintStops = buildSmoothTintStops(samples, gates, lightStrength);
   const rimStops = buildRimColorStops(samples, rimGates, lightStrength);
 
@@ -440,6 +457,7 @@ function buildProfileFromSamples(samples: RgbSample[], lightStrength: number): E
   return {
     maskGradient: `linear-gradient(to bottom, ${maskStops.join(', ')})`,
     rimMaskGradient: `linear-gradient(to bottom, ${rimMaskStops.join(', ')})`,
+    reflexMaskGradient: `linear-gradient(to bottom, ${reflexMaskStops.join(', ')})`,
     tintGradient: `linear-gradient(to bottom, ${tintStops.join(', ')})`,
     rimGradient: `linear-gradient(to bottom, ${rimStops.join(', ')})`,
     peakAlpha,
@@ -451,6 +469,7 @@ function buildProfileFromSamples(samples: RgbSample[], lightStrength: number): E
 const FULL_EDGE_PROFILE: EdgeReflexBackdropProfile = {
   maskGradient: 'linear-gradient(to bottom, #000 0%, #000 100%)',
   rimMaskGradient: 'linear-gradient(to bottom, #000 0%, #000 100%)',
+  reflexMaskGradient: 'linear-gradient(to bottom, #000 0%, #000 100%)',
   tintGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
   rimGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
   peakAlpha: 1,
@@ -461,6 +480,7 @@ const FULL_EDGE_PROFILE: EdgeReflexBackdropProfile = {
 const EMPTY_EDGE_PROFILE: EdgeReflexBackdropProfile = {
   maskGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
   rimMaskGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
+  reflexMaskGradient: 'linear-gradient(to bottom, #000 0%, #000 100%)',
   tintGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
   rimGradient: 'linear-gradient(to bottom, transparent 0%, transparent 100%)',
   peakAlpha: 0,
