@@ -3,31 +3,29 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Experiment Five — Stage</title>
+    <title>Experiment Five — Showcase</title>
     <link rel="stylesheet" href="showcase.css" />
   </head>
   <body>
-    <header class="topbar">
-      <h1>Experiment Five · Stage</h1>
-      <nav class="viewnav">
-        <a href="index.html" class="active">Stage</a>
-        <a href="switch.html">Switcher</a>
-        <a href="compare.html">Compare (A/B)</a>
-      </nav>
+    <header class="bar">
+      <h1>Experiment Five</h1>
+      <div class="modes">
+        <button id="mFocus" class="mode is-active">Focus</button>
+        <button id="mGrid" class="mode">Grid</button>
+      </div>
+      <div class="spacer"></div>
+      <div class="bar__ctl" id="ctl"></div>
+      <button id="shot" class="iconbtn" title="Save screenshot">📷</button>
+      <button id="full" class="iconbtn" title="Fullscreen">⛶</button>
     </header>
 
-    <div class="toolbar" id="toolbar"></div>
+    <main class="work">
+      <aside class="rail" id="rail" aria-label="Branches"></aside>
+      <section class="stagewrap" id="stagewrap">
+        <div class="stage" id="stage"></div>
+      </section>
+    </main>
 
-    <div class="boardwrap" id="boardwrap">
-      <div class="board" id="board">
-        <div class="board-inner" id="board-inner"></div>
-        <div class="board-pan" id="board-pan" title="Drag to move all together"></div>
-      </div>
-    </div>
-
-    <script type="module">
-      import { initBoard } from './board.js';
-      initBoard({ mode: 'stage' });
-    </script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>
