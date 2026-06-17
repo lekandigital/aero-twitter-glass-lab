@@ -1,0 +1,1347 @@
+/* Experiment 4 — reference left-panel sizing + opposite-corner highlights (PwzzovO) */
+
+.experiment-set-one-page [data-e4-inspect].e4-inspect-blink {
+  --inspect-blink-color: #ff8c42;
+  --inspect-blink-glow: rgba(255, 140, 66, 0.35);
+  animation: inspect-outline-blink 0.7s linear 1;
+}
+
+.experiment-set-one-page[data-e4-inspect-mode='true'] [data-e4-inspect] {
+  cursor: crosshair;
+}
+
+/* ── Layer A ── */
+
+.experiment-four-layer-a {
+  position: relative;
+  box-sizing: border-box;
+  width: var(--e4-layerA-width);
+  height: var(--e4-layerA-height);
+  min-height: var(--e4-layerA-height);
+  border-radius: var(--e4-layerA-radius);
+  isolation: isolate;
+  overflow: hidden;
+  cursor: inherit;
+
+  border: none;
+  outline: 1px solid rgba(255, 255, 255, calc(0.14 * var(--e4-layerA-rim-strength)));
+  outline-offset: -3px;
+
+  /* Clear bezel glass: a faint cool sky-catch from above, a near-invisible
+     vertical wash, and a whisper of cool body tint so the frame stays bright
+     but reads as glass (matches the reference frame). */
+  background:
+    radial-gradient(
+      ellipse 112% 42% at 50% -10%,
+      rgba(255, 255, 255, calc(var(--e4-layerA-top-radial) * var(--e4-layerA-transparency) * 0.7)) 0%,
+      transparent 58%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, calc(var(--e4-layerA-fill-top) * var(--e4-layerA-transparency))) 0%,
+      rgba(246, 247, 248, calc(var(--e4-layerA-fill-mid) * var(--e4-layerA-transparency))) 34%,
+      rgba(238, 240, 242, calc(var(--e4-layerA-fill-bottom) * var(--e4-layerA-transparency))) 100%
+    ),
+    rgba(249, 250, 251, calc(var(--e4-layerA-body-tint) * var(--e4-layerA-transparency)));
+
+  backdrop-filter: blur(var(--e4-layerA-frost)) saturate(var(--e4-layerA-saturate)) brightness(var(--e4-layerA-brightness));
+  -webkit-backdrop-filter: blur(var(--e4-layerA-frost)) saturate(var(--e4-layerA-saturate))
+    brightness(var(--e4-layerA-brightness));
+
+  /* Aero "wet glass" bevel: crisp top highlight lip, cool base shade for pane
+     thickness, tight contact shadow, soft ambient drop, and the cyan halo.
+     Brightness floors keep the bevel readable even when borderWidth is low. */
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, calc(0.6 + 0.4 * var(--e4-layerA-rim-strength, 0.3))),
+    inset 0 3px 7px rgba(255, 255, 255, calc(0.16 + 0.34 * var(--e4-layerA-rim-strength, 0.3))),
+    inset 0 -18px 30px rgba(56, 58, 62, calc(0.1 + var(--e4-layerA-inner-depth, 0.2) * var(--e4-layerA-depth-strength, 0.5) * 0.5)),
+    inset 0 0 0 1px rgba(255, 255, 255, calc(0.18 + 0.3 * var(--e4-layerA-rim-strength, 0.3))),
+    0 2px 6px rgba(28, 30, 33, calc(0.12 + var(--e4-layerA-outer-shadow, 0.3) * var(--e4-layerA-depth-strength, 0.5) * 0.3)),
+    0 22px var(--e4-layerA-shadow-spread, 56px) rgba(33, 35, 39, calc(0.1 + var(--e4-layerA-outer-shadow, 0.3) * var(--e4-layerA-depth-strength, 0.5) * 0.6)),
+    0 0 46px rgba(218, 220, 222, calc(0.06 + var(--e4-layerA-glow, 0.2) * var(--e4-layerA-depth-strength, 0.5) * 0.85));
+}
+
+/* Refraction — a faint highlight ring hugging the rim, warped by an SVG
+   displacement filter (#e4-glass-refract) so the border shimmers like thick
+   glass. Masked transparent through the center so it only touches the edges;
+   opacity scales with each layer's refraction setting (0 = off). */
+.experiment-four-layer-a::before,
+.experiment-four-layer-b::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  filter: url(#e4-glass-refract);
+  background: conic-gradient(
+    from 208deg at 50% 50%,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.34) 36deg,
+    transparent 86deg,
+    rgba(224, 227, 230, 0.22) 166deg,
+    transparent 214deg,
+    rgba(255, 255, 255, 0.26) 300deg,
+    transparent 348deg
+  );
+  -webkit-mask: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 54%, #000 100%);
+  mask: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 54%, #000 100%);
+}
+
+.experiment-four-layer-a::before {
+  opacity: calc(var(--e4-layerA-refraction, 0.06) * 0.9);
+}
+
+.experiment-four-layer-b::before {
+  opacity: calc(var(--e4-layerB-refraction, 0.14) * 0.9);
+}
+
+.experiment-four-layer-a__bezel-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  /* Wet-glass top reflection: a broad specular bloom from above plus a tight
+     bright band hugging the very top edge, then a cool wash at the base. */
+  background:
+    radial-gradient(
+      ellipse 130% 72% at 50% -24%,
+      rgba(255, 255, 255, calc(0.34 + 0.4 * var(--e4-layerA-top-shine, 0.5))) 0%,
+      rgba(255, 255, 255, calc(0.08 + 0.18 * var(--e4-layerA-top-shine, 0.5))) 38%,
+      transparent 62%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, calc(0.5 + 0.4 * var(--e4-layerA-rim-strength, 0.3))) 0%,
+      rgba(255, 255, 255, calc(0.18 + 0.22 * var(--e4-layerA-rim-strength, 0.3))) 6%,
+      transparent 18%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(176, 184, 196, calc(0.04 + 0.07 * var(--e4-layerA-depth-strength, 0.5))) 0%,
+      transparent 20%
+    );
+}
+
+/* Continuous rounded perimeter rim that follows the corners (gradient border via
+   mask). Bright white at the top, cooling to a neutral silver toward the base. */
+.experiment-four-layer-a__bezel-rim::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: var(--e4-layerA-bezel-ring-px, 1.6px);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(246, 247, 248, 0.84) 16%,
+    rgba(228, 231, 234, 0.5) 52%,
+    rgba(206, 210, 214, 0.52) 100%
+  );
+  opacity: calc(0.6 + 0.4 * var(--e4-layerA-rim-border, 0.5));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Specular hotline hugging the top edge and upper corners. */
+.experiment-four-layer-a__bezel-rim::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(
+      ellipse 68% 24% at 50% 0%,
+      rgba(255, 255, 255, calc(0.4 + 0.45 * var(--e4-layerA-top-shine, 0.5))) 0%,
+      transparent 72%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, transparent 4%);
+}
+
+.experiment-four-layer-a__bezel-rim-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--e4-layerA-rim-border-px, 2px);
+  pointer-events: none;
+  z-index: 2;
+  background: rgba(255, 255, 255, 1);
+}
+
+.experiment-four-layer-a__bezel-rim-edge--top {
+  top: 0;
+  opacity: calc(var(--e4-layerA-rim-top-border) * var(--e4-layerA-rim-top-strength));
+}
+
+.experiment-four-layer-a__bezel-rim-edge--bottom {
+  bottom: 0;
+  opacity: calc(var(--e4-layerA-rim-bottom-border) * var(--e4-layerA-rim-bottom-strength));
+}
+
+.experiment-four-layer-a__bezel-rim-side {
+  position: absolute;
+  top: var(--e4-layerA-rim-side-gap-top, 12px);
+  bottom: var(--e4-layerA-rim-side-gap-bottom, 12px);
+  width: var(--e4-layerA-rim-side-width-px, 1px);
+  pointer-events: none;
+  z-index: 2;
+  opacity: calc(var(--e4-layerA-rim-left-border) * var(--e4-layerA-rim-left-strength) * 0.85);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.72) 18%,
+    rgba(255, 255, 255, 0.38) 50%,
+    rgba(255, 255, 255, 0.12) 82%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+}
+
+.experiment-four-layer-a__bezel-rim-side--left {
+  left: 0;
+  opacity: calc(var(--e4-layerA-rim-left-border) * var(--e4-layerA-rim-left-strength) * 0.85);
+  box-shadow: 0 0 var(--e4-layerA-rim-side-shadow-blur-px, 10px) rgba(0, 0, 0, calc(0.35 * var(--e4-layerA-rim-side-shadow-strength, 0)));
+}
+
+.experiment-four-layer-a__bezel-rim-side--right {
+  right: 0;
+  transform: scaleX(-1);
+  opacity: calc(var(--e4-layerA-rim-right-border) * var(--e4-layerA-rim-right-strength) * 0.85);
+  box-shadow: 0 0 var(--e4-layerA-rim-side-shadow-blur-px, 10px) rgba(0, 0, 0, calc(0.35 * var(--e4-layerA-rim-side-shadow-strength, 0)));
+}
+
+.experiment-four-layer-a__bezel-inset {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--e4-layerB-width);
+  height: var(--e4-layerB-height);
+  pointer-events: none;
+}
+
+.experiment-four-layer-a__bezel-inset .experiment-four-layer-b {
+  min-width: 0;
+  min-height: 0;
+  pointer-events: auto;
+}
+
+.experiment-four-layer-b__rim-side {
+  position: absolute;
+  top: var(--e4-layerB-rim-side-gap-top, 10px);
+  bottom: var(--e4-layerB-rim-side-gap-bottom, 10px);
+  width: var(--e4-layerB-rim-side-width-px, 1px);
+  pointer-events: none;
+  z-index: 2;
+  opacity: calc(var(--e4-layerB-rim-left-border) * var(--e4-layerB-rim-left-strength) * 0.7);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.55) 22%,
+    rgba(255, 255, 255, 0.28) 55%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+}
+
+.experiment-four-layer-b__rim-side--left {
+  left: 0;
+  opacity: calc(var(--e4-layerB-rim-left-border) * var(--e4-layerB-rim-left-strength) * 0.7);
+  box-shadow: 0 0 var(--e4-layerB-rim-side-shadow-blur-px, 10px) rgba(0, 0, 0, calc(0.35 * var(--e4-layerB-rim-side-shadow-strength, 0)));
+}
+
+.experiment-four-layer-b__rim-side--right {
+  right: 0;
+  transform: scaleX(-1);
+  opacity: calc(var(--e4-layerB-rim-right-border) * var(--e4-layerB-rim-right-strength) * 0.7);
+  box-shadow: 0 0 var(--e4-layerB-rim-side-shadow-blur-px, 10px) rgba(0, 0, 0, calc(0.35 * var(--e4-layerB-rim-side-shadow-strength, 0)));
+}
+
+.experiment-four-layer-b__rim-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  pointer-events: none;
+  z-index: 2;
+  background: rgba(255, 255, 255, 1);
+}
+
+.experiment-four-layer-b__rim-edge--top {
+  top: 0;
+  opacity: calc(var(--e4-layerB-rim-top-border) * var(--e4-layerB-rim-top-strength) * 0.85);
+}
+
+.experiment-four-layer-b__rim-edge--bottom {
+  bottom: 0;
+  opacity: calc(var(--e4-layerB-rim-bottom-border) * var(--e4-layerB-rim-bottom-strength) * 0.85);
+}
+
+.experiment-four-layer-a__pwzzovO-glass-wrap,
+.experiment-four-layer-b__pwzzovO-glass-wrap {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 4;
+  overflow: hidden;
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-band,
+.experiment-four-layer-b__pwzzovO-backdrop-band {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  isolation: isolate;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge,
+.experiment-four-layer-b__pwzzovO-backdrop-edge {
+  position: absolute;
+  border-radius: 0;
+  pointer-events: none;
+  overflow: hidden;
+  isolation: isolate;
+  contain: strict;
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--left,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--right {
+  top: 0;
+  bottom: 0;
+  width: min(10%, 28px);
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--top,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--top,
+.experiment-four-layer-a__pwzzovO-backdrop-edge--bottom,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--bottom {
+  left: 0;
+  right: 0;
+  height: min(10%, 28px);
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--left,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--left {
+  left: 0;
+  right: auto;
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--right,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--right {
+  left: auto;
+  right: 0;
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--top,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--top {
+  top: 0;
+  bottom: auto;
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--bottom,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--bottom {
+  top: auto;
+  bottom: 0;
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--left {
+  --glass-reflex-light: var(--e4-layerA-reflex-left-light, 0);
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--right {
+  --glass-reflex-light: var(--e4-layerA-reflex-right-light, 0);
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--top {
+  --glass-reflex-light: var(--e4-layerA-reflex-top-light, 0);
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--bottom {
+  --glass-reflex-light: var(--e4-layerA-reflex-bottom-light, 0);
+}
+
+.experiment-four-layer-b__pwzzovO-backdrop-edge--left {
+  --glass-reflex-light: var(--e4-layerB-reflex-left-light, 0);
+}
+
+.experiment-four-layer-b__pwzzovO-backdrop-edge--right {
+  --glass-reflex-light: var(--e4-layerB-reflex-right-light, 0);
+}
+
+.experiment-four-layer-b__pwzzovO-backdrop-edge--top {
+  --glass-reflex-light: var(--e4-layerB-reflex-top-light, 0);
+}
+
+.experiment-four-layer-b__pwzzovO-backdrop-edge--bottom {
+  --glass-reflex-light: var(--e4-layerB-reflex-bottom-light, 0);
+}
+
+.experiment-four-layer-a__pwzzovO-glass,
+.experiment-four-layer-b__pwzzovO-glass {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--pwzzovO-corner-opacity, 0);
+  --glass-reflex-light: var(--pwzzovO-corner-light, 0);
+  --glass-reflex-dark: var(--pwzzovO-corner-dark, 0);
+  box-shadow:
+    inset 0 0 0 var(--pwzzovO-rim-px, 1px) color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 10%), transparent),
+    inset 1.8px 3px 0px -2px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 90%), transparent),
+    inset -2px -2px 0px -2px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 80%), transparent),
+    inset -3px -8px 1px -6px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 60%), transparent),
+    inset -0.3px -1px 4px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 12%), transparent),
+    inset -1.5px 2.5px 0px -2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 20%), transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 20%), transparent),
+    inset 2px -6.5px 1px -4px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent),
+    0px 1px 5px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent),
+    0px 6px 16px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent);
+}
+
+.experiment-four-layer-a__pwzzovO-glass {
+  --c-light: var(--e4-layerA-reflex-light-color, #fff);
+  --c-dark: var(--e4-layerA-reflex-dark-color, #000);
+  --pwzzovO-rim-px: var(--e4-layerA-reflex-rim-px, 1px);
+}
+
+.experiment-four-layer-b__pwzzovO-glass {
+  --c-light: var(--e4-layerB-reflex-light-color, #fff);
+  --c-dark: var(--e4-layerB-reflex-dark-color, #000);
+  --pwzzovO-rim-px: var(--e4-layerB-reflex-rim-px, 1px);
+}
+
+.experiment-four-layer-a__pwzzovO-glass--tl,
+.experiment-four-layer-b__pwzzovO-glass--tl {
+  --pwzzovO-corner-opacity: var(--e4-layerA-reflex-tl-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerA-reflex-tl-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerA-reflex-tl-dark, 0);
+  -webkit-mask-image: radial-gradient(
+    ellipse 100% 100% at 0% 0%,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-mask-reach, 44%),
+    transparent var(--e4-layerA-reflex-mask-fade, 74%)
+  );
+  mask-image: radial-gradient(
+    ellipse 100% 100% at 0% 0%,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-mask-reach, 44%),
+    transparent var(--e4-layerA-reflex-mask-fade, 74%)
+  );
+}
+
+.experiment-four-layer-a__pwzzovO-glass--tr,
+.experiment-four-layer-b__pwzzovO-glass--tr {
+  --pwzzovO-corner-opacity: var(--e4-layerA-reflex-tr-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerA-reflex-tr-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerA-reflex-tr-dark, 0);
+  -webkit-mask-image: radial-gradient(
+    ellipse 100% 100% at 100% 0%,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-mask-reach, 44%),
+    transparent var(--e4-layerA-reflex-mask-fade, 74%)
+  );
+  mask-image: radial-gradient(
+    ellipse 100% 100% at 100% 0%,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-mask-reach, 44%),
+    transparent var(--e4-layerA-reflex-mask-fade, 74%)
+  );
+}
+
+.experiment-four-layer-a__pwzzovO-glass--bl,
+.experiment-four-layer-b__pwzzovO-glass--bl {
+  --pwzzovO-corner-opacity: var(--e4-layerA-reflex-bl-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerA-reflex-bl-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerA-reflex-bl-dark, 0);
+  -webkit-mask-image: radial-gradient(
+    ellipse 100% 100% at 0% 100%,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-mask-reach, 44%),
+    transparent var(--e4-layerA-reflex-mask-fade, 74%)
+  );
+  mask-image: radial-gradient(
+    ellipse 100% 100% at 0% 100%,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-mask-reach, 44%),
+    transparent var(--e4-layerA-reflex-mask-fade, 74%)
+  );
+}
+
+.experiment-four-layer-a__pwzzovO-glass--br,
+.experiment-four-layer-b__pwzzovO-glass--br {
+  --pwzzovO-corner-opacity: var(--e4-layerA-reflex-br-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerA-reflex-br-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerA-reflex-br-dark, 0);
+  -webkit-mask-image: radial-gradient(
+    ellipse 100% 100% at 100% 100%,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-mask-reach, 44%),
+    transparent var(--e4-layerA-reflex-mask-fade, 74%)
+  );
+  mask-image: radial-gradient(
+    ellipse 100% 100% at 100% 100%,
+    #000 0%,
+    #000 var(--e4-layerA-reflex-mask-reach, 44%),
+    transparent var(--e4-layerA-reflex-mask-fade, 74%)
+  );
+}
+
+.experiment-four-layer-b__pwzzovO-glass--tl {
+  --pwzzovO-corner-opacity: var(--e4-layerB-reflex-tl-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerB-reflex-tl-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerB-reflex-tl-dark, 0);
+  -webkit-mask-image: radial-gradient(
+    ellipse 100% 100% at 0% 0%,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-mask-reach, 44%),
+    transparent var(--e4-layerB-reflex-mask-fade, 74%)
+  );
+  mask-image: radial-gradient(
+    ellipse 100% 100% at 0% 0%,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-mask-reach, 44%),
+    transparent var(--e4-layerB-reflex-mask-fade, 74%)
+  );
+}
+
+.experiment-four-layer-b__pwzzovO-glass--tr {
+  --pwzzovO-corner-opacity: var(--e4-layerB-reflex-tr-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerB-reflex-tr-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerB-reflex-tr-dark, 0);
+  -webkit-mask-image: radial-gradient(
+    ellipse 100% 100% at 100% 0%,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-mask-reach, 44%),
+    transparent var(--e4-layerB-reflex-mask-fade, 74%)
+  );
+  mask-image: radial-gradient(
+    ellipse 100% 100% at 100% 0%,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-mask-reach, 44%),
+    transparent var(--e4-layerB-reflex-mask-fade, 74%)
+  );
+}
+
+.experiment-four-layer-b__pwzzovO-glass--bl {
+  --pwzzovO-corner-opacity: var(--e4-layerB-reflex-bl-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerB-reflex-bl-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerB-reflex-bl-dark, 0);
+  -webkit-mask-image: radial-gradient(
+    ellipse 100% 100% at 0% 100%,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-mask-reach, 44%),
+    transparent var(--e4-layerB-reflex-mask-fade, 74%)
+  );
+  mask-image: radial-gradient(
+    ellipse 100% 100% at 0% 100%,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-mask-reach, 44%),
+    transparent var(--e4-layerB-reflex-mask-fade, 74%)
+  );
+}
+
+.experiment-four-layer-b__pwzzovO-glass--br {
+  --pwzzovO-corner-opacity: var(--e4-layerB-reflex-br-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerB-reflex-br-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerB-reflex-br-dark, 0);
+  -webkit-mask-image: radial-gradient(
+    ellipse 100% 100% at 100% 100%,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-mask-reach, 44%),
+    transparent var(--e4-layerB-reflex-mask-fade, 74%)
+  );
+  mask-image: radial-gradient(
+    ellipse 100% 100% at 100% 100%,
+    #000 0%,
+    #000 var(--e4-layerB-reflex-mask-reach, 44%),
+    transparent var(--e4-layerB-reflex-mask-fade, 74%)
+  );
+}
+
+.experiment-four-layer-a__pwzzovO-glass--left,
+.experiment-four-layer-b__pwzzovO-glass--left,
+.experiment-four-layer-a__pwzzovO-glass--right,
+.experiment-four-layer-b__pwzzovO-glass--right,
+.experiment-four-layer-a__pwzzovO-glass--top,
+.experiment-four-layer-b__pwzzovO-glass--top,
+.experiment-four-layer-a__pwzzovO-glass--bottom,
+.experiment-four-layer-b__pwzzovO-glass--bottom {
+  inset: auto;
+  border-radius: 0;
+  overflow: hidden;
+  isolation: isolate;
+  contain: paint;
+  /* Corner PwzzovO stack uses diagonal inset shadows — never reuse on linear edges */
+  box-shadow: none;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--left,
+.experiment-four-layer-b__pwzzovO-glass--left,
+.experiment-four-layer-a__pwzzovO-glass--right,
+.experiment-four-layer-b__pwzzovO-glass--right {
+  height: auto;
+  width: min(10%, 28px);
+}
+
+.experiment-four-layer-a__pwzzovO-glass--top,
+.experiment-four-layer-b__pwzzovO-glass--top,
+.experiment-four-layer-a__pwzzovO-glass--bottom,
+.experiment-four-layer-b__pwzzovO-glass--bottom {
+  width: auto;
+  height: min(10%, 28px);
+}
+
+.experiment-four-layer-a__pwzzovO-glass-edge-rim,
+.experiment-four-layer-b__pwzzovO-glass-edge-rim {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  pointer-events: none;
+  background: var(--pwzzovO-edge-backdrop-rim, transparent);
+  -webkit-mask-image: var(--pwzzovO-edge-backdrop-rim-mask, linear-gradient(to bottom, transparent 0%, transparent 100%));
+  mask-image: var(--pwzzovO-edge-backdrop-rim-mask, linear-gradient(to bottom, transparent 0%, transparent 100%));
+  mix-blend-mode: normal;
+  opacity: calc((0.72 + var(--pwzzovO-edge-backdrop-color-gain, 0) * 0.28) * (0.5 + var(--glass-reflex-light, 1) * 0.5));
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--left .experiment-four-layer-a__pwzzovO-glass-edge-rim,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--left .experiment-four-layer-b__pwzzovO-glass-edge-rim {
+  left: 0;
+  right: auto;
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--right .experiment-four-layer-a__pwzzovO-glass-edge-rim,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--right .experiment-four-layer-b__pwzzovO-glass-edge-rim {
+  left: auto;
+  right: 0;
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--top .experiment-four-layer-a__pwzzovO-glass-edge-rim,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--top .experiment-four-layer-b__pwzzovO-glass-edge-rim,
+.experiment-four-layer-a__pwzzovO-backdrop-edge--bottom .experiment-four-layer-a__pwzzovO-glass-edge-rim,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--bottom .experiment-four-layer-b__pwzzovO-glass-edge-rim {
+  top: 0;
+  bottom: auto;
+  left: 0;
+  right: 0;
+  width: auto;
+  height: 3px;
+  -webkit-mask-image: var(--pwzzovO-edge-backdrop-rim-mask, linear-gradient(to right, transparent 0%, transparent 100%));
+  mask-image: var(--pwzzovO-edge-backdrop-rim-mask, linear-gradient(to right, transparent 0%, transparent 100%));
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--bottom .experiment-four-layer-a__pwzzovO-glass-edge-rim,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--bottom .experiment-four-layer-b__pwzzovO-glass-edge-rim {
+  top: auto;
+  bottom: 0;
+}
+
+.experiment-four-layer-a__pwzzovO-glass-edge-tint,
+.experiment-four-layer-b__pwzzovO-glass-edge-tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--pwzzovO-edge-backdrop-tint, transparent);
+  -webkit-mask-image:
+    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, transparent 0%, transparent 100%)),
+    linear-gradient(to right, #000 0%, #000 12%, transparent 62%);
+  mask-image:
+    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, transparent 0%, transparent 100%)),
+    linear-gradient(to right, #000 0%, #000 12%, transparent 62%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  mix-blend-mode: normal;
+  opacity: calc((0.34 + var(--pwzzovO-edge-backdrop-color-gain, 0) * 0.52) * (0.5 + var(--glass-reflex-light, 1) * 0.5));
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--right .experiment-four-layer-a__pwzzovO-glass-edge-tint,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--right .experiment-four-layer-b__pwzzovO-glass-edge-tint {
+  -webkit-mask-image:
+    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, transparent 0%, transparent 100%)),
+    linear-gradient(to left, #000 0%, #000 12%, transparent 62%);
+  mask-image:
+    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to bottom, transparent 0%, transparent 100%)),
+    linear-gradient(to left, #000 0%, #000 12%, transparent 62%);
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--top .experiment-four-layer-a__pwzzovO-glass-edge-tint,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--top .experiment-four-layer-b__pwzzovO-glass-edge-tint {
+  -webkit-mask-image:
+    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to right, transparent 0%, transparent 100%)),
+    linear-gradient(to bottom, #000 0%, #000 12%, transparent 62%);
+  mask-image:
+    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to right, transparent 0%, transparent 100%)),
+    linear-gradient(to bottom, #000 0%, #000 12%, transparent 62%);
+}
+
+.experiment-four-layer-a__pwzzovO-backdrop-edge--bottom .experiment-four-layer-a__pwzzovO-glass-edge-tint,
+.experiment-four-layer-b__pwzzovO-backdrop-edge--bottom .experiment-four-layer-b__pwzzovO-glass-edge-tint {
+  -webkit-mask-image:
+    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to right, transparent 0%, transparent 100%)),
+    linear-gradient(to top, #000 0%, #000 12%, transparent 62%);
+  mask-image:
+    var(--pwzzovO-edge-backdrop-mask, linear-gradient(to right, transparent 0%, transparent 100%)),
+    linear-gradient(to top, #000 0%, #000 12%, transparent 62%);
+}
+
+.experiment-four-layer-a__pwzzovO-glass--left,
+.experiment-four-layer-b__pwzzovO-glass--left {
+  left: 0;
+  right: auto;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--right,
+.experiment-four-layer-b__pwzzovO-glass--right {
+  left: auto;
+  right: 0;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--left {
+  top: var(--e4-layerA-rim-side-gap-top, 12px);
+  bottom: var(--e4-layerA-rim-side-gap-bottom, 12px);
+  --pwzzovO-corner-opacity: var(--e4-layerA-reflex-left-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerA-reflex-left-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerA-reflex-left-dark, 0);
+  --reflex-edge-glow: var(--e4-layerA-reflex-left-glow, 0.22);
+  -webkit-mask-image:
+    linear-gradient(
+      to right,
+      #000 0%,
+      #000 var(--e4-layerA-reflex-left-edge-mask-reach, 26%),
+      transparent var(--e4-layerA-reflex-left-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
+  mask-image:
+    linear-gradient(
+      to right,
+      #000 0%,
+      #000 var(--e4-layerA-reflex-left-edge-mask-reach, 26%),
+      transparent var(--e4-layerA-reflex-left-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  box-shadow:
+    inset 1px 0 0 var(--pwzzovO-rim-px, 1px)
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 14%),
+        transparent
+      ),
+    inset 4px 0 calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow)))
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 30% * var(--reflex-edge-glow)),
+        transparent
+      ),
+    inset -2px 0 calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow)))
+      color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 22% * var(--reflex-edge-glow)), transparent);
+}
+
+.experiment-four-layer-a__pwzzovO-glass--right {
+  top: var(--e4-layerA-rim-side-gap-top, 12px);
+  bottom: var(--e4-layerA-rim-side-gap-bottom, 12px);
+  --pwzzovO-corner-opacity: var(--e4-layerA-reflex-right-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerA-reflex-right-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerA-reflex-right-dark, 0);
+  --reflex-edge-glow: var(--e4-layerA-reflex-right-glow, 0.22);
+  -webkit-mask-image:
+    linear-gradient(
+      to left,
+      #000 0%,
+      #000 var(--e4-layerA-reflex-right-edge-mask-reach, 26%),
+      transparent var(--e4-layerA-reflex-right-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
+  mask-image:
+    linear-gradient(
+      to left,
+      #000 0%,
+      #000 var(--e4-layerA-reflex-right-edge-mask-reach, 26%),
+      transparent var(--e4-layerA-reflex-right-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  box-shadow:
+    inset -1px 0 0 var(--pwzzovO-rim-px, 1px)
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 14%),
+        transparent
+      ),
+    inset -4px 0 calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow)))
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 30% * var(--reflex-edge-glow)),
+        transparent
+      ),
+    inset 2px 0 calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow)))
+      color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 22% * var(--reflex-edge-glow)), transparent);
+}
+
+.experiment-four-layer-b__pwzzovO-glass--left {
+  top: var(--e4-layerB-rim-side-gap-top, 10px);
+  bottom: var(--e4-layerB-rim-side-gap-bottom, 10px);
+  --pwzzovO-corner-opacity: var(--e4-layerB-reflex-left-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerB-reflex-left-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerB-reflex-left-dark, 0);
+  --reflex-edge-glow: var(--e4-layerB-reflex-left-glow, 0.22);
+  -webkit-mask-image:
+    linear-gradient(
+      to right,
+      #000 0%,
+      #000 var(--e4-layerB-reflex-left-edge-mask-reach, 26%),
+      transparent var(--e4-layerB-reflex-left-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
+  mask-image:
+    linear-gradient(
+      to right,
+      #000 0%,
+      #000 var(--e4-layerB-reflex-left-edge-mask-reach, 26%),
+      transparent var(--e4-layerB-reflex-left-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  box-shadow:
+    inset 1px 0 0 var(--pwzzovO-rim-px, 1px)
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 14%),
+        transparent
+      ),
+    inset 4px 0 calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow)))
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 30% * var(--reflex-edge-glow)),
+        transparent
+      ),
+    inset -2px 0 calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow)))
+      color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 22% * var(--reflex-edge-glow)), transparent);
+}
+
+.experiment-four-layer-b__pwzzovO-glass--right {
+  top: var(--e4-layerB-rim-side-gap-top, 10px);
+  bottom: var(--e4-layerB-rim-side-gap-bottom, 10px);
+  --pwzzovO-corner-opacity: var(--e4-layerB-reflex-right-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerB-reflex-right-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerB-reflex-right-dark, 0);
+  --reflex-edge-glow: var(--e4-layerB-reflex-right-glow, 0.22);
+  -webkit-mask-image:
+    linear-gradient(
+      to left,
+      #000 0%,
+      #000 var(--e4-layerB-reflex-right-edge-mask-reach, 26%),
+      transparent var(--e4-layerB-reflex-right-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
+  mask-image:
+    linear-gradient(
+      to left,
+      #000 0%,
+      #000 var(--e4-layerB-reflex-right-edge-mask-reach, 26%),
+      transparent var(--e4-layerB-reflex-right-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to bottom, #000 0%, #000 100%));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  box-shadow:
+    inset -1px 0 0 var(--pwzzovO-rim-px, 1px)
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 14%),
+        transparent
+      ),
+    inset -4px 0 calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow)))
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 30% * var(--reflex-edge-glow)),
+        transparent
+      ),
+    inset 2px 0 calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow)))
+      color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 22% * var(--reflex-edge-glow)), transparent);
+}
+
+.experiment-four-layer-a__pwzzovO-glass--top,
+.experiment-four-layer-b__pwzzovO-glass--top,
+.experiment-four-layer-a__pwzzovO-glass--bottom,
+.experiment-four-layer-b__pwzzovO-glass--bottom {
+  left: auto;
+  right: auto;
+}
+
+.experiment-four-layer-a__pwzzovO-glass--top {
+  top: 0;
+  bottom: auto;
+  left: var(--e4-layerA-rim-side-gap-top, 12px);
+  right: var(--e4-layerA-rim-side-gap-bottom, 12px);
+  --pwzzovO-corner-opacity: var(--e4-layerA-reflex-top-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerA-reflex-top-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerA-reflex-top-dark, 0);
+  --reflex-edge-glow: var(--e4-layerA-reflex-top-glow, 0.22);
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 var(--e4-layerA-reflex-top-edge-mask-reach, 26%),
+      transparent var(--e4-layerA-reflex-top-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to right, #000 0%, #000 100%));
+  mask-image:
+    linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 var(--e4-layerA-reflex-top-edge-mask-reach, 26%),
+      transparent var(--e4-layerA-reflex-top-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to right, #000 0%, #000 100%));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  box-shadow:
+    inset 0 1px 0 var(--pwzzovO-rim-px, 1px)
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 14%),
+        transparent
+      ),
+    inset 0 4px calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow)))
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 30% * var(--reflex-edge-glow)),
+        transparent
+      ),
+    inset 0 -2px calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow)))
+      color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 22% * var(--reflex-edge-glow)), transparent);
+}
+
+.experiment-four-layer-a__pwzzovO-glass--bottom {
+  top: auto;
+  bottom: 0;
+  left: var(--e4-layerA-rim-side-gap-top, 12px);
+  right: var(--e4-layerA-rim-side-gap-bottom, 12px);
+  --pwzzovO-corner-opacity: var(--e4-layerA-reflex-bottom-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerA-reflex-bottom-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerA-reflex-bottom-dark, 0);
+  --reflex-edge-glow: var(--e4-layerA-reflex-bottom-glow, 0.22);
+  -webkit-mask-image:
+    linear-gradient(
+      to top,
+      #000 0%,
+      #000 var(--e4-layerA-reflex-bottom-edge-mask-reach, 26%),
+      transparent var(--e4-layerA-reflex-bottom-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to right, #000 0%, #000 100%));
+  mask-image:
+    linear-gradient(
+      to top,
+      #000 0%,
+      #000 var(--e4-layerA-reflex-bottom-edge-mask-reach, 26%),
+      transparent var(--e4-layerA-reflex-bottom-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to right, #000 0%, #000 100%));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  box-shadow:
+    inset 0 -1px 0 var(--pwzzovO-rim-px, 1px)
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 14%),
+        transparent
+      ),
+    inset 0 -4px calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow)))
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 30% * var(--reflex-edge-glow)),
+        transparent
+      ),
+    inset 0 2px calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow)))
+      color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 22% * var(--reflex-edge-glow)), transparent);
+}
+
+.experiment-four-layer-b__pwzzovO-glass--top {
+  top: 0;
+  bottom: auto;
+  left: var(--e4-layerB-rim-side-gap-top, 10px);
+  right: var(--e4-layerB-rim-side-gap-bottom, 10px);
+  --pwzzovO-corner-opacity: var(--e4-layerB-reflex-top-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerB-reflex-top-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerB-reflex-top-dark, 0);
+  --reflex-edge-glow: var(--e4-layerB-reflex-top-glow, 0.22);
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 var(--e4-layerB-reflex-top-edge-mask-reach, 26%),
+      transparent var(--e4-layerB-reflex-top-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to right, #000 0%, #000 100%));
+  mask-image:
+    linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 var(--e4-layerB-reflex-top-edge-mask-reach, 26%),
+      transparent var(--e4-layerB-reflex-top-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to right, #000 0%, #000 100%));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  box-shadow:
+    inset 0 1px 0 var(--pwzzovO-rim-px, 1px)
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 14%),
+        transparent
+      ),
+    inset 0 4px calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow)))
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 30% * var(--reflex-edge-glow)),
+        transparent
+      ),
+    inset 0 -2px calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow)))
+      color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 22% * var(--reflex-edge-glow)), transparent);
+}
+
+.experiment-four-layer-b__pwzzovO-glass--bottom {
+  top: auto;
+  bottom: 0;
+  left: var(--e4-layerB-rim-side-gap-top, 10px);
+  right: var(--e4-layerB-rim-side-gap-bottom, 10px);
+  --pwzzovO-corner-opacity: var(--e4-layerB-reflex-bottom-opacity, 0);
+  --pwzzovO-corner-light: var(--e4-layerB-reflex-bottom-light, 0);
+  --pwzzovO-corner-dark: var(--e4-layerB-reflex-bottom-dark, 0);
+  --reflex-edge-glow: var(--e4-layerB-reflex-bottom-glow, 0.22);
+  -webkit-mask-image:
+    linear-gradient(
+      to top,
+      #000 0%,
+      #000 var(--e4-layerB-reflex-bottom-edge-mask-reach, 26%),
+      transparent var(--e4-layerB-reflex-bottom-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to right, #000 0%, #000 100%));
+  mask-image:
+    linear-gradient(
+      to top,
+      #000 0%,
+      #000 var(--e4-layerB-reflex-bottom-edge-mask-reach, 26%),
+      transparent var(--e4-layerB-reflex-bottom-edge-mask-fade, 62%)
+    ),
+    var(--pwzzovO-edge-backdrop-reflex-mask, linear-gradient(to right, #000 0%, #000 100%));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  box-shadow:
+    inset 0 -1px 0 var(--pwzzovO-rim-px, 1px)
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 14%),
+        transparent
+      ),
+    inset 0 -4px calc(10px * var(--reflex-edge-glow)) calc(-4px - 8px * (1 - var(--reflex-edge-glow)))
+      color-mix(
+        in srgb,
+        var(--c-light) calc(var(--glass-reflex-light) * 30% * var(--reflex-edge-glow)),
+        transparent
+      ),
+    inset 0 2px calc(8px * var(--reflex-edge-glow)) calc(-5px - 7px * (1 - var(--reflex-edge-glow)))
+      color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 22% * var(--reflex-edge-glow)), transparent);
+}
+
+.experiment-four-layer-a__radial-corners,
+.experiment-four-layer-b__radial-corners {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 3;
+  mix-blend-mode: screen;
+  opacity: var(--e4-layerA-radial-paired-opacity, 0);
+  background:
+    radial-gradient(
+      ellipse var(--e4-layerA-radial-size, 88px) var(--e4-layerA-radial-size, 88px) at var(--e4-layerA-radial-pos-a, 0% 0%),
+      color-mix(in srgb, var(--e4-layerA-radial-color, #fff) calc(var(--e4-layerA-radial-peak, 0.88) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--e4-layerA-radial-color, #fff) calc(var(--e4-layerA-radial-mid, 0.28) * 100%), transparent) var(--e4-layerA-radial-mid-stop, 36%),
+      transparent var(--e4-layerA-radial-fade-stop, 72%)
+    ),
+    radial-gradient(
+      ellipse var(--e4-layerA-radial-size, 88px) var(--e4-layerA-radial-size, 88px) at var(--e4-layerA-radial-pos-b, 100% 100%),
+      color-mix(in srgb, var(--e4-layerA-radial-color, #fff) calc(var(--e4-layerA-radial-sec-peak, 0.78) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--e4-layerA-radial-color, #fff) calc(var(--e4-layerA-radial-sec-mid, 0.22) * 100%), transparent) var(--e4-layerA-radial-sec-mid-stop, 38%),
+      transparent var(--e4-layerA-radial-sec-fade-stop, 74%)
+    );
+}
+
+.experiment-four-layer-b__radial-corners {
+  opacity: var(--e4-layerB-radial-paired-opacity, 0);
+  background:
+    radial-gradient(
+      ellipse var(--e4-layerB-radial-size, 88px) var(--e4-layerB-radial-size, 88px) at var(--e4-layerB-radial-pos-a, 0% 0%),
+      color-mix(in srgb, var(--e4-layerB-radial-color, #fff) calc(var(--e4-layerB-radial-peak, 0.88) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--e4-layerB-radial-color, #fff) calc(var(--e4-layerB-radial-mid, 0.28) * 100%), transparent) var(--e4-layerB-radial-mid-stop, 36%),
+      transparent var(--e4-layerB-radial-fade-stop, 72%)
+    ),
+    radial-gradient(
+      ellipse var(--e4-layerB-radial-size, 88px) var(--e4-layerB-radial-size, 88px) at var(--e4-layerB-radial-pos-b, 100% 100%),
+      color-mix(in srgb, var(--e4-layerB-radial-color, #fff) calc(var(--e4-layerB-radial-sec-peak, 0.78) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--e4-layerB-radial-color, #fff) calc(var(--e4-layerB-radial-sec-mid, 0.22) * 100%), transparent) var(--e4-layerB-radial-sec-mid-stop, 38%),
+      transparent var(--e4-layerB-radial-sec-fade-stop, 74%)
+    );
+}
+
+.experiment-set-one-page[data-e4-layerA-radial-layout='individual'] .experiment-four-layer-a__radial-corners {
+  opacity: 1;
+  background:
+    radial-gradient(
+      ellipse var(--e4-layerA-radial-tl-size, 88px) var(--e4-layerA-radial-tl-size, 88px) at 0% 0%,
+      color-mix(in srgb, var(--e4-layerA-radial-color, #fff) calc(var(--e4-layerA-radial-peak, 0.88) * var(--e4-layerA-radial-tl-alpha, 0) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--e4-layerA-radial-color, #fff) calc(var(--e4-layerA-radial-mid, 0.28) * var(--e4-layerA-radial-tl-alpha, 0) * 100%), transparent) var(--e4-layerA-radial-mid-stop, 36%),
+      transparent var(--e4-layerA-radial-fade-stop, 72%)
+    ),
+    radial-gradient(
+      ellipse var(--e4-layerA-radial-tr-size, 88px) var(--e4-layerA-radial-tr-size, 88px) at 100% 0%,
+      color-mix(in srgb, var(--e4-layerA-radial-color, #fff) calc(var(--e4-layerA-radial-peak, 0.88) * var(--e4-layerA-radial-tr-alpha, 0) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--e4-layerA-radial-color, #fff) calc(var(--e4-layerA-radial-mid, 0.28) * var(--e4-layerA-radial-tr-alpha, 0) * 100%), transparent) var(--e4-layerA-radial-mid-stop, 36%),
+      transparent var(--e4-layerA-radial-fade-stop, 72%)
+    ),
+    radial-gradient(
+      ellipse var(--e4-layerA-radial-bl-size, 88px) var(--e4-layerA-radial-bl-size, 88px) at 0% 100%,
+      color-mix(in srgb, var(--e4-layerA-radial-color, #fff) calc(var(--e4-layerA-radial-sec-peak, 0.78) * var(--e4-layerA-radial-bl-alpha, 0) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--e4-layerA-radial-color, #fff) calc(var(--e4-layerA-radial-sec-mid, 0.22) * var(--e4-layerA-radial-bl-alpha, 0) * 100%), transparent) var(--e4-layerA-radial-sec-mid-stop, 38%),
+      transparent var(--e4-layerA-radial-sec-fade-stop, 74%)
+    ),
+    radial-gradient(
+      ellipse var(--e4-layerA-radial-br-size, 88px) var(--e4-layerA-radial-br-size, 88px) at 100% 100%,
+      color-mix(in srgb, var(--e4-layerA-radial-color, #fff) calc(var(--e4-layerA-radial-sec-peak, 0.78) * var(--e4-layerA-radial-br-alpha, 0) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--e4-layerA-radial-color, #fff) calc(var(--e4-layerA-radial-sec-mid, 0.22) * var(--e4-layerA-radial-br-alpha, 0) * 100%), transparent) var(--e4-layerA-radial-sec-mid-stop, 38%),
+      transparent var(--e4-layerA-radial-sec-fade-stop, 74%)
+    );
+}
+
+.experiment-set-one-page[data-e4-layerB-radial-layout='individual'] .experiment-four-layer-b__radial-corners {
+  opacity: 1;
+  background:
+    radial-gradient(
+      ellipse var(--e4-layerB-radial-tl-size, 88px) var(--e4-layerB-radial-tl-size, 88px) at 0% 0%,
+      color-mix(in srgb, var(--e4-layerB-radial-color, #fff) calc(var(--e4-layerB-radial-peak, 0.88) * var(--e4-layerB-radial-tl-alpha, 0) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--e4-layerB-radial-color, #fff) calc(var(--e4-layerB-radial-mid, 0.28) * var(--e4-layerB-radial-tl-alpha, 0) * 100%), transparent) var(--e4-layerB-radial-mid-stop, 36%),
+      transparent var(--e4-layerB-radial-fade-stop, 72%)
+    ),
+    radial-gradient(
+      ellipse var(--e4-layerB-radial-tr-size, 88px) var(--e4-layerB-radial-tr-size, 88px) at 100% 0%,
+      color-mix(in srgb, var(--e4-layerB-radial-color, #fff) calc(var(--e4-layerB-radial-peak, 0.88) * var(--e4-layerB-radial-tr-alpha, 0) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--e4-layerB-radial-color, #fff) calc(var(--e4-layerB-radial-mid, 0.28) * var(--e4-layerB-radial-tr-alpha, 0) * 100%), transparent) var(--e4-layerB-radial-mid-stop, 36%),
+      transparent var(--e4-layerB-radial-fade-stop, 72%)
+    ),
+    radial-gradient(
+      ellipse var(--e4-layerB-radial-bl-size, 88px) var(--e4-layerB-radial-bl-size, 88px) at 0% 100%,
+      color-mix(in srgb, var(--e4-layerB-radial-color, #fff) calc(var(--e4-layerB-radial-sec-peak, 0.78) * var(--e4-layerB-radial-bl-alpha, 0) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--e4-layerB-radial-color, #fff) calc(var(--e4-layerB-radial-sec-mid, 0.22) * var(--e4-layerB-radial-bl-alpha, 0) * 100%), transparent) var(--e4-layerB-radial-sec-mid-stop, 38%),
+      transparent var(--e4-layerB-radial-sec-fade-stop, 74%)
+    ),
+    radial-gradient(
+      ellipse var(--e4-layerB-radial-br-size, 88px) var(--e4-layerB-radial-br-size, 88px) at 100% 100%,
+      color-mix(in srgb, var(--e4-layerB-radial-color, #fff) calc(var(--e4-layerB-radial-sec-peak, 0.78) * var(--e4-layerB-radial-br-alpha, 0) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--e4-layerB-radial-color, #fff) calc(var(--e4-layerB-radial-sec-mid, 0.22) * var(--e4-layerB-radial-br-alpha, 0) * 100%), transparent) var(--e4-layerB-radial-sec-mid-stop, 38%),
+      transparent var(--e4-layerB-radial-sec-fade-stop, 74%)
+    );
+}
+
+.experiment-four-layer-a__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: inherit;
+  height: 100%;
+  padding: 1.25rem 1.35rem 1.5rem;
+  pointer-events: none;
+}
+
+/* ── Layer B ── */
+
+.experiment-four-layer-b {
+  position: relative;
+  width: var(--e4-layerB-width);
+  height: var(--e4-layerB-height);
+  min-height: var(--e4-layerB-height);
+  border-radius: var(--e4-layerB-radius);
+  isolation: isolate;
+  overflow: hidden;
+  cursor: inherit;
+
+  border: none;
+
+  /* Wet frosted body: bright cool-white crown, airy powder-blue midriff, and a
+     clearer cool base so the grass reads through; a broad sky reflection from
+     above and a soft sky-bounce rising from the bottom edge. */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, calc(var(--e4-layerB-fill-top) * var(--e4-layerB-transparency))) 0%,
+      rgba(247, 248, 249, calc(var(--e4-layerB-fill-mid) * var(--e4-layerB-transparency))) 42%,
+      rgba(240, 242, 243, calc(var(--e4-layerB-fill-bottom) * var(--e4-layerB-transparency) * var(--e4-layerB-depth-strength))) 100%
+    ),
+    radial-gradient(
+      ellipse 96% 52% at 50% -2%,
+      rgba(255, 255, 255, calc(var(--e4-layerB-top-radial) * var(--e4-layerB-transparency))),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 122% 30% at 50% 106%,
+      rgba(247, 248, 249, calc(0.1 * var(--e4-layerB-transparency))),
+      transparent 72%
+    ),
+    rgba(245, 246, 247, calc(var(--e4-layerB-body-tint) * var(--e4-layerB-transparency)));
+
+  backdrop-filter: blur(var(--e4-layerB-frost)) saturate(var(--e4-layerB-saturate)) brightness(var(--e4-layerB-brightness));
+  -webkit-backdrop-filter: blur(var(--e4-layerB-frost)) saturate(var(--e4-layerB-saturate))
+    brightness(var(--e4-layerB-brightness));
+
+  /* Matching wet-glass bevel for the frosted inner sheet — subtler than A. */
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, calc(0.5 + 0.4 * var(--e4-layerB-rim-strength, 0.3))),
+    inset 0 3px 6px rgba(255, 255, 255, calc(0.12 + 0.26 * var(--e4-layerB-rim-strength, 0.3))),
+    inset 0 -20px 34px rgba(54, 56, 60, calc(0.08 + var(--e4-layerB-inner-depth, 0.2) * var(--e4-layerB-depth-strength, 0.5) * 0.85)),
+    inset 0 0 0 1px rgba(255, 255, 255, calc(0.14 + 0.24 * var(--e4-layerB-rim-strength, 0.3))),
+    0 2px 5px rgba(28, 30, 33, calc(0.1 + var(--e4-layerB-outer-shadow, 0.3) * var(--e4-layerB-depth-strength, 0.5) * 0.28)),
+    0 12px 30px rgba(33, 35, 39, calc(0.08 + var(--e4-layerB-outer-shadow, 0.3) * var(--e4-layerB-depth-strength, 0.5) * 0.45)),
+    0 0 38px rgba(218, 220, 222, calc(0.05 + var(--e4-layerB-glow, 0.18) * var(--e4-layerB-depth-strength, 0.5) * 0.7));
+}
+
+/* Continuous rounded rim for layer B — thinner and a touch softer than A. */
+.experiment-four-layer-b::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 1;
+  padding: var(--e4-layerB-bezel-ring-px, 1.1px);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.94) 0%,
+    rgba(244, 245, 246, 0.72) 20%,
+    rgba(226, 229, 232, 0.42) 58%,
+    rgba(204, 208, 213, 0.44) 100%
+  );
+  opacity: calc(0.55 + 0.4 * var(--e4-layerB-rim-border, 0.4));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.experiment-four-layer-b__shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: var(--e4-layerB-shine-opacity);
+  mix-blend-mode: screen;
+  /* Crisp bright band under the top edge, a soft diagonal wet streak, a broad
+     specular bloom from above, and a faint sky-bounce rising at the base. */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, calc(0.3 + 0.5 * var(--e4-layerB-top-shine, 0.5))) 0%,
+      rgba(255, 255, 255, calc(0.08 + 0.2 * var(--e4-layerB-top-shine, 0.5))) 8%,
+      transparent 22%
+    ),
+    linear-gradient(
+      118deg,
+      transparent 28%,
+      rgba(255, 255, 255, 0.08) 44%,
+      rgba(255, 255, 255, calc(0.1 + var(--e4-layerB-diagonal-gloss, 0.4) * var(--e4-layerB-rim-strength, 0.3))) 49%,
+      rgba(255, 255, 255, 0.1) 55%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 124% 64% at 50% -14%,
+      rgba(255, 255, 255, calc(0.2 + 0.62 * var(--e4-layerB-top-shine, 0.5))),
+      transparent 74%
+    ),
+    radial-gradient(
+      ellipse 132% 26% at 50% 112%,
+      rgba(246, 250, 252, calc(0.05 + 0.18 * var(--e4-layerB-top-shine, 0.5))),
+      transparent 74%
+    );
+}
+
+.experiment-set-one-page[data-e4-layerB-show-sparkles='false'] .experiment-four-layer-b__sparkle {
+  display: none;
+}
+
+.experiment-four-layer-b__sparkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fff;
+  pointer-events: none;
+  z-index: 5;
+  opacity: var(--e4-layerB-sparkle);
+  box-shadow:
+    0 0 8px 2px rgba(255, 255, 255, 0.95),
+    0 0 16px 3px rgba(214, 224, 232, 0.5);
+  animation: e1-sparkle-pulse 3.2s ease-in-out infinite;
+}
+
+.experiment-four-layer-b__sparkle--a {
+  top: 12%;
+  left: 18%;
+}
+
+.experiment-four-layer-b__sparkle--b {
+  top: 6%;
+  right: 14%;
+  animation-delay: 1.2s;
+}
+
+.experiment-four-layer-b__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: inherit;
+  height: 100%;
+  padding: 1.25rem 1.35rem 1.5rem;
+  pointer-events: none;
+}
+
+.experiment-four-layer-a__content .experiment-one-panel__drag-hint,
+.experiment-four-layer-b__content .experiment-one-panel__drag-hint {
+  margin-top: 0.75rem;
+  font-size: 0.68rem;
+}
+
+.experiment-four-layer-a__content .experiment-one-panel__title,
+.experiment-four-layer-b__content .experiment-one-panel__title {
+  font-size: 1.35rem;
+}
+
+.experiment-set-one-page[data-hide-panel-text='true'] .experiment-four-layer-a__content,
+.experiment-set-one-page[data-hide-panel-text='true'] .experiment-four-layer-b__content {
+  visibility: hidden;
+}

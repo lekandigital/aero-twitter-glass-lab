@@ -15,6 +15,9 @@
 .vscode/*
 dist
 dist-ssr
+# Showcase is a prebuilt static site Vercel serves as-is — keep it tracked.
+!showcase/dist/
+!showcase/dist/**
 lerna-debug.log*
 logs
 node_modules

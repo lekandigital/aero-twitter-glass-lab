@@ -1,0 +1,90 @@
+/*
+ * Showcase normalize — injected into each branch iframe (same-origin) by harness.js.
+ * Goal: strip the app chrome and pin BOTH the wallpaper box and the Experiment-Five
+ * panel to one fixed geometry/position so all six branches are directly comparable.
+ *
+ * Coordinate basis (provided / measured against `.aero-wallpaper__image`):
+ *   background box : 1440 x 1572  (object-fit: contain, as in the live app)
+ *   Panel A (.experiment-four-layer-a): x 24.61  y 327.55  w 316  h 760  radius 30
+ *   Panel B (.experiment-four-layer-b): x 30.61  y 333.55  w 304  h 748  radius 24
+ *   -> B is a centered 6px bezel inset of A, so sizing B + centering reproduces it.
+ */
+
+/* ---- strip chrome ---- */
+.route-switcher,
+.experiment-one-settings-dock,
+.experiment-set-one-header,
+.experiment-one-refraction-defs { display: none !important; }
+
+/* keep ancestors transparent so the z-index:-1 wallpaper shows through */
+html, body, #root { margin: 0 !important; padding: 0 !important; background: transparent !important; }
+.workspace-page { margin: 0 !important; padding: 0 !important; position: static !important; background: transparent !important; }
+
+/* ---- wallpaper: pin to a 1440x1572 box at the top-left of the viewport ---- */
+.aero-wallpaper {
+  position: fixed !important;
+  inset: 0 !important;
+  display: block !important;
+  overflow: hidden !important;
+  background: #0a1628 !important;
+  z-index: -1 !important;
+}
+.aero-wallpaper__stage {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 1440px !important;
+  height: 1572px !important;
+  display: block !important;
+}
+.aero-wallpaper__image {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 1440px !important;
+  height: 1572px !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: contain !important;     /* matches the live app's letterboxing */
+  object-position: center !important;
+}
+
+/* ---- stage = a 1440x1572 coordinate space anchored at the viewport top-left ---- */
+.experiment-set-one-stage {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  width: 1440px !important;
+  height: 1572px !important;
+  min-height: 1572px !important;
+}
+.experiment-set-one-stage__canvas {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 1440px !important;
+  height: 1572px !important;
+  min-height: 1572px !important;
+}
+
+/* ---- panel position: pin the draggable shell (translate is inline; override it) ---- */
+.experiment-set-two-draggable {
+  transform: translate(24.61px, 327.55px) !important;
+  transition: none !important;
+}
+
+/* ---- Panel A geometry (inline width/height -> need !important) ---- */
+.experiment-four-layer-a {
+  width: 316px !important;
+  height: 760px !important;
+  min-height: 760px !important;
+  --e4-layerA-radius: 30px !important;
+  /* Panel B is sized from these vars on the centered bezel-inset child */
+  --e4-layerB-width: 304px !important;
+  --e4-layerB-height: 748px !important;
+  --e4-layerB-radius: 24px !important;
+}
+.experiment-four-layer-b {
+  --e4-layerB-radius: 24px !important;
+}

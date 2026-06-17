@@ -1,0 +1,30 @@
+{
+  "slug": "chatgpt-5.5",
+  "label": "ChatGPT 5.5 veryhigh",
+  "branch": "chatgpt-5.5-veryhigh-experiment-five-attempt",
+  "commit": "6b5a333",
+  "geometry": {
+    "background": {
+      "selector": ".aero-wallpaper__image",
+      "width": 1440,
+      "height": 1572,
+      "objectFit": "contain"
+    },
+    "panelA": {
+      "selector": ".experiment-four-layer-a",
+      "x": 24.61,
+      "y": 327.55,
+      "width": 316,
+      "height": 760,
+      "radius": 30
+    },
+    "panelB": {
+      "selector": ".experiment-four-layer-b",
+      "x": 30.61,
+      "y": 333.55,
+      "width": 304,
+      "height": 748,
+      "radius": 24
+    }
+  }
+}
