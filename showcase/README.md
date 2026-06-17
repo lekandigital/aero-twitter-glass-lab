@@ -4,18 +4,20 @@ A self-contained static site that renders the Experiment-Five glass panel from *
 branches** side by side, all against the **same background** at the **same fixed panel
 geometry/position**, so the glass treatments can be compared directly against the reference.
 
-- `dist/index.html` — **Stage**: all branches stacked at one shared X/Y; flip between them
-  (same position), Free-move drag, Snap to set position, current/reference bg, zoom, fullscreen.
-- `dist/switch.html` — **Switcher**: one panel as big as the screen allows (same size/position
-  relative to the bg), text hidden by default, fullscreen.
-- `dist/compare.html` — **Compare (A/B swipe)**: two branches over the same seamless bg with a
-  draggable divider — before/after wipe at the identical position.
-- `archive/<slug>/` — per-branch exact CSS, style-computing JS, compiled CSS bundle, and a
-  `meta.json` recipe (commit + applied geometry)
+`dist/index.html` is a single app with two modes:
+- **Focus** — one branch, big and centred; switch via the left rail; optional **Reference**
+  beside it; **Free move** (native drag → live-correct lighting); **Zoom**; **Screenshot**.
+- **Grid** — every branch (+ the Reference target) as a tidy tile overview; click a tile to
+  open it in Focus; **Screenshot**.
 
-Backgrounds live inside each iframe (backdrop-filter only samples its own document), so panels
-are compared by switching/swiping rather than overlaying transparent layers. Panel POSITION is
-controlled at runtime via an injected `#showcase-ctl` <style>; SIZE/chrome via `normalize.css`.
+`archive/<slug>/` holds each branch's exact CSS, style-computing JS, compiled CSS bundle, and a
+`meta.json` recipe (commit + applied geometry).
+
+Each panel is a real build in a same-origin iframe, positioned **natively** at the snap point
+(seeded at build time) so the edge-reflex lighting samples the wallpaper correctly; after a
+panel settles/becomes visible we dispatch a `resize` so it re-samples (see `refreshReflex`).
+Backgrounds live inside each iframe (backdrop-filter only samples its own document). Panels live
+in fixed `.card`s that are only ever transformed, never reparented (that would reload them).
 
 ## How it works
 
