@@ -43,6 +43,12 @@ body {
 /* clean fullscreen viewer — just the demo (background + pane) */
 body.is-viewer .bar, body.is-viewer .rail { display: none; }
 body.is-viewer .stagewrap { background: #05070c; }
+.viewer-label { display: none; }
+body.is-viewer .viewer-label {
+  display: block; position: fixed; top: 16px; left: 16px; z-index: 1000; pointer-events: none;
+  background: rgba(0, 0, 0, 0.6); color: #eaf2ff; padding: 7px 16px; border-radius: 999px;
+  font-size: 15px; font-weight: 600; letter-spacing: 0.01em;
+}
 .viewer-hint { display: none; }
 body.is-viewer .viewer-hint {
   display: block; position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
