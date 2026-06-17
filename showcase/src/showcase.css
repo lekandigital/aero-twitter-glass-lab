@@ -50,6 +50,7 @@ body {
   transform-origin: top left; transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
 }
+.card.is-hidden { visibility: hidden; pointer-events: none; }
 .card__label { display: none; height: 110px; font-size: 60px; font-weight: 600; color: #cfe0f5; padding: 6px 4px 24px; white-space: nowrap; }
 .card.card--labelled .card__label { display: block; }
 .card__view { position: relative; width: 1440px; height: 1572px; overflow: hidden; border-radius: 14px; background: #0a1628; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45); }
