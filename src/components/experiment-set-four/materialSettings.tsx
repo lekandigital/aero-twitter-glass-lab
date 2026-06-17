@@ -519,10 +519,13 @@ export function e4LayerBDimensionStyle(s: E4MaterialSettings, nested: boolean): 
 export type E4InspectTarget =
   | 'layer-a'
   | 'layer-a-rim'
+  | 'layer-a-shine'
+  | 'layer-a-refraction'
   | 'layer-a-corners'
   | 'layer-a-radial'
   | 'layer-b'
   | 'layer-b-shine'
+  | 'layer-b-refraction'
   | 'layer-b-corners'
   | 'layer-b-radial';
 
@@ -1316,6 +1319,20 @@ export const E4_INSPECT_CATALOG: Record<
     note: 'Soft screen-blended radial blooms — paired diagonals or per-corner control.',
     fields: [...radialFieldsA, ...palette],
   },
+  'layer-a-shine': {
+    label: 'Layer A — shine layer',
+    fields: [
+      prefixed('layerA', 'topShine'),
+      prefixed('layerA', 'topRadial'),
+      prefixed('layerA', 'diagonalGloss'),
+      prefixed('layerA', 'shineOpacity'),
+      ...palette,
+    ],
+  },
+  'layer-a-refraction': {
+    label: 'Layer A — edge refraction',
+    fields: [prefixed('layerA', 'refraction'), prefixed('layerA', 'depth'), ...palette],
+  },
   'layer-b': {
     label: 'Layer B — frost body',
     note: 'Frosted inner sheet — nested inside layer A bezel with matching reference inset.',
@@ -1340,6 +1357,10 @@ export const E4_INSPECT_CATALOG: Record<
       prefixed('layerB', 'showSparkles'),
       ...palette,
     ],
+  },
+  'layer-b-refraction': {
+    label: 'Layer B — edge refraction',
+    fields: [prefixed('layerB', 'refraction'), prefixed('layerB', 'depth'), ...palette],
   },
   'layer-b-corners': {
     label: 'Layer B — PwzzovO reflex',

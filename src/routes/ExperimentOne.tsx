@@ -1,7 +1,4 @@
 import {
-  ExperimentOneRefractionFilterDefs,
-} from '../components/experiment-one/primitives';
-import {
   ExperimentSetOneProvider,
   ExperimentSetOneSettingsDock,
 } from '../components/experiment-set-one/combinedSettings';
@@ -11,7 +8,6 @@ import { ExperimentSetOneStage } from '../components/experiment-set-one/Experime
 export function ExperimentOne() {
   return (
     <ExperimentSetOneProvider>
-      <ExperimentOneRefractionFilterDefs />
       <ExperimentSetOneSettingsDock />
 
       <header className="experiment-set-one-header">
