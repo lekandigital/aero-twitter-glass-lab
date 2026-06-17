@@ -35,6 +35,7 @@ let freeMove = true, hideText = true, bgRef = false, refRow = true, interleave =
 
 const refIndex = () => items.length - 1;
 const current = () => items[nav[navPos]];
+const labelOf = (it) => (it.kind === 'ref' ? 'Reference target' : `${it.label} · Save ${it.save}`);
 
 function goFullscreen() { try { if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); } catch {} }
 
@@ -131,6 +132,7 @@ function layout() {
     f.el.style.pointerEvents = freeMove && f.kind === 'panel' ? 'auto' : 'none';
     place(f, (W - VIEW_W * scale) / 2, (H - ch * scale) / 2, scale, false);
     if (f.handle) setTimeout(() => refreshReflex(f.handle), 90);
+    if (viewer) document.getElementById('viewerLabel').textContent = labelOf(f);   // which demo
   }
   updateRail();
 }
@@ -205,7 +207,7 @@ function toggle(label, checked, onchange, disabled) {
   rebuildNav();
   document.getElementById('mFocus').onclick = () => setMode('focus');
   document.getElementById('mGrid').onclick = () => setMode('grid');
-  document.getElementById('shot').onclick = () => captureElement(current().view, shotName());
+  document.getElementById('shot').onclick = () => captureElement(current().view, shotName(), labelOf(current()));
   document.getElementById('full').onclick = () => { if (mode === 'grid') return; goFullscreen(); setMode('viewer'); };
   window.addEventListener('resize', layout);
   document.addEventListener('fullscreenchange', () => {
@@ -216,7 +218,7 @@ function toggle(label, checked, onchange, disabled) {
     if (mode === 'focus' || mode === 'viewer') {
       if (e.key === 'ArrowRight') step(1);
       if (e.key === 'ArrowLeft') step(-1);
-      if (e.key === 's') captureElement(current().view, shotName());            // screenshot: bg + pane
+      if (e.key === 's') captureElement(current().view, shotName(), labelOf(current())); // screenshot: bg + pane
       if (e.key === 'r') { interleave = !interleave; const cur = nav[navPos]; rebuildNav(); navPos = Math.max(0, nav.indexOf(cur)); layout(); buildCtl(); }
     }
     if (e.key === 'g' && mode !== 'viewer') setMode('grid');

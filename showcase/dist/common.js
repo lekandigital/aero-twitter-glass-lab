@@ -156,7 +156,7 @@ export async function captureScreenshot(name = 'experiment-five.png') {
  * the element's on-screen rect — the element is overflow-clipped to the background's area,
  * so the crop is exactly the bg + pane with no navy letterbox and no rest-of-page.
  */
-export async function captureElement(el, name = 'experiment-five.png') {
+export async function captureElement(el, name = 'experiment-five.png', label = '') {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
     alert('Image export needs the Screen Capture API (Chrome/Edge). Fallback: ⌘⇧4.');
     return;
@@ -183,13 +183,30 @@ export async function captureElement(el, name = 'experiment-five.png') {
 
     const c = document.createElement('canvas');
     c.width = sw; c.height = sh;
-    c.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
+    const ctx = c.getContext('2d');
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
+    if (label) drawLabel(ctx, sw, sh, label);    // stamp which demo this is
     c.toBlob((blob) => download(blob, name), 'image/png');
   } catch (err) {
     console.warn('[showcase] image export cancelled/failed', err);
   } finally {
     stream?.getTracks().forEach((t) => t.stop());
   }
+}
+
+function drawLabel(ctx, w, h, text) {
+  const fs = Math.max(16, Math.round(w * 0.024));
+  const padX = Math.round(fs * 0.8), padY = Math.round(fs * 0.5), margin = Math.round(fs * 0.9);
+  ctx.font = `600 ${fs}px -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif`;
+  ctx.textBaseline = 'middle';
+  const tw = ctx.measureText(text).width;
+  const bw = tw + padX * 2, bh = fs + padY * 2;
+  const x = margin, y = h - margin - bh;
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x, y, bw, bh, bh / 2); ctx.fill(); }
+  else ctx.fillRect(x, y, bw, bh);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(text, x + padX, y + bh / 2);
 }
 
 function download(blob, name) {
