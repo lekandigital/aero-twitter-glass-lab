@@ -6,16 +6,31 @@
     <title>Experiment Five — Switcher</title>
     <link rel="stylesheet" href="showcase.css" />
   </head>
-  <body data-mode="switch">
+  <body>
     <header class="topbar">
       <h1>Experiment Five · Switcher</h1>
-      <span class="sub">Flip between branches in the exact same spot over the background</span>
-      <a href="index.html">← Grid view</a>
+      <nav class="viewnav">
+        <a href="index.html">Stage</a>
+        <a href="switch.html" class="active">Switcher</a>
+        <a href="compare.html">Compare (A/B)</a>
+      </nav>
     </header>
-    <nav id="switch-bar" class="switch-bar"></nav>
-    <div class="switch-wrap">
-      <div id="switch" data-scale="0.62"></div>
+
+    <div class="toolbar">
+      <div class="tool-group" id="chips"></div>
+      <div class="tool-sep"></div>
+      <button class="btn" id="prev" title="Previous">‹</button>
+      <button class="btn" id="next" title="Next">›</button>
+      <div class="tool-sep"></div>
+      <label class="toggle"><input type="checkbox" id="bg" /> Reference bg</label>
+      <label class="toggle"><input type="checkbox" id="text" /> Show text</label>
+      <button class="btn" id="fs" title="Fullscreen">⛶ Fullscreen</button>
     </div>
-    <script src="harness.js"></script>
+
+    <div class="stagewrap stagewrap--fill" id="stagewrap">
+      <div class="stage" id="stage"></div>
+    </div>
+
+    <script type="module" src="switch.js"></script>
   </body>
 </html>

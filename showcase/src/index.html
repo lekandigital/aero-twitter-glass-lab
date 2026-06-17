@@ -3,16 +3,41 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Experiment Five — Branch Showcase</title>
+    <title>Experiment Five — Stage</title>
     <link rel="stylesheet" href="showcase.css" />
   </head>
-  <body data-mode="grid">
+  <body>
     <header class="topbar">
-      <h1>Experiment Five · Branch Showcase</h1>
-      <span class="sub">Same background · same panel geometry (A 316×760 r30 @ 24.61,327.55) · compare the glass treatment</span>
-      <a href="switch.html">Switcher view →</a>
+      <h1>Experiment Five · Stage</h1>
+      <nav class="viewnav">
+        <a href="index.html" class="active">Stage</a>
+        <a href="switch.html">Switcher</a>
+        <a href="compare.html">Compare (A/B)</a>
+      </nav>
     </header>
-    <main id="grid" class="grid" data-scale="0.32"></main>
-    <script src="harness.js"></script>
+
+    <div class="toolbar" id="toolbar">
+      <div class="tool-group" id="chips" aria-label="Branch"></div>
+      <div class="tool-sep"></div>
+      <button class="btn" id="prev" title="Previous branch">‹</button>
+      <button class="btn" id="next" title="Next branch">›</button>
+      <div class="tool-sep"></div>
+      <button class="btn" id="snap" title="Snap panel to its set x/y">⌖ Snap</button>
+      <label class="toggle"><input type="checkbox" id="move" /> Free move</label>
+      <div class="tool-sep"></div>
+      <label class="toggle"><input type="checkbox" id="bg" /> Reference bg</label>
+      <label class="toggle"><input type="checkbox" id="text" /> Show text</label>
+      <div class="tool-sep"></div>
+      <label class="zoom">Zoom <input type="range" id="zoom" min="0.25" max="1.6" step="0.01" /> <span id="zoomval">100%</span></label>
+      <button class="btn" id="fs" title="Fullscreen">⛶</button>
+    </div>
+
+    <div class="stagewrap" id="stagewrap">
+      <div class="stage" id="stage">
+        <div class="dragcatch" id="dragcatch" hidden></div>
+      </div>
+    </div>
+
+    <script type="module" src="stage.js"></script>
   </body>
 </html>

@@ -78,11 +78,9 @@ html, body, #root { margin: 0 !important; padding: 0 !important; background: tra
   min-height: 1572px !important;
 }
 
-/* ---- panel position: pin the draggable shell (translate is inline; override it) ---- */
-.experiment-set-two-draggable {
-  transform: translate(24.61px, 327.55px) !important;
-  transition: none !important;
-}
+/* ---- panel position is parent-controlled at runtime via the injected #showcase-ctl
+       <style> (so it can be moved / snapped). transitions off for crisp dragging. ---- */
+.experiment-set-two-draggable { transition: none !important; }
 
 /* ---- Panel A geometry (inline width/height -> need !important) ---- */
 .experiment-four-layer-a {
