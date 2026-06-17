@@ -2,6 +2,7 @@
   "slug": "opus-4.8-max",
   "label": "Opus 4.8 Max",
   "branch": "claude-opus-4.8-max-experiment-five-attempt",
+  "save": 32,
   "commit": "5f3e9f1",
   "geometry": {
     "background": {

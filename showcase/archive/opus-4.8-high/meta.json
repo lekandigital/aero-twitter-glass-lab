@@ -1,9 +1,9 @@
 {
-  "slug": "opus-4.8-max-two",
-  "label": "Opus 4.8 Max (two)",
-  "branch": "claude-opus-4.8-max-experiment-five-attempt-two",
-  "save": 66,
-  "commit": "a97cfb0",
+  "slug": "opus-4.8-high",
+  "label": "Opus 4.8 High",
+  "branch": "claude-opus-4.8-high-experiment-five-attempt",
+  "save": 22,
+  "commit": "f172628",
   "geometry": {
     "background": {
       "selector": ".aero-wallpaper__image",

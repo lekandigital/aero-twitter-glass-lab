@@ -2,6 +2,7 @@
   "slug": "chatgpt-5.5",
   "label": "ChatGPT 5.5 veryhigh",
   "branch": "chatgpt-5.5-veryhigh-experiment-five-attempt",
+  "save": 45,
   "commit": "6b5a333",
   "geometry": {
     "background": {
