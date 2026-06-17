@@ -1,0 +1,1249 @@
+/* Approach 2 — Reference-Labeled Liquid Aero Glass Lab */
+
+.a2-page {
+  --a2-cyan: #7ee8ff;
+  --a2-blue: #3d9ee8;
+  --a2-deep: #0d4a8c;
+  --a2-rim: rgba(255, 255, 255, 0.88);
+  --a2-rim-soft: rgba(255, 255, 255, 0.42);
+  --a2-radius-lg: 24px;
+  --a2-radius-md: 16px;
+  --a2-radius-pill: 999px;
+  --a2-blur: 22px;
+  --a2-text: #f0f8ff;
+  --a2-text-muted: rgba(240, 248, 255, 0.72);
+  --a2-font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  position: relative;
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 0 0 5rem;
+  font-family: var(--a2-font);
+  color: var(--a2-text);
+  text-align: left;
+}
+
+.a2-svg-filters {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* ── Page header ── */
+
+.a2-lab-header {
+  margin-bottom: 2rem;
+  padding: 1.35rem 1.5rem;
+  border-radius: var(--a2-radius-lg);
+}
+
+.a2-lab-header h1 {
+  margin: 0 0 0.4rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.a2-lab-header p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--a2-text-muted);
+  line-height: 1.55;
+  max-width: 72ch;
+}
+
+.a2-section {
+  margin-bottom: 3.25rem;
+}
+
+.a2-section-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--a2-cyan);
+  letter-spacing: 0.01em;
+}
+
+.a2-section-desc {
+  margin: 0 0 1.35rem;
+  font-size: 0.86rem;
+  color: var(--a2-text-muted);
+  max-width: 70ch;
+  line-height: 1.5;
+}
+
+/* ── Reference tags ── */
+
+.a2-ref-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.a2-ref-tag {
+  display: inline-block;
+  padding: 0.12rem 0.45rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: rgba(200, 240, 255, 0.92);
+  background: rgba(8, 30, 60, 0.55);
+  border: 1px solid rgba(126, 232, 255, 0.35);
+  border-radius: 4px;
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+}
+
+.a2-ref-tags--panel {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.55rem;
+  z-index: 12;
+  max-width: 55%;
+  justify-content: flex-end;
+}
+
+.a2-ref-tags--inline {
+  margin-bottom: 0.35rem;
+}
+
+.a2-ref-tags--nav {
+  margin-top: 0.25rem;
+  padding-left: 0.25rem;
+}
+
+.a2-ref-tags--card {
+  margin-bottom: 0.4rem;
+}
+
+/* ── Background bubbles / glints ── */
+
+.a2-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.a2-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 45% at 12% 18%, rgba(255, 255, 255, 0.28), transparent 58%),
+    radial-gradient(ellipse 55% 40% at 88% 72%, rgba(126, 232, 255, 0.22), transparent 52%),
+    radial-gradient(circle at 50% 100%, rgba(0, 100, 200, 0.12), transparent 45%);
+}
+
+.a2-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.15) 38%, transparent 68%),
+    radial-gradient(circle at 70% 80%, rgba(126, 232, 255, 0.25), transparent 55%);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    inset 0 -4px 12px rgba(0, 68, 160, 0.18),
+    inset 0 2px 8px rgba(255, 255, 255, 0.55),
+    0 8px 28px rgba(0, 60, 140, 0.15);
+  animation: a2-bubble-float 8s ease-in-out infinite;
+}
+
+.a2-glint {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 10px 3px rgba(255, 255, 255, 0.95),
+    0 0 24px 6px rgba(126, 232, 255, 0.45);
+  animation: a2-glint-pulse 3.5s ease-in-out infinite;
+}
+
+@keyframes a2-bubble-float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.03);
+  }
+}
+
+@keyframes a2-glint-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.75);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+/* ── Core glass panel ── */
+
+.a2-glass {
+  position: relative;
+  border-radius: var(--a2-radius-lg);
+  isolation: isolate;
+  overflow: hidden;
+
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.08) 28%, rgba(19, 132, 218, 0.18) 100%),
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.75), transparent 34%),
+    radial-gradient(circle at 90% 100%, rgba(0, 119, 255, 0.32), transparent 42%),
+    rgba(130, 220, 255, 0.14);
+
+  border: 1.5px solid rgba(255, 255, 255, 0.52);
+
+  backdrop-filter: blur(var(--a2-blur)) saturate(180%) brightness(112%);
+  -webkit-backdrop-filter: blur(var(--a2-blur)) saturate(180%) brightness(112%);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -18px 32px rgba(0, 68, 160, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25),
+    0 18px 50px rgba(0, 46, 110, 0.28),
+    0 0 38px rgba(88, 190, 255, 0.22);
+
+  transition: box-shadow 0.25s, border-color 0.25s;
+}
+
+/* ::before = top sheen / reflection */
+.a2-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.62) 0%,
+      rgba(255, 255, 255, 0.18) 12%,
+      rgba(255, 255, 255, 0.04) 32%,
+      transparent 52%
+    ),
+    linear-gradient(
+      115deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.22) 46%,
+      rgba(255, 255, 255, 0.38) 50%,
+      rgba(255, 255, 255, 0.12) 54%,
+      transparent 62%
+    ),
+    radial-gradient(ellipse 100% 55% at 50% -8%, rgba(255, 255, 255, 0.45), transparent 68%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ::after = rim / refraction / glint overlay */
+.a2-glass::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: calc(var(--a2-radius-lg) - 2px);
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(0, 80, 160, 0.35),
+    inset 2px 2px 6px rgba(255, 255, 255, 0.12),
+    inset -2px -2px 8px rgba(0, 60, 140, 0.15);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.a2-glass-inner {
+  position: relative;
+  z-index: 5;
+  padding: 1rem 1.15rem;
+}
+
+.a2-glass:hover {
+  border-color: rgba(255, 255, 255, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -20px 36px rgba(0, 68, 160, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+    0 22px 58px rgba(0, 46, 110, 0.35),
+    0 0 48px rgba(88, 190, 255, 0.32);
+}
+
+/* ── Glass variants ── */
+
+.a2-glass--thick {
+  --a2-blur: 26px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.12) 32%, rgba(19, 132, 218, 0.22) 100%),
+    radial-gradient(circle at 15% 0%, rgba(255, 255, 255, 0.82), transparent 38%),
+    rgba(140, 210, 255, 0.18);
+  border-width: 2px;
+  border-color: rgba(255, 255, 255, 0.65);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.92),
+    inset 0 -22px 38px rgba(0, 55, 130, 0.28),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.2),
+    0 24px 60px rgba(0, 40, 100, 0.35),
+    0 0 42px rgba(100, 200, 255, 0.28);
+}
+
+.a2-glass--cyan {
+  background:
+    linear-gradient(165deg, rgba(180, 240, 255, 0.55) 0%, rgba(61, 180, 255, 0.28) 55%, rgba(0, 100, 200, 0.22) 100%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.65), transparent 45%),
+    rgba(60, 180, 255, 0.2);
+  border-color: rgba(180, 240, 255, 0.58);
+}
+
+.a2-glass--frosted {
+  --a2-blur: 32px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(200, 230, 255, 0.15) 100%),
+    rgba(180, 220, 255, 0.12);
+  backdrop-filter: blur(32px) saturate(200%) brightness(118%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(118%);
+}
+
+.a2-glass--rim::before {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.25) 14%, transparent 42%),
+    radial-gradient(ellipse 110% 65% at 50% -12%, rgba(255, 255, 255, 0.55), transparent 70%);
+}
+
+.a2-glass--rim::after {
+  border-width: 1.5px;
+  border-color: rgba(255, 255, 255, 0.62);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 0 rgba(0, 70, 150, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.a2-glass--refractive {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.06) 30%, rgba(19, 132, 218, 0.2) 100%),
+    radial-gradient(circle at 25% 5%, rgba(255, 255, 255, 0.7), transparent 40%),
+    rgba(120, 200, 255, 0.1);
+}
+
+.a2-glass--refractive::after {
+  border: 1.5px solid transparent;
+  border-image: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(255, 255, 255, 0.15) 35%,
+      rgba(0, 150, 255, 0.35) 65%,
+      rgba(255, 255, 255, 0.55) 100%
+    )
+    1;
+}
+
+.a2-glass--filter-refract::before {
+  filter: url(#a2-glass-refract);
+  opacity: 0.35;
+}
+
+.a2-glass--deep-shadow {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -28px 48px rgba(0, 50, 120, 0.38),
+    inset 0 -8px 16px rgba(0, 80, 180, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
+    0 20px 52px rgba(0, 35, 90, 0.38),
+    0 0 40px rgba(60, 160, 255, 0.2);
+}
+
+.a2-glass--nested {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.04) 40%, rgba(19, 132, 218, 0.12) 100%),
+    rgba(255, 255, 255, 0.06);
+  --a2-blur: 16px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -12px 24px rgba(0, 68, 160, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.a2-glass--bubble {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(130, 220, 255, 0.12) 100%),
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.55), transparent 50%),
+    rgba(100, 200, 255, 0.1);
+}
+
+.a2-glass--bubble .a2-glass-inner::before {
+  content: '';
+  position: absolute;
+  top: 12%;
+  right: 18%;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, transparent 70%);
+  filter: blur(1px);
+  pointer-events: none;
+  animation: a2-glint-pulse 2.8s ease-in-out infinite;
+}
+
+.a2-glass--footer {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(20, 60, 120, 0.32) 100%),
+    rgba(15, 45, 90, 0.28);
+  border-radius: calc(var(--a2-radius-lg) - 4px);
+}
+
+.a2-glass--floating {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    inset 0 -20px 36px rgba(0, 68, 160, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+    0 28px 64px rgba(0, 35, 90, 0.42),
+    0 0 52px rgba(88, 190, 255, 0.32);
+}
+
+.a2-glass--acrylic {
+  --a2-blur: 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.02) 35%, rgba(19, 132, 218, 0.08) 100%),
+    rgba(130, 220, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.38);
+  backdrop-filter: blur(14px) saturate(160%) brightness(108%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%) brightness(108%);
+}
+
+.a2-glass--rail .a2-glass-inner {
+  padding: 1.3rem 1.05rem;
+}
+
+.a2-glass--main .a2-glass-inner {
+  padding: 1.15rem 1.3rem 1.3rem;
+}
+
+.a2-glass--widget .a2-glass-inner {
+  padding: 0.95rem 1.05rem;
+}
+
+/* ── Composition shell layouts ── */
+
+.a2-composition {
+  display: grid;
+  gap: 1rem;
+  min-height: 540px;
+}
+
+.a2-composition--balanced {
+  grid-template-columns: 210px 1fr 270px;
+}
+
+.a2-composition--vista {
+  grid-template-columns: 230px 1fr 240px;
+}
+
+.a2-composition--islands {
+  grid-template-columns: 1fr;
+  position: relative;
+  min-height: 500px;
+}
+
+.a2-composition--islands .a2-rail {
+  position: absolute;
+  left: 2%;
+  top: 6%;
+  width: 190px;
+}
+
+.a2-composition--islands .a2-main {
+  position: absolute;
+  left: 20%;
+  top: 3%;
+  right: 20%;
+}
+
+.a2-composition--islands .a2-stack {
+  position: absolute;
+  right: 2%;
+  top: 8%;
+  width: 230px;
+}
+
+.a2-composition--islands .a2-footer-plate--island {
+  position: absolute;
+  left: 2%;
+  bottom: 4%;
+  width: 210px;
+}
+
+.a2-composition--acrylic {
+  grid-template-columns: 190px 1fr 250px;
+}
+
+@media (max-width: 1100px) {
+  .a2-composition--balanced,
+  .a2-composition--vista,
+  .a2-composition--acrylic {
+    grid-template-columns: 1fr;
+  }
+
+  .a2-composition--islands .a2-rail,
+  .a2-composition--islands .a2-main,
+  .a2-composition--islands .a2-stack,
+  .a2-composition--islands .a2-footer-plate--island {
+    position: static;
+    width: auto;
+  }
+}
+
+.a2-rail,
+.a2-main,
+.a2-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.a2-brand {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.65rem;
+  text-shadow: 0 1px 3px rgba(0, 40, 80, 0.45);
+}
+
+.a2-brand--sm {
+  font-size: 1.15rem;
+}
+
+.a2-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.a2-nav-dot {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.a2-rail-action {
+  margin-top: 1rem;
+}
+
+.a2-topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.35rem;
+}
+
+.a2-search--grow {
+  flex: 1;
+}
+
+.a2-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* ── Buttons ── */
+
+.a2-button-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.a2-button-wrap--icon {
+  align-items: center;
+}
+
+.a2-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.88rem;
+  line-height: 1;
+  overflow: hidden;
+  transition: filter 0.15s, transform 0.12s, box-shadow 0.15s;
+}
+
+.a2-button:focus-visible,
+.a2-icon-button:focus-visible,
+.a2-pill:focus-visible {
+  outline: 2px solid var(--a2-cyan);
+  outline-offset: 2px;
+}
+
+.a2-button-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.65) 0%,
+    rgba(255, 255, 255, 0.15) 22%,
+    transparent 48%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.a2-button--primary {
+  padding: 0.58rem 1.45rem;
+  border-radius: var(--a2-radius-pill);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 40, 80, 0.55);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.1) 20%, transparent 42%),
+    linear-gradient(180deg, #7ed4ff 0%, var(--a2-blue) 42%, var(--a2-deep) 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -3px 6px rgba(0, 45, 100, 0.42),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25),
+    0 5px 16px rgba(26, 90, 158, 0.52),
+    0 0 20px rgba(88, 190, 255, 0.35);
+}
+
+.a2-button--primary:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -3px 6px rgba(0, 45, 100, 0.38),
+    0 8px 22px rgba(26, 90, 158, 0.58),
+    0 0 28px rgba(88, 190, 255, 0.45);
+}
+
+.a2-button--primary:active {
+  transform: translateY(1px);
+  filter: brightness(0.95);
+  box-shadow:
+    inset 0 3px 6px rgba(0, 40, 80, 0.45),
+    0 2px 8px rgba(26, 90, 158, 0.35);
+}
+
+.a2-button--glass {
+  padding: 0.52rem 1.25rem;
+  border-radius: var(--a2-radius-pill);
+  color: var(--a2-text);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.1) 32%, transparent 55%),
+    rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.58);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 5px rgba(26, 90, 158, 0.18),
+    0 4px 14px rgba(8, 40, 90, 0.25);
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+}
+
+.a2-button--glass:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.15) 32%, transparent 55%),
+    rgba(255, 255, 255, 0.16);
+}
+
+.a2-icon-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.08) 40%, transparent 55%),
+    linear-gradient(180deg, rgba(140, 210, 255, 0.25), rgba(60, 140, 220, 0.15));
+  color: var(--a2-text);
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -2px 5px rgba(0, 50, 110, 0.25),
+    0 4px 14px rgba(8, 40, 90, 0.28),
+    0 0 16px rgba(88, 190, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: filter 0.15s, transform 0.12s;
+}
+
+.a2-icon-button:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.a2-icon-button:active {
+  transform: translateY(1px);
+}
+
+/* ── Pills (nav / search) ── */
+
+.a2-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--a2-text);
+  overflow: hidden;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.12s;
+}
+
+.a2-pill--nav {
+  width: 100%;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--a2-radius-pill);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, transparent 45%),
+    rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  text-align: left;
+}
+
+.a2-pill--nav:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, transparent 45%),
+    rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.a2-pill--nav-active {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.12) 28%, transparent 50%),
+    linear-gradient(180deg, #6ec8ff 0%, var(--a2-blue) 50%, var(--a2-deep) 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.68);
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 40, 80, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -2px 5px rgba(0, 50, 110, 0.35),
+    0 4px 14px rgba(26, 90, 158, 0.42),
+    0 0 18px rgba(88, 190, 255, 0.28);
+}
+
+.a2-pill--search {
+  width: 100%;
+  padding: 0.5rem 0.95rem;
+  border-radius: var(--a2-radius-pill);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.08) 35%, transparent 55%),
+    rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.52);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -2px 6px rgba(0, 60, 140, 0.15),
+    0 4px 16px rgba(0, 40, 90, 0.2);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+}
+
+.a2-pill--search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--a2-text);
+  font-family: inherit;
+  font-size: 0.86rem;
+  outline: none;
+}
+
+.a2-pill--search input::placeholder {
+  color: rgba(240, 248, 255, 0.5);
+}
+
+.a2-nav-wrap {
+  position: relative;
+}
+
+/* ── Badge ── */
+
+.a2-badge-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.a2-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  border-radius: var(--a2-radius-pill);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, transparent 35%),
+    linear-gradient(180deg, #ff6b8a, #e0244a);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 2px 8px rgba(200, 30, 60, 0.45);
+}
+
+.a2-badge--on-icon {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  z-index: 3;
+}
+
+.a2-badge--nav {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  font-size: 0.65rem;
+}
+
+/* ── Segmented control ── */
+
+.a2-segmented {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--a2-radius-pill);
+  background: rgba(10, 30, 60, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(8px);
+}
+
+.a2-segmented button {
+  padding: 0.4rem 0.85rem;
+  border: none;
+  border-radius: var(--a2-radius-pill);
+  background: transparent;
+  color: var(--a2-text-muted);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.a2-segmented--active,
+.a2-segmented button.a2-segmented--active {
+  color: #fff;
+  font-weight: 600;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, transparent 40%),
+    linear-gradient(180deg, #6ec8ff, var(--a2-blue));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 2px 8px rgba(26, 90, 158, 0.35);
+}
+
+/* ── Cards / feed ── */
+
+.a2-card {
+  position: relative;
+  border-radius: var(--a2-radius-md);
+  padding: 0.85rem 1rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.04) 40%, rgba(19, 132, 218, 0.1) 100%),
+    rgba(120, 200, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -10px 20px rgba(0, 68, 160, 0.12);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+}
+
+.a2-card-title {
+  margin: 0 0 0.3rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.a2-card-text {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--a2-text-muted);
+  line-height: 1.45;
+}
+
+.a2-card-text--sm {
+  font-size: 0.78rem;
+}
+
+.a2-card-meta {
+  margin: 0.5rem 0 0;
+  font-size: 0.72rem;
+  color: rgba(240, 248, 255, 0.45);
+}
+
+.a2-media-plate {
+  height: 140px;
+  margin-bottom: 0.75rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(240, 248, 255, 0.65);
+  background:
+    linear-gradient(135deg, rgba(100, 180, 240, 0.35), rgba(60, 140, 200, 0.2)),
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.35), transparent 55%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.a2-media-plate--compact {
+  height: 100px;
+  margin-bottom: 0;
+}
+
+/* ── Composer ── */
+
+.a2-composer-input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--a2-text);
+  font-family: inherit;
+  font-size: 0.86rem;
+  resize: vertical;
+  outline: none;
+  backdrop-filter: blur(6px);
+}
+
+.a2-composer-input::placeholder {
+  color: rgba(240, 248, 255, 0.45);
+}
+
+.a2-composer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.65rem;
+}
+
+/* ── Profile / trending ── */
+
+.a2-profile-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.a2-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.45), rgba(100, 180, 255, 0.35)),
+    var(--a2-blue);
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.a2-avatar--sm {
+  width: 36px;
+  height: 36px;
+}
+
+.a2-profile-name {
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.a2-profile-handle {
+  font-size: 0.72rem;
+  color: rgba(240, 248, 255, 0.55);
+}
+
+.a2-trending-item {
+  padding: 0.45rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.a2-trending-item:last-child {
+  border-bottom: none;
+}
+
+.a2-trending-tag {
+  font-size: 0.68rem;
+  color: rgba(240, 248, 255, 0.5);
+}
+
+.a2-trending-topic {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--a2-cyan);
+}
+
+.a2-status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 0.35rem;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+  vertical-align: middle;
+}
+
+/* ── Specimen grid ── */
+
+.a2-specimen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.15rem;
+}
+
+.a2-specimen-grid--controls {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  align-items: start;
+}
+
+.a2-specimen-grid--overlays {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.a2-specimen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.a2-specimen-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.a2-specimen-title {
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+/* ── Overlay studies ── */
+
+.a2-overlay-host {
+  min-height: 120px;
+}
+
+.a2-overlay-float {
+  position: absolute;
+  z-index: 8;
+}
+
+.a2-overlay-float--pill {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.a2-overlay-nested {
+  margin-top: 0.65rem;
+}
+
+.a2-overlay-scene {
+  position: relative;
+  min-height: 140px;
+}
+
+.a2-overlay-sidebar {
+  width: 55%;
+}
+
+.a2-overlay-profile {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 72%;
+  z-index: 6;
+}
+
+.a2-overlay-chrome {
+  padding: 1.5rem;
+  border-radius: var(--a2-radius-lg);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(0, 80, 160, 0.12)),
+    rgba(60, 140, 220, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* ── Layer breakdown ── */
+
+.a2-layer-breakdown {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .a2-layer-breakdown {
+    grid-template-columns: 1fr;
+  }
+}
+
+.a2-layer-demo {
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.a2-layer-demo-inner {
+  text-align: center;
+  padding: 2rem;
+}
+
+.a2-layer-demo-label {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.a2-layer-callout {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  pointer-events: none;
+}
+
+.a2-layer-callout-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(200, 240, 255, 0.95);
+  background: rgba(8, 24, 50, 0.72);
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  border: 1px solid rgba(126, 232, 255, 0.35);
+  white-space: nowrap;
+}
+
+.a2-layer-callout-line {
+  width: 24px;
+  height: 1px;
+  background: rgba(126, 232, 255, 0.55);
+}
+
+.a2-layer-callout--top-left {
+  top: 8%;
+  left: 4%;
+}
+
+.a2-layer-callout--top-right {
+  top: 8%;
+  right: 4%;
+  flex-direction: row-reverse;
+}
+
+.a2-layer-callout--left {
+  top: 35%;
+  left: 2%;
+}
+
+.a2-layer-callout--right {
+  top: 35%;
+  right: 2%;
+  flex-direction: row-reverse;
+}
+
+.a2-layer-callout--top {
+  top: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: column;
+}
+
+.a2-layer-callout--bottom {
+  bottom: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: column-reverse;
+}
+
+.a2-layer-callout--bottom-left {
+  bottom: 10%;
+  left: 4%;
+}
+
+.a2-layer-callout--bottom-right {
+  bottom: 10%;
+  right: 4%;
+  flex-direction: row-reverse;
+}
+
+.a2-layer-callout--center-right {
+  top: 55%;
+  right: 3%;
+  flex-direction: row-reverse;
+}
+
+.a2-layer-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.a2-layer-filter-note {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: rgba(200, 240, 255, 0.65);
+}
+
+/* ── Layout variations ── */
+
+.a2-variation {
+  border-radius: var(--a2-radius-lg);
+  padding: 1rem;
+  background: rgba(8, 20, 45, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 1.5rem;
+}
+
+.a2-variation--vista .a2-glass {
+  --a2-blur: 28px;
+}
+
+.a2-variation--islands .a2-glass--floating {
+  transform: translateY(-5px);
+}
+
+.a2-variation--acrylic .a2-glass {
+  --a2-blur: 12px;
+}

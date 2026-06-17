@@ -2,6 +2,7 @@
   "slug": "opus-4.8-max-mistake",
   "label": "Opus 4.8 Max (mistake)",
   "branch": "claude-opus-4.8-max-experiment-five-attempt-mistake",
+  "save": 29,
   "commit": "84eb065",
   "geometry": {
     "background": {

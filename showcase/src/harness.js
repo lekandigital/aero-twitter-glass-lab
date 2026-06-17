@@ -8,19 +8,12 @@
  * we can drive its DOM and share localStorage with it.
  */
 
-const SESSION_KEY = 'experiment-set-1-session';
 const NAV_HREF = '/experiment-set-1';
 const PANEL_SELECTOR = '.experiment-four-layer-a';
 const STAGE_LOGICAL = { w: 1440, h: 1572 };
 
-// Boot every branch straight into Experiment Five (partial session is normalized by the app).
-function seedSession() {
-  try {
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ activeExperiment: 'five' }));
-  } catch (err) {
-    console.warn('[showcase] could not seed session', err);
-  }
-}
+// Each branch build self-seeds Experiment Five + its specific save via an in-iframe
+// localStorage shim (injected at build time), so no parent-level seeding is needed here.
 
 function waitFor(getter, { tries = 120, interval = 80 } = {}) {
   return new Promise((resolve) => {
@@ -96,7 +89,7 @@ async function initGrid(branches) {
     tile.className = 'tile';
     const cap = document.createElement('figcaption');
     cap.className = 'tile__cap';
-    cap.textContent = branch.label;
+    cap.textContent = branch.save != null ? `${branch.label} · Save ${branch.save}` : branch.label;
     const { frame } = makeStage(branch, scale);
     tile.appendChild(cap);
     tile.appendChild(frame);
@@ -119,7 +112,7 @@ async function initSwitch(branches) {
 
     const btn = document.createElement('button');
     btn.className = 'switch-btn' + (i === 0 ? ' is-active' : '');
-    btn.textContent = branch.label;
+    btn.textContent = branch.save != null ? `${branch.label} · ${branch.save}` : branch.label;
     btn.addEventListener('click', () => {
       stages.forEach((s, j) => (s.style.display = j === i ? 'block' : 'none'));
       bar.querySelectorAll('.switch-btn').forEach((b) => b.classList.remove('is-active'));
@@ -131,7 +124,6 @@ async function initSwitch(branches) {
 }
 
 (async function main() {
-  seedSession();
   const branches = await loadBranches();
   if (document.body.dataset.mode === 'switch') {
     await initSwitch(branches);

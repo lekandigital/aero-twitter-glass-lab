@@ -12,7 +12,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { cpSync, mkdirSync, rmSync, writeFileSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { cpSync, mkdirSync, rmSync, writeFileSync, readFileSync, existsSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -23,13 +23,16 @@ const DIST = join(__dirname, 'dist');
 const ARCHIVE = join(__dirname, 'archive');
 const WORKTREES = '/private/tmp/aero-branch-compare';
 
+// Ordered to match the provided table (ascending latest-save id). `save` is the exact
+// Experiment-Five save each branch should open (a committed built-in save in that branch).
 const BRANCHES = [
-  { slug: 'opus-4.8-max', label: 'Opus 4.8 Max', branch: 'claude-opus-4.8-max-experiment-five-attempt' },
-  { slug: 'opus-4.8-max-two', label: 'Opus 4.8 Max (two)', branch: 'claude-opus-4.8-max-experiment-five-attempt-two' },
-  { slug: 'opus-4.8-max-mistake', label: 'Opus 4.8 Max (mistake)', branch: 'claude-opus-4.8-max-experiment-five-attempt-mistake' },
-  { slug: 'composer-2-max', label: 'Composer 2 Max', branch: 'composer-2-max-experiment-five-attempt-two' },
-  { slug: 'mix-opus-composer', label: 'Mix · Opus 4.8 + Composer 2.5', branch: 'mix-claude-opus-4.8-max-composer-2.5-experiment-five-attempt' },
-  { slug: 'chatgpt-5.5', label: 'ChatGPT 5.5 veryhigh', branch: 'chatgpt-5.5-veryhigh-experiment-five-attempt' },
+  { slug: 'opus-4.8-high', label: 'Opus 4.8 High', branch: 'claude-opus-4.8-high-experiment-five-attempt', save: 22 },
+  { slug: 'opus-4.8-max-mistake', label: 'Opus 4.8 Max (mistake)', branch: 'claude-opus-4.8-max-experiment-five-attempt-mistake', save: 29 },
+  { slug: 'opus-4.8-max', label: 'Opus 4.8 Max', branch: 'claude-opus-4.8-max-experiment-five-attempt', save: 32 },
+  { slug: 'chatgpt-5.5', label: 'ChatGPT 5.5 veryhigh', branch: 'chatgpt-5.5-veryhigh-experiment-five-attempt', save: 45 },
+  { slug: 'mix-opus-composer', label: 'Mix · Opus 4.8 + Composer 2.5', branch: 'mix-claude-opus-4.8-max-composer-2.5-experiment-five-attempt', save: 55 },
+  { slug: 'opus-4.8-max-two', label: 'Opus 4.8 Max (two)', branch: 'claude-opus-4.8-max-experiment-five-attempt-two', save: 66 },
+  { slug: 'composer-2-max', label: 'Composer 2 Max', branch: 'composer-2-max-experiment-five-attempt-two', save: 76 },
 ];
 
 // Source files copied verbatim into each branch's archive (exact CSS + style-JS).
@@ -64,14 +67,42 @@ function gitSha(worktree) {
 // loaded from the site-root /aero-bg.png, not these per-build copies).
 const PRUNE = ['raw-reference-lab', 'reference-demos', 'reference.png', 'aero-bg.png'];
 
+/*
+ * Inject a per-iframe localStorage SHIM into the built index.html so this branch boots
+ * directly into Experiment Five with its specific save selected. The shim is in-memory
+ * and per-iframe, so same-origin iframes don't share/clobber each other's session, and
+ * the app's own resolveInitialE5() loads the committed built-in save. The branch SOURCE
+ * is untouched — only this build artifact carries the seed.
+ */
+function injectSaveSeed(outDir, b) {
+  const file = join(outDir, 'index.html');
+  const html = readFileSync(file, 'utf8');
+  // e1/e2/e3 stubs are required only so loadExperimentSetOneSession() accepts the session
+  // (it bails when any are missing). Experiment Five never reads them, so {} is safe; the
+  // real driver is selectedSaveIdByExperiment.five, which resolveInitialE5() loads.
+  const session = JSON.stringify({
+    e1: {}, e2: {}, e3: {},
+    activeExperiment: 'five',
+    selectedSaveIdByExperiment: { five: b.save },
+  });
+  const seed = `<script>(function(){var store={};store['experiment-set-1-session']=${JSON.stringify(session)};` +
+    `var shim={getItem:function(k){return Object.prototype.hasOwnProperty.call(store,k)?store[k]:null;},` +
+    `setItem:function(k,v){store[k]=String(v);},removeItem:function(k){delete store[k];},` +
+    `clear:function(){store={};},key:function(i){return Object.keys(store)[i]||null;},` +
+    `get length(){return Object.keys(store).length;}};` +
+    `try{Object.defineProperty(window,'localStorage',{configurable:true,get:function(){return shim;}});}catch(e){}})();</script>`;
+  writeFileSync(file, html.replace('<head>', `<head>${seed}`));
+}
+
 function buildBranch(b) {
   const worktree = join(WORKTREES, b.branch);
   if (!existsSync(worktree)) throw new Error(`worktree missing: ${worktree}`);
   const vite = join(worktree, 'node_modules', '.bin', 'vite');
   const outDir = join(DIST, 'panels', b.slug);
-  process.stdout.write(`  building ${b.slug.padEnd(22)} (${b.branch}) ... `);
+  process.stdout.write(`  building ${b.slug.padEnd(22)} (${b.branch}) save ${b.save} ... `);
   sh(vite, ['build', '--base=./', `--outDir=${outDir}`, '--emptyOutDir'], worktree);
   for (const p of PRUNE) rmSync(join(outDir, p), { recursive: true, force: true });
+  injectSaveSeed(outDir, b);
   process.stdout.write(`ok\n`);
   return { worktree, outDir };
 }
@@ -98,7 +129,7 @@ function archiveBranch(b, worktree, outDir) {
   }
   writeFileSync(
     join(dir, 'meta.json'),
-    JSON.stringify({ slug: b.slug, label: b.label, branch: b.branch, commit: gitSha(worktree), geometry: GEOMETRY }, null, 2),
+    JSON.stringify({ slug: b.slug, label: b.label, branch: b.branch, save: b.save, commit: gitSha(worktree), geometry: GEOMETRY }, null, 2),
   );
 }
 
@@ -107,7 +138,7 @@ function copyHarness() {
   for (const f of readdirSync(SRC)) cpSync(join(SRC, f), join(DIST, f));
   // Shared background at the site root (branch builds hardcode an absolute /aero-bg.png).
   cpSync(join(REPO, 'public', 'aero-bg.png'), join(DIST, 'aero-bg.png'));
-  writeFileSync(join(DIST, 'branches.json'), JSON.stringify(BRANCHES.map(({ slug, label }) => ({ slug, label })), null, 2));
+  writeFileSync(join(DIST, 'branches.json'), JSON.stringify(BRANCHES.map(({ slug, label, save }) => ({ slug, label, save })), null, 2));
 }
 
 function main() {

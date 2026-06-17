@@ -1,26 +1,37 @@
 [
   {
-    "slug": "opus-4.8-max",
-    "label": "Opus 4.8 Max"
-  },
-  {
-    "slug": "opus-4.8-max-two",
-    "label": "Opus 4.8 Max (two)"
+    "slug": "opus-4.8-high",
+    "label": "Opus 4.8 High",
+    "save": 22
   },
   {
     "slug": "opus-4.8-max-mistake",
-    "label": "Opus 4.8 Max (mistake)"
+    "label": "Opus 4.8 Max (mistake)",
+    "save": 29
   },
   {
-    "slug": "composer-2-max",
-    "label": "Composer 2 Max"
-  },
-  {
-    "slug": "mix-opus-composer",
-    "label": "Mix · Opus 4.8 + Composer 2.5"
+    "slug": "opus-4.8-max",
+    "label": "Opus 4.8 Max",
+    "save": 32
   },
   {
     "slug": "chatgpt-5.5",
-    "label": "ChatGPT 5.5 veryhigh"
+    "label": "ChatGPT 5.5 veryhigh",
+    "save": 45
+  },
+  {
+    "slug": "mix-opus-composer",
+    "label": "Mix · Opus 4.8 + Composer 2.5",
+    "save": 55
+  },
+  {
+    "slug": "opus-4.8-max-two",
+    "label": "Opus 4.8 Max (two)",
+    "save": 66
+  },
+  {
+    "slug": "composer-2-max",
+    "label": "Composer 2 Max",
+    "save": 76
   }
 ]

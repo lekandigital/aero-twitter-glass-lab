@@ -1,0 +1,86 @@
+/* Matte frost + oily gloss — shared vertical zone mask on frosted panels. */
+
+.glass-frost-matte,
+.glass-frost-gloss {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  -webkit-mask-image: var(--sheet-frost-surface-mask, none);
+  mask-image: var(--sheet-frost-surface-mask, none);
+}
+
+/* Diffuse matte tooth — softened micro texture, not harsh film grain */
+.glass-frost-matte {
+  opacity: var(--sheet-frost-matte, 0);
+  mix-blend-mode: overlay;
+  filter: blur(0.75px) contrast(82%) saturate(90%) brightness(104%);
+  background-color: rgba(236, 244, 252, 0.14);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.38' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)' opacity='0.35'/%3E%3C/svg%3E");
+  background-size: var(--sheet-frost-matte-texture, 160px);
+}
+
+/* Oily specular sheen on top of matte — screen blend, diagonal wet highlight */
+.glass-frost-gloss {
+  opacity: var(--sheet-frost-gloss, 0);
+  mix-blend-mode: screen;
+  filter: contrast(112%) brightness(108%);
+  background:
+    linear-gradient(
+      168deg,
+      rgba(255, 255, 255, 0.62) 0%,
+      rgba(255, 255, 255, 0.16) 14%,
+      transparent 38%
+    ),
+    linear-gradient(
+      118deg,
+      transparent 34%,
+      rgba(255, 255, 255, 0.28) 46%,
+      rgba(255, 255, 255, 0.1) 52%,
+      transparent 66%
+    ),
+    radial-gradient(ellipse 120% 40% at 50% 0%, rgba(255, 255, 255, 0.22), transparent 72%);
+}
+
+.experiment-one-panel {
+  --sheet-frost-matte: var(--e1-frost-matte, 0);
+  --sheet-frost-matte-texture: var(--e1-frost-matte-texture, 160px);
+  --sheet-frost-gloss: var(--e1-frost-gloss, 0);
+  --sheet-frost-surface-mask: var(--e1-frost-surface-mask, none);
+}
+
+.experiment-two-sheet--frost {
+  --sheet-frost-matte: var(--e2-frost-matte, 0);
+  --sheet-frost-matte-texture: var(--e2-frost-matte-texture, 160px);
+  --sheet-frost-gloss: var(--e2-frost-gloss, 0);
+  --sheet-frost-surface-mask: var(--e2-frost-surface-mask, none);
+}
+
+.experiment-three-layer-a {
+  --sheet-frost-matte: var(--e3-layerA-frost-matte, 0);
+  --sheet-frost-matte-texture: var(--e3-layerA-frost-matte-texture, 160px);
+  --sheet-frost-gloss: var(--e3-layerA-frost-gloss, 0);
+  --sheet-frost-surface-mask: var(--e3-layerA-frost-surface-mask, none);
+}
+
+.experiment-three-layer-b {
+  --sheet-frost-matte: var(--e3-layerB-frost-matte, 0);
+  --sheet-frost-matte-texture: var(--e3-layerB-frost-matte-texture, 160px);
+  --sheet-frost-gloss: var(--e3-layerB-frost-gloss, 0);
+  --sheet-frost-surface-mask: var(--e3-layerB-frost-surface-mask, none);
+}
+
+.experiment-four-layer-a {
+  --sheet-frost-matte: var(--e4-layerA-frost-matte, 0);
+  --sheet-frost-matte-texture: var(--e4-layerA-frost-matte-texture, 160px);
+  --sheet-frost-gloss: var(--e4-layerA-frost-gloss, 0);
+  --sheet-frost-surface-mask: var(--e4-layerA-frost-surface-mask, none);
+}
+
+.experiment-four-layer-b {
+  --sheet-frost-matte: var(--e4-layerB-frost-matte, 0);
+  --sheet-frost-matte-texture: var(--e4-layerB-frost-matte-texture, 160px);
+  --sheet-frost-gloss: var(--e4-layerB-frost-gloss, 0);
+  --sheet-frost-surface-mask: var(--e4-layerB-frost-surface-mask, none);
+}
