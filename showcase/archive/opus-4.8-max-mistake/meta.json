@@ -1,0 +1,30 @@
+{
+  "slug": "opus-4.8-max-mistake",
+  "label": "Opus 4.8 Max (mistake)",
+  "branch": "claude-opus-4.8-max-experiment-five-attempt-mistake",
+  "commit": "84eb065",
+  "geometry": {
+    "background": {
+      "selector": ".aero-wallpaper__image",
+      "width": 1440,
+      "height": 1572,
+      "objectFit": "contain"
+    },
+    "panelA": {
+      "selector": ".experiment-four-layer-a",
+      "x": 24.61,
+      "y": 327.55,
+      "width": 316,
+      "height": 760,
+      "radius": 30
+    },
+    "panelB": {
+      "selector": ".experiment-four-layer-b",
+      "x": 30.61,
+      "y": 333.55,
+      "width": 304,
+      "height": 748,
+      "radius": 24
+    }
+  }
+}

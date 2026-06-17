@@ -1,0 +1,101 @@
+:root {
+  --bg: #0a1628;
+  --fg: #e9f1ff;
+  --muted: #8aa1c4;
+  --line: rgba(255, 255, 255, 0.1);
+  --accent: #5fb0ff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+.topbar {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: rgba(10, 22, 40, 0.9);
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+.topbar h1 { font-size: 1rem; margin: 0; font-weight: 600; letter-spacing: 0.01em; }
+.topbar .sub { color: var(--muted); font-size: 0.8rem; }
+.topbar a { color: var(--accent); text-decoration: none; font-size: 0.8rem; margin-left: auto; }
+.topbar a:hover { text-decoration: underline; }
+
+/* ---------- shared stage (a scaled iframe of the 1440x1572 logical app) ---------- */
+.stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+.stage__frame {
+  border: 0;
+  transform-origin: top left;
+  display: block;
+}
+
+/* ---------- grid view ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 1.75rem 1.5rem;
+  padding: 1.5rem;
+  justify-content: center;
+}
+.tile { margin: 0; }
+.tile__cap {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: repeat(2, max-content); }
+}
+@media (max-width: 760px) {
+  .grid { grid-template-columns: max-content; }
+}
+
+/* ---------- switcher view ---------- */
+.switch-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.switch-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.switch-btn:hover { background: rgba(255, 255, 255, 0.1); }
+.switch-btn.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #06203c;
+  font-weight: 600;
+}
+.switch-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.switch-stage { margin: 0 auto; }

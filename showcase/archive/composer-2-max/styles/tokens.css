@@ -1,0 +1,10 @@
+:root {
+  --aero-text: #f4f8ff;
+  --aero-text-muted: rgba(244, 248, 255, 0.75);
+  --aero-panel-bg: rgba(8, 18, 36, 0.55);
+  --aero-panel-border: rgba(255, 255, 255, 0.18);
+  --aero-accent: #5eb8ff;
+  --aero-radius: 12px;
+  --aero-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  --aero-font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}

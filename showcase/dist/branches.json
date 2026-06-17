@@ -1,0 +1,26 @@
+[
+  {
+    "slug": "opus-4.8-max",
+    "label": "Opus 4.8 Max"
+  },
+  {
+    "slug": "opus-4.8-max-two",
+    "label": "Opus 4.8 Max (two)"
+  },
+  {
+    "slug": "opus-4.8-max-mistake",
+    "label": "Opus 4.8 Max (mistake)"
+  },
+  {
+    "slug": "composer-2-max",
+    "label": "Composer 2 Max"
+  },
+  {
+    "slug": "mix-opus-composer",
+    "label": "Mix · Opus 4.8 + Composer 2.5"
+  },
+  {
+    "slug": "chatgpt-5.5",
+    "label": "ChatGPT 5.5 veryhigh"
+  }
+]

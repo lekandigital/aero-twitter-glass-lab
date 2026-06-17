@@ -1,0 +1,191 @@
+/* Experiment 3 — reference layer study (independent Layer A + Layer B) */
+
+.experiment-set-one-page [data-e3-inspect].e3-inspect-blink {
+  --inspect-blink-color: #ff8c42;
+  --inspect-blink-glow: rgba(255, 140, 66, 0.35);
+  animation: inspect-outline-blink 0.7s linear 1;
+}
+
+.experiment-set-one-page[data-e3-inspect-mode='true'] [data-e3-inspect] {
+  cursor: crosshair;
+}
+
+/* ── Layer A: ultra-transparent bezel frame ── */
+
+.experiment-three-layer-a {
+  position: relative;
+  box-sizing: border-box;
+  width: var(--e3-layerA-width);
+  min-height: var(--e3-layerA-height);
+  border-radius: var(--e3-layerA-radius);
+  isolation: isolate;
+  overflow: hidden;
+  cursor: inherit;
+
+  border: calc(2px + 1px * var(--e3-layerA-rim-strength)) solid
+    rgba(255, 255, 255, calc(var(--e3-layerA-rim-border) * var(--e3-layerA-rim-strength)));
+  outline: 1px solid rgba(255, 255, 255, calc(0.2 * var(--e3-layerA-rim-strength)));
+  outline-offset: -4px;
+
+  background:
+    linear-gradient(
+      168deg,
+      rgba(255, 255, 255, calc(var(--e3-layerA-fill-top) * var(--e3-layerA-transparency))) 0%,
+      rgba(220, 245, 255, calc(var(--e3-layerA-fill-mid) * var(--e3-layerA-transparency))) 30%,
+      rgba(180, 230, 255, calc(var(--e3-layerA-fill-bottom) * var(--e3-layerA-transparency))) 100%
+    ),
+    rgba(255, 255, 255, calc(var(--e3-layerA-body-tint) * var(--e3-layerA-transparency)));
+
+  backdrop-filter: blur(var(--e3-layerA-frost)) saturate(var(--e3-layerA-saturate)) brightness(var(--e3-layerA-brightness));
+  -webkit-backdrop-filter: blur(var(--e3-layerA-frost)) saturate(var(--e3-layerA-saturate))
+    brightness(var(--e3-layerA-brightness));
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, calc(0.92 * var(--e3-layerA-rim-strength))),
+    inset 0 1px 3px rgba(255, 255, 255, calc(0.5 * var(--e3-layerA-rim-strength))),
+    inset 0 -16px 28px rgba(0, 68, 170, calc(var(--e3-layerA-inner-depth) * var(--e3-layerA-depth-strength) * 0.45)),
+    inset 0 0 0 1px rgba(255, 255, 255, calc(0.32 * var(--e3-layerA-rim-strength))),
+    0 18px var(--e3-layerA-shadow-spread) rgba(0, 38, 100, calc(var(--e3-layerA-outer-shadow) * var(--e3-layerA-depth-strength))),
+    0 0 40px rgba(90, 200, 255, calc(var(--e3-layerA-glow) * var(--e3-layerA-depth-strength)));
+
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.experiment-three-layer-a__bezel-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, calc(0.78 * var(--e3-layerA-rim-strength))) 0%,
+      rgba(255, 255, 255, calc(0.28 * var(--e3-layerA-rim-strength))) 12%,
+      transparent 30%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(0, 100, 210, calc(0.12 * var(--e3-layerA-depth-strength))) 0%,
+      transparent 16%
+    );
+}
+
+.experiment-three-layer-a__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: inherit;
+  padding: 1.5rem 1.75rem 2rem;
+  pointer-events: none;
+}
+
+/* ── Layer B: frosted body sheet ── */
+
+.experiment-three-layer-b {
+  position: relative;
+  width: var(--e3-layerB-width);
+  min-height: var(--e3-layerB-height);
+  border-radius: var(--e3-layerB-radius);
+  isolation: isolate;
+  overflow: hidden;
+  cursor: inherit;
+
+  border: 1px solid rgba(255, 255, 255, calc(var(--e3-layerB-rim-border) * var(--e3-layerB-rim-strength) * 0.85));
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, calc(var(--e3-layerB-fill-top) * var(--e3-layerB-transparency))) 0%,
+      rgba(235, 248, 255, calc(var(--e3-layerB-fill-mid) * var(--e3-layerB-transparency))) 38%,
+      rgba(200, 235, 255, calc(var(--e3-layerB-fill-bottom) * var(--e3-layerB-transparency) * var(--e3-layerB-depth-strength))) 100%
+    ),
+    radial-gradient(
+      ellipse 90% 50% at 50% 0%,
+      rgba(255, 255, 255, calc(var(--e3-layerB-top-radial) * var(--e3-layerB-transparency))),
+      transparent 58%
+    ),
+    rgba(210, 240, 255, calc(var(--e3-layerB-body-tint) * var(--e3-layerB-transparency)));
+
+  backdrop-filter: blur(var(--e3-layerB-frost)) saturate(var(--e3-layerB-saturate)) brightness(var(--e3-layerB-brightness));
+  -webkit-backdrop-filter: blur(var(--e3-layerB-frost)) saturate(var(--e3-layerB-saturate))
+    brightness(var(--e3-layerB-brightness));
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, calc(0.72 * var(--e3-layerB-rim-strength))),
+    inset 0 -20px 36px rgba(0, 68, 170, calc(var(--e3-layerB-inner-depth) * var(--e3-layerB-depth-strength))),
+    inset 0 0 0 1px rgba(255, 255, 255, calc(0.22 * var(--e3-layerB-rim-strength))),
+    0 8px 24px rgba(0, 38, 100, calc(var(--e3-layerB-outer-shadow) * var(--e3-layerB-depth-strength) * 0.35));
+}
+
+.experiment-three-layer-b__shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: var(--e3-layerB-shine-opacity);
+  mix-blend-mode: screen;
+  background:
+    linear-gradient(
+      115deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.1) 42%,
+      rgba(255, 255, 255, calc(var(--e3-layerB-diagonal-gloss) * var(--e3-layerB-rim-strength))) 48%,
+      rgba(255, 255, 255, 0.14) 54%,
+      transparent 66%
+    ),
+    radial-gradient(
+      ellipse 100% 55% at 50% -8%,
+      rgba(255, 255, 255, calc(var(--e3-layerB-top-shine) * var(--e3-layerB-rim-strength))),
+      transparent 70%
+    );
+}
+
+.experiment-set-one-page[data-e3-layerB-show-sparkles='false'] .experiment-three-layer-b__sparkle {
+  display: none;
+}
+
+.experiment-three-layer-b__sparkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fff;
+  pointer-events: none;
+  z-index: 3;
+  opacity: var(--e3-layerB-sparkle);
+  box-shadow:
+    0 0 8px 2px rgba(255, 255, 255, 0.95),
+    0 0 16px 3px rgba(126, 232, 255, 0.5);
+  animation: e1-sparkle-pulse 3.2s ease-in-out infinite;
+}
+
+.experiment-three-layer-b__sparkle--a {
+  top: 12%;
+  left: 18%;
+}
+
+.experiment-three-layer-b__sparkle--b {
+  top: 6%;
+  right: 14%;
+  animation-delay: 1.2s;
+}
+
+.experiment-three-layer-b__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: inherit;
+  padding: 1.5rem 1.75rem 2rem;
+  pointer-events: none;
+}
+
+.experiment-three-layer-a__content .experiment-one-panel__drag-hint,
+.experiment-three-layer-b__content .experiment-one-panel__drag-hint {
+  margin-top: 1rem;
+}

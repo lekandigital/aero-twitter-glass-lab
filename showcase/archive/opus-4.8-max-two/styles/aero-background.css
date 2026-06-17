@@ -1,0 +1,45 @@
+.aero-wallpaper {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #0a1628;
+}
+
+.aero-wallpaper__stage {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.aero-wallpaper__image {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-height: 100vh;
+  max-width: 100vw;
+  object-fit: contain;
+  object-position: center;
+}
+
+.aero-wallpaper--compare .aero-wallpaper__image {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  height: 100%;
+  width: auto;
+  max-height: 100vh;
+  max-width: 100vw;
+}
+
+.aero-wallpaper--compare .aero-wallpaper__image--reference {
+  z-index: 1;
+}
+
+/* Intentionally no darkening overlay: show wallpaper images as-is. */
