@@ -151,9 +151,10 @@ export async function captureScreenshot(name = 'experiment-five.png') {
 
 /*
  * Export an image of ONE element (the demo = aero background + glass pane). The glass uses
- * backdrop-filter, which only exists in real rendered pixels, so we use the Region Capture
- * API: capture the current tab, then track.cropTo(element) so the frames ARE just that
- * element — no whole-page capture, no manual crop. Falls back to a manual crop if needed.
+ * backdrop-filter, whose composited pixels are only readable via the Screen Capture API
+ * (a DOM/canvas render can't reproduce it). We capture the current tab and crop STRICTLY to
+ * the element's on-screen rect — the element is overflow-clipped to the background's area,
+ * so the crop is exactly the bg + pane with no navy letterbox and no rest-of-page.
  */
 export async function captureElement(el, name = 'experiment-five.png') {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
@@ -166,42 +167,23 @@ export async function captureElement(el, name = 'experiment-five.png') {
       video: { frameRate: 30 }, audio: false,
       preferCurrentTab: true, selfBrowserSurface: 'include', surfaceSwitching: 'exclude',
     });
-    const track = stream.getVideoTracks()[0];
-    let cropped = false;
-    try {
-      const CT = window.CropTarget || window.RestrictionTarget;
-      if (CT && CT.fromElement && track.cropTo) { await track.cropTo(await CT.fromElement(el)); cropped = true; }
-    } catch { /* region capture unavailable */ }
-    await new Promise((r) => setTimeout(r, 260));   // let the crop apply
+    const video = document.createElement('video');
+    video.srcObject = stream; video.muted = true;
+    await video.play();
+    await new Promise((r) => setTimeout(r, 220));
 
-    // grab one frame (ImageCapture is most reliable; fall back to a <video>)
-    let frame, fw, fh;
-    try {
-      frame = await new ImageCapture(track).grabFrame();
-      fw = frame.width; fh = frame.height;
-    } catch {
-      const v = document.createElement('video');
-      v.srcObject = stream; v.muted = true; await v.play();
-      await new Promise((r) => setTimeout(r, 160));
-      frame = v; fw = v.videoWidth; fh = v.videoHeight;
-    }
-
-    const dpr = window.devicePixelRatio || 1;
+    const fw = video.videoWidth, fh = video.videoHeight;
+    const scale = fw / window.innerWidth;            // device px per CSS px (current-tab capture)
     const r = el.getBoundingClientRect();
-    // If cropTo really worked the frame is element-sized; otherwise crop the full-tab frame
-    // ourselves (this also rescues the case where cropTo resolves but doesn't actually crop).
-    const looksCropped = cropped && Math.abs(fw - r.width * dpr) < r.width * dpr * 0.5;
-    let sx = 0, sy = 0, sw = fw, sh = fh;
-    if (!looksCropped) {
-      const scale = fw / window.innerWidth;
-      sx = Math.max(0, Math.round(r.left * scale));
-      sy = Math.max(0, Math.round(r.top * scale));
-      sw = Math.max(1, Math.round(r.width * scale));
-      sh = Math.max(1, Math.round(r.height * scale));
-    }
+    const inset = Math.round(1 * scale);             // shave 1px to avoid any edge seam
+    const sx = Math.min(fw, Math.max(0, Math.round(r.left * scale) + inset));
+    const sy = Math.min(fh, Math.max(0, Math.round(r.top * scale) + inset));
+    const sw = Math.max(1, Math.round(r.width * scale) - inset * 2);
+    const sh = Math.max(1, Math.round(r.height * scale) - inset * 2);
+
     const c = document.createElement('canvas');
     c.width = sw; c.height = sh;
-    c.getContext('2d').drawImage(frame, sx, sy, sw, sh, 0, 0, sw, sh);
+    c.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
     c.toBlob((blob) => download(blob, name), 'image/png');
   } catch (err) {
     console.warn('[showcase] image export cancelled/failed', err);
