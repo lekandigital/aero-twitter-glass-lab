@@ -149,32 +149,52 @@ export async function captureScreenshot(name = 'experiment-five.png') {
   }
 }
 
-/* Screenshot just one element's on-screen region (e.g. the demo + its aero background),
- * by capturing the tab and cropping to the element's rect — iframe pixels included. */
+/*
+ * Export an image of ONE element (the demo = aero background + glass pane). The glass uses
+ * backdrop-filter, which only exists in real rendered pixels, so we use the Region Capture
+ * API: capture the current tab, then track.cropTo(element) so the frames ARE just that
+ * element — no whole-page capture, no manual crop. Falls back to a manual crop if needed.
+ */
 export async function captureElement(el, name = 'experiment-five.png') {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-    alert('Screenshot needs the Screen Capture API. Use your OS screenshot instead (⌘⇧4).');
+    alert('Image export needs the Screen Capture API (Chrome/Edge). Fallback: ⌘⇧4.');
     return;
   }
+  let stream;
   try {
-    const stream = await navigator.mediaDevices.getDisplayMedia({
-      video: { width: { ideal: 3840 } }, audio: false,
+    stream = await navigator.mediaDevices.getDisplayMedia({
+      video: { frameRate: 30 }, audio: false,
       preferCurrentTab: true, selfBrowserSurface: 'include', surfaceSwitching: 'exclude',
     });
+    const track = stream.getVideoTracks()[0];
+    let cropped = false;
+    try {
+      const CT = window.CropTarget;
+      if (CT && CT.fromElement && track.cropTo) { await track.cropTo(await CT.fromElement(el)); cropped = true; }
+    } catch { /* region capture unavailable */ }
+
     const video = document.createElement('video');
-    video.srcObject = stream;
+    video.srcObject = stream; video.muted = true;
     await video.play();
-    await new Promise((r) => setTimeout(r, 180));
-    const sx = video.videoWidth / window.innerWidth, sy = video.videoHeight / window.innerHeight;
-    const r = el.getBoundingClientRect();
-    const cw = Math.max(1, Math.round(r.width * sx)), ch = Math.max(1, Math.round(r.height * sy));
+    await new Promise((r) => setTimeout(r, 240));   // let the crop apply + a frame paint
+
+    let sx = 0, sy = 0, sw = video.videoWidth, sh = video.videoHeight;
+    if (!cropped) {
+      const scale = video.videoWidth / window.innerWidth;
+      const r = el.getBoundingClientRect();
+      sx = Math.max(0, Math.round(r.left * scale));
+      sy = Math.max(0, Math.round(r.top * scale));
+      sw = Math.max(1, Math.round(r.width * scale));
+      sh = Math.max(1, Math.round(r.height * scale));
+    }
     const c = document.createElement('canvas');
-    c.width = cw; c.height = ch;
-    c.getContext('2d').drawImage(video, Math.round(r.left * sx), Math.round(r.top * sy), cw, ch, 0, 0, cw, ch);
-    stream.getTracks().forEach((t) => t.stop());
+    c.width = sw; c.height = sh;
+    c.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
     c.toBlob((blob) => download(blob, name), 'image/png');
   } catch (err) {
-    console.warn('[showcase] screenshot cancelled/failed', err);
+    console.warn('[showcase] image export cancelled/failed', err);
+  } finally {
+    stream?.getTracks().forEach((t) => t.stop());
   }
 }
 

@@ -166,15 +166,19 @@ function shotName() { return `experiment-five-${current().label.replace(/\s+/g, 
 // ---------- controls ----------
 function buildCtl() {
   ctlEl.innerHTML = '';
-  if (mode !== 'focus') {
-    ctlEl.append(toggle('Reference row', refRow, (v) => { refRow = v; layout(); }));
+  if (mode === 'viewer') return;                 // clean fullscreen — no controls
+  if (mode === 'grid') {
+    ctlEl.append(
+      toggle('Reference row', refRow, (v) => { refRow = v; layout(); }),
+      // when on, opening a tile fullscreen interleaves the reference as you arrow: demo -> reference -> demo
+      toggle('Reference between', interleave, (v) => { interleave = v; rebuildNav(); }),
+    );
     return;
   }
   const isPanel = current().kind === 'panel';
   ctlEl.append(
     toggle('Free move', freeMove, (v) => { freeMove = v; layout(); }, !isPanel),
     toggle('Reference row', refRow, (v) => { refRow = v; layout(); }),
-    toggle('Reference between', interleave, (v) => { interleave = v; const cur = nav[navPos]; rebuildNav(); navPos = Math.max(0, nav.indexOf(cur)); layout(); }),
     toggle('Reference bg', bgRef, (v) => { bgRef = v; items.forEach((it) => it.handle && setBg(it.handle, v ? 'reference' : 'current')); }, !isPanel),
     toggle('Text', !hideText, (v) => { hideText = !v; items.forEach((it) => it.handle && setHideText(it.handle, hideText)); }, !isPanel),
     zoomCtl(),
