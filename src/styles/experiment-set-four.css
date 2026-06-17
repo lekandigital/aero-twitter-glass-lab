@@ -24,7 +24,7 @@
   cursor: inherit;
 
   border: none;
-  outline: 1px solid rgba(255, 255, 255, calc(0.14 * var(--e4-layerA-rim-strength)));
+  outline: 1px solid rgba(255, 255, 255, calc(0.18 * var(--e4-layerA-rim-strength)));
   outline-offset: -3px;
 
   background:
@@ -43,10 +43,27 @@
   box-shadow:
     inset 0 2px 0 rgba(255, 255, 255, calc(0.92 * var(--e4-layerA-rim-strength))),
     inset 0 1px 3px rgba(255, 255, 255, calc(0.5 * var(--e4-layerA-rim-strength))),
+    inset -10px 0 22px rgba(0, 78, 180, calc(var(--e4-layerA-inner-depth) * var(--e4-layerA-depth-strength) * 0.22)),
     inset 0 -16px 28px rgba(0, 68, 170, calc(var(--e4-layerA-inner-depth) * var(--e4-layerA-depth-strength) * 0.45)),
-    inset 0 0 0 1px rgba(255, 255, 255, calc(0.32 * var(--e4-layerA-rim-strength))),
+    inset 0 0 0 1px rgba(255, 255, 255, calc(0.4 * var(--e4-layerA-rim-strength))),
     0 18px var(--e4-layerA-shadow-spread) rgba(0, 38, 100, calc(var(--e4-layerA-outer-shadow) * var(--e4-layerA-depth-strength))),
-    0 0 40px rgba(90, 200, 255, calc(var(--e4-layerA-glow) * var(--e4-layerA-depth-strength)));
+    0 0 22px rgba(214, 240, 255, calc(var(--e4-layerA-glow) * var(--e4-layerA-depth-strength) * 0.95)),
+    0 0 50px rgba(120, 200, 255, calc(var(--e4-layerA-glow) * var(--e4-layerA-depth-strength) * 0.65));
+}
+
+/* Refractive bezel edge — mirrors the Layer B rim split, scaled by refraction. */
+.experiment-four-layer-a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: var(--e4-layerA-refraction, 0);
+  mix-blend-mode: screen;
+  box-shadow:
+    inset 2px 0 6px -4px rgba(150, 210, 255, 0.95),
+    inset -2px 0 6px -4px rgba(255, 244, 252, 0.9);
 }
 
 .experiment-four-layer-a__bezel-rim {
@@ -1111,6 +1128,25 @@
     inset 0 -20px 36px rgba(0, 68, 170, calc(var(--e4-layerB-inner-depth) * var(--e4-layerB-depth-strength))),
     inset 0 0 0 1px rgba(255, 255, 255, calc(0.22 * var(--e4-layerB-rim-strength))),
     0 8px 24px rgba(0, 38, 100, calc(var(--e4-layerB-outer-shadow) * var(--e4-layerB-depth-strength) * 0.35));
+}
+
+/* Refractive glass edge — light bending at the rim splits cool (left/top) from
+   warm-white (right/bottom). Driven by the previously-unused refraction var, so
+   it stays invisible at refraction:0 and only reads near the edges. */
+.experiment-four-layer-b::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: var(--e4-layerB-refraction, 0);
+  mix-blend-mode: screen;
+  box-shadow:
+    inset 2.5px 0 7px -4px rgba(150, 210, 255, 0.95),
+    inset 0 2.5px 7px -4px rgba(190, 226, 255, 0.8),
+    inset -2.5px 0 7px -4px rgba(255, 244, 252, 0.9),
+    inset 0 -2.5px 7px -4px rgba(120, 195, 255, 0.7);
 }
 
 .experiment-four-layer-b__shine {
