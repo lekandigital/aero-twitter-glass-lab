@@ -91,6 +91,34 @@ body {
 .dragcatch:active { cursor: grabbing; }
 .stage.is-move { outline: 2px dashed rgba(95, 176, 255, 0.5); outline-offset: -2px; }
 
+/* ---------- multi-column board (Stage / Switcher) ---------- */
+.boardwrap { position: relative; flex: 1; min-height: 0; overflow: hidden; background: #0a1628; }
+.board { position: absolute; inset: 0; overflow: hidden; }
+.board-inner {
+  position: absolute; top: 0; left: 0; transform-origin: top left;
+  display: flex; gap: 72px; padding: 12px; will-change: transform;
+}
+.board-pan { position: absolute; inset: 0; z-index: 50; cursor: grab; }
+.board-pan:active { cursor: grabbing; }
+.board.is-free .board-pan { display: none; }
+.board.is-free .col__panel { outline: 2px dashed rgba(95, 176, 255, 0.55); outline-offset: -2px; }
+
+.col { display: flex; flex-direction: column; gap: 14px; flex: 0 0 auto; }
+.col__label { color: #d6e6fb; font-size: 26px; font-weight: 600; }
+.col__cap { color: #8aa1c4; font-size: 20px; }
+.col__panel {
+  position: relative; width: 1440px; height: 1572px; overflow: hidden;
+  border-radius: 12px; background: #0a1628;
+}
+.col__panel .panel-iframe { position: absolute; top: 0; left: 0; }
+.col__ref { width: 1440px; display: flex; flex-direction: column; gap: 8px; }
+.col__ref img, .col--refonly img { width: 1440px; height: auto; display: block; border-radius: 12px; }
+.col--refonly { align-items: flex-start; }
+
+/* A/B compare scene (swipe stage + reference beneath) */
+.scene { transform-origin: center center; display: flex; flex-direction: column; gap: 6px; }
+.cmp-ref { width: 1440px; height: auto; display: block; border-radius: 10px; }
+
 /* A/B divider */
 .divider {
   position: absolute; top: 0; bottom: 0; width: 0; z-index: 10;
