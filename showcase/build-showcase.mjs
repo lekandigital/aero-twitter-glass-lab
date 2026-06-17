@@ -85,7 +85,10 @@ function injectSaveSeed(outDir, b) {
     activeExperiment: 'five',
     selectedSaveIdByExperiment: { five: b.save },
   });
+  // Pre-set the one-time "download all e5 configs" flag so that dev-only auto-export
+  // effect short-circuits instead of downloading files on every iframe load.
   const seed = `<script>(function(){var store={};store['experiment-set-1-session']=${JSON.stringify(session)};` +
+    `store['exp-set-1:e5-download-all-v1']='1';` +
     `var shim={getItem:function(k){return Object.prototype.hasOwnProperty.call(store,k)?store[k]:null;},` +
     `setItem:function(k,v){store[k]=String(v);},removeItem:function(k){delete store[k];},` +
     `clear:function(){store={};},key:function(i){return Object.keys(store)[i]||null;},` +
