@@ -74,6 +74,10 @@ const PRUNE = ['raw-reference-lab', 'reference-demos', 'reference.png', 'aero-bg
  * the app's own resolveInitialE5() loads the committed built-in save. The branch SOURCE
  * is untouched — only this build artifact carries the seed.
  */
+const SNAP = { x: 24.61, y: 327.55 };
+const NORMALIZE_CSS = readFileSync(join(SRC, 'normalize.css'), 'utf8');
+const DRAG_POS_KEY = 'drag-position:exp-set-1:layer-a-4'; // Experiment-Five panel position
+
 function injectSaveSeed(outDir, b) {
   const file = join(outDir, 'index.html');
   const html = readFileSync(file, 'utf8');
@@ -85,16 +89,23 @@ function injectSaveSeed(outDir, b) {
     activeExperiment: 'five',
     selectedSaveIdByExperiment: { five: b.save },
   });
-  // Pre-set the one-time "download all e5 configs" flag so that dev-only auto-export
-  // effect short-circuits instead of downloading files on every iframe load.
-  const seed = `<script>(function(){var store={};store['experiment-set-1-session']=${JSON.stringify(session)};` +
+  // Seed the panel at the snap position NATIVELY (drag-position) so the app positions it
+  // itself and the edge-reflex lighting samples the wallpaper at the correct spot from the
+  // first render — and any native drag re-samples exactly like the standalone app. The
+  // download flag is pre-set so the dev-only "export all e5 configs" effect short-circuits.
+  const seed = `<script>(function(){var store={};` +
+    `store['experiment-set-1-session']=${JSON.stringify(session)};` +
     `store['exp-set-1:e5-download-all-v1']='1';` +
+    `store[${JSON.stringify(DRAG_POS_KEY)}]=${JSON.stringify(JSON.stringify(SNAP))};` +
     `var shim={getItem:function(k){return Object.prototype.hasOwnProperty.call(store,k)?store[k]:null;},` +
     `setItem:function(k,v){store[k]=String(v);},removeItem:function(k){delete store[k];},` +
     `clear:function(){store={};},key:function(i){return Object.keys(store)[i]||null;},` +
     `get length(){return Object.keys(store).length;}};` +
     `try{Object.defineProperty(window,'localStorage',{configurable:true,get:function(){return shim;}});}catch(e){}})();</script>`;
-  writeFileSync(file, html.replace('<head>', `<head>${seed}`));
+  // Inject normalize at BUILD time (before the app renders) so layout/size/chrome are right
+  // from the first paint — runtime injection moved the panel after the reflex had sampled.
+  const style = `<style id="showcase-normalize">${NORMALIZE_CSS}</style>`;
+  writeFileSync(file, html.replace('<head>', `<head>${seed}${style}`));
 }
 
 function buildBranch(b) {

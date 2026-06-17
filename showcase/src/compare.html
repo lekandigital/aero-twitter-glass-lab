@@ -22,14 +22,19 @@
       <div class="tool-sep"></div>
       <label class="toggle"><input type="checkbox" id="bg" /> Reference bg</label>
       <label class="toggle"><input type="checkbox" id="text" /> Show text</label>
-      <button class="btn" id="center" title="Center divider">↔ Center</button>
-      <button class="btn" id="fs" title="Fullscreen">⛶ Fullscreen</button>
-      <span class="hint">Drag the divider to wipe between A and B at the same position.</span>
+      <button class="btn" id="center">↔ Center</button>
+      <button class="btn" id="shot">📷 Save screenshot</button>
+      <button class="btn" id="fs">⛶ Fullscreen</button>
+      <span class="hint">Drag the divider to wipe A↔B at the same position · reference shown beneath.</span>
     </div>
 
     <div class="stagewrap stagewrap--fill" id="stagewrap">
-      <div class="stage" id="stage">
-        <div class="divider" id="divider"><div class="divider__handle">⇆</div></div>
+      <div class="scene" id="scene">
+        <div class="stage" id="stage">
+          <div class="divider" id="divider"><div class="divider__handle">⇆</div></div>
+        </div>
+        <div class="col__cap">reference</div>
+        <img class="cmp-ref" src="reference.png" alt="reference" />
       </div>
     </div>
 

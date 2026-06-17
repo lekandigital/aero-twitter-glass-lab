@@ -16,21 +16,18 @@
       </nav>
     </header>
 
-    <div class="toolbar">
-      <div class="tool-group" id="chips"></div>
-      <div class="tool-sep"></div>
-      <button class="btn" id="prev" title="Previous">‹</button>
-      <button class="btn" id="next" title="Next">›</button>
-      <div class="tool-sep"></div>
-      <label class="toggle"><input type="checkbox" id="bg" /> Reference bg</label>
-      <label class="toggle"><input type="checkbox" id="text" /> Show text</label>
-      <button class="btn" id="fs" title="Fullscreen">⛶ Fullscreen</button>
+    <div class="toolbar" id="toolbar"></div>
+
+    <div class="boardwrap" id="boardwrap">
+      <div class="board" id="board">
+        <div class="board-inner" id="board-inner"></div>
+        <div class="board-pan" id="board-pan" title="Drag to move all together"></div>
+      </div>
     </div>
 
-    <div class="stagewrap stagewrap--fill" id="stagewrap">
-      <div class="stage" id="stage"></div>
-    </div>
-
-    <script type="module" src="switch.js"></script>
+    <script type="module">
+      import { initBoard } from './board.js';
+      initBoard({ mode: 'switch', big: true });
+    </script>
   </body>
 </html>

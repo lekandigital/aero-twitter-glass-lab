@@ -16,28 +16,18 @@
       </nav>
     </header>
 
-    <div class="toolbar" id="toolbar">
-      <div class="tool-group" id="chips" aria-label="Branch"></div>
-      <div class="tool-sep"></div>
-      <button class="btn" id="prev" title="Previous branch">‹</button>
-      <button class="btn" id="next" title="Next branch">›</button>
-      <div class="tool-sep"></div>
-      <button class="btn" id="snap" title="Snap panel to its set x/y">⌖ Snap</button>
-      <label class="toggle"><input type="checkbox" id="move" /> Free move</label>
-      <div class="tool-sep"></div>
-      <label class="toggle"><input type="checkbox" id="bg" /> Reference bg</label>
-      <label class="toggle"><input type="checkbox" id="text" /> Show text</label>
-      <div class="tool-sep"></div>
-      <label class="zoom">Zoom <input type="range" id="zoom" min="0.25" max="1.6" step="0.01" /> <span id="zoomval">100%</span></label>
-      <button class="btn" id="fs" title="Fullscreen">⛶</button>
-    </div>
+    <div class="toolbar" id="toolbar"></div>
 
-    <div class="stagewrap" id="stagewrap">
-      <div class="stage" id="stage">
-        <div class="dragcatch" id="dragcatch" hidden></div>
+    <div class="boardwrap" id="boardwrap">
+      <div class="board" id="board">
+        <div class="board-inner" id="board-inner"></div>
+        <div class="board-pan" id="board-pan" title="Drag to move all together"></div>
       </div>
     </div>
 
-    <script type="module" src="stage.js"></script>
+    <script type="module">
+      import { initBoard } from './board.js';
+      initBoard({ mode: 'stage' });
+    </script>
   </body>
 </html>
