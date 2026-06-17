@@ -14,15 +14,21 @@ const dragcatch = document.getElementById('dragcatch');
 const chipsEl = document.getElementById('chips');
 
 let panels = [];          // handles
-let active = 0;           // visible branch index
+let active = 0;           // visible item index (panels first, then the reference image)
+let refImg = null;        // reference.png shown as a selectable "Reference" item
+let refIndex = 0;         // index of the reference item (== panels.length)
 let shared = { x: SNAP.x, y: SNAP.y };
 let zoom = 0.6;
 let freeMove = false;
 
+const isRefActive = () => active === refIndex;
+
 function applyShared() { panels.forEach((p) => setPos(p, shared.x, shared.y)); }
 
 function showActive() {
-  panels.forEach((p, i) => { p.iframe.style.display = i === active ? 'block' : 'none'; });
+  const ref = isRefActive();
+  panels.forEach((p, i) => { p.iframe.style.display = !ref && i === active ? 'block' : 'none'; });
+  if (refImg) refImg.style.display = ref ? 'block' : 'none';
   [...chipsEl.children].forEach((c, i) => c.classList.toggle('is-active', i === active));
 }
 
@@ -42,6 +48,12 @@ function buildChips(branches) {
     chip.addEventListener('click', () => { active = i; showActive(); });
     chipsEl.appendChild(chip);
   });
+  // Reference target as its own selectable item (flip between branches and the reference).
+  const ref = document.createElement('button');
+  ref.className = 'chip chip--ref';
+  ref.innerHTML = `<span>Reference</span><em>target</em>`;
+  ref.addEventListener('click', () => { active = refIndex; showActive(); });
+  chipsEl.appendChild(ref);
 }
 
 // ---- drag (free-move) updates the shared position; delta is divided by zoom ----
@@ -64,8 +76,9 @@ function initDrag() {
 }
 
 function bindControls() {
-  document.getElementById('prev').onclick = () => { active = (active - 1 + panels.length) % panels.length; showActive(); };
-  document.getElementById('next').onclick = () => { active = (active + 1) % panels.length; showActive(); };
+  const count = () => panels.length + 1; // branches + reference
+  document.getElementById('prev').onclick = () => { active = (active - 1 + count()) % count(); showActive(); };
+  document.getElementById('next').onclick = () => { active = (active + 1) % count(); showActive(); };
   document.getElementById('snap').onclick = () => { shared = { ...SNAP }; applyShared(); };
   document.getElementById('move').onchange = (e) => {
     freeMove = e.target.checked;
@@ -93,6 +106,14 @@ function bindControls() {
     stage.appendChild(h.iframe);
     return h;
   });
+  refIndex = panels.length;
+  // Reference target image, framed like the in-panel wallpaper (contain in 1440x1572).
+  refImg = document.createElement('img');
+  refImg.className = 'ref-image';
+  refImg.src = 'reference.png';
+  refImg.alt = 'Reference target';
+  refImg.style.display = 'none';
+  stage.appendChild(refImg);
   // fit zoom to the available area
   zoom = Math.max(0.3, fitScale(window.innerWidth - 40, window.innerHeight - 160));
   applyZoom();

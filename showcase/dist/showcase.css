@@ -80,6 +80,13 @@ body {
   position: absolute; top: 0; left: 0; border: 0; display: block;
   background: transparent;
 }
+.ref-image {
+  position: absolute; top: 0; left: 0; width: 1440px; height: 1572px;
+  object-fit: contain; object-position: center; background: #0a1628;
+}
+.chip--ref { border-style: dashed; }
+.chip--ref.is-active { background: #ffd479; border-color: #ffd479; color: #3a2a00; }
+.chip--ref.is-active em { color: rgba(58, 42, 0, 0.7); }
 .dragcatch { position: absolute; inset: 0; z-index: 50; cursor: grab; }
 .dragcatch:active { cursor: grabbing; }
 .stage.is-move { outline: 2px dashed rgba(95, 176, 255, 0.5); outline-offset: -2px; }
