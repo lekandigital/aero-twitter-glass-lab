@@ -51,7 +51,7 @@ body.is-viewer .viewer-hint {
 }
 @keyframes hintfade { 0%, 68% { opacity: 1; } 100% { opacity: 0; } }
 
-.stagewrap { position: relative; flex: 1; min-height: 0; overflow: hidden; background: radial-gradient(120% 120% at 50% 0%, #0e1d33 0%, #081020 100%); }
+.stagewrap { position: relative; flex: 1; min-height: 0; overflow: hidden; background: #06070b; }
 .stagewrap.is-grid { overflow: auto; }
 .stage { position: relative; width: 100%; height: 100%; }
 
@@ -63,10 +63,12 @@ body.is-viewer .viewer-hint {
 .card.is-hidden { visibility: hidden; pointer-events: none; }
 .card__label { display: none; height: 110px; font-size: 60px; font-weight: 600; color: #cfe0f5; padding: 6px 4px 24px; white-space: nowrap; }
 .card.card--labelled .card__label { display: block; }
-.card__view { position: relative; width: 1440px; height: 1572px; overflow: hidden; border-radius: 14px; background: #0a1628; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45); }
-.card__view iframe { position: absolute; top: 0; left: 0; width: 1440px; height: 1572px; border: 0; }
-/* reference image stacked under each demo */
-.card__ref { width: 1440px; height: 961px; margin-top: 24px; border-radius: 14px; overflow: hidden; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45); }
+/* the demo view shows ONLY the background's real area (1440x961, landscape) — the iframe is
+   1440x1572 (portrait) shifted up by 306px so the navy letterbox top/bottom is cropped out */
+.card__view { position: relative; width: 1440px; height: 961px; overflow: hidden; border-radius: 14px; background: #0a1628; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45); }
+.card__view iframe { position: absolute; top: -306px; left: 0; width: 1440px; height: 1572px; border: 0; }
+/* reference image stacked under each demo (tight gap) */
+.card__ref { width: 1440px; height: 961px; margin-top: 8px; border-radius: 14px; overflow: hidden; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45); }
 .card__ref img { width: 1440px; height: 961px; object-fit: cover; display: block; }
 /* standalone reference target card */
 .card--ref .card__view { height: 961px; }
