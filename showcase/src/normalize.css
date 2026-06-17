@@ -49,6 +49,16 @@ html, body, #root { margin: 0 !important; padding: 0 !important; background: tra
   object-position: center !important;
 }
 
+/* ---- route page wrapper: it holds the --e4-* vars AND is the stage's offsetParent.
+       It's normally a centered max-width column (~920px => +260px left), which shifted
+       the panel. Make it full-width at the viewport's left so x coordinates are exact. ---- */
+.experiment-one-page, .experiment-set-one-page {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important;
+  width: auto !important;
+}
+
 /* ---- stage = a 1440x1572 coordinate space anchored at the viewport top-left ---- */
 .experiment-set-one-stage {
   position: absolute !important;
