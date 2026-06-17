@@ -95,7 +95,8 @@ function place(card, x, y, scale, withLabel) {
 
 function layout() {
   const W = stagewrap.clientWidth, H = stagewrap.clientHeight;
-  items.forEach((it) => { if (it.ref) it.ref.style.display = refRow ? 'block' : 'none'; });
+  // stacked reference is never shown in the clean fullscreen viewer
+  items.forEach((it) => { if (it.ref) it.ref.style.display = (refRow && mode !== 'viewer') ? 'block' : 'none'; });
 
   if (mode === 'grid') {
     stagewrap.classList.add('is-grid');
@@ -114,12 +115,15 @@ function layout() {
     });
     stage.style.height = `${GAP + Math.ceil(panels.length / cols) * (cardH + GAP)}px`;
   } else {
+    // focus = demo + stacked reference (with chrome); viewer = JUST the demo bg+pane, filling the screen
+    const viewer = mode === 'viewer';
     stagewrap.classList.remove('is-grid');
     stage.style.height = '100%';
     const f = current();
     items.forEach((it) => { it.el.classList.add('is-hidden'); it.el.style.pointerEvents = 'none'; });
-    const ch = contentH(f);
-    const scale = Math.min(W * 0.94 / VIEW_W, H * 0.94 / ch) * zoom;
+    const ch = viewer ? (f.kind === 'ref' ? REF_IMG_H : VIEW_H) : contentH(f);
+    const margin = viewer ? 1 : 0.94;
+    const scale = Math.min(W * margin / VIEW_W, H * margin / ch) * (viewer ? 1 : zoom);
     f.el.classList.remove('is-hidden');
     f.el.style.pointerEvents = freeMove && f.kind === 'panel' ? 'auto' : 'none';
     place(f, (W - VIEW_W * scale) / 2, (H - ch * scale) / 2, scale, false);
@@ -138,6 +142,7 @@ function setMode(m) {
   document.getElementById('mFocus').classList.toggle('is-active', m === 'focus');
   document.getElementById('mGrid').classList.toggle('is-active', m === 'grid');
   work.classList.toggle('is-grid', m === 'grid');
+  document.body.classList.toggle('is-viewer', m === 'viewer'); // hides bar + rail (clean fullscreen)
   buildCtl();
   layout();
 }
@@ -146,13 +151,17 @@ function openItem(itemIndex) {
   navPos = Math.max(0, nav.indexOf(itemIndex));
   setMode('focus');
 }
-// Grid tile click: request fullscreen FIRST (while the click gesture is fresh), then focus.
+// Grid tile click: request fullscreen FIRST (while the click gesture is fresh), then show the
+// clean viewer (just the demo bg+pane) — NOT the focus layout.
 function openFromGrid(itemIndex) {
   if (mode !== 'grid') return;
+  rebuildNav();
+  navPos = Math.max(0, nav.indexOf(itemIndex));
   goFullscreen();
-  openItem(itemIndex);
+  setMode('viewer');
 }
 function step(dir) { navPos = (navPos + dir + nav.length) % nav.length; layout(); }
+function shotName() { return `experiment-five-${current().label.replace(/\s+/g, '-').toLowerCase()}.png`; }
 
 // ---------- controls ----------
 function buildCtl() {
@@ -192,15 +201,21 @@ function toggle(label, checked, onchange, disabled) {
   rebuildNav();
   document.getElementById('mFocus').onclick = () => setMode('focus');
   document.getElementById('mGrid').onclick = () => setMode('grid');
-  document.getElementById('shot').onclick = () => captureElement(current().view, `experiment-five-${current().label.replace(/\s+/g, '-').toLowerCase()}.png`);
-  document.getElementById('full').onclick = () => toggleFullscreen(document.documentElement);
+  document.getElementById('shot').onclick = () => captureElement(current().view, shotName());
+  document.getElementById('full').onclick = () => { if (mode === 'grid') return; goFullscreen(); setMode('viewer'); };
   window.addEventListener('resize', layout);
-  document.addEventListener('fullscreenchange', () => setTimeout(layout, 60)); // rescale into/out of fullscreen
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && mode === 'viewer') setMode('grid'); // exit fullscreen -> back to grid
+    else setTimeout(layout, 60);
+  });
   window.addEventListener('keydown', (e) => {
-    if (mode !== 'focus') return;
-    if (e.key === 'ArrowRight') step(1);
-    if (e.key === 'ArrowLeft') step(-1);
-    if (e.key === 'g') setMode('grid');
+    if (mode === 'focus' || mode === 'viewer') {
+      if (e.key === 'ArrowRight') step(1);
+      if (e.key === 'ArrowLeft') step(-1);
+      if (e.key === 's') captureElement(current().view, shotName());            // screenshot: bg + pane
+      if (e.key === 'r') { interleave = !interleave; const cur = nav[navPos]; rebuildNav(); navPos = Math.max(0, nav.indexOf(cur)); layout(); buildCtl(); }
+    }
+    if (e.key === 'g' && mode !== 'viewer') setMode('grid');
   });
   setMode('focus');
 })();

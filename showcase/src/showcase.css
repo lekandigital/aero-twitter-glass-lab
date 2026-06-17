@@ -40,6 +40,17 @@ body {
 .railitem.is-active em { color: rgba(6, 32, 60, 0.75); }
 .railitem--ref { border-style: dashed; }
 
+/* clean fullscreen viewer — just the demo (background + pane) */
+body.is-viewer .bar, body.is-viewer .rail { display: none; }
+body.is-viewer .stagewrap { background: #05070c; }
+.viewer-hint { display: none; }
+body.is-viewer .viewer-hint {
+  display: block; position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6); color: #d6e6fb; padding: 8px 16px; border-radius: 999px;
+  font-size: 13px; z-index: 1000; pointer-events: none; animation: hintfade 3.5s forwards;
+}
+@keyframes hintfade { 0%, 68% { opacity: 1; } 100% { opacity: 0; } }
+
 .stagewrap { position: relative; flex: 1; min-height: 0; overflow: hidden; background: radial-gradient(120% 120% at 50% 0%, #0e1d33 0%, #081020 100%); }
 .stagewrap.is-grid { overflow: auto; }
 .stage { position: relative; width: 100%; height: 100%; }
