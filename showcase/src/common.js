@@ -143,14 +143,45 @@ export async function captureScreenshot(name = 'experiment-five.png') {
     c.width = video.videoWidth; c.height = video.videoHeight;
     c.getContext('2d').drawImage(video, 0, 0);
     stream.getTracks().forEach((t) => t.stop());
-    c.toBlob((blob) => {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = name;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-    }, 'image/png');
+    c.toBlob((blob) => download(blob, name), 'image/png');
   } catch (err) {
     console.warn('[showcase] screenshot cancelled/failed', err);
   }
+}
+
+/* Screenshot just one element's on-screen region (e.g. the demo + its aero background),
+ * by capturing the tab and cropping to the element's rect — iframe pixels included. */
+export async function captureElement(el, name = 'experiment-five.png') {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+    alert('Screenshot needs the Screen Capture API. Use your OS screenshot instead (⌘⇧4).');
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+      video: { width: { ideal: 3840 } }, audio: false,
+      preferCurrentTab: true, selfBrowserSurface: 'include', surfaceSwitching: 'exclude',
+    });
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    await video.play();
+    await new Promise((r) => setTimeout(r, 180));
+    const sx = video.videoWidth / window.innerWidth, sy = video.videoHeight / window.innerHeight;
+    const r = el.getBoundingClientRect();
+    const cw = Math.max(1, Math.round(r.width * sx)), ch = Math.max(1, Math.round(r.height * sy));
+    const c = document.createElement('canvas');
+    c.width = cw; c.height = ch;
+    c.getContext('2d').drawImage(video, Math.round(r.left * sx), Math.round(r.top * sy), cw, ch, 0, 0, cw, ch);
+    stream.getTracks().forEach((t) => t.stop());
+    c.toBlob((blob) => download(blob, name), 'image/png');
+  } catch (err) {
+    console.warn('[showcase] screenshot cancelled/failed', err);
+  }
+}
+
+function download(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
