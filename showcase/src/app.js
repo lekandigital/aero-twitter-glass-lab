@@ -25,7 +25,9 @@ const work = document.querySelector('.work');
 let items = [];            // { el, view, handle?, kind:'panel'|'ref', label, save? }
 let mode = 'focus';
 let focusIndex = 0;
-let freeMove = false, hideText = true, bgRef = false, refBeside = false, zoom = 1;
+let freeMove = false, hideText = true, bgRef = false, zoom = 1;
+
+function goFullscreen() { try { if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); } catch {} }
 
 const refItemIndex = () => items.length - 1;
 const focused = () => items[focusIndex];
@@ -41,7 +43,8 @@ function makeCard(kind, label, inner) {
   view.className = 'card__view';
   view.appendChild(inner);
   el.append(lab, view);
-  stage.appendChild(el);
+  el.classList.add('is-hidden');   // hidden via visibility (keeps layout so the panel's
+  stage.appendChild(el);           // drag bounds measure correctly and snap isn't clamped to 0,0)
   return { el, view };
 }
 
@@ -50,13 +53,13 @@ function build(branches) {
     const h = createPanel(b);
     h.hideText = true;
     const { el, view } = makeCard('panel', `${b.label} · Save ${b.save}`, h.iframe);
-    el.addEventListener('click', () => { if (mode === 'grid') focusItem(i); });
+    el.addEventListener('click', () => { if (mode === 'grid') focusItem(i, true); });   // grid tile -> fullscreen focus
     return { el, view, handle: h, kind: 'panel', label: b.label, save: b.save };
   });
   const img = document.createElement('img');
   img.src = REF_SRC; img.alt = 'Reference target'; img.className = 'ref-img';
   const { el, view } = makeCard('ref', 'Reference target', img);
-  el.addEventListener('click', () => { if (mode === 'grid') focusItem(refItemIndex()); });
+  el.addEventListener('click', () => { if (mode === 'grid') focusItem(refItemIndex(), true); });
   items.push({ el, view, kind: 'ref', label: 'Reference' });
 
   buildRail();
@@ -90,7 +93,7 @@ function layout() {
     const scale = tileW / VIEW_W;
     const cardH = (VIEW_H + LABEL_H) * scale;
     items.forEach((it, i) => {
-      it.el.style.display = 'block';
+      it.el.classList.remove('is-hidden');
       it.el.style.pointerEvents = 'auto';
       const col = i % cols, row = Math.floor(i / cols);
       place(it, GAP + col * (tileW + GAP), GAP + row * (cardH + GAP), scale, true);
@@ -102,25 +105,11 @@ function layout() {
     stagewrap.classList.remove('is-grid');
     stage.style.height = '100%';
     const f = focused();
-    const showRef = refBeside && f.kind === 'panel';
-    items.forEach((it) => { it.el.style.display = 'none'; it.el.style.pointerEvents = 'none'; });
-
-    if (!showRef) {
-      const scale = Math.min(W * 0.94 / VIEW_W, H * 0.94 / VIEW_H) * zoom;
-      f.el.style.display = 'block';
-      f.el.style.pointerEvents = freeMove && f.kind === 'panel' ? 'auto' : 'none';
-      place(f, (W - VIEW_W * scale) / 2, (H - VIEW_H * scale) / 2, scale, false);
-    } else {
-      const colW = (W - 3 * GAP) / 2;
-      const scale = Math.min(colW / VIEW_W, H * 0.94 / VIEW_H);
-      const y = (H - VIEW_H * scale) / 2;
-      const ref = items[refItemIndex()];
-      f.el.style.display = ref.el.style.display = 'block';
-      f.el.style.pointerEvents = freeMove ? 'auto' : 'none';
-      ref.el.style.pointerEvents = 'none';
-      place(f, GAP, y, scale, false);
-      place(ref, GAP * 2 + colW, y, scale, false);
-    }
+    items.forEach((it) => { it.el.classList.add('is-hidden'); it.el.style.pointerEvents = 'none'; });
+    const scale = Math.min(W * 0.94 / VIEW_W, H * 0.94 / VIEW_H) * zoom;
+    f.el.classList.remove('is-hidden');
+    f.el.style.pointerEvents = freeMove && f.kind === 'panel' ? 'auto' : 'none';
+    place(f, (W - VIEW_W * scale) / 2, (H - VIEW_H * scale) / 2, scale, false);
     if (f.handle) setTimeout(() => refreshReflex(f.handle), 90);
   }
   updateRail();
@@ -139,7 +128,7 @@ function setMode(m) {
   buildCtl();
   layout();
 }
-function focusItem(i) { focusIndex = i; setMode('focus'); }
+function focusItem(i, fullscreen) { focusIndex = i; setMode('focus'); if (fullscreen) goFullscreen(); }
 
 // ---------- context controls ----------
 function buildCtl() {
@@ -148,9 +137,8 @@ function buildCtl() {
   const isPanel = focused().kind === 'panel';
   ctlEl.append(
     toggle('Free move', freeMove, (v) => { freeMove = v; layout(); }, !isPanel),
-    toggle('Reference', refBeside, (v) => { refBeside = v; layout(); }, !isPanel),
+    toggle('Reference background', bgRef, (v) => { bgRef = v; items.forEach((it) => it.handle && setBg(it.handle, v ? 'reference' : 'current')); }, !isPanel),
     toggle('Text', !hideText, (v) => { hideText = !v; items.forEach((it) => it.handle && setHideText(it.handle, hideText)); }, !isPanel),
-    toggle('Ref bg', bgRef, (v) => { bgRef = v; items.forEach((it) => it.handle && setBg(it.handle, v ? 'reference' : 'current')); }, !isPanel),
     zoomCtl(),
   );
 }
