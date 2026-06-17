@@ -1,73 +1,45 @@
-# React + TypeScript + Vite
+# Aero Twitter Glass Lab
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Workspace for experimenting with Aero-style liquid glass on a Twitter-like panel layout. The repo contains the main React app, reference demos, and a public **Experiment Five showcase** that compares six model branches side by side.
 
-Currently, two official plugins are available:
+## Live sites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Site | URL | What it is |
+|------|-----|------------|
+| Main app | [aero-twitter-glass-lab.vercel.app](https://aero-twitter-glass-lab.vercel.app) | Interactive glass lab (Vite + React) |
+| Experiment Five showcase | [aero-experiment-five-showcase.vercel.app](https://aero-experiment-five-showcase.vercel.app) | Static comparison viewer for six branches |
 
-## React Compiler
+## Main app
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev        # local dev server
+npm run build      # production build → dist/
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Root [`vercel.json`](vercel.json) deploys the main app from `dist/`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Experiment Five showcase
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+A self-contained static site under [`showcase/`](showcase/) that renders the Experiment Five glass panel from **six branches** at the same background and geometry so treatments can be compared against the reference image.
+
+- **Source:** [`showcase/src/`](showcase/src/) (`index.html`, `app.js`, `common.js`, CSS)
+- **Built output:** [`showcase/dist/`](showcase/dist/) (committed; served as-is on Vercel)
+- **Docs:** [`showcase/README.md`](showcase/README.md)
+
+```bash
+# Preview locally
+python -m http.server 5199 --directory showcase/dist
+# or: npx serve showcase/dist
+
+# Rebuild panels (requires local branch worktrees — see showcase/README.md)
+node showcase/build-showcase.mjs
 ```
+
+[`showcase/vercel.json`](showcase/vercel.json) deploys the prebuilt `showcase/dist` folder as a separate Vercel project.
+
+## Other directories
+
+- `public/reference-demos/` — curated reference implementations
+- `public/raw-reference-lab/` — browsable archive of raw reference demos
+- `_reference_vault/` — local reference library (not deployed)

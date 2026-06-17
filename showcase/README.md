@@ -22,7 +22,7 @@ in fixed `.card`s that are only ever transformed, never reparented (that would r
 ## How it works
 
 Each branch is built **as-is** from its git worktree into `dist/panels/<slug>/` with a
-relative asset base. The harness ([src/harness.js](src/harness.js)) loads each build in a
+relative asset base. The harness ([src/common.js](src/common.js)) loads each build in a
 **same-origin iframe**, seeds the session to boot **Experiment Five**, navigates to the
 Experiment-Set-1 route client-side, then injects [src/normalize.css](src/normalize.css) to
 strip the app chrome and pin the geometry. Nothing in the six branches is modified.
@@ -49,12 +49,16 @@ git add showcase && git commit     # commit the refreshed static output
 
 ## Deploying to Vercel
 
-`showcase/dist` is a prebuilt static folder. The repo root `vercel.json` currently deploys
-the **main app** (`npm run build` → `dist`). To deploy this showcase instead, point Vercel's
-**Output Directory** at `showcase/dist` with no build step — e.g.:
+**Live:** [aero-experiment-five-showcase.vercel.app](https://aero-experiment-five-showcase.vercel.app)
 
-```json
-{ "framework": null, "buildCommand": "echo prebuilt", "outputDirectory": "showcase/dist" }
+`showcase/dist` is a prebuilt static folder committed to git. It is deployed as a **separate
+Vercel project** from the main app (root `vercel.json` still deploys the React lab).
+
+[`vercel.json`](vercel.json) in this folder sets the project root to `showcase/` and serves
+`dist/` with no build step. After changing source under `src/`, rebuild locally, commit
+`dist/`, and push — Vercel redeploys automatically.
+
+```bash
+# One-off deploy from this directory
+vercel --prod
 ```
-
-(Left as a note rather than applied, so the existing app deployment isn't changed silently.)
