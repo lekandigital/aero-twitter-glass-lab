@@ -16,8 +16,10 @@ import {
   captureElement, toggleFullscreen, REF_SRC,
 } from './common.js';
 
-const VIEW_W = STAGE.w, VIEW_H = STAGE.h;
-const REF_IMG_H = 961, REF_GAP = 24, LABEL_H = 110, GAP = 28;
+// VIEW_H is the visible demo height = the aero background's actual area (landscape), cropping
+// out the navy letterbox of the 1440x1572 portrait iframe (see .card__view in the CSS).
+const VIEW_W = STAGE.w, VIEW_H = 961;
+const REF_IMG_H = 961, REF_GAP = 8, LABEL_H = 110, GAP = 28;
 
 const stage = document.getElementById('stage');
 const stagewrap = document.getElementById('stagewrap');
@@ -86,7 +88,8 @@ function rebuildNav() {
 }
 
 // ---------- layout ----------
-function contentH(it) { return it.kind === 'ref' ? REF_IMG_H : VIEW_H + (refRow ? REF_GAP + REF_IMG_H : 0); }
+// reference stacks under the demo only in focus mode
+function contentH(it) { return it.kind === 'ref' ? REF_IMG_H : VIEW_H + (refRow && mode === 'focus' ? REF_GAP + REF_IMG_H : 0); }
 
 function place(card, x, y, scale, withLabel) {
   card.el.classList.toggle('card--labelled', withLabel);
@@ -95,8 +98,8 @@ function place(card, x, y, scale, withLabel) {
 
 function layout() {
   const W = stagewrap.clientWidth, H = stagewrap.clientHeight;
-  // stacked reference is never shown in the clean fullscreen viewer
-  items.forEach((it) => { if (it.ref) it.ref.style.display = (refRow && mode !== 'viewer') ? 'block' : 'none'; });
+  // reference stacks under demos only in focus (not grid, not the clean fullscreen viewer)
+  items.forEach((it) => { if (it.ref) it.ref.style.display = (refRow && mode === 'focus') ? 'block' : 'none'; });
 
   if (mode === 'grid') {
     stagewrap.classList.add('is-grid');
@@ -168,11 +171,8 @@ function buildCtl() {
   ctlEl.innerHTML = '';
   if (mode === 'viewer') return;                 // clean fullscreen — no controls
   if (mode === 'grid') {
-    ctlEl.append(
-      toggle('Reference row', refRow, (v) => { refRow = v; layout(); }),
-      // when on, opening a tile fullscreen interleaves the reference as you arrow: demo -> reference -> demo
-      toggle('Reference between', interleave, (v) => { interleave = v; rebuildNav(); }),
-    );
+    // when on, opening a tile fullscreen interleaves the reference as you arrow: demo -> reference -> demo
+    ctlEl.append(toggle('Reference between', interleave, (v) => { interleave = v; rebuildNav(); }));
     return;
   }
   const isPanel = current().kind === 'panel';

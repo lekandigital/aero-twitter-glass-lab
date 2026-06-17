@@ -169,19 +169,31 @@ export async function captureElement(el, name = 'experiment-five.png') {
     const track = stream.getVideoTracks()[0];
     let cropped = false;
     try {
-      const CT = window.CropTarget;
+      const CT = window.CropTarget || window.RestrictionTarget;
       if (CT && CT.fromElement && track.cropTo) { await track.cropTo(await CT.fromElement(el)); cropped = true; }
     } catch { /* region capture unavailable */ }
+    await new Promise((r) => setTimeout(r, 260));   // let the crop apply
 
-    const video = document.createElement('video');
-    video.srcObject = stream; video.muted = true;
-    await video.play();
-    await new Promise((r) => setTimeout(r, 240));   // let the crop apply + a frame paint
+    // grab one frame (ImageCapture is most reliable; fall back to a <video>)
+    let frame, fw, fh;
+    try {
+      frame = await new ImageCapture(track).grabFrame();
+      fw = frame.width; fh = frame.height;
+    } catch {
+      const v = document.createElement('video');
+      v.srcObject = stream; v.muted = true; await v.play();
+      await new Promise((r) => setTimeout(r, 160));
+      frame = v; fw = v.videoWidth; fh = v.videoHeight;
+    }
 
-    let sx = 0, sy = 0, sw = video.videoWidth, sh = video.videoHeight;
-    if (!cropped) {
-      const scale = video.videoWidth / window.innerWidth;
-      const r = el.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const r = el.getBoundingClientRect();
+    // If cropTo really worked the frame is element-sized; otherwise crop the full-tab frame
+    // ourselves (this also rescues the case where cropTo resolves but doesn't actually crop).
+    const looksCropped = cropped && Math.abs(fw - r.width * dpr) < r.width * dpr * 0.5;
+    let sx = 0, sy = 0, sw = fw, sh = fh;
+    if (!looksCropped) {
+      const scale = fw / window.innerWidth;
       sx = Math.max(0, Math.round(r.left * scale));
       sy = Math.max(0, Math.round(r.top * scale));
       sw = Math.max(1, Math.round(r.width * scale));
@@ -189,7 +201,7 @@ export async function captureElement(el, name = 'experiment-five.png') {
     }
     const c = document.createElement('canvas');
     c.width = sw; c.height = sh;
-    c.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
+    c.getContext('2d').drawImage(frame, sx, sy, sw, sh, 0, 0, sw, sh);
     c.toBlob((blob) => download(blob, name), 'image/png');
   } catch (err) {
     console.warn('[showcase] image export cancelled/failed', err);
