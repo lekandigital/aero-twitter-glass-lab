@@ -58,12 +58,12 @@ function build(branches) {
   items = branches.map((b, i) => {
     const h = createPanel(b); h.hideText = true;
     const { el, view, ref } = makeCard('panel', `${b.label} · Save ${b.save}`, h.iframe, true);
-    el.addEventListener('click', () => { if (mode === 'grid') focus(i, true); });
+    el.addEventListener('click', () => openFromGrid(i));
     return { el, view, ref, handle: h, kind: 'panel', label: b.label, save: b.save };
   });
   const img = document.createElement('img'); img.src = REF_SRC; img.alt = 'Reference'; img.className = 'ref-full';
   const { el, view } = makeCard('ref', 'Reference target', img, false);
-  el.addEventListener('click', () => { if (mode === 'grid') focus(refIndex(), true); });
+  el.addEventListener('click', () => openFromGrid(refIndex()));
   items.push({ el, view, kind: 'ref', label: 'Reference' });
   buildRail();
 }
@@ -74,7 +74,7 @@ function buildRail() {
     const b = document.createElement('button');
     b.className = 'railitem' + (it.kind === 'ref' ? ' railitem--ref' : '');
     b.innerHTML = it.kind === 'ref' ? `<span>Reference</span><em>target</em>` : `<span>${it.label}</span><em>Save ${it.save}</em>`;
-    b.addEventListener('click', () => focus(i));
+    b.addEventListener('click', () => openItem(i));
     railEl.appendChild(b);
   });
 }
@@ -141,11 +141,16 @@ function setMode(m) {
   buildCtl();
   layout();
 }
-function focus(itemIndex, fullscreen) {
+function openItem(itemIndex) {
   rebuildNav();
   navPos = Math.max(0, nav.indexOf(itemIndex));
   setMode('focus');
-  if (fullscreen) goFullscreen();
+}
+// Grid tile click: request fullscreen FIRST (while the click gesture is fresh), then focus.
+function openFromGrid(itemIndex) {
+  if (mode !== 'grid') return;
+  goFullscreen();
+  openItem(itemIndex);
 }
 function step(dir) { navPos = (navPos + dir + nav.length) % nav.length; layout(); }
 
@@ -190,6 +195,7 @@ function toggle(label, checked, onchange, disabled) {
   document.getElementById('shot').onclick = () => captureElement(current().view, `experiment-five-${current().label.replace(/\s+/g, '-').toLowerCase()}.png`);
   document.getElementById('full').onclick = () => toggleFullscreen(document.documentElement);
   window.addEventListener('resize', layout);
+  document.addEventListener('fullscreenchange', () => setTimeout(layout, 60)); // rescale into/out of fullscreen
   window.addEventListener('keydown', (e) => {
     if (mode !== 'focus') return;
     if (e.key === 'ArrowRight') step(1);
