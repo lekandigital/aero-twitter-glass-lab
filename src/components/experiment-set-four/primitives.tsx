@@ -77,6 +77,7 @@ export function ExperimentFourLayerBSheet({ nested = false }: { nested?: boolean
       <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--right" aria-hidden="true" />
       <GlassFrostSurface />
       <span className="experiment-four-layer-b__shine" aria-hidden="true" {...e4InspectAttrs('layer-b-shine')} />
+      <span className="experiment-four-layer-b__refraction" aria-hidden="true" />
       <span
         className="experiment-four-layer-b__radial-corners"
         aria-hidden="true"
@@ -120,6 +121,8 @@ export function ExperimentFourLayerASheet({ nestedB = false }: { nestedB?: boole
     >
       <span className="experiment-four-layer-a__bezel-rim" aria-hidden="true" {...e4InspectAttrs('layer-a-rim')} />
       <GlassFrostSurface />
+      <span className="experiment-four-layer-a__shine" aria-hidden="true" />
+      <span className="experiment-four-layer-a__refraction" aria-hidden="true" />
       <span className="experiment-four-layer-a__bezel-rim-edge experiment-four-layer-a__bezel-rim-edge--top" aria-hidden="true" />
       <span className="experiment-four-layer-a__bezel-rim-edge experiment-four-layer-a__bezel-rim-edge--bottom" aria-hidden="true" />
       <span
