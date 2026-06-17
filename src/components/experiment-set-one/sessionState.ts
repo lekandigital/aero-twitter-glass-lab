@@ -13,6 +13,7 @@ import {
   E3_MASTER_DEFAULT,
   E4_MASTER_DEFAULT,
 } from './masterDefaults';
+import { SAVE_74_ID } from './builtInSave74';
 
 import {
   DEFAULT_EXPERIMENT_VISIBILITY,
@@ -55,7 +56,7 @@ export function defaultSession(): ExperimentSetOneSession {
     experimentVisible: DEFAULT_EXPERIMENT_VISIBILITY,
     referenceWallpaper: false,
     activeExperiment: 'four',
-    selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: null },
+    selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: SAVE_74_ID },
     cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
     layerEditMode: 'both',
   };

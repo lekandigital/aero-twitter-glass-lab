@@ -82,6 +82,9 @@ import {
   E5_BORDER_REFINEMENTS_VERSION,
   refineExperimentFivePanels,
 } from '../experiment-set-five/borderCornerRefinements';
+import { e5LayoutPresetFromSaves } from '../experiment-set-five/e5PanelLayout';
+import { SAVE_74_ID } from './builtInSave74';
+import { builtInSave74 } from './builtInSave74';
 import { clearAllExperimentSetOnePositions, EXPERIMENT_SET_ONE_POSITION_KEYS, loadDragPosition } from './dragPositions';
 import {
   defaultSession,
@@ -97,6 +100,7 @@ import {
 import { clearInspectFlash, flashInspectElement } from '../shared/inspectFlash';
 import { useReferenceWallpaper } from '../shared/useReferenceWallpaper';
 import { buildExperimentSetOneConfigText } from './exportConfig';
+import { ExperimentOneRefractionFilterDefs } from '../experiment-one/primitives';
 import { downloadTextFile } from '../../utils/downloadTextFile';
 
 const E1_SECTION_ORDER = [
@@ -157,37 +161,22 @@ export function useExperimentSetOne() {
   return ctx;
 }
 
-function e5LayoutPresetFromSaves() {
-  const all = loadExperimentSetOneSaves();
-  const save19 = all.find((s) => s.id === 19 || s.label === 'Save 19');
-  const e4Settings = save19?.e4;
-  if (!e4Settings) return null;
-  return {
-    layerAWidth: e4Settings.layerAWidth,
-    layerAHeight: e4Settings.layerAHeight,
-    layerABezelInsetX: e4Settings.layerABezelInsetX,
-    layerABezelInsetY: e4Settings.layerABezelInsetY,
-    layerACornerRadius: e4Settings.layerACornerRadius,
-  } as const;
-}
-
 function applyE5OverridesStatic(raw: E4MaterialSettings): E4MaterialSettings {
-  const next = {
+  return syncE4LayerBLayoutFromBezel({
     ...raw,
-    ...(e5LayoutPresetFromSaves() ?? {}),
+    ...e5LayoutPresetFromSaves(),
     layerBNestedInA: true,
-  } as E4MaterialSettings;
-  return syncE4LayerBLayoutFromBezel(next);
+  });
 }
 
 function resolveInitialE5(boot: ExperimentSetOneSession): E4MaterialSettings {
   if (boot.e5) return normalizeE4MaterialSettings(boot.e5);
-  const selectedSaveId = boot.selectedSaveIdByExperiment?.five;
-  if (selectedSaveId != null) {
-    const snapshot = loadExperimentSetOneSaves().find((save) => save.id === selectedSaveId);
-    if (snapshot?.e4) {
-      return applyE5OverridesStatic(normalizeE4MaterialSettings(snapshot.e4));
-    }
+  const selectedSaveId = boot.selectedSaveIdByExperiment?.five ?? SAVE_74_ID;
+  const snapshot =
+    loadExperimentSetOneSaves().find((save) => save.id === selectedSaveId) ??
+    builtInSave74();
+  if (snapshot.e4) {
+    return applyE5OverridesStatic(normalizeE4MaterialSettings(snapshot.e4));
   }
   return applyE5OverridesStatic(normalizeE4MaterialSettings(boot.e4));
 }
@@ -284,7 +273,7 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
   useEffect(() => {
     if (activeExperiment !== 'five') return;
     if (e5BorderRefinementsVersion >= E5_BORDER_REFINEMENTS_VERSION) return;
-    setE5State((prev) => refineExperimentFivePanels(prev));
+    setE5State((prev) => applyE5OverridesStatic(refineExperimentFivePanels(prev)));
     setE5BorderRefinementsVersion(E5_BORDER_REFINEMENTS_VERSION);
   }, [activeExperiment, e5BorderRefinementsVersion]);
 
@@ -521,7 +510,10 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
         data-e3-inspect-mode={inspectMode}
         data-e4-inspect-mode={inspectMode}
         data-hide-panel-text={hidePanelText}
+        data-selected-save-five={selectedSaveIdByExperiment.five ?? ''}
+        data-selected-save-four={selectedSaveIdByExperiment.four ?? ''}
       >
+        <ExperimentOneRefractionFilterDefs />
         {children}
       </div>
     </ExperimentSetOneContext.Provider>
@@ -1058,7 +1050,7 @@ export function ExperimentSetOneSettingsDock() {
               <ExperimentMultiLayerSettings
                 experimentKey="e5"
                 title="Experiment Five"
-                description="Copy of Experiment Four saves with forced nested bezel + Save 19 layout footprint."
+                description="Copy of Experiment Four saves with forced nested bezel + Save 28/19 layout footprint."
                 filtering={filtering}
                 fields={visibleE5Fields}
                 sectionOrder={E4_SECTION_ORDER}

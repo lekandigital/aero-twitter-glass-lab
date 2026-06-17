@@ -2,6 +2,7 @@ import { e4InspectAttrs, e4LayerADimensionStyle, e4LayerBDimensionStyle } from '
 import { useExperimentSetOne } from '../experiment-set-one/combinedSettings';
 import { ExperimentTwoDraggableSheet } from '../experiment-set-two/primitives';
 import { GlassFrostSurface } from '../shared/GlassFrostSurface';
+import { BezelCornerCaps } from '../shared/BezelCornerCaps';
 import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/PwzzovOGlassCorners';
 import type { E4MaterialSettings } from '../experiment-set-four/materialSettings';
 
@@ -75,8 +76,14 @@ function ExperimentFiveLayerBSheet() {
       <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--bottom" aria-hidden="true" />
       <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--left" aria-hidden="true" />
       <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--right" aria-hidden="true" />
+      <BezelCornerCaps layerClass="experiment-four-layer-b" />
       <GlassFrostSurface />
       <span className="experiment-four-layer-b__shine" aria-hidden="true" {...e4InspectAttrs('layer-b-shine')} />
+      <span
+        className="experiment-four-layer-b__refraction"
+        aria-hidden="true"
+        {...e4InspectAttrs('layer-b-refraction')}
+      />
       <span
         className="experiment-four-layer-b__radial-corners"
         aria-hidden="true"
@@ -125,6 +132,13 @@ function ExperimentFiveLayerASheet() {
       <span
         className="experiment-four-layer-a__bezel-rim-side experiment-four-layer-a__bezel-rim-side--right"
         aria-hidden="true"
+      />
+      <BezelCornerCaps layerClass="experiment-four-layer-a" />
+      <span className="experiment-four-layer-a__shine" aria-hidden="true" {...e4InspectAttrs('layer-a-shine')} />
+      <span
+        className="experiment-four-layer-a__refraction"
+        aria-hidden="true"
+        {...e4InspectAttrs('layer-a-refraction')}
       />
       <span
         className="experiment-four-layer-a__radial-corners"
