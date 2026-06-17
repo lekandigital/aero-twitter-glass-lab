@@ -3,34 +3,36 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Experiment Five — Switcher</title>
+    <title>Experiment Five — Compare A/B</title>
     <link rel="stylesheet" href="showcase.css" />
   </head>
   <body>
     <header class="topbar">
-      <h1>Experiment Five · Switcher</h1>
+      <h1>Experiment Five · Compare (A/B swipe)</h1>
       <nav class="viewnav">
         <a href="index.html">Stage</a>
-        <a href="switch.html" class="active">Switcher</a>
-        <a href="compare.html">Compare (A/B)</a>
+        <a href="switch.html">Switcher</a>
+        <a href="compare.html" class="active">Compare (A/B)</a>
       </nav>
     </header>
 
     <div class="toolbar">
-      <div class="tool-group" id="chips"></div>
-      <div class="tool-sep"></div>
-      <button class="btn" id="prev" title="Previous">‹</button>
-      <button class="btn" id="next" title="Next">›</button>
+      <label class="sel">Left (A) <select id="selA"></select></label>
+      <label class="sel">Right (B) <select id="selB"></select></label>
       <div class="tool-sep"></div>
       <label class="toggle"><input type="checkbox" id="bg" /> Reference bg</label>
       <label class="toggle"><input type="checkbox" id="text" /> Show text</label>
+      <button class="btn" id="center" title="Center divider">↔ Center</button>
       <button class="btn" id="fs" title="Fullscreen">⛶ Fullscreen</button>
+      <span class="hint">Drag the divider to wipe between A and B at the same position.</span>
     </div>
 
     <div class="stagewrap stagewrap--fill" id="stagewrap">
-      <div class="stage" id="stage"></div>
+      <div class="stage" id="stage">
+        <div class="divider" id="divider"><div class="divider__handle">⇆</div></div>
+      </div>
     </div>
 
-    <script type="module" src="switch.js"></script>
+    <script type="module" src="compare.js"></script>
   </body>
 </html>

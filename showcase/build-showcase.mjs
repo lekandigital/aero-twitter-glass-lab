@@ -139,8 +139,11 @@ function archiveBranch(b, worktree, outDir) {
 function copyHarness() {
   mkdirSync(DIST, { recursive: true });
   for (const f of readdirSync(SRC)) cpSync(join(SRC, f), join(DIST, f));
-  // Shared background at the site root (branch builds hardcode an absolute /aero-bg.png).
+  // Shared backgrounds at the site root: aero-bg.png (branch builds hardcode an absolute
+  // /aero-bg.png) plus reference.png, which views switch to at runtime.
   cpSync(join(REPO, 'public', 'aero-bg.png'), join(DIST, 'aero-bg.png'));
+  if (existsSync(join(REPO, 'public', 'reference.png')))
+    cpSync(join(REPO, 'public', 'reference.png'), join(DIST, 'reference.png'));
   writeFileSync(join(DIST, 'branches.json'), JSON.stringify(BRANCHES.map(({ slug, label, save }) => ({ slug, label, save })), null, 2));
 }
 

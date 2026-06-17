@@ -4,10 +4,18 @@ A self-contained static site that renders the Experiment-Five glass panel from *
 branches** side by side, all against the **same background** at the **same fixed panel
 geometry/position**, so the glass treatments can be compared directly against the reference.
 
-- `dist/index.html` — **grid** view (all six at once)
-- `dist/switch.html` — **switcher** view (flip branches in the exact same spot)
+- `dist/index.html` — **Stage**: all branches stacked at one shared X/Y; flip between them
+  (same position), Free-move drag, Snap to set position, current/reference bg, zoom, fullscreen.
+- `dist/switch.html` — **Switcher**: one panel as big as the screen allows (same size/position
+  relative to the bg), text hidden by default, fullscreen.
+- `dist/compare.html` — **Compare (A/B swipe)**: two branches over the same seamless bg with a
+  draggable divider — before/after wipe at the identical position.
 - `archive/<slug>/` — per-branch exact CSS, style-computing JS, compiled CSS bundle, and a
   `meta.json` recipe (commit + applied geometry)
+
+Backgrounds live inside each iframe (backdrop-filter only samples its own document), so panels
+are compared by switching/swiping rather than overlaying transparent layers. Panel POSITION is
+controlled at runtime via an injected `#showcase-ctl` <style>; SIZE/chrome via `normalize.css`.
 
 ## How it works
 
