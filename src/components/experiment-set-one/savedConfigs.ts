@@ -13,13 +13,14 @@ import {
   REFERENCE_CORNER_SAVE_ID,
   REFERENCE_CORNER_SAVE_LABEL,
 } from '../experiment-set-four/referenceCornerLighting';
-import { SAVE_20_ID, builtInSave20 } from './builtInSave20';
-import { SAVE_21_ID, builtInSave21 } from './builtInSave21';
-import { SAVE_22_ID, builtInSave22 } from './builtInSave22';
+import committedSavesJson from '../../data/experiment-set-one/saves.json';
+import { downloadTextFile } from '../../utils/downloadTextFile';
 
 // Earliest exported config in ~/Downloads that includes Experiment Four.
 // Used only as a one-time migration heuristic for older saves.
 const E4_BEGIN_CUTOFF_ISO = '2026-06-16T00:47:50.565Z';
+const STORAGE_KEY = 'experiment-set-1-saved-configs';
+const SAVES_API = '/api/experiment-set-one/saves';
 
 export type ExperimentSetOneSnapshot = {
   id: number;
@@ -35,7 +36,8 @@ export type ExperimentSetOneSnapshot = {
   cornersOnly?: boolean;
 };
 
-const STORAGE_KEY = 'experiment-set-1-saved-configs';
+const committedSaves = (committedSavesJson as ExperimentSetOneSnapshot[]).map(migrateSnapshotScope);
+let runtimeSaves: ExperimentSetOneSnapshot[] | null = null;
 let memoryStorageFallback: ExperimentSetOneSnapshot[] | null = null;
 
 function builtInReferenceCornerSave(): ExperimentSetOneSnapshot {
@@ -70,7 +72,6 @@ function dedupeSnapshots(saves: ExperimentSetOneSnapshot[]) {
   const seen = new Set<string>();
   const next: ExperimentSetOneSnapshot[] = [];
   for (const save of saves) {
-    // Only dedupe full material snapshots (the built-in "cornersOnly" entry isn't in storage).
     if (save.cornersOnly) {
       next.push(save);
       continue;
@@ -95,46 +96,32 @@ function migrateSnapshotScope(save: ExperimentSetOneSnapshot): ExperimentSetOneS
   return { ...save, scope: savedAtMs < cutoffMs ? 'three' : 'four' };
 }
 
-function readStorage(): ExperimentSetOneSnapshot[] {
+function repoSaves(): ExperimentSetOneSnapshot[] {
+  return runtimeSaves ?? committedSaves;
+}
+
+function committedSaveIds(): Set<number> {
+  return new Set(repoSaves().map((save) => save.id));
+}
+
+function readLegacyStorage(): ExperimentSetOneSnapshot[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as ExperimentSetOneSnapshot[];
     if (!Array.isArray(parsed)) return [];
-    // If older sessions created user saves with ids that are now reserved for built-ins (20/21),
-    // remap them instead of dropping data.
-    const used = new Set<number>();
-    const migrated = parsed.map(migrateSnapshotScope).map((save) => {
-      let next = save;
-      if (isReservedSaveId(next.id)) {
-        const newId = nextAvailableSaveId(new Set([...used, ...parsed.map((s) => s.id)]));
-        next = { ...next, id: newId, label: `Save ${newId}` };
-      }
-      used.add(next.id);
-      return next;
-    });
-    const deduped = dedupeSnapshots(migrated);
-    if (deduped.length !== parsed.length || migrated.some((s, i) => s.scope !== parsed[i]?.scope)) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(deduped));
-      } catch {
-        memoryStorageFallback = deduped;
-      }
-    }
-    return deduped;
+    return dedupeSnapshots(parsed.map(migrateSnapshotScope));
   } catch {
     return memoryStorageFallback ?? [];
   }
 }
 
-function writeStorage(saves: ExperimentSetOneSnapshot[]) {
+function clearLegacyStorage() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(saves));
+    localStorage.removeItem(STORAGE_KEY);
     memoryStorageFallback = null;
   } catch {
-    // If persistent storage is blocked (privacy mode, quota, etc.),
-    // keep saves working for the current tab session.
-    memoryStorageFallback = saves;
+    memoryStorageFallback = null;
   }
 }
 
@@ -144,7 +131,7 @@ function withNormalizedE4(save: ExperimentSetOneSnapshot): ExperimentSetOneSnaps
 }
 
 function isReservedSaveId(id: number): boolean {
-  return id === REFERENCE_CORNER_SAVE_ID || id === SAVE_20_ID || id === SAVE_21_ID || id === SAVE_22_ID;
+  return id === REFERENCE_CORNER_SAVE_ID || committedSaveIds().has(id);
 }
 
 function nextAvailableSaveId(existingIds: Set<number>): number {
@@ -153,36 +140,65 @@ function nextAvailableSaveId(existingIds: Set<number>): number {
   return id;
 }
 
+function assembleSaveList(storage: ExperimentSetOneSnapshot[]): ExperimentSetOneSnapshot[] {
+  const materialSaves = dedupeSnapshots(storage.filter((save) => !save.cornersOnly && save.id !== REFERENCE_CORNER_SAVE_ID))
+    .sort((a, b) => a.id - b.id)
+    .map(withNormalizedE4);
+  return [builtInReferenceCornerSave(), ...materialSaves];
+}
+
 export function loadExperimentSetOneSaves(): ExperimentSetOneSnapshot[] {
-  // Order (for UI): reference corners, then user saves up to and including Save 19,
-  // then built-in Save 20, Save 21, and Save 22, then remaining user saves.
-  //
-  // This guarantees Save 20/21/22 appear after Save 19 even when Save 19 lives in localStorage.
-  const storage = readStorage();
-  const idx19 = storage.findIndex((s) => s.id === 19 || s.label === 'Save 19');
-  if (idx19 === -1) {
-    return [
-      builtInReferenceCornerSave(),
-      ...storage,
-      withNormalizedE4(builtInSave20()),
-      withNormalizedE4(builtInSave21()),
-      withNormalizedE4(builtInSave22()),
-    ];
-  }
-  const before = storage.slice(0, idx19 + 1);
-  const after = storage.slice(idx19 + 1);
-  return [
-    builtInReferenceCornerSave(),
-    ...before,
-    withNormalizedE4(builtInSave20()),
-    withNormalizedE4(builtInSave21()),
-    withNormalizedE4(builtInSave22()),
-    ...after,
-  ];
+  return assembleSaveList(repoSaves());
 }
 
 export function getBuiltInReferenceCornerSave(): ExperimentSetOneSnapshot {
   return builtInReferenceCornerSave();
+}
+
+export function setExperimentSetOneRuntimeSaves(saves: ExperimentSetOneSnapshot[]) {
+  runtimeSaves = dedupeSnapshots(saves.map(migrateSnapshotScope));
+}
+
+export async function hydrateExperimentSetOneSaves(): Promise<boolean> {
+  const legacy = readLegacyStorage();
+  if (legacy.length === 0) return false;
+
+  try {
+    const res = await fetch(`${SAVES_API}/merge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(legacy),
+    });
+    if (!res.ok) throw new Error(`merge failed: ${res.status}`);
+    const saves = (await res.json()) as ExperimentSetOneSnapshot[];
+    setExperimentSetOneRuntimeSaves(saves);
+    clearLegacyStorage();
+    return true;
+  } catch {
+    const merged = dedupeSnapshots([...repoSaves(), ...legacy]);
+    setExperimentSetOneRuntimeSaves(merged);
+    return true;
+  }
+}
+
+async function persistSaveToRepo(snapshot: ExperimentSetOneSnapshot): Promise<boolean> {
+  try {
+    const res = await fetch(SAVES_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(snapshot),
+    });
+    if (!res.ok) return false;
+    const saves = (await res.json()) as ExperimentSetOneSnapshot[];
+    setExperimentSetOneRuntimeSaves(saves);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function downloadSaveJson(snapshot: ExperimentSetOneSnapshot) {
+  downloadTextFile(`save-${snapshot.id}.json`, `${JSON.stringify(snapshot, null, 2)}\n`);
 }
 
 export function addExperimentSetOneSave(
@@ -192,10 +208,10 @@ export function addExperimentSetOneSave(
   e4: E4MaterialSettings,
   scope: ExperimentId,
 ): ExperimentSetOneSnapshot {
-  const existing = readStorage();
+  const existing = repoSaves();
   const ids = new Set(existing.map((s) => s.id));
   const id = nextAvailableSaveId(ids);
-  const snapshot: ExperimentSetOneSnapshot = {
+  const snapshot: ExperimentSetOneSnapshot = migrateSnapshotScope({
     id,
     label: `Save ${id}`,
     savedAt: new Date().toISOString(),
@@ -204,8 +220,11 @@ export function addExperimentSetOneSave(
     e3,
     e4,
     scope,
-  };
-  writeStorage([...existing, snapshot]);
+  });
+  setExperimentSetOneRuntimeSaves([...existing, snapshot]);
+  void persistSaveToRepo(snapshot).then((ok) => {
+    if (!ok) downloadSaveJson(snapshot);
+  });
   return snapshot;
 }
 
