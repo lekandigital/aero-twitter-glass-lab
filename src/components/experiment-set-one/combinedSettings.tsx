@@ -74,6 +74,7 @@ import { downloadExperimentSetOneConfig } from './exportConfig';
 import {
   addExperimentSetOneSave,
   getFieldFromSnapshot,
+  hydrateExperimentSetOneSaves,
   loadExperimentSetOneSaves,
   type ExperimentSetOneSnapshot,
 } from './savedConfigs';
@@ -228,6 +229,12 @@ export function ExperimentSetOneProvider({ children }: { children: ReactNode }) 
     return () => {
       document.body.style.overflow = prev;
     };
+  }, []);
+
+  useEffect(() => {
+    void hydrateExperimentSetOneSaves().then((changed) => {
+      if (changed) setSaves(loadExperimentSetOneSaves());
+    });
   }, []);
 
   const style = useMemo(
