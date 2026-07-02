@@ -119,7 +119,7 @@ export function ExperimentSetTwoDraggableShell({
             ? isFixed
               ? { left: position.x, top: position.y }
               : { transform: `translate(${position.x}px, ${position.y}px)` }
-            : { visibility: 'hidden' }
+            : undefined
         }
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}

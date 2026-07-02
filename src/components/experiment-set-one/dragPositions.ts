@@ -13,6 +13,7 @@ export const EXPERIMENT_SET_ONE_POSITION_KEYS = {
   layerB: 'exp-set-1:layer-b',
   layerA4: 'exp-set-1:layer-a-4',
   layerB4: 'exp-set-1:layer-b-4',
+  layerC6: 'exp-set-1:layer-c-6',
   layerA5: 'exp-set-1:layer-a-5',
 } as const;
 

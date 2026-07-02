@@ -43,7 +43,7 @@ const REFERENCE_LEFT_PANEL_SHAPE_OVERRIDES = {
 /**
  * PwzzovO glass reflex — per-corner asymmetry from reference (strong TL, soft TR, faint bottom).
  */
-const REFERENCE_GLASS_REFLEX_OVERRIDES = {
+export const REFERENCE_GLASS_REFLEX_OVERRIDES = {
   layerAGlassReflexMode: 3,
   layerAGlassReflexTlLight: 1.38,
   layerAGlassReflexTlDark: 0.38,

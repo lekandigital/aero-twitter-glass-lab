@@ -1,21 +1,26 @@
 import type { LayerEditMode } from './layerEditMode';
 
-const OPTIONS: { value: LayerEditMode; label: string; shortLabel: string }[] = [
+const BASE_OPTIONS: { value: LayerEditMode; label: string; shortLabel: string }[] = [
   { value: 'both', label: 'Both layers', shortLabel: 'Both' },
   { value: 'layerA', label: 'Layer A', shortLabel: 'A' },
   { value: 'layerB', label: 'Layer B', shortLabel: 'B' },
 ];
 
+const LAYER_C_OPTION = { value: 'layerC' as const, label: 'Layer C', shortLabel: 'C' };
+
 export function LayerEditModeToggle({
   value,
   onChange,
   layout = 'horizontal',
+  showLayerC = false,
 }: {
   value: LayerEditMode;
   onChange: (mode: LayerEditMode) => void;
   layout?: 'horizontal' | 'side';
+  showLayerC?: boolean;
 }) {
   const isSide = layout === 'side';
+  const options = showLayerC ? [...BASE_OPTIONS, LAYER_C_OPTION] : BASE_OPTIONS;
 
   return (
     <div
@@ -23,7 +28,7 @@ export function LayerEditModeToggle({
       role="group"
       aria-label="Layer edit mode"
     >
-      {OPTIONS.map((option) => (
+      {options.map((option) => (
         <button
           key={option.value}
           type="button"

@@ -1,3 +1,4 @@
+/** Draggable panels for Experiment Set 1 — positions persist across refresh. */
 import {
   ExperimentOneDraggablePanel,
   ExperimentOneGlassPanel,
@@ -11,20 +12,14 @@ import {
   ExperimentThreeDraggableLayerA,
   ExperimentThreeDraggableLayerB,
 } from '../experiment-set-three/primitives';
-import {
-  ExperimentFourDraggableLayerA,
-  ExperimentFourDraggableLayerB,
-} from '../experiment-set-four/primitives';
-import { ExperimentFiveDraggableLayerA } from '../experiment-set-five/primitives';
-import { EXPERIMENT_SET_ONE_POSITION_KEYS, loadDragPosition } from './dragPositions';
+import { EXPERIMENT_SET_ONE_POSITION_KEYS } from './dragPositions';
 import { useExperimentSetOne } from './combinedSettings';
+import { VariantPanelSlots } from './VariantPanelSlots';
 
-/** Draggable panels for Experiment Set 1 — positions persist across refresh. */
 export function ExperimentSetOneStage() {
-  const { layoutResetVersion, activeExperiment, experimentVisible, e4 } = useExperimentSetOne();
+  const { layoutResetVersion, activeExperiment, e4, e7 } = useExperimentSetOne();
   const nestedB = e4.layerBNestedInA;
-  const show = (id: keyof typeof experimentVisible) => id === activeExperiment;
-  const e5Position = loadDragPosition(EXPERIMENT_SET_ONE_POSITION_KEYS.layerA4) ?? { x: 40, y: 48 };
+  const show = (id: 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven') => id === activeExperiment;
 
   return (
     <main className="experiment-set-one-stage" aria-label="Experiment Set 1 panel stage">
@@ -86,29 +81,37 @@ export function ExperimentSetOneStage() {
         )}
 
         {show('four') && (
-          <>
-            <ExperimentFourDraggableLayerA
-              initialPosition={{ x: 40, y: 48 }}
-              persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerA4}
-              layoutResetVersion={layoutResetVersion}
-              nestedB={nestedB}
-            />
-            {!nestedB && (
-              <ExperimentFourDraggableLayerB
-                initialPosition={{ x: 52, y: 60 }}
-                persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerB4}
-                layoutResetVersion={layoutResetVersion}
-              />
-            )}
-          </>
+          <VariantPanelSlots
+            experiment="four"
+            layoutResetVersion={layoutResetVersion}
+            nestedB={nestedB}
+          />
         )}
 
         {show('five') && (
-          <ExperimentFiveDraggableLayerA
-            initialPosition={e5Position}
+          <VariantPanelSlots
+            experiment="five"
             layoutResetVersion={layoutResetVersion}
+            nestedB={nestedB}
           />
         )}
+
+        {show('six') && (
+          <VariantPanelSlots
+            experiment="six"
+            layoutResetVersion={layoutResetVersion}
+            nestedB={true}
+          />
+        )}
+
+        {show('seven') && (
+          <VariantPanelSlots
+            experiment="seven"
+            layoutResetVersion={layoutResetVersion}
+            nestedB={e7.layerBNestedInA}
+          />
+        )}
+
       </div>
     </main>
   );

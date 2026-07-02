@@ -15,12 +15,15 @@ import {
 } from '../experiment-set-four/referenceCornerLighting';
 import committedSavesJson from '../../data/experiment-set-one/saves.json';
 import { downloadTextFile } from '../../utils/downloadTextFile';
+import { renderVariantForSaveId, type RenderVariantSlug } from '../../render-variants/manifest';
 
 // Earliest exported config in ~/Downloads that includes Experiment Four.
 // Used only as a one-time migration heuristic for older saves.
 const E4_BEGIN_CUTOFF_ISO = '2026-06-16T00:47:50.565Z';
 const STORAGE_KEY = 'experiment-set-1-saved-configs';
 const SAVES_API = '/api/experiment-set-one/saves';
+
+export type SaveScope = ExperimentId | 'general';
 
 export type ExperimentSetOneSnapshot = {
   id: number;
@@ -31,9 +34,17 @@ export type ExperimentSetOneSnapshot = {
   e3: E3MaterialSettings;
   e4?: Partial<E4MaterialSettings>;
   /** Which experiment this save is meant for (used to filter saves list + load behavior). */
-  scope?: ExperimentId;
+  scope?: SaveScope;
   /** When true, loading only merges Experiment Four corner lighting fields. */
   cornersOnly?: boolean;
+  /** When set, loading this save activates the branch render pipeline. */
+  branchVariant?: RenderVariantSlug;
+  /** Experiment Six clone — original branch save id for variant routing. */
+  sourceSaveId?: number;
+  /** General-scope preset id (e.g. accidental glitch captures). */
+  generalPreset?: string;
+  /** Stage drag position for general presets (experiment-four layer A slot). */
+  panelPosition?: { x: number; y: number };
 };
 
 const committedSaves = (committedSavesJson as ExperimentSetOneSnapshot[]).map(migrateSnapshotScope);
@@ -61,6 +72,8 @@ function sortedRecord<T extends Record<string, unknown>>(value: T): Record<strin
 
 function snapshotFingerprint(snapshot: ExperimentSetOneSnapshot): string {
   return JSON.stringify({
+    scope: snapshot.scope ?? null,
+    sourceSaveId: snapshot.sourceSaveId ?? null,
     e1: sortedRecord(snapshot.e1 as Record<string, unknown>),
     e2: sortedRecord(snapshot.e2 as Record<string, unknown>),
     e3: sortedRecord(snapshot.e3 as Record<string, unknown>),
@@ -125,9 +138,14 @@ function clearLegacyStorage() {
   }
 }
 
+function withBranchVariant(save: ExperimentSetOneSnapshot): ExperimentSetOneSnapshot {
+  const variant = renderVariantForSaveId(save.id);
+  return variant ? { ...save, branchVariant: variant.slug } : save;
+}
+
 function withNormalizedE4(save: ExperimentSetOneSnapshot): ExperimentSetOneSnapshot {
-  if (!save.e4) return save;
-  return { ...save, e4: normalizeE4MaterialSettings(save.e4) };
+  if (!save.e4) return withBranchVariant(save);
+  return withBranchVariant({ ...save, e4: normalizeE4MaterialSettings(save.e4) });
 }
 
 function isReservedSaveId(id: number): boolean {
@@ -206,7 +224,7 @@ export function addExperimentSetOneSave(
   e2: E2MaterialSettings,
   e3: E3MaterialSettings,
   e4: E4MaterialSettings,
-  scope: ExperimentId,
+  scope: SaveScope,
 ): ExperimentSetOneSnapshot {
   const existing = repoSaves();
   const ids = new Set(existing.map((s) => s.id));
@@ -230,7 +248,7 @@ export function addExperimentSetOneSave(
 
 export function getFieldFromSnapshot(
   snapshot: ExperimentSetOneSnapshot,
-  experiment: 'one' | 'two' | 'three' | 'four',
+  experiment: 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven',
   fieldId: string,
 ): string | number | boolean | undefined {
   if (experiment === 'four' && snapshot.id === REFERENCE_CORNER_SAVE_ID) {
@@ -239,7 +257,7 @@ export function getFieldFromSnapshot(
     if (override !== undefined) return override;
     return undefined;
   }
-  if (experiment === 'four') {
+  if (experiment === 'four' || experiment === 'five' || experiment === 'six' || experiment === 'seven') {
     if (!snapshot.e4) return undefined;
     return snapshot.e4[fieldId as keyof E4MaterialSettings] as string | number | boolean;
   }

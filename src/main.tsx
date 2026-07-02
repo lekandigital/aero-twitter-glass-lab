@@ -12,9 +12,13 @@ import './styles/approach-two.css';
 import './styles/experiment-one.css';
 import './styles/experiment-set-two.css';
 import './styles/experiment-set-three.css';
-import './styles/experiment-set-four.css';
+// experiment-set-four.css is injected scoped per render-variant (incl. the default
+// no-variant state) by src/render-variants/injectVariantStyles.ts, so it is NOT
+// imported globally here — that would leak main's rules into active variants.
+import './styles/showcase-align.css';
 import './styles/glass-frost-surface.css';
 import './styles/material-settings.css';
+import './styles/experiment-set-six.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

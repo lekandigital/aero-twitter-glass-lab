@@ -15,6 +15,14 @@ import {
 
 type ResetTarget<T> = { label: string; value: T };
 
+type AlternateFieldConfig = {
+  values: Record<string, unknown>;
+  defaults: Record<string, unknown>;
+  onChange: (id: string, value: unknown) => void;
+  resetTargets?: (fieldId: string) => ResetTarget<unknown>[];
+  fieldIds: ReadonlySet<string>;
+};
+
 type ExperimentMultiLayerSettingsProps<TSettings extends Record<string, unknown>> = {
   experimentKey: string;
   title: string;
@@ -29,14 +37,15 @@ type ExperimentMultiLayerSettingsProps<TSettings extends Record<string, unknown>
   onPairedChange: (suffix: string, value: TSettings[keyof TSettings]) => void;
   resetTargets: (
     masterValue: TSettings[keyof TSettings],
-    experiment: 'three' | 'four',
+    experiment: 'three' | 'four' | 'five' | 'six' | 'seven',
     fieldId: string,
     saves: ExperimentSetOneSnapshot[],
   ) => ResetTarget<TSettings[keyof TSettings]>[];
   scopedSaves: ExperimentSetOneSnapshot[];
-  saveExperiment: 'three' | 'four';
+  saveExperiment: 'three' | 'four' | 'five' | 'six' | 'seven';
   isOpen: (id: string) => boolean;
   onToggle: (id: string) => void;
+  alternateFields?: AlternateFieldConfig;
 };
 
 export function ExperimentMultiLayerSettings<TSettings extends Record<string, unknown>>({
@@ -56,6 +65,7 @@ export function ExperimentMultiLayerSettings<TSettings extends Record<string, un
   saveExperiment,
   isOpen,
   onToggle,
+  alternateFields,
 }: ExperimentMultiLayerSettingsProps<TSettings>) {
   const displayFields = transformFieldsForLayerMode(fields, layerEditMode);
   const displaySections = sectionsForLayerMode(displayFields, sectionOrder, layerEditMode);
@@ -91,19 +101,28 @@ export function ExperimentMultiLayerSettings<TSettings extends Record<string, un
             fieldsClassName="experiment-one-settings-dock__fields"
           >
             {sectionFields.map((field, index) => {
-              const pairedSuffix = resolvePairedSuffix(field.id, allIds);
+              const isAlternate = alternateFields?.fieldIds.has(field.id) ?? false;
+              const pairedSuffix = isAlternate ? null : resolvePairedSuffix(field.id, allIds);
               const fieldId = field.id as keyof TSettings & string;
-              const value = resolveFieldValueForLayerMode(settings, field.id, layerEditMode) as TSettings[keyof TSettings];
+              const value = isAlternate
+                ? (alternateFields!.values[field.id] as TSettings[keyof TSettings])
+                : (resolveFieldValueForLayerMode(settings, field.id, layerEditMode) as TSettings[keyof TSettings]);
               const outOfSync =
-                layerEditMode === 'both' && pairedSuffix
+                !isAlternate && layerEditMode === 'both' && pairedSuffix
                   ? layerPairValuesDiffer(settings, field.id, allIds)
                   : false;
 
-              const masterValue = pairedSuffix
-                ? (masterDefault[`layerA${pairedSuffix}` as keyof TSettings] as TSettings[keyof TSettings])
-                : (masterDefault[fieldId] as TSettings[keyof TSettings]);
+              const masterValue = isAlternate
+                ? (alternateFields!.defaults[field.id] as TSettings[keyof TSettings])
+                : pairedSuffix
+                  ? (masterDefault[`layerA${pairedSuffix}` as keyof TSettings] as TSettings[keyof TSettings])
+                  : (masterDefault[fieldId] as TSettings[keyof TSettings]);
 
               const handleChange = (next: TSettings[keyof TSettings]) => {
+                if (isAlternate) {
+                  alternateFields!.onChange(field.id, next);
+                  return;
+                }
                 if (layerEditMode === 'both' && pairedSuffix) {
                   onPairedChange(pairedSuffix, next);
                   return;
@@ -112,6 +131,10 @@ export function ExperimentMultiLayerSettings<TSettings extends Record<string, un
               };
 
               const handleResetTo = (next: TSettings[keyof TSettings]) => {
+                if (isAlternate) {
+                  alternateFields!.onChange(field.id, next);
+                  return;
+                }
                 if (layerEditMode === 'both' && pairedSuffix) {
                   onPairedChange(pairedSuffix, next);
                   return;
@@ -119,7 +142,11 @@ export function ExperimentMultiLayerSettings<TSettings extends Record<string, un
                 onChange(fieldId, next);
               };
 
-              const targets = resetTargets(masterValue, saveExperiment, field.id, scopedSaves);
+              const targets = (
+                isAlternate
+                  ? (alternateFields!.resetTargets?.(field.id) ?? [{ label: 'Default', value: masterValue }])
+                  : resetTargets(masterValue, saveExperiment, field.id, scopedSaves)
+              ) as ResetTarget<TSettings[keyof TSettings]>[];
 
               return (
                 <MaterialSettingFieldRow

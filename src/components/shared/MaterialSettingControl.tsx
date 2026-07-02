@@ -32,15 +32,21 @@ export function materialTypeLabel(field: MaterialFieldBase): string {
   return 'number';
 }
 
-function clampNumber(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
+function clampNumber(value: number, min?: number, max?: number) {
+  let next = value;
+  if (min !== undefined) next = Math.max(min, next);
+  if (max !== undefined) next = Math.min(max, next);
+  return next;
 }
 
 function stepNumber(field: MaterialFieldBase, current: number, direction: -1 | 1) {
   const step = field.step ?? 1;
-  const min = field.min ?? 0;
-  const max = field.max ?? 100;
-  return clampNumber(current + direction * step, min, max);
+  return clampNumber(current + direction * step, field.min, field.max);
+}
+
+/** Arrow keys always nudge by 1 — independent of field.step (e.g. width step 4). */
+function nudgeNumberByOne(current: number, direction: -1 | 1, min?: number, max?: number) {
+  return clampNumber(current + direction, min, max);
 }
 
 function hexToRgb(hex: string) {
@@ -67,9 +73,9 @@ function settingValuesEqual(a: unknown, b: unknown) {
   return a === b;
 }
 
-function isValidNumberDraft(raw: string, min: number) {
+function isValidNumberDraft(raw: string, min?: number) {
   if (raw === '') return true;
-  if (min < 0) return /^-?\d*\.?\d*$/.test(raw);
+  if (min !== undefined && min < 0) return /^-?\d*\.?\d*$/.test(raw);
   return /^\d*\.?\d*$/.test(raw);
 }
 
@@ -92,8 +98,9 @@ function MaterialNumberControl<TValue>({
 }: MaterialNumberControlProps<TValue>) {
   const p = (suffix: string) => `${classPrefix}-settings-dock__${suffix}`;
   const stop = (event: { stopPropagation: () => void }) => event.stopPropagation();
-  const min = field.min ?? 0;
-  const max = field.max ?? 100;
+  const min = field.min;
+  const max = field.max;
+  const hasRange = min !== undefined && max !== undefined;
   const [draft, setDraft] = useState(() => formatNumberValue(value));
   const [editing, setEditing] = useState(false);
   const valueRef = useRef(value);
@@ -117,6 +124,20 @@ function MaterialNumberControl<TValue>({
     onChange(clampNumber(parsed, min, max) as TValue);
   };
 
+  const stepFromCurrent = (direction: -1 | 1) => {
+    let base = valueRef.current;
+    if (editing) {
+      const trimmed = draft.trim();
+      if (trimmed !== '' && trimmed !== '-' && trimmed !== '.') {
+        const parsed = Number(trimmed);
+        if (!Number.isNaN(parsed)) base = clampNumber(parsed, min, max);
+      }
+    }
+    const next = nudgeNumberByOne(base, direction, min, max);
+    onChange(next as TValue);
+    if (editing) setDraft(formatNumberValue(next));
+  };
+
   return (
     <div className="mat-setting-control mat-setting-control--number" onClick={stop}>
       <div className={p('stepper')}>
@@ -124,7 +145,7 @@ function MaterialNumberControl<TValue>({
           type="button"
           className={p('step-btn')}
           aria-label={`Decrease ${field.label}`}
-          disabled={value <= min}
+          disabled={min !== undefined && value <= min}
           onClick={() => onChange(stepNumber(field, valueRef.current, -1) as TValue)}
         >
           −
@@ -149,6 +170,11 @@ function MaterialNumberControl<TValue>({
               commitDraft();
             }}
             onKeyDown={(e) => {
+              if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                stepFromCurrent(e.key === 'ArrowUp' ? 1 : -1);
+                return;
+              }
               if (e.key === 'Enter') {
                 e.preventDefault();
                 commitDraft();
@@ -167,12 +193,13 @@ function MaterialNumberControl<TValue>({
           type="button"
           className={p('step-btn')}
           aria-label={`Increase ${field.label}`}
-          disabled={value >= max}
+          disabled={max !== undefined && value >= max}
           onClick={() => onChange(stepNumber(field, valueRef.current, 1) as TValue)}
         >
           +
         </button>
       </div>
+      {hasRange && (
       <input
         type="range"
         className="mat-setting-range"
@@ -183,6 +210,7 @@ function MaterialNumberControl<TValue>({
         aria-label={`${field.label} slider`}
         onChange={(e) => onChange(Number(e.target.value) as TValue)}
       />
+      )}
     </div>
   );
 }

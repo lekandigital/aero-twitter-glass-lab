@@ -125,8 +125,8 @@ export const E2_SETTING_FIELDS: SettingField[] = [
   { id: 'colorBlue', label: 'Blue', dataType: 'color', section: 'Palette' },
   { id: 'colorDeep', label: 'Deep blue', dataType: 'color', section: 'Palette' },
 
-  { id: 'transWidth', label: 'Width', dataType: 'number', section: 'Transparent sheet', min: 280, max: 900, step: 4, unit: 'px' },
-  { id: 'transHeight', label: 'Height', dataType: 'number', section: 'Transparent sheet', min: 200, max: 640, step: 4, unit: 'px' },
+  { id: 'transWidth', label: 'Width', dataType: 'number', section: 'Transparent sheet', step: 4, unit: 'px' },
+  { id: 'transHeight', label: 'Height', dataType: 'number', section: 'Transparent sheet', step: 4, unit: 'px' },
   { id: 'transRadius', label: 'Corner radius', dataType: 'number', section: 'Transparent sheet', min: 8, max: 48, step: 1, unit: 'px' },
   { id: 'transTransparency', label: 'Transparency', dataType: 'number', section: 'Transparent sheet', min: 0, max: 100, step: 1, unit: '%' },
   { id: 'transBlur', label: 'Backdrop blur', dataType: 'number', section: 'Transparent sheet', min: 0, max: 24, step: 1, unit: 'px' },
@@ -145,8 +145,8 @@ export const E2_SETTING_FIELDS: SettingField[] = [
   { id: 'transShadowSpread', label: 'Shadow spread', dataType: 'number', section: 'Transparent sheet', min: 8, max: 80, step: 1, unit: 'px' },
   { id: 'transGlow', label: 'Outer glow', dataType: 'number', section: 'Transparent sheet', min: 0, max: 80, step: 1, unit: '%' },
 
-  { id: 'frostWidth', label: 'Width', dataType: 'number', section: 'Frost sheet', min: 200, max: 720, step: 4, unit: 'px' },
-  { id: 'frostHeight', label: 'Height', dataType: 'number', section: 'Frost sheet', min: 160, max: 560, step: 4, unit: 'px' },
+  { id: 'frostWidth', label: 'Width', dataType: 'number', section: 'Frost sheet', step: 4, unit: 'px' },
+  { id: 'frostHeight', label: 'Height', dataType: 'number', section: 'Frost sheet', step: 4, unit: 'px' },
   { id: 'frostRadius', label: 'Corner radius', dataType: 'number', section: 'Frost sheet', min: 8, max: 48, step: 1, unit: 'px' },
   { id: 'frostOpacity', label: 'Fill opacity', dataType: 'number', section: 'Frost sheet', min: 0, max: 100, step: 1, unit: '%' },
   { id: 'frostBlur', label: 'Frost blur', dataType: 'number', section: 'Frost sheet', min: 0, max: 48, step: 1, unit: 'px' },

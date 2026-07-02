@@ -1,12 +1,13 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type PointerEvent,
   type RefObject,
 } from 'react';
-import { clearDragPosition, loadDragPosition, saveDragPosition, type DragPoint } from '../../utils/dragPositionStorage';
+import { loadDragPosition, saveDragPosition, type DragPoint } from '../../utils/dragPositionStorage';
 
 export type { DragPoint };
 
@@ -47,6 +48,18 @@ function emptyDragState(): HoldDragState {
   };
 }
 
+function readInitialDragPoint(
+  persistKey: string | undefined,
+  initialPosition: DragPoint | 'center',
+): DragPoint | null {
+  if (persistKey) {
+    const stored = loadDragPosition(persistKey);
+    if (stored) return stored;
+  }
+  if (typeof initialPosition === 'object') return initialPosition;
+  return null;
+}
+
 /** Suppresses the next click after a hold-drag (e.g. inspect pickers). */
 let suppressNextClick = false;
 
@@ -68,9 +81,11 @@ export function useHoldDrag({
 }: UseHoldDragOptions) {
   const dragRef = useRef<HoldDragState>(emptyDragState());
   const initialPositionRef = useRef(initialPosition);
-  const [position, setPosition] = useState<DragPoint | null>(null);
+  const [position, setPosition] = useState<DragPoint | null>(() =>
+    readInitialDragPoint(persistKey, initialPosition),
+  );
   const [dragging, setDragging] = useState(false);
-  const initialized = useRef(false);
+  const initialized = useRef(readInitialDragPoint(persistKey, initialPosition) !== null);
   const wasDraggingRef = useRef(false);
   const layoutResetRef = useRef(layoutResetVersion);
 
@@ -134,7 +149,7 @@ export function useHoldDrag({
     initialized.current = true;
   }, [clampPosition, getBounds, persistKey, shellRef]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!initialized.current) placeInitial();
   }, [placeInitial]);
 
@@ -143,7 +158,6 @@ export function useHoldDrag({
     layoutResetRef.current = layoutResetVersion;
     if (layoutResetVersion === 0) return;
 
-    if (persistKey) clearDragPosition(persistKey);
     initialized.current = false;
     placeInitial();
   }, [layoutResetVersion, persistKey, placeInitial]);
@@ -171,6 +185,10 @@ export function useHoldDrag({
     },
     [dragExcludeSelector, dragHandleSelector],
   );
+
+  const fallbackPosition =
+    typeof initialPositionRef.current === 'object' ? initialPositionRef.current : null;
+  const displayPosition = position ?? fallbackPosition;
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
@@ -229,11 +247,11 @@ export function useHoldDrag({
   };
 
   return {
-    position,
+    position: displayPosition,
     dragging,
     onPointerDown,
     onPointerMove,
     endDrag,
-    ready: initialized.current || position !== null,
+    ready: initialized.current || displayPosition !== null,
   };
 }
