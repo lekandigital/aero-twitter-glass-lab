@@ -37,12 +37,12 @@ type ExperimentMultiLayerSettingsProps<TSettings extends Record<string, unknown>
   onPairedChange: (suffix: string, value: TSettings[keyof TSettings]) => void;
   resetTargets: (
     masterValue: TSettings[keyof TSettings],
-    experiment: 'three' | 'four' | 'five' | 'six' | 'seven',
+    experiment: 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight',
     fieldId: string,
     saves: ExperimentSetOneSnapshot[],
   ) => ResetTarget<TSettings[keyof TSettings]>[];
   scopedSaves: ExperimentSetOneSnapshot[];
-  saveExperiment: 'three' | 'four' | 'five' | 'six' | 'seven';
+  saveExperiment: 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight';
   isOpen: (id: string) => boolean;
   onToggle: (id: string) => void;
   alternateFields?: AlternateFieldConfig;

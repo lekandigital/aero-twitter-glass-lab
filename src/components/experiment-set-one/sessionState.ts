@@ -40,6 +40,8 @@ export type ExperimentSetOneSession = {
   e6?: E4MaterialSettings;
   /** Live Experiment Seven working copy — compact nested rects, no layer C. */
   e7?: E4MaterialSettings;
+  /** Live Experiment Eight working copy — duplicate of Experiment Six. */
+  e8?: E4MaterialSettings;
   /** Experiment Six layer C circle layout (diameter, inset position). */
   e6LayerC?: E6LayerCLayoutSettings;
   hidePanelText: boolean;
@@ -75,7 +77,7 @@ export function defaultSession(): ExperimentSetOneSession {
     experimentVisible: DEFAULT_EXPERIMENT_VISIBILITY,
     referenceWallpaper: false,
     activeExperiment: 'four',
-    selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: null, six: null, seven: null },
+    selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: null, six: null, seven: null, eight: null },
     cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
     layerEditMode: 'both',
   };
@@ -124,6 +126,7 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       e5: parsed.e5 ? normalizeE4MaterialSettings(parsed.e5) : undefined,
       e6: parsed.e6 ? normalizeE4MaterialSettings(parsed.e6) : undefined,
       e7: parsed.e7 ? normalizeE4MaterialSettings(parsed.e7) : undefined,
+      e8: parsed.e8 ? normalizeE4MaterialSettings(parsed.e8) : undefined,
       e6LayerC: parsed.e6LayerC,
       hidePanelText: typeof parsed.hidePanelText === 'boolean' ? parsed.hidePanelText : true,
       layerAVisible: parsed.layerAVisible !== false,
@@ -139,7 +142,8 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
         parsed.activeExperiment === 'four' ||
         parsed.activeExperiment === 'five' ||
         parsed.activeExperiment === 'six' ||
-        parsed.activeExperiment === 'seven'
+        parsed.activeExperiment === 'seven' ||
+        parsed.activeExperiment === 'eight'
           ? parsed.activeExperiment
           : 'four',
       selectedSaveIdByExperiment: parsed.selectedSaveIdByExperiment ?? undefined,

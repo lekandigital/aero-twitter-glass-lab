@@ -138,14 +138,15 @@ type ExperimentSelection =
   | { experiment: 'four'; target: E4InspectTarget; label: string }
   | { experiment: 'five'; target: E4InspectTarget; label: string }
   | { experiment: 'six'; target: E4InspectTarget | E6LayerCInspectTarget; label: string }
-  | { experiment: 'seven'; target: E4InspectTarget; label: string };
+  | { experiment: 'seven'; target: E4InspectTarget; label: string }
+  | { experiment: 'eight'; target: E4InspectTarget | E6LayerCInspectTarget; label: string };
 
 function catalogSaveId(save: { id: number; sourceSaveId?: number }) {
   return save.sourceSaveId ?? save.id;
 }
 
-function e4DockExperiment(activeExperiment: ExperimentId): 'four' | 'five' | 'six' | 'seven' {
-  if (activeExperiment === 'five' || activeExperiment === 'six' || activeExperiment === 'seven' ) {
+function e4DockExperiment(activeExperiment: ExperimentId): 'four' | 'five' | 'six' | 'seven' | 'eight' {
+  if (activeExperiment === 'five' || activeExperiment === 'six' || activeExperiment === 'seven' || activeExperiment === 'eight') {
     return activeExperiment;
   }
   return 'four';
@@ -159,6 +160,7 @@ type ExperimentSetOneContextValue = {
   e5: E4MaterialSettings;
   e6: E4MaterialSettings;
   e7: E4MaterialSettings;
+  e8: E4MaterialSettings;
   e6LayerC: E6LayerCLayoutSettings;
   setE1: <K extends keyof E1MaterialSettings>(id: K, value: E1MaterialSettings[K]) => void;
   setE2: <K extends keyof E2MaterialSettings>(id: K, value: E2MaterialSettings[K]) => void;
@@ -167,6 +169,7 @@ type ExperimentSetOneContextValue = {
   setE5: <K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => void;
   setE6: <K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => void;
   setE7: <K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => void;
+  setE8: <K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => void;
   setE6LayerC: <K extends keyof E6LayerCLayoutSettings>(id: K, value: E6LayerCLayoutSettings[K]) => void;
   resetAll: () => void;
   saves: ExperimentSetOneSnapshot[];
@@ -264,6 +267,18 @@ function resolveInitialE7(boot: ExperimentSetOneSession): E4MaterialSettings {
   return applyE7OverridesStatic(normalizeE4MaterialSettings(boot.e4));
 }
 
+function resolveInitialE8(boot: ExperimentSetOneSession): E4MaterialSettings {
+  const selectedSaveId = boot.selectedSaveIdByExperiment?.eight;
+  if (selectedSaveId != null) {
+    const snapshot = loadExperimentSetOneSaves().find((save) => save.id === selectedSaveId);
+    if (snapshot?.e4) {
+      return applyE6OverridesStatic(normalizeE4MaterialSettings(snapshot.e4));
+    }
+  }
+  if (boot.e8) return applyE6OverridesStatic(normalizeE4MaterialSettings(boot.e8));
+  return applyE6OverridesStatic(normalizeE4MaterialSettings(boot.e4));
+}
+
 
 
 function resolveInitialE5(boot: ExperimentSetOneSession): E4MaterialSettings {
@@ -317,6 +332,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   const [e5, setE5State] = useState<E4MaterialSettings>(() => resolveInitialE5(boot));
   const [e6, setE6State] = useState<E4MaterialSettings>(() => resolveInitialE6(boot));
   const [e7, setE7State] = useState<E4MaterialSettings>(() => resolveInitialE7(boot));
+  const [e8, setE8State] = useState<E4MaterialSettings>(() => resolveInitialE8(boot));
   const [e6LayerC, setE6LayerCState] = useState<E6LayerCLayoutSettings>(() =>
     resolveInitialE6LayerC(boot, resolveInitialE6(boot)),
   );
@@ -343,6 +359,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     five: boot.selectedSaveIdByExperiment?.five ?? null,
     six: boot.selectedSaveIdByExperiment?.six ?? null,
     seven: boot.selectedSaveIdByExperiment?.seven ?? null,
+    eight: boot.selectedSaveIdByExperiment?.eight ?? null,
   });
   const [selection, setSelection] = useState<ExperimentSelection | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
@@ -372,7 +389,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (activeExperiment !== 'four' && activeExperiment !== 'five' && activeExperiment !== 'six' && activeExperiment !== 'seven') return;
+    if (activeExperiment !== 'four' && activeExperiment !== 'five' && activeExperiment !== 'six' && activeExperiment !== 'seven' && activeExperiment !== 'eight') return;
     if (prevActiveExperimentRef.current === activeExperiment) return;
     prevActiveExperimentRef.current = activeExperiment;
     setE4State((prev) => applyShowcasePanelGeometry(prev));
@@ -414,7 +431,15 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         setE5State(next);
         return next;
       });
-    }  }, [activeExperiment, variantModule, saves, selectedSaveIdByExperiment.seven]);
+    }
+    if (activeExperiment === 'eight') {
+      setE8State((prev) => {
+        const next = applyE6OverridesStatic(prev, variantModule);
+        setE5State(next);
+        return next;
+      });
+    }
+  }, [activeExperiment, variantModule, saves, selectedSaveIdByExperiment]);
 
   useEffect(() => {
     if (activeExperiment === 'seven') setLayerCVisible(false);
@@ -427,6 +452,14 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (activeExperiment === 'seven') setE5State(e7);
   }, [activeExperiment, e7]);
+
+  useEffect(() => {
+    if (activeExperiment === 'eight') setE5State(e8);
+  }, [activeExperiment, e8]);
+
+  useEffect(() => {
+    if (activeExperiment === 'eight') setE8State(e6);
+  }, [activeExperiment, e6]);
 
   useEffect(() => {
     setE6LayerCState((prev) => clampE6LayerCLayout(prev, e6));
@@ -445,17 +478,20 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
             ? e4CssVars(e6)
             : activeExperiment === 'seven'
               ? e4CssVars(e7)
+              : activeExperiment === 'eight'
+                ? e4CssVars(e6)
               : e4CssVars(e4)),
       }) as CSSProperties,
-    [e1, e2, e3, e4, e5, e6, e7, activeExperiment, e4CssVars],
+    [e1, e2, e3, e4, e5, e6, e7, e8, activeExperiment, e4CssVars],
   );
 
   const activeE4Materials = useMemo(() => {
     if (activeExperiment === 'five') return e5;
     if (activeExperiment === 'six') return e6;
     if (activeExperiment === 'seven') return e7;
+    if (activeExperiment === 'eight') return e6;
     return e4;
-  }, [activeExperiment, e4, e5, e6, e7]);
+  }, [activeExperiment, e4, e5, e6, e7, e8]);
 
   const setE1 = useCallback(<K extends keyof E1MaterialSettings>(id: K, value: E1MaterialSettings[K]) => {
     setE1State((prev) => ({ ...prev, [id]: value }));
@@ -489,6 +525,14 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     setE7State((prev) => {
       const next = patchE4LayoutField(prev, id, value);
       if (activeExperiment === 'seven') setE5State(next);
+      return next;
+    });
+  }, [activeExperiment]);
+
+  const setE8 = useCallback(<K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => {
+    setE8State((prev) => {
+      const next = patchE4LayoutField(prev, id, value);
+      if (activeExperiment === 'eight') setE5State(next);
       return next;
     });
   }, [activeExperiment]);
@@ -533,7 +577,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       e1,
       e2,
       e3,
-      activeExperiment === 'five' ? e5 : activeExperiment === 'six' ? e6 : activeExperiment === 'seven' ? e7 : e4,
+      activeExperiment === 'five' ? e5 : activeExperiment === 'six' ? e6 : activeExperiment === 'seven' ? e7 : activeExperiment === 'eight' ? e8 : e4,
       scope,
     );
     setSaves(loadExperimentSetOneSaves());
@@ -541,9 +585,9 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       e1,
       e2,
       e3,
-      activeExperiment === 'five' ? e5 : activeExperiment === 'six' ? e6 : activeExperiment === 'seven' ? e7 : e4,
+      activeExperiment === 'five' ? e5 : activeExperiment === 'six' ? e6 : activeExperiment === 'seven' ? e7 : activeExperiment === 'eight' ? e8 : e4,
     );
-  }, [e1, e2, e3, e4, e5, e6, e7, selection, activeExperiment]);
+  }, [e1, e2, e3, e4, e5, e6, e7, e8, selection, activeExperiment]);
 
   const borderRefineVersion = variantModule?.E5_BORDER_REFINEMENTS_VERSION ?? E5_BORDER_REFINEMENTS_VERSION;
   const borderRefine = variantModule?.refineExperimentFivePanels ?? refineExperimentFivePanels;
@@ -584,6 +628,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         if (activeExperiment === 'five') setE5State((prev) => applyReferenceCornerLighting(prev));
         else if (activeExperiment === 'six') setE6State((prev) => applyReferenceCornerLighting(prev));
         else if (activeExperiment === 'seven') setE7State((prev) => applyReferenceCornerLighting(prev));
+        else if (activeExperiment === 'eight') setE8State((prev) => applyReferenceCornerLighting(prev));
         else setE4State((prev) => applyReferenceCornerLighting(prev));
         return;
       }
@@ -615,6 +660,9 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
             setE5State(applyE6OverridesStatic(material, loadedModule));
           } else if (activeExperiment === 'five') {
             setE5State(finalizeE5Material(applyShowcasePanelGeometry(material), loadedModule));
+          } else if (activeExperiment === 'eight') {
+            setE8State(applyE6OverridesStatic(material, loadedModule));
+            setE5State(applyE6OverridesStatic(material, loadedModule));
           } else {
             setE4State(applyShowcasePanelGeometry(material));
           }
@@ -642,6 +690,8 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
             setE6State(applyE6OverridesStatic(normalized, loadedModule));
           } else if (activeExperiment === 'seven') {
             setE7State((currentE7) => finalizeE7Material(normalized, currentE7, loadedModule));
+          } else if (activeExperiment === 'eight') {
+            setE8State(applyE6OverridesStatic(normalized, loadedModule));
           } else {
             setE4State(normalized);
           }
@@ -658,6 +708,14 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         if (snapshot.e4) {
           const material = applyE6OverridesStatic(normalize(snapshot.e4), loadedModule);
           setE6State(material);
+          setE5State(material);
+        }
+        return;
+      }
+      if (snapshot.scope === 'eight') {
+        if (snapshot.e4) {
+          const material = applyE6OverridesStatic(normalize(snapshot.e4), loadedModule);
+          setE8State(material);
           setE5State(material);
         }
         return;
@@ -685,6 +743,8 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
           setE6State(applyE6OverridesStatic(normalized, loadedModule));
         } else if (activeExperiment === 'seven') {
           setE7State((currentE7) => finalizeE7Material(normalized, currentE7, loadedModule));
+        } else if (activeExperiment === 'eight') {
+          setE8State(applyE6OverridesStatic(normalized, loadedModule));
         }
       }
     },
@@ -724,6 +784,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       e5,
       e6,
       e7,
+      e8,
       e6LayerC,
       hidePanelText,
       layerAVisible,
@@ -839,6 +900,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       e5,
       e6,
       e7,
+      e8,
       e6LayerC,
       setE1,
       setE2,
@@ -847,6 +909,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       setE5,
       setE6,
       setE7,
+      setE8,
       setE6LayerC,
       resetAll,
       saves,
@@ -874,7 +937,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       referenceWallpaper,
       toggleReferenceWallpaper,
     }),
-    [e1, e2, e3, e4, e5, e6, e7, e6LayerC, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE6LayerC, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, toggleLayerAVisible, toggleLayerBVisible, toggleLayerCVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selection, clearSelection, referenceWallpaper, toggleReferenceWallpaper],
+    [e1, e2, e3, e4, e5, e6, e7, e8, e6LayerC, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE6LayerC, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, toggleLayerAVisible, toggleLayerBVisible, toggleLayerCVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selection, clearSelection, referenceWallpaper, toggleReferenceWallpaper],
   );
 
   return (
@@ -896,17 +959,20 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         data-e5-visible={experimentVisible.five}
         data-e6-visible={experimentVisible.six}
         data-e7-visible={experimentVisible.seven}
+        data-e8-visible={experimentVisible.eight}
         data-e1-inspect-mode={inspectMode}
         data-e2-inspect-mode={inspectMode}
         data-e3-inspect-mode={inspectMode}
         data-e4-inspect-mode={inspectMode}
         data-e5-inspect-mode={inspectMode}
         data-e6-inspect-mode={inspectMode}
+        data-e8-inspect-mode={inspectMode}
         data-showcase-align={
           activeExperiment === 'four' ||
           activeExperiment === 'five' ||
           activeExperiment === 'six' ||
-          activeExperiment === 'seven'
+          activeExperiment === 'seven' ||
+          activeExperiment === 'eight'
         }
         data-hide-panel-text={hidePanelText ? 'true' : 'false'}
         data-layer-a-visible={layerAVisible ? 'true' : 'false'}
@@ -915,6 +981,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         data-render-variant={activeRenderVariant ?? ''}
         data-selected-save-four={selectedSaveIdByExperiment.four ?? ''}
         data-selected-save-five={selectedSaveIdByExperiment.five ?? ''}
+        data-selected-save-eight={selectedSaveIdByExperiment.eight ?? ''}
       >
         {children}
       </div>
@@ -996,9 +1063,15 @@ function selectionPersistKey(selection: ExperimentSelection) {
       ? EXPERIMENT_SET_ONE_POSITION_KEYS.layerA
       : EXPERIMENT_SET_ONE_POSITION_KEYS.layerB;
   }
-  if (selection.experiment === 'four' || selection.experiment === 'five' || selection.experiment === 'six' || selection.experiment === 'seven') {
+  if (selection.experiment === 'four' || selection.experiment === 'five' || selection.experiment === 'six' || selection.experiment === 'seven' || selection.experiment === 'eight') {
     if (selection.experiment === 'six' && isE6LayerCInspectTarget(selection.target)) {
       return EXPERIMENT_SET_ONE_POSITION_KEYS.layerC6;
+    }
+    if (selection.experiment === 'eight' && isE6LayerCInspectTarget(selection.target)) {
+      return EXPERIMENT_SET_ONE_POSITION_KEYS.layerC6;
+    }
+    if (selection.experiment === 'eight') {
+      return EXPERIMENT_SET_ONE_POSITION_KEYS.layerA8;
     }
     return selection.target.startsWith('layer-a')
       ? EXPERIMENT_SET_ONE_POSITION_KEYS.layerA4
@@ -1028,7 +1101,7 @@ function sectionsForFields<T extends { section: string }>(
 
 function fieldResetTargets<T extends string | number | boolean>(
   masterValue: T,
-  experiment: 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' ,
+  experiment: 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight',
   fieldId: string,
   saves: ExperimentSetOneSnapshot[],
 ) {
@@ -1049,14 +1122,18 @@ export function ExperimentSetOneSettingsDock() {
     e4,
     e5,
     e6,
-    e7,    e6LayerC,
+    e7,
+    e8,
+    e6LayerC,
     setE1,
     setE2,
     setE3,
     setE4,
     setE5,
     setE6,
-    setE7,    setE6LayerC,
+    setE7,
+    setE8,
+    setE6LayerC,
     resetAll,
     saves,
     saveCurrent,
@@ -1091,7 +1168,7 @@ export function ExperimentSetOneSettingsDock() {
     if (saveScope === 'five') {
       return saves.filter((s) => s.scope === 'four' || s.scope === 'five' || s.scope === 'general' || s.cornersOnly);
     }
-  if (saveScope === 'six') {
+    if (saveScope === 'six' || saveScope === 'eight') {
       return saves.filter((s) => s.scope === 'six' || s.scope === 'general' || s.cornersOnly);
     }
     if (saveScope === 'seven') {
@@ -1108,7 +1185,7 @@ export function ExperimentSetOneSettingsDock() {
   );
   const branchSaveGroups = useMemo(
     () =>
-      saveScope === 'four' || saveScope === 'five' || saveScope === 'six' || saveScope === 'seven'
+      saveScope === 'four' || saveScope === 'five' || saveScope === 'six' || saveScope === 'seven' || saveScope === 'eight'
         ? RENDER_VARIANTS.map((variant) => ({
             variant,
             saves: scopedSaves
@@ -1320,7 +1397,8 @@ export function ExperimentSetOneSettingsDock() {
     dockExperiment === 'four' ||
     dockExperiment === 'five' ||
     dockExperiment === 'six' ||
-    dockExperiment === 'seven';
+    dockExperiment === 'seven' ||
+    dockExperiment === 'eight';
 
   return (
     <ExperimentOneDraggableShell
@@ -1382,6 +1460,7 @@ export function ExperimentSetOneSettingsDock() {
                 ['five', 'E5'],
                 ['six', 'E6'],
                 ['seven', 'E7'],
+                ['eight', 'E8'],
                               ] as const
             ).map(([id, label]) => (
               <button
@@ -1499,7 +1578,7 @@ export function ExperimentSetOneSettingsDock() {
                     value={layerEditMode}
                     onChange={handleLayerEditModeChange}
                     layout="side"
-                    showLayerC={dockExperiment === 'six'}
+                  showLayerC={dockExperiment === 'six' || dockExperiment === 'eight'}
                   />
                   <span className="experiment-one-settings-dock__layer-rail-label">Show</span>
                   <LayerVisibilityToggles
@@ -1509,7 +1588,7 @@ export function ExperimentSetOneSettingsDock() {
                     onToggleLayerA={toggleLayerAVisible}
                     onToggleLayerB={toggleLayerBVisible}
                     onToggleLayerC={toggleLayerCVisible}
-                    showLayerC={dockExperiment === 'six'}
+                    showLayerC={dockExperiment === 'six' || dockExperiment === 'eight'}
                   />
                 </aside>
               )}
@@ -1757,7 +1836,32 @@ export function ExperimentSetOneSettingsDock() {
                 isOpen={isOpen}
                 onToggle={toggle}
               />
-            )}            </div>
+            )}
+            {dockExperiment === 'eight' && (
+              <ExperimentMultiLayerSettings
+                experimentKey="e8"
+                title="Experiment Eight"
+                description="Duplicate of Experiment Six with the same compact panel geometry and layer C flow."
+                filtering={e6DockFiltering}
+                fields={visibleE6Fields}
+                sectionOrder={e6SectionOrder}
+                settings={e8}
+                masterDefault={E4_MASTER_DEFAULT}
+                layerEditMode={e6LayerEditMode}
+                onChange={(id, value) => setE8(id as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings])}
+                onPairedChange={(suffix, value) => {
+                  setE8(`layerA${suffix}` as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings]);
+                  setE8(`layerB${suffix}` as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings]);
+                }}
+                resetTargets={fieldResetTargets}
+                scopedSaves={scopedSaves}
+                saveExperiment="eight"
+                isOpen={isOpen}
+                onToggle={toggle}
+                alternateFields={e6AlternateFields}
+              />
+            )}
+            </div>
             </div>
           </div>
         )}
