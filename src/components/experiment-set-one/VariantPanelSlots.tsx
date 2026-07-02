@@ -16,7 +16,7 @@ import { useRenderVariant } from '../../render-variants/RenderVariantContext';
 type VariantPanelSlotsProps = {
   layoutResetVersion: number;
   nestedB: boolean;
-  experiment: 'four' | 'five' | 'six' | 'seven';
+  experiment: 'four' | 'five' | 'six' | 'seven' | 'eight';
 };
 
 const COMPACT_PANEL_SNAP = EXPERIMENT_SIX_PANEL_SNAP;
@@ -92,6 +92,15 @@ function DefaultPanels({ layoutResetVersion, nestedB, experiment }: VariantPanel
       />
     );
   }
+  if (experiment === 'eight') {
+    return (
+      <DefaultExperimentSixLayerA
+        initialPosition={COMPACT_PANEL_SNAP}
+        persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerA8}
+        layoutResetVersion={layoutResetVersion}
+      />
+    );
+  }
   return (
     <>
       <ExperimentFourDraggableLayerA
@@ -119,7 +128,7 @@ export function VariantPanelSlots(props: VariantPanelSlotsProps) {
   const fallback = <DefaultPanels {...props} />;
   const showNestedB = nestedB && layerBVisible;
 
-  if (experiment === 'six' || experiment === 'seven') {
+  if (experiment === 'six' || experiment === 'seven' || experiment === 'eight') {
     const DefaultCompactPanel = experiment === 'six' ? DefaultExperimentSixLayerA : DefaultExperimentSevenLayerA;
     const mainPanel =
       experiment === 'seven' ? (
@@ -128,7 +137,13 @@ export function VariantPanelSlots(props: VariantPanelSlotsProps) {
           persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerA4}
           layoutResetVersion={layoutResetVersion}
         />
-        ) : module ? (
+      ) : experiment === 'eight' ? (
+        <DefaultExperimentSixLayerA
+          initialPosition={COMPACT_PANEL_SNAP}
+          persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerA8}
+          layoutResetVersion={layoutResetVersion}
+        />
+      ) : module ? (
         <module.ExperimentFiveDraggableLayerA
           initialPosition={COMPACT_PANEL_SNAP}
           persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerA4}

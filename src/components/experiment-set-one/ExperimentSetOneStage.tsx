@@ -19,7 +19,7 @@ import { VariantPanelSlots } from './VariantPanelSlots';
 export function ExperimentSetOneStage() {
   const { layoutResetVersion, activeExperiment, e4, e7 } = useExperimentSetOne();
   const nestedB = e4.layerBNestedInA;
-  const show = (id: 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven') => id === activeExperiment;
+  const show = (id: 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight') => id === activeExperiment;
 
   return (
     <main className="experiment-set-one-stage" aria-label="Experiment Set 1 panel stage">
@@ -109,6 +109,14 @@ export function ExperimentSetOneStage() {
             experiment="seven"
             layoutResetVersion={layoutResetVersion}
             nestedB={e7.layerBNestedInA}
+          />
+        )}
+
+        {show('eight') && (
+          <VariantPanelSlots
+            experiment="eight"
+            layoutResetVersion={layoutResetVersion}
+            nestedB={true}
           />
         )}
 
