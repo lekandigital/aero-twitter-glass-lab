@@ -1,0 +1,39 @@
+/* Experiment Six — branch circle (layer C) stacked on nested B. */
+
+.experiment-set-one-page[data-layer-c-visible='false'] .experiment-six-layer-c-drag-bounds {
+  display: none !important;
+}
+
+.experiment-four-layer-a__bezel-inset > .experiment-four-layer-b:not(.experiment-six-layer-c) {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.experiment-six-layer-c-drag-bounds {
+  z-index: 6;
+}
+
+.experiment-six-layer-c.experiment-four-layer-b {
+  border-radius: 50% !important;
+  position: relative;
+  z-index: 2;
+}
+
+.experiment-six-layer-c .experiment-four-layer-b__rim-side,
+.experiment-six-layer-c .experiment-four-layer-b__rim-edge,
+.experiment-six-layer-c .experiment-four-layer-b__content {
+  display: none !important;
+}
+
+.experiment-six-layer-c .experiment-four-layer-b__radial-corners {
+  border-radius: 50%;
+}
+
+.experiment-six-layer-c .experiment-four-layer-b__pwzzovO-glass-wrap {
+  border-radius: 50%;
+}
+
+.experiment-six-layer-c-draggable.experiment-set-two-draggable--active {
+  z-index: 7;
+}

@@ -1,5 +1,6 @@
 import { e4InspectAttrs, e4LayerADimensionStyle, e4LayerBDimensionStyle } from './materialSettings';
 import { useExperimentSetOne } from '../experiment-set-one/combinedSettings';
+import { useLayerStageVisibility } from '../experiment-set-one/layerStageVisibility';
 import { ExperimentTwoDraggableSheet } from '../experiment-set-two/primitives';
 import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 import type { E4MaterialSettings } from '../experiment-set-four/materialSettings';
@@ -109,7 +110,8 @@ export function ExperimentFourLayerBSheet({ nested = false }: { nested?: boolean
 }
 
 export function ExperimentFourLayerASheet({ nestedB = false }: { nestedB?: boolean }) {
-  const { e4 } = useExperimentSetOne();
+  const { e4, layerBVisible } = useExperimentSetOne();
+  const showNestedB = nestedB && layerBVisible;
   return (
     <div
       className="experiment-four-layer-a"
@@ -143,7 +145,7 @@ export function ExperimentFourLayerASheet({ nestedB = false }: { nestedB?: boole
         rimSideGapBottom={e4.layerARimSideGapBottom}
         backdropLights={layerBackdropLights('layerA', e4)}
       />
-      {nestedB && (
+      {showNestedB && (
         <div className="experiment-four-layer-a__bezel-inset">
           <ExperimentFourLayerBSheet nested />
         </div>
@@ -154,7 +156,7 @@ export function ExperimentFourLayerASheet({ nestedB = false }: { nestedB?: boole
           title="Layer A"
           subtitle="Experiment Four · bezel frame"
           body={
-            nestedB
+            showNestedB
               ? 'Composite reference shell — layer B is nested inside with configurable bezel inset.'
               : 'Bezel frame — drag independently from layer B and stack to match the reference.'
           }
@@ -175,6 +177,10 @@ export function ExperimentFourDraggableLayerA({
   layoutResetVersion?: number;
   nestedB?: boolean;
 }) {
+  const { layerAVisible, layerBVisible } = useLayerStageVisibility();
+  const keepNestedComposite = nestedB && layerBVisible;
+  if (!layerAVisible && !keepNestedComposite) return null;
+
   return (
     <ExperimentTwoDraggableSheet
       initialPosition={initialPosition}
@@ -197,6 +203,9 @@ export function ExperimentFourDraggableLayerB({
   persistKey?: string;
   layoutResetVersion?: number;
 }) {
+  const { layerBVisible } = useLayerStageVisibility();
+  if (!layerBVisible) return null;
+
   return (
     <ExperimentTwoDraggableSheet
       initialPosition={initialPosition}

@@ -49,6 +49,10 @@
     0 0 40px rgba(90, 200, 255, calc(var(--e4-layerA-glow) * var(--e4-layerA-depth-strength)));
 }
 
+.experiment-set-one-page[data-e4-layerB-nested='true'] .experiment-four-layer-a {
+  overflow: visible;
+}
+
 .experiment-four-layer-a__bezel-rim {
   position: absolute;
   inset: 0;
@@ -171,7 +175,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: 1px;
+  height: calc(var(--e4-layerB-rim-edge-height-px, 1px) / 2);
   pointer-events: none;
   z-index: 2;
   background: rgba(255, 255, 255, 1);
@@ -1191,6 +1195,8 @@
 }
 
 .experiment-set-one-page[data-hide-panel-text='true'] .experiment-four-layer-a__content,
-.experiment-set-one-page[data-hide-panel-text='true'] .experiment-four-layer-b__content {
+.experiment-set-one-page[data-hide-panel-text='true'] .experiment-four-layer-b__content,
+.experiment-set-one-page[data-hide-panel-text='true'] .experiment-four-layer-a__content .experiment-one-panel__drag-hint,
+.experiment-set-one-page[data-hide-panel-text='true'] .experiment-four-layer-b__content .experiment-one-panel__drag-hint {
   visibility: hidden;
 }

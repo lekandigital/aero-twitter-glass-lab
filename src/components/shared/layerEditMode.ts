@@ -1,14 +1,14 @@
 import type { MaterialFieldBase } from './MaterialSettingControl';
 import { orderedSections } from './materialSettingGroups';
 
-export type LayerEditMode = 'both' | 'layerA' | 'layerB';
+export type LayerEditMode = 'both' | 'layerA' | 'layerB' | 'layerC';
 
 export const E3_SHARED_SECTIONS = ['Palette'] as const;
 
 export const E4_SHARED_SECTIONS = ['Palette', 'Layer A · Bezel layout'] as const;
 
 export function stripLayerSectionPrefix(section: string): string {
-  return section.replace(/^Layer [AB] · /, '');
+  return section.replace(/^Layer [ABC] · /, '');
 }
 
 /** Stable foldable-section key across Both / Layer A / Layer B display names. */
@@ -30,9 +30,41 @@ export function layerFieldSuffix(fieldId: string): string | null {
   return null;
 }
 
+const LAYER_SIZE_SUFFIXES = new Set(['Width', 'Height']);
+
+export function isIndependentLayerSizeField(fieldId: string): boolean {
+  const suffix = layerFieldSuffix(fieldId);
+  return suffix !== null && LAYER_SIZE_SUFFIXES.has(suffix);
+}
+
+export const LAYER_A_LAYOUT_FIELD_IDS = ['layerAWidth', 'layerAHeight'] as const;
+export const LAYER_B_LAYOUT_FIELD_IDS = ['layerBWidth', 'layerBHeight'] as const;
+
+export function layoutFieldIdsForMode(mode: LayerEditMode): readonly string[] {
+  if (mode === 'layerA') return LAYER_A_LAYOUT_FIELD_IDS;
+  if (mode === 'layerB' || mode === 'layerC') return LAYER_B_LAYOUT_FIELD_IDS;
+  return [...LAYER_A_LAYOUT_FIELD_IDS, ...LAYER_B_LAYOUT_FIELD_IDS];
+}
+
+/** Keep width/height visible for the active layer edit mode while inspecting sub-targets. */
+export function augmentFieldsWithLayerLayout<T extends { id: string }>(
+  visible: T[],
+  all: T[],
+  mode: LayerEditMode,
+): T[] {
+  const ids = new Set(visible.map((field) => field.id));
+  const out = [...visible];
+  for (const id of layoutFieldIdsForMode(mode)) {
+    if (ids.has(id)) continue;
+    const field = all.find((candidate) => candidate.id === id);
+    if (field) out.push(field);
+  }
+  return out;
+}
+
 export function isPairedLayerField(fieldId: string, allIds: ReadonlySet<string>): boolean {
   const suffix = layerFieldSuffix(fieldId);
-  if (!suffix) return false;
+  if (!suffix || LAYER_SIZE_SUFFIXES.has(suffix)) return false;
   return allIds.has(`layerA${suffix}`) && allIds.has(`layerB${suffix}`);
 }
 
@@ -51,10 +83,13 @@ export function shouldShowFieldInLayerMode(
 
   const isA = fieldId.startsWith('layerA');
   const isB = fieldId.startsWith('layerB');
-  const hasPair = allIds.has(`layerA${suffix}`) && allIds.has(`layerB${suffix}`);
+  const paired = isPairedLayerField(fieldId, allIds);
 
-  if (mode === 'layerA' && isB && hasPair) return false;
-  if (mode === 'layerB' && isA && hasPair) return false;
+  if (mode === 'layerA' && isB && paired) return false;
+  if (mode === 'layerA' && isB && isIndependentLayerSizeField(fieldId)) return false;
+  if ((mode === 'layerB' || mode === 'layerC') && isA && paired) return false;
+  if ((mode === 'layerB' || mode === 'layerC') && isA && isIndependentLayerSizeField(fieldId)) return false;
+  if (mode === 'layerC' && isA && !isB) return false;
   return true;
 }
 
@@ -76,13 +111,11 @@ export function transformFieldsForLayerMode<T extends MaterialFieldBase>(
 
   for (const field of fields) {
     if (field.id.startsWith('layerB')) {
-      const suffix = field.id.slice(6);
-      if (allIds.has(`layerA${suffix}`)) continue;
+      if (isPairedLayerField(field.id, allIds)) continue;
     }
 
     if (field.id.startsWith('layerA')) {
-      const suffix = field.id.slice(6);
-      if (allIds.has(`layerB${suffix}`)) {
+      if (isPairedLayerField(field.id, allIds)) {
         output.push({
           ...field,
           section: displaySectionForBothMode(field.section),
@@ -140,6 +173,12 @@ export function resolveFieldValueForLayerMode(
 ): unknown {
   if (mode === 'layerB' && fieldId.startsWith('layerA')) {
     const suffix = fieldId.slice(6);
+    if (isIndependentLayerSizeField(fieldId)) return settings[fieldId];
+    return settings[`layerB${suffix}`];
+  }
+  if (mode === 'layerC' && fieldId.startsWith('layerA')) {
+    const suffix = fieldId.slice(6);
+    if (isIndependentLayerSizeField(fieldId)) return settings[fieldId];
     return settings[`layerB${suffix}`];
   }
   return settings[fieldId];

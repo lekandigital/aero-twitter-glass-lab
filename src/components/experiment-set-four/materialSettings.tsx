@@ -207,6 +207,8 @@ export type E4MaterialSettings = E3MaterialSettings & {
   layerBRimSideGapTop: number;
   /** Inner frost vertical side highlight inset from bottom (layer B). */
   layerBRimSideGapBottom: number;
+  /** Horizontal rim stroke thickness in px (layer B top/bottom). */
+  layerBRimEdgeHeightPx: number;
   /** Vertical rim side line thickness in px (layer B). */
   layerBRimSideWidthPx: number;
   /** Vertical rim side line shadow strength percent (layer B). */
@@ -239,6 +241,7 @@ const E4_BEZEL_DEFAULTS = {
   layerARimSideShadowBlurPx: 10,
   layerBRimSideGapTop: 10,
   layerBRimSideGapBottom: 10,
+  layerBRimEdgeHeightPx: 1,
   layerBRimSideWidthPx: 1,
   layerBRimSideShadowStrength: 0,
   layerBRimSideShadowBlurPx: 10,
@@ -430,7 +433,7 @@ export function buildE4MasterDefaultSettings(): E4MaterialSettings {
   });
 }
 
-/** Keep layer B width/height concentric inside layer A bezel. */
+/** Keep layer B width/height concentric inside layer A bezel — defaults/presets only. */
 export function syncE4LayerBDimensionsFromBezel(s: E4MaterialSettings): E4MaterialSettings {
   const insetX = s.layerABezelInsetX as number;
   const insetY = s.layerABezelInsetY as number;
@@ -458,14 +461,7 @@ export function syncE4LayerBLayoutFromBezel(s: E4MaterialSettings): E4MaterialSe
   return syncE4LayerBCornerRadiusFromBezel(syncE4LayerBDimensionsFromBezel(s));
 }
 
-const LAYOUT_SYNC_RESIZE_B = new Set([
-  'layerAWidth',
-  'layerAHeight',
-  'layerABezelInsetX',
-  'layerABezelInsetY',
-]);
-
-/** Apply width/height/inset edits and keep layers A + B proportional. */
+/** Apply layout edits — width/height for A and B are independent; bezel sync runs on preset load only. */
 export function patchE4LayoutField(
   s: E4MaterialSettings,
   id: keyof E4MaterialSettings,
@@ -475,27 +471,6 @@ export function patchE4LayoutField(
 
   if (id === 'layerACornerRadius') {
     return syncE4LayerBCornerRadiusFromBezel(next);
-  }
-
-  if (LAYOUT_SYNC_RESIZE_B.has(id)) {
-    const synced = syncE4LayerBDimensionsFromBezel(next);
-    return id === 'layerABezelInsetX' ? syncE4LayerBCornerRadiusFromBezel(synced) : synced;
-  }
-
-  if (id === 'layerBWidth' || id === 'layerBHeight') {
-    const outerW = next.layerAWidth as number;
-    const outerH = next.layerAHeight as number;
-    const innerW = id === 'layerBWidth' ? (value as number) : (next.layerBWidth as number);
-    const innerH = id === 'layerBHeight' ? (value as number) : (next.layerBHeight as number);
-    const insetX = Math.max(4, Math.round((outerW - innerW) / 2));
-    const insetY = Math.max(4, Math.round((outerH - innerH) / 2));
-    return {
-      ...next,
-      layerBWidth: innerW,
-      layerBHeight: innerH,
-      layerABezelInsetX: insetX,
-      layerABezelInsetY: insetY,
-    };
   }
 
   return next;
@@ -947,8 +922,12 @@ const PALETTE_FIELDS: SettingField[] = [
 function buildE4SheetFields(prefix: 'layerA' | 'layerB', label: string): E4SettingField[] {
   const borderSection = sheetSectionLabel(label, 'Border' as E2SheetSection);
   const fields = buildSheetFields(prefix, label).map((field) => {
-    if (field.id === `${prefix}Height`) return { ...field, max: 920 };
-    if (prefix === 'layerA' && field.id === `${prefix}Width`) return { ...field, max: 320 };
+    if (field.id === `${prefix}Width`) {
+      return { ...field, label: `${label} width` };
+    }
+    if (field.id === `${prefix}Height`) {
+      return { ...field, label: `${label} height` };
+    }
     if (field.id === `${prefix}BorderWidth` || field.id === `${prefix}BorderOpacity`) {
       return { ...field, when: borderEdgeUnified(prefix) };
     }
@@ -1266,6 +1245,8 @@ function radialFieldIds(prefix: 'layerA' | 'layerB'): string[] {
   ];
 }
 
+const LAYER_A_LAYOUT_INSPECT_FIELDS = ['layerAWidth', 'layerAHeight'] as const;
+const LAYER_B_LAYOUT_INSPECT_FIELDS = ['layerBWidth', 'layerBHeight'] as const;
 const pwzzovFieldsA = glassReflexFieldIds('layerA');
 const pwzzovFieldsB = glassReflexFieldIds('layerB');
 
@@ -1292,6 +1273,7 @@ export const E4_INSPECT_CATALOG: Record<
   'layer-a-rim': {
     label: 'Layer A — rim highlight',
     fields: [
+      ...LAYER_A_LAYOUT_INSPECT_FIELDS,
       ...borderEdgeFieldIds('layerA'),
       prefixed('layerA', 'topRadial'),
       prefixed('layerA', 'depth'),
@@ -1309,12 +1291,12 @@ export const E4_INSPECT_CATALOG: Record<
   'layer-a-corners': {
     label: 'Layer A — PwzzovO reflex',
     note: 'Inset box-shadow stack from CodePen erichologist/PwzzovO (.switcher).',
-    fields: [...pwzzovFieldsA, ...palette],
+    fields: [...LAYER_A_LAYOUT_INSPECT_FIELDS, ...pwzzovFieldsA, ...palette],
   },
   'layer-a-radial': {
     label: 'Layer A — radial corners',
     note: 'Soft screen-blended radial blooms — paired diagonals or per-corner control.',
-    fields: [...radialFieldsA, ...palette],
+    fields: [...LAYER_A_LAYOUT_INSPECT_FIELDS, ...radialFieldsA, ...palette],
   },
   'layer-b': {
     label: 'Layer B — frost body',
@@ -1332,6 +1314,7 @@ export const E4_INSPECT_CATALOG: Record<
   'layer-b-shine': {
     label: 'Layer B — shine layer',
     fields: [
+      ...LAYER_B_LAYOUT_INSPECT_FIELDS,
       prefixed('layerB', 'topShine'),
       prefixed('layerB', 'topRadial'),
       prefixed('layerB', 'diagonalGloss'),
@@ -1344,11 +1327,11 @@ export const E4_INSPECT_CATALOG: Record<
   'layer-b-corners': {
     label: 'Layer B — PwzzovO reflex',
     note: 'Inset box-shadow corner reflex on the frost body.',
-    fields: [...pwzzovFieldsB, ...palette],
+    fields: [...LAYER_B_LAYOUT_INSPECT_FIELDS, ...pwzzovFieldsB, ...palette],
   },
   'layer-b-radial': {
     label: 'Layer B — radial corners',
-    fields: [...radialFieldsB, ...palette],
+    fields: [...LAYER_B_LAYOUT_INSPECT_FIELDS, ...radialFieldsB, ...palette],
   },
 };
 
@@ -1632,6 +1615,7 @@ function bezelToCssVars(s: E4MaterialSettings): Record<string, string | number> 
     '--e4-layerA-rim-side-width-px': `${s.layerARimSideWidthPx}px`,
     '--e4-layerA-rim-side-shadow-strength': `${s.layerARimSideShadowStrength / 100}`,
     '--e4-layerA-rim-side-shadow-blur-px': `${s.layerARimSideShadowBlurPx}px`,
+    '--e4-layerB-rim-edge-height-px': `${s.layerBRimEdgeHeightPx}px`,
     '--e4-layerB-rim-side-gap-top': `${s.layerBRimSideGapTop}px`,
     '--e4-layerB-rim-side-gap-bottom': `${s.layerBRimSideGapBottom}px`,
     '--e4-layerB-rim-side-width-px': `${s.layerBRimSideWidthPx}px`,

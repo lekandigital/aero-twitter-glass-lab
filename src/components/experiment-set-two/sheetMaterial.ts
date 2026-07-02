@@ -74,8 +74,8 @@ type E2SheetFieldSpec = {
 };
 
 const SHEET_FIELD_SPECS: E2SheetFieldSpec[] = [
-  { key: 'width', label: 'Width', section: 'Layout', dataType: 'number', min: 200, max: 900, step: 4, unit: 'px' },
-  { key: 'height', label: 'Height', section: 'Layout', dataType: 'number', min: 160, max: 640, step: 4, unit: 'px' },
+  { key: 'width', label: 'Width', section: 'Layout', dataType: 'number', step: 4, unit: 'px' },
+  { key: 'height', label: 'Height', section: 'Layout', dataType: 'number', step: 4, unit: 'px' },
   { key: 'transparency', label: 'Transparency', section: 'Background', dataType: 'number', min: 0, max: 100, step: 1, unit: '%' },
   { key: 'frost', label: 'Frost blur', section: 'Background', dataType: 'number', min: 0, max: 40, step: 1, unit: 'px' },
   { key: 'frostMatte', label: 'Frost matte', section: 'Background', dataType: 'number', min: 0, max: 100, step: 1, unit: '%' },

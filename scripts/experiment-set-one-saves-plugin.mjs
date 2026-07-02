@@ -38,6 +38,8 @@ function sortedRecord(value) {
 
 function fingerprint(snapshot) {
   return JSON.stringify({
+    scope: snapshot.scope ?? null,
+    sourceSaveId: snapshot.sourceSaveId ?? null,
     e1: sortedRecord(snapshot.e1),
     e2: sortedRecord(snapshot.e2),
     e3: sortedRecord(snapshot.e3),

@@ -4,7 +4,7 @@
  */
 
 import type { E4MaterialSettings } from '../experiment-set-four/materialSettings';
-import { syncE4LayerBLayoutFromBezel } from '../experiment-set-four/materialSettings';
+import { applyShowcasePanelGeometry } from '../experiment-set-one/showcasePanelGeometry';
 
 export const E5_BORDER_REFINEMENTS_VERSION = 1;
 
@@ -106,10 +106,8 @@ export function refineExperimentFivePanels(e5: E4MaterialSettings): E4MaterialSe
     layerARimSideGapBottom: nudge(s.layerARimSideGapBottom, 16),
     layerBRimSideGapTop: nudge(s.layerBRimSideGapTop, 13),
     layerBRimSideGapBottom: nudge(s.layerBRimSideGapBottom, 13),
-    layerABezelInsetX: nudge(s.layerABezelInsetX, 11),
-    layerABezelInsetY: nudge(s.layerABezelInsetY, 11),
   };
   s = nudgeGlassReflexLayer(s, 'layerA');
   s = nudgeGlassReflexLayer(s, 'layerB');
-  return syncE4LayerBLayoutFromBezel(s);
+  return applyShowcasePanelGeometry({ ...s, layerBNestedInA: true });
 }

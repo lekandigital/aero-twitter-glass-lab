@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Experiment Set One Saves",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "label", "savedAt", "e1", "e2", "e3"],
+    "properties": {
+      "id": { "type": "integer" },
+      "label": { "type": "string" },
+      "savedAt": { "type": "string", "format": "date-time" },
+      "scope": { "type": "string", "enum": ["one", "two", "three", "four", "five", "six", "seven", "general"] },
+      "generalPreset": { "type": "string" },
+      "panelPosition": {
+        "type": "object",
+        "properties": { "x": { "type": "number" }, "y": { "type": "number" } },
+        "required": ["x", "y"]
+      },
+      "cornersOnly": { "type": "boolean" },
+      "e1": { "type": "object" },
+      "e2": { "type": "object" },
+      "e3": { "type": "object" },
+      "e4": { "type": "object" }
+    }
+  }
+}

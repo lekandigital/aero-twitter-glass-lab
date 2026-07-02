@@ -17,7 +17,9 @@
     "raw-reference-lab:install-runners": "node scripts/install-reference-runners.mjs",
     "raw-reference-lab:dev:all": "node scripts/dev-raw-reference-lab.mjs",
     "raw-reference-lab:check": "node scripts/audit-raw-reference-demos.mjs && node scripts/audit-raw-reference-links.mjs && node scripts/check-raw-reference-lab.mjs",
-    "saves:import": "npx --yes tsx scripts/import-experiment-set-one-saves.mjs"
+    "saves:import": "npx --yes tsx scripts/import-experiment-set-one-saves.mjs",
+    "saves:generate-six": "node scripts/generate-experiment-six-saves.mjs",
+    "render-variants:sync": "node scripts/sync-render-variants.mjs"
   },
   "dependencies": {
     "7.css": "^0.21.1",

@@ -1,5 +1,7 @@
 import { e4InspectAttrs, e4LayerADimensionStyle, e4LayerBDimensionStyle } from '../experiment-set-four/materialSettings';
 import { useExperimentSetOne } from '../experiment-set-one/combinedSettings';
+import { useLayerStageVisibility } from '../experiment-set-one/layerStageVisibility';
+import { SHOWCASE_PANEL_SNAP } from '../experiment-set-one/showcasePanelGeometry';
 import { ExperimentTwoDraggableSheet } from '../experiment-set-two/primitives';
 import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/PwzzovOGlassCorners';
@@ -105,7 +107,7 @@ function ExperimentFiveLayerBSheet() {
 }
 
 function ExperimentFiveLayerASheet() {
-  const { e5 } = useExperimentSetOne();
+  const { e5, layerBVisible } = useExperimentSetOne();
   return (
     <div
       className="experiment-four-layer-a"
@@ -139,15 +141,17 @@ function ExperimentFiveLayerASheet() {
         rimSideGapBottom={e5.layerARimSideGapBottom}
         backdropLights={layerBackdropLights('layerA', e5)}
       />
-      <div className="experiment-four-layer-a__bezel-inset">
-        <ExperimentFiveLayerBSheet />
-      </div>
+      {layerBVisible && (
+        <div className="experiment-four-layer-a__bezel-inset">
+          <ExperimentFiveLayerBSheet />
+        </div>
+      )}
       <div className="experiment-four-layer-a__content">
         <LayerCopy
           eyebrow="Reference left panel"
           title="Layer A"
           subtitle="Experiment Five · forced nested bezel"
-          body="Same materials as Experiment Four saves, but always nested and forced to the Save 19 layout footprint."
+          body="Same materials as Experiment Four saves, with showcase panel geometry (316×760) and forced nested bezel."
         />
       </div>
     </div>
@@ -155,7 +159,7 @@ function ExperimentFiveLayerASheet() {
 }
 
 export function ExperimentFiveDraggableLayerA({
-  initialPosition = { x: 40, y: 48 },
+  initialPosition = SHOWCASE_PANEL_SNAP,
   persistKey,
   layoutResetVersion = 0,
 }: {
@@ -163,6 +167,9 @@ export function ExperimentFiveDraggableLayerA({
   persistKey?: string;
   layoutResetVersion?: number;
 }) {
+  const { layerAVisible, layerBVisible } = useLayerStageVisibility();
+  if (!layerAVisible && !layerBVisible) return null;
+
   return (
     <ExperimentTwoDraggableSheet
       initialPosition={initialPosition}

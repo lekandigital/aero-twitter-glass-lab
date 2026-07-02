@@ -1,0 +1,81 @@
+/*
+ * Showcase coordinate space for Experiment Set 1 E4/E5.
+ * Pins wallpaper + stage to a shared 1440×1572 box (top-left of .aero-wallpaper__image).
+ * Panel drag x/y (24.61, 327.55) is relative to this box, not the viewport-wide stage.
+ */
+
+body:has(.experiment-set-one-page[data-showcase-align='true']) .workspace-page {
+  padding: 0;
+}
+
+body:has(.experiment-set-one-page[data-showcase-align='true']) .route-switcher {
+  position: relative;
+  z-index: 2;
+  margin: 0.75rem 0.75rem 0;
+}
+
+body:has(.experiment-set-one-page[data-showcase-align='true']) .aero-wallpaper {
+  display: block;
+  overflow: hidden;
+}
+
+body:has(.experiment-set-one-page[data-showcase-align='true']) .aero-wallpaper__stage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1440px;
+  height: 1572px;
+  display: block;
+}
+
+body:has(.experiment-set-one-page[data-showcase-align='true']) .aero-wallpaper__image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1440px;
+  height: 1572px;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+  object-position: center;
+}
+
+.experiment-set-one-page[data-showcase-align='true'] {
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  width: auto;
+}
+
+.experiment-set-one-page[data-showcase-align='true'] .experiment-set-one-stage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0;
+  width: 1440px;
+  height: 1572px;
+  min-height: 1572px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.experiment-set-one-page[data-showcase-align='true'] .experiment-set-one-stage__canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1440px;
+  height: 1572px;
+  min-height: 1572px;
+}
+
+.experiment-set-one-page[data-showcase-align='true'] .experiment-set-two-draggable {
+  transition: none;
+  pointer-events: auto;
+}
+
+.experiment-set-one-page[data-showcase-align='true'] .experiment-set-one-header {
+  position: relative;
+  z-index: 2;
+  margin: 0.75rem 0.75rem 1rem;
+  max-width: 42rem;
+}

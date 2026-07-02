@@ -1,4 +1,5 @@
 import { e3InspectAttrs } from './materialSettings';
+import { useLayerStageVisibility } from '../experiment-set-one/layerStageVisibility';
 import { ExperimentTwoDraggableSheet } from '../experiment-set-two/primitives';
 import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 
@@ -81,6 +82,9 @@ export function ExperimentThreeDraggableLayerA({
   persistKey?: string;
   layoutResetVersion?: number;
 }) {
+  const { layerAVisible } = useLayerStageVisibility();
+  if (!layerAVisible) return null;
+
   return (
     <ExperimentTwoDraggableSheet
       initialPosition={initialPosition}
@@ -102,6 +106,9 @@ export function ExperimentThreeDraggableLayerB({
   persistKey?: string;
   layoutResetVersion?: number;
 }) {
+  const { layerBVisible } = useLayerStageVisibility();
+  if (!layerBVisible) return null;
+
   return (
     <ExperimentTwoDraggableSheet
       initialPosition={initialPosition}
