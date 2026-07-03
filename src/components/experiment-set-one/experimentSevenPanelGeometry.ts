@@ -154,3 +154,17 @@ export function applyExperimentSevenPanelGeometry(s: E4MaterialSettings): E4Mate
     ...bHairlines,
   };
 }
+
+/** E8 reuses the compact E7 dimensions only; all other styling stays on the E8 branch state. */
+export function applyExperimentEightPanelGeometry(s: E4MaterialSettings): E4MaterialSettings {
+  return {
+    ...s,
+    layerAWidth: EXPERIMENT_SEVEN_PANEL_LAYOUT.layerAWidth,
+    layerAHeight: EXPERIMENT_SEVEN_PANEL_LAYOUT.layerAHeight,
+    layerACornerRadius: EXPERIMENT_SEVEN_PANEL_LAYOUT.layerACornerRadius,
+    layerBWidth: EXPERIMENT_SEVEN_PANEL_LAYOUT.layerBWidth,
+    layerBHeight: EXPERIMENT_SEVEN_PANEL_LAYOUT.layerBHeight,
+    layerBCornerRadius: EXPERIMENT_SEVEN_PANEL_LAYOUT.layerBCornerRadius,
+    layerBNestedInA: true,
+  };
+}

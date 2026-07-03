@@ -100,6 +100,7 @@ import { useReferenceWallpaper } from '../shared/useReferenceWallpaper';
 import { applyShowcasePanelGeometry, SHOWCASE_PANEL_SNAP } from './showcasePanelGeometry';
 import { applyExperimentSixPanelGeometry } from './experimentSixPanelGeometry';
 import {
+  applyExperimentEightPanelGeometry,
   applyExperimentSevenPanelGeometry,
   mergeExperimentSevenSharedPanelFields,
 } from './experimentSevenPanelGeometry';
@@ -272,11 +273,12 @@ function resolveInitialE8(boot: ExperimentSetOneSession): E4MaterialSettings {
   if (selectedSaveId != null) {
     const snapshot = loadExperimentSetOneSaves().find((save) => save.id === selectedSaveId);
     if (snapshot?.e4) {
-      return applyE6OverridesStatic(normalizeE4MaterialSettings(snapshot.e4));
+      return applyE7OverridesStatic(normalizeE4MaterialSettings(snapshot.e4));
     }
   }
-  if (boot.e8) return applyE6OverridesStatic(normalizeE4MaterialSettings(boot.e8));
-  return applyE6OverridesStatic(normalizeE4MaterialSettings(boot.e4));
+  if (boot.e8) return applyExperimentEightPanelGeometry(normalizeE4MaterialSettings(boot.e8));
+  const resolvedE7 = resolveInitialE7(boot);
+  return applyExperimentEightPanelGeometry(resolvedE7);
 }
 
 
@@ -434,12 +436,12 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     }
     if (activeExperiment === 'eight') {
       setE8State((prev) => {
-        const next = applyE6OverridesStatic(prev, variantModule);
+        const next = applyE7OverridesStatic(prev);
         setE5State(next);
         return next;
       });
     }
-  }, [activeExperiment, variantModule, saves, selectedSaveIdByExperiment]);
+  }, [activeExperiment, saves, selectedSaveIdByExperiment]);
 
   useEffect(() => {
     if (activeExperiment === 'seven') setLayerCVisible(false);
@@ -458,10 +460,6 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   }, [activeExperiment, e8]);
 
   useEffect(() => {
-    if (activeExperiment === 'eight') setE8State(e6);
-  }, [activeExperiment, e6]);
-
-  useEffect(() => {
     setE6LayerCState((prev) => clampE6LayerCLayout(prev, e6));
   }, [e6.layerBWidth, e6.layerBHeight]);
 
@@ -474,13 +472,13 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         ...e3SettingsToCssVars(e3),
         ...(activeExperiment === 'five'
           ? e4CssVars(e5)
-          : activeExperiment === 'six'
-            ? e4CssVars(e6)
-            : activeExperiment === 'seven'
-              ? e4CssVars(e7)
-              : activeExperiment === 'eight'
-                ? e4CssVars(e6)
-              : e4CssVars(e4)),
+            : activeExperiment === 'six'
+              ? e4CssVars(e6)
+              : activeExperiment === 'seven'
+                ? e4CssVars(e7)
+                : activeExperiment === 'eight'
+                  ? e4CssVars(e8)
+                  : e4CssVars(e4)),
       }) as CSSProperties,
     [e1, e2, e3, e4, e5, e6, e7, e8, activeExperiment, e4CssVars],
   );
@@ -489,7 +487,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     if (activeExperiment === 'five') return e5;
     if (activeExperiment === 'six') return e6;
     if (activeExperiment === 'seven') return e7;
-    if (activeExperiment === 'eight') return e6;
+    if (activeExperiment === 'eight') return e8;
     return e4;
   }, [activeExperiment, e4, e5, e6, e7, e8]);
 
@@ -531,7 +529,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
 
   const setE8 = useCallback(<K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => {
     setE8State((prev) => {
-      const next = patchE4LayoutField(prev, id, value);
+      const next = applyExperimentEightPanelGeometry(patchE4LayoutField(prev, id, value));
       if (activeExperiment === 'eight') setE5State(next);
       return next;
     });
@@ -573,11 +571,12 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
 
   const saveCurrent = useCallback(() => {
     const scope = selection ? selection.experiment : activeExperiment;
+    const currentE8 = e8;
     addExperimentSetOneSave(
       e1,
       e2,
       e3,
-      activeExperiment === 'five' ? e5 : activeExperiment === 'six' ? e6 : activeExperiment === 'seven' ? e7 : activeExperiment === 'eight' ? e8 : e4,
+      activeExperiment === 'five' ? e5 : activeExperiment === 'six' ? e6 : activeExperiment === 'seven' ? e7 : activeExperiment === 'eight' ? currentE8 : e4,
       scope,
     );
     setSaves(loadExperimentSetOneSaves());
@@ -585,7 +584,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       e1,
       e2,
       e3,
-      activeExperiment === 'five' ? e5 : activeExperiment === 'six' ? e6 : activeExperiment === 'seven' ? e7 : activeExperiment === 'eight' ? e8 : e4,
+      activeExperiment === 'five' ? e5 : activeExperiment === 'six' ? e6 : activeExperiment === 'seven' ? e7 : activeExperiment === 'eight' ? currentE8 : e4,
     );
   }, [e1, e2, e3, e4, e5, e6, e7, e8, selection, activeExperiment]);
 
@@ -661,8 +660,9 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
           } else if (activeExperiment === 'five') {
             setE5State(finalizeE5Material(applyShowcasePanelGeometry(material), loadedModule));
           } else if (activeExperiment === 'eight') {
-            setE8State(applyE6OverridesStatic(material, loadedModule));
-            setE5State(applyE6OverridesStatic(material, loadedModule));
+            const e8Material = applyExperimentEightPanelGeometry(material);
+            setE8State(e8Material);
+            setE5State(e8Material);
           } else {
             setE4State(applyShowcasePanelGeometry(material));
           }
@@ -691,7 +691,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
           } else if (activeExperiment === 'seven') {
             setE7State((currentE7) => finalizeE7Material(normalized, currentE7, loadedModule));
           } else if (activeExperiment === 'eight') {
-            setE8State(applyE6OverridesStatic(normalized, loadedModule));
+            setE8State(applyExperimentEightPanelGeometry(normalized));
           } else {
             setE4State(normalized);
           }
@@ -714,7 +714,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       }
       if (snapshot.scope === 'eight') {
         if (snapshot.e4) {
-          const material = applyE6OverridesStatic(normalize(snapshot.e4), loadedModule);
+          const material = applyExperimentEightPanelGeometry(normalize(snapshot.e4));
           setE8State(material);
           setE5State(material);
         }
@@ -744,7 +744,8 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         } else if (activeExperiment === 'seven') {
           setE7State((currentE7) => finalizeE7Material(normalized, currentE7, loadedModule));
         } else if (activeExperiment === 'eight') {
-          setE8State(applyE6OverridesStatic(normalized, loadedModule));
+            const material = applyExperimentEightPanelGeometry(normalized);
+          setE8State(material);
         }
       }
     },
