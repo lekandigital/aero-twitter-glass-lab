@@ -13,6 +13,7 @@ import {
   E3_MASTER_DEFAULT,
   E4_MASTER_DEFAULT,
 } from './masterDefaults';
+import { applyExperimentEightPanelGeometry } from './experimentSevenPanelGeometry';
 import { applyShowcasePanelGeometry } from './showcasePanelGeometry';
 
 import {
@@ -40,7 +41,7 @@ export type ExperimentSetOneSession = {
   e6?: E4MaterialSettings;
   /** Live Experiment Seven working copy — compact nested rects, no layer C. */
   e7?: E4MaterialSettings;
-  /** Live Experiment Eight working copy — duplicate of Experiment Six. */
+  /** Live Experiment Eight working copy — compact geometry only. */
   e8?: E4MaterialSettings;
   /** Experiment Six layer C circle layout (diameter, inset position). */
   e6LayerC?: E6LayerCLayoutSettings;
@@ -126,7 +127,7 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       e5: parsed.e5 ? normalizeE4MaterialSettings(parsed.e5) : undefined,
       e6: parsed.e6 ? normalizeE4MaterialSettings(parsed.e6) : undefined,
       e7: parsed.e7 ? normalizeE4MaterialSettings(parsed.e7) : undefined,
-      e8: parsed.e8 ? normalizeE4MaterialSettings(parsed.e8) : undefined,
+      e8: parsed.e8 ? applyExperimentEightPanelGeometry(normalizeE4MaterialSettings(parsed.e8)) : undefined,
       e6LayerC: parsed.e6LayerC,
       hidePanelText: typeof parsed.hidePanelText === 'boolean' ? parsed.hidePanelText : true,
       layerAVisible: parsed.layerAVisible !== false,
