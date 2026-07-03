@@ -30,6 +30,18 @@ import type { E6LayerCLayoutSettings } from '../experiment-set-six/layerCMateria
 const SESSION_KEY = 'experiment-set-1-session';
 let memorySessionFallback: ExperimentSetOneSession | null = null;
 
+function applyExperimentTenPanelGeometry(raw: E4MaterialSettings): E4MaterialSettings {
+  return applyShowcasePanelGeometry({
+    ...normalizeE4MaterialSettings(raw),
+    layerAWidth: 652,
+    layerAHeight: 686,
+    layerACornerRadius: 20,
+    layerBWidth: 642,
+    layerBHeight: 674,
+    layerBCornerRadius: 16,
+  });
+}
+
 export type ExperimentSetOneSession = {
   e1: E1MaterialSettings;
   e2: E2MaterialSettings;
@@ -45,6 +57,8 @@ export type ExperimentSetOneSession = {
   e8?: E4MaterialSettings;
   /** Live Experiment Nine working copy — duplicate of Experiment Four. */
   e9?: E4MaterialSettings;
+  /** Live Experiment Ten working copy — duplicate of Experiment Nine. */
+  e10?: E4MaterialSettings;
   /** Experiment Six layer C circle layout (diameter, inset position). */
   e6LayerC?: E6LayerCLayoutSettings;
   hidePanelText: boolean;
@@ -80,7 +94,7 @@ export function defaultSession(): ExperimentSetOneSession {
     experimentVisible: DEFAULT_EXPERIMENT_VISIBILITY,
     referenceWallpaper: false,
     activeExperiment: 'four',
-    selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: null, six: null, seven: null, eight: null, nine: null },
+    selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: null, six: null, seven: null, eight: null, nine: null, ten: null },
     cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
     layerEditMode: 'both',
   };
@@ -131,6 +145,7 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       e7: parsed.e7 ? normalizeE4MaterialSettings(parsed.e7) : undefined,
       e8: parsed.e8 ? applyExperimentEightPanelGeometry(normalizeE4MaterialSettings(parsed.e8)) : undefined,
       e9: parsed.e9 ? applyShowcasePanelGeometry(normalizeE4MaterialSettings(parsed.e9)) : undefined,
+      e10: parsed.e10 ? applyExperimentTenPanelGeometry(parsed.e10) : undefined,
       e6LayerC: parsed.e6LayerC,
       hidePanelText: typeof parsed.hidePanelText === 'boolean' ? parsed.hidePanelText : true,
       layerAVisible: parsed.layerAVisible !== false,
@@ -148,7 +163,8 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
         parsed.activeExperiment === 'six' ||
         parsed.activeExperiment === 'seven' ||
         parsed.activeExperiment === 'eight' ||
-        parsed.activeExperiment === 'nine'
+        parsed.activeExperiment === 'nine' ||
+        parsed.activeExperiment === 'ten'
           ? parsed.activeExperiment
           : 'four',
       selectedSaveIdByExperiment: parsed.selectedSaveIdByExperiment ?? undefined,
