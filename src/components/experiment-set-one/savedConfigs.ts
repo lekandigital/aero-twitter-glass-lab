@@ -248,7 +248,7 @@ export function addExperimentSetOneSave(
 
 export function getFieldFromSnapshot(
   snapshot: ExperimentSetOneSnapshot,
-  experiment: 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight',
+  experiment: 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine',
   fieldId: string,
 ): string | number | boolean | undefined {
   if (experiment === 'four' && snapshot.id === REFERENCE_CORNER_SAVE_ID) {
@@ -257,7 +257,7 @@ export function getFieldFromSnapshot(
     if (override !== undefined) return override;
     return undefined;
   }
-  if (experiment === 'four' || experiment === 'five' || experiment === 'six' || experiment === 'seven' || experiment === 'eight') {
+  if (experiment === 'four' || experiment === 'five' || experiment === 'six' || experiment === 'seven' || experiment === 'eight' || experiment === 'nine') {
     if (!snapshot.e4) return undefined;
     return snapshot.e4[fieldId as keyof E4MaterialSettings] as string | number | boolean;
   }
