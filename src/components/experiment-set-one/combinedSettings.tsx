@@ -170,6 +170,14 @@ function saveSelectionKey(id: number, branchSlug?: RenderVariantSlug | null): st
   return `${branchSlug ?? 'base'}:${id}`;
 }
 
+function parseSelectionKey(key: string): { branchSlug: string | null; id: number } {
+  const colonIndex = key.lastIndexOf(':');
+  if (colonIndex === -1) return { branchSlug: null, id: Number(key) };
+  const branchPart = key.slice(0, colonIndex);
+  const idPart = Number(key.slice(colonIndex + 1));
+  return { branchSlug: branchPart === 'base' ? null : branchPart, id: idPart };
+}
+
 function normalizeSaveSelectionKeys(
   rawKeys: Partial<Record<ExperimentId, string[]>> | undefined,
   rawIds: Partial<Record<ExperimentId, number[]>> | undefined,
@@ -249,6 +257,28 @@ function saveOrderIndex(order: number[], id: number): number {
 
 function sortSavesByVisualOrder<T extends { id: number }>(saves: T[], order: number[]): T[] {
   return [...saves].sort((a, b) => saveOrderIndex(order, a.id) - saveOrderIndex(order, b.id) || a.id - b.id);
+}
+
+/** Returns the saves that are available for a given experiment, applying scope filtering. */
+function getScopedSavesForExperiment(
+  allSaves: ExperimentSetOneSnapshot[],
+  experiment: ExperimentId,
+): ExperimentSetOneSnapshot[] {
+  if (experiment === 'five')
+    return allSaves.filter((s) => s.scope === 'four' || s.scope === 'five' || s.scope === 'general' || s.cornersOnly);
+  if (experiment === 'six' || experiment === 'eight')
+    return allSaves.filter((s) => s.scope === 'six' || s.scope === 'general' || s.cornersOnly);
+  if (experiment === 'seven')
+    return allSaves.filter((s) => s.scope === 'seven' || s.scope === 'general' || s.cornersOnly);
+  if (experiment === 'four')
+    return allSaves.filter((s) => s.scope === 'four' || s.scope === 'general' || s.cornersOnly);
+  if (experiment === 'nine')
+    return allSaves.filter((s) => s.scope === 'four' || s.scope === 'nine' || s.scope === 'general' || s.cornersOnly);
+  if (experiment === 'ten')
+    return allSaves.filter(
+      (s) => s.scope === 'four' || s.scope === 'nine' || s.scope === 'ten' || s.scope === 'general' || s.cornersOnly,
+    );
+  return allSaves.filter((s) => s.scope === experiment || s.cornersOnly);
 }
 
 type ExperimentSetOneContextValue = {
@@ -1700,6 +1730,76 @@ export function ExperimentSetOneSettingsDock() {
     [selectedSaveVisualOrder, selectedSaveKeysByExperiment],
   );
 
+  // ── Roster panel state ──
+  const [expandedSwapKey, setExpandedSwapKey] = useState<string | null>(null);
+
+  // Close swap dropdown when selection changes
+  const prevSaveCountRef = useRef(selectedSaveCount);
+  useEffect(() => {
+    if (selectedSaveCount !== prevSaveCountRef.current) {
+      prevSaveCountRef.current = selectedSaveCount;
+    }
+  }, [selectedSaveCount]);
+
+  // Derive roster items: all selected saves, grouped by experiment, with swap alternatives
+  type RosterItem = {
+    experiment: ExperimentId;
+    experimentLabel: string;
+    key: string;
+    instanceKey: string;
+    save: ExperimentSetOneSnapshot | undefined;
+    branchSlug: string | null;
+    swapAlternatives: Array<{ save: ExperimentSetOneSnapshot; key: string; branchSlug: string | null }>;
+  };
+
+  const rosterItems = useMemo(() => {
+    const items: RosterItem[] = [];
+    for (const experiment of EXPERIMENT_ORDER) {
+      const keys = selectedSaveKeysByExperiment[experiment] ?? [];
+      if (keys.length === 0) continue;
+      const experimentSaves = getScopedSavesForExperiment(saves, experiment);
+      for (const key of keys) {
+        const parsed = parseSelectionKey(key);
+        const save = saves.find((s) => s.id === parsed.id);
+        const instanceKey = selectedSaveInstanceKey(experiment, key);
+        // Build swap alternatives: all saves for this experiment that are NOT currently selected
+        const selectedKeysSet = new Set(keys);
+        const alternatives: RosterItem['swapAlternatives'] = [];
+        for (const altSave of experimentSaves) {
+          const altBranch = altSave.branchVariant ?? null;
+          const altKey = saveSelectionKey(altSave.id, altBranch);
+          if (!selectedKeysSet.has(altKey)) {
+            alternatives.push({ save: altSave, key: altKey, branchSlug: altBranch });
+          }
+        }
+        items.push({
+          experiment,
+          experimentLabel: experimentTitle(experiment),
+          key,
+          instanceKey,
+          save,
+          branchSlug: parsed.branchSlug,
+          swapAlternatives: alternatives,
+        });
+      }
+    }
+    return items;
+  }, [selectedSaveKeysByExperiment, saves]);
+
+  // Group roster items by experiment for rendering
+  const rosterGroups = useMemo(() => {
+    const groups: Array<{ experiment: ExperimentId; label: string; items: RosterItem[] }> = [];
+    let currentGroup: (typeof groups)[number] | null = null;
+    for (const item of rosterItems) {
+      if (!currentGroup || currentGroup.experiment !== item.experiment) {
+        currentGroup = { experiment: item.experiment, label: item.experimentLabel, items: [] };
+        groups.push(currentGroup);
+      }
+      currentGroup.items.push(item);
+    }
+    return groups;
+  }, [rosterItems]);
+
   const e1Highlight = useMemo(() => e1Highlighted(selection), [selection]);
   const e2Highlight = useMemo(() => e2Highlighted(selection), [selection]);
   const e3Highlight = useMemo(() => e3Highlighted(selection), [selection]);
@@ -2038,23 +2138,129 @@ export function ExperimentSetOneSettingsDock() {
                   </div>
                 </div>
 
-                {/* Multi-select inline badge */}
-                {(showMultiSelectionSummary || saveSelectionMode) && (
-                  <div className="experiment-one-settings-dock__saves-inline-badge">
-                    <span className="experiment-one-settings-dock__saves-inline-badge-text">
-                      {selectedSaveCount > 0
-                        ? `${multiSummaryExperimentCount} exp · ${selectedSaveCount} saves`
-                        : saveSelectionMode
-                          ? 'Click saves to select'
-                          : `${multiSummaryExperimentCount} experiments`}
-                    </span>
-                    <button
-                      type="button"
-                      className="experiment-one-settings-dock__toolbar-btn"
-                      onClick={clearMultiSelection}
-                    >
-                      Clear
-                    </button>
+                {/* Multi-select roster panel */}
+                {(selectedSaveCount > 0 || saveSelectionMode) && (
+                  <div className="experiment-one-settings-dock__roster">
+                    <div className="experiment-one-settings-dock__roster-header">
+                      <span className="experiment-one-settings-dock__roster-title">
+                        {selectedSaveCount > 0 ? 'Selected' : 'Click saves to select'}
+                      </span>
+                      {selectedSaveCount > 0 && (
+                        <span className="experiment-one-settings-dock__roster-count">{selectedSaveCount}</span>
+                      )}
+                      <button
+                        type="button"
+                        className="experiment-one-settings-dock__toolbar-btn"
+                        onClick={() => { clearMultiSelection(); setExpandedSwapKey(null); }}
+                        style={{ marginLeft: 'auto' }}
+                      >
+                        Clear
+                      </button>
+                    </div>
+                    {rosterGroups.map((group) => (
+                      <div key={group.experiment} className="experiment-one-settings-dock__roster-group">
+                        <span className="experiment-one-settings-dock__roster-group-label">{group.label}</span>
+                        {group.items.map((item) => {
+                          const orderIndex = selectedSaveInstanceOrder.indexOf(item.instanceKey);
+                          const canReorder = selectedSaveInstanceOrder.length > 1 && orderIndex !== -1;
+                          const isFrontMost = orderIndex === 0;
+                          const isBackMost = orderIndex === selectedSaveInstanceOrder.length - 1;
+                          const isExpanded = expandedSwapKey === item.instanceKey;
+                          const branchLabel = item.branchSlug && item.branchSlug !== 'base'
+                            ? RENDER_VARIANTS.find((v) => v.slug === item.branchSlug)?.label ?? item.branchSlug
+                            : null;
+                          return (
+                            <div key={item.instanceKey}>
+                              <div
+                                className={`experiment-one-settings-dock__roster-item${isExpanded ? ' experiment-one-settings-dock__roster-item--expanded' : ''}`}
+                                onClick={() => setExpandedSwapKey(isExpanded ? null : item.instanceKey)}
+                                title={`${item.save?.label ?? item.key} · click to swap with another save`}
+                              >
+                                <span className="experiment-one-settings-dock__roster-item-dot" />
+                                <span className="experiment-one-settings-dock__roster-item-label">
+                                  {item.save?.label ?? `Save ${parseSelectionKey(item.key).id}`}
+                                </span>
+                                {branchLabel && (
+                                  <span className="experiment-one-settings-dock__roster-item-branch">{branchLabel}</span>
+                                )}
+                                <span className="experiment-one-settings-dock__roster-item-actions" onClick={(e) => e.stopPropagation()}>
+                                  {canReorder && (
+                                    <>
+                                      <button
+                                        type="button"
+                                        className="experiment-one-settings-dock__save-context-btn"
+                                        onClick={(e) => { e.stopPropagation(); bringSaveForward(item.experiment, item.key); }}
+                                        disabled={isFrontMost}
+                                        title="Bring forward"
+                                      >
+                                        ▲
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="experiment-one-settings-dock__save-context-btn"
+                                        onClick={(e) => { e.stopPropagation(); sendSaveBackward(item.experiment, item.key); }}
+                                        disabled={isBackMost}
+                                        title="Send backward"
+                                      >
+                                        ▼
+                                      </button>
+                                    </>
+                                  )}
+                                  <button
+                                    type="button"
+                                    className="experiment-one-settings-dock__roster-remove"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toggleSaveMultiSelection(item.experiment, item.key, true);
+                                      if (expandedSwapKey === item.instanceKey) setExpandedSwapKey(null);
+                                    }}
+                                    title="Remove from selection"
+                                  >
+                                    ✕
+                                  </button>
+                                </span>
+                              </div>
+                              {isExpanded && item.swapAlternatives.length > 0 && (
+                                <div className="experiment-one-settings-dock__swap-dropdown">
+                                  <span className="experiment-one-settings-dock__swap-dropdown-title">Swap with</span>
+                                  {item.swapAlternatives.map((alt) => {
+                                    const altBranchLabel = alt.branchSlug
+                                      ? RENDER_VARIANTS.find((v) => v.slug === alt.branchSlug)?.label ?? alt.branchSlug
+                                      : null;
+                                    return (
+                                      <button
+                                        key={alt.key}
+                                        type="button"
+                                        className="experiment-one-settings-dock__swap-option"
+                                        onClick={() => {
+                                          // Swap: remove old, add new
+                                          toggleSaveMultiSelection(item.experiment, item.key, true);
+                                          toggleSaveMultiSelection(item.experiment, alt.key, true);
+                                          setExpandedSwapKey(null);
+                                        }}
+                                        title={`Swap to ${alt.save.label}`}
+                                      >
+                                        <span className="experiment-one-settings-dock__swap-option-label">
+                                          {alt.save.label}
+                                        </span>
+                                        {altBranchLabel && (
+                                          <span className="experiment-one-settings-dock__swap-option-branch">{altBranchLabel}</span>
+                                        )}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                              {isExpanded && item.swapAlternatives.length === 0 && (
+                                <div className="experiment-one-settings-dock__swap-dropdown">
+                                  <span className="experiment-one-settings-dock__swap-dropdown-title">No other saves available</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))}
                   </div>
                 )}
 
