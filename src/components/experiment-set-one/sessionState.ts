@@ -117,6 +117,7 @@ function normalizeSelectedSaveKeysByExperiment(
   const rawIdRecord = rawIds && typeof rawIds === 'object' ? (rawIds as Partial<Record<ExperimentId, unknown>>) : undefined;
   const legacyKeyFor = (experiment: ExperimentId, id: number) =>
     `${experiment === activeExperiment && activeRenderVariant ? activeRenderVariant : 'base'}:${id}`;
+  const keyMatchesSaveId = (key: string, id: number) => key.endsWith(`:${id}`);
 
   for (const experiment of allowed) {
     const keyValue = rawKeyRecord?.[experiment];
@@ -130,16 +131,14 @@ function normalizeSelectedSaveKeysByExperiment(
           .map((id) => legacyKeyFor(experiment, id))
       : [];
     const normalized = Array.from(new Set([...keys, ...legacyKeys]));
-    if (normalized.length > 0) next[experiment] = normalized;
-  }
-
-  for (const experiment of allowed) {
     const selected = selectedSaveIdByExperiment?.[experiment];
-    if (typeof selected === 'number' && Number.isFinite(selected)) {
-      const existing = next[experiment] ?? [];
-      const key = legacyKeyFor(experiment, selected);
-      if (!existing.includes(key)) next[experiment] = [...existing, key];
-    }
+    if (
+      normalized.length === 1 &&
+      typeof selected === 'number' &&
+      Number.isFinite(selected) &&
+      keyMatchesSaveId(normalized[0], selected)
+    ) continue;
+    if (normalized.length > 0) next[experiment] = normalized;
   }
 
   return next;
