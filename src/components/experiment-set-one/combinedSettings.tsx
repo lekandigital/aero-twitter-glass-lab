@@ -98,6 +98,10 @@ import {
 import { clearInspectFlash, flashInspectElement } from '../shared/inspectFlash';
 import { useReferenceWallpaper } from '../shared/useReferenceWallpaper';
 import { applyShowcasePanelGeometry, SHOWCASE_PANEL_SNAP } from './showcasePanelGeometry';
+import {
+  applyExperimentTenPanelGeometry,
+  normalizeExperimentTenPanelGeometry,
+} from './experimentTenPanelGeometry';
 import { applyExperimentSixPanelGeometry } from './experimentSixPanelGeometry';
 import {
   applyExperimentEightPanelGeometry,
@@ -304,26 +308,12 @@ function resolveInitialE10(boot: ExperimentSetOneSession): E4MaterialSettings {
   if (selectedSaveId != null) {
     const snapshot = loadExperimentSetOneSaves().find((save) => save.id === selectedSaveId);
     if (snapshot?.e4) {
-      return applyExperimentTenPanelGeometry(snapshot.e4 as E4MaterialSettings);
+      return normalizeExperimentTenPanelGeometry(snapshot.e4 as E4MaterialSettings);
     }
   }
-  if (boot.e10) return applyExperimentTenPanelGeometry(boot.e10);
+  if (boot.e10) return normalizeExperimentTenPanelGeometry(boot.e10);
   return applyExperimentTenPanelGeometry(boot.e9 ?? boot.e4);
 }
-
-function applyExperimentTenPanelGeometry(raw: E4MaterialSettings): E4MaterialSettings {
-  return applyShowcasePanelGeometry({
-    ...normalizeE4MaterialSettings(raw),
-    layerAWidth: 652,
-    layerAHeight: 686,
-    layerACornerRadius: 20,
-    layerBWidth: 642,
-    layerBHeight: 674,
-    layerBCornerRadius: 16,
-  });
-}
-
-
 
 function resolveInitialE5(boot: ExperimentSetOneSession): E4MaterialSettings {
   const active = boot.activeExperiment ?? 'four';
@@ -855,7 +845,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       }
       if (snapshot.scope === 'ten') {
         if (snapshot.e4) {
-          setE10State(applyExperimentTenPanelGeometry(normalize(snapshot.e4)));
+          setE10State(normalizeExperimentTenPanelGeometry(normalize(snapshot.e4)));
         }
         return;
       }
