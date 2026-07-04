@@ -1896,7 +1896,7 @@ export function ExperimentSetOneSettingsDock() {
     <ExperimentOneDraggableShell
       className="experiment-one-settings-dock"
       dragHandleSelector=".experiment-one-settings-dock__header"
-      dragExcludeSelector="button, input, textarea, select, .experiment-one-settings-dock__body, .experiment-one-settings-dock__settings-scroll, .experiment-one-settings-dock__saves-list, .experiment-one-settings-dock__layer-rail, .mat-setting-control"
+      dragExcludeSelector="button, input, textarea, select, .experiment-one-settings-dock__body, .experiment-one-settings-dock__settings-scroll, .experiment-one-settings-dock__saves-list, .experiment-one-settings-dock__layer-rail, .mat-setting-control, .experiment-one-settings-dock__experiment-tabs, .experiment-one-settings-dock__toolbar"
       initialPosition={{ x: 20, y: 96 }}
       bounds="viewport"
       persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.settingsDock}
@@ -1904,6 +1904,7 @@ export function ExperimentSetOneSettingsDock() {
       ariaLabel="Material settings"
     >
       <div className={`experiment-one-settings-dock__shell${open ? '' : ' experiment-one-settings-dock__shell--collapsed'}`}>
+        {/* ── Zone 1: Drag handle + collapse ── */}
         <header className="experiment-one-settings-dock__header">
           <div className="experiment-one-settings-dock__drag-handle" title="Drag settings panel">
             <span className="experiment-one-settings-dock__grip" aria-hidden="true" />
@@ -1913,82 +1914,6 @@ export function ExperimentSetOneSettingsDock() {
             </span>
           </div>
           <div className="experiment-one-settings-dock__header-actions">
-            <button
-              type="button"
-              className={`experiment-one-settings-dock__toggle${inspectMode ? ' experiment-one-settings-dock__toggle--active' : ''}`}
-              onClick={() => setInspectMode(!inspectMode)}
-              aria-pressed={inspectMode}
-            >
-              Inspect
-            </button>
-            {selection && (
-              <button type="button" className="experiment-one-settings-dock__toggle" onClick={clearSelection}>
-                Clear
-              </button>
-            )}
-            <button
-              type="button"
-              className={`experiment-one-settings-dock__toggle${hidePanelText ? ' experiment-one-settings-dock__toggle--active' : ''}`}
-              onClick={() => setHidePanelText(!hidePanelText)}
-              aria-pressed={hidePanelText}
-            >
-              Hide text
-            </button>
-            <button
-              type="button"
-              className={`experiment-one-settings-dock__toggle${referenceWallpaper ? ' experiment-one-settings-dock__toggle--active' : ''}`}
-              onClick={toggleReferenceWallpaper}
-              aria-pressed={referenceWallpaper}
-              title="Overlay reference.png on aero-bg at matched scale"
-            >
-              Reference bg
-            </button>
-            {(
-              [
-                ['one', 'E1'],
-                ['two', 'E2'],
-                ['three', 'E3'],
-                ['four', 'E4'],
-                ['five', 'E5'],
-                ['six', 'E6'],
-                ['seven', 'E7'],
-                ['eight', 'E8'],
-                ['nine', 'E9'],
-                ['ten', 'E10'],
-                              ] as const
-            ).map(([id, label]) => {
-              const hasSelectedSaves = (selectedSaveKeysByExperiment[id]?.length ?? 0) > 0;
-              const multiSelected = (selectedExperimentSet.has(id) && selectedExperimentCount > 1) || hasSelectedSaves;
-              const activeInMultiView = multiSelected;
-              const showActive = dockExperiment === id && (!anyMultiSelectionActive || activeInMultiView);
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  className={`experiment-one-settings-dock__toggle${showActive ? ' experiment-one-settings-dock__toggle--active' : ''}${multiSelected ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
-                  onClick={(event) => {
-                    const additive = event.metaKey || event.ctrlKey || event.shiftKey;
-                    toggleExperimentMultiSelection(id, additive);
-                  }}
-                  aria-pressed={multiSelected}
-                  title={`Show ${label} settings · Cmd/Ctrl/Shift-click to add or remove it from multi-select`}
-                >
-                  {label}
-                </button>
-              );
-            })}
-            <button type="button" className="experiment-one-settings-dock__toggle" onClick={collapseAll}>
-              Collapse
-            </button>
-            <button type="button" className="experiment-one-settings-dock__toggle" onClick={openAll}>
-              Expand
-            </button>
-            <button type="button" className="experiment-one-settings-dock__toggle" onClick={resetLayoutPositions} title="Reset panel and settings dock positions to defaults">
-              Reset layout
-            </button>
-            <button type="button" className="experiment-one-settings-dock__toggle" onClick={resetAll} title="Reset all experiments to master default">
-              Reset
-            </button>
             <button type="button" className="experiment-one-settings-dock__toggle" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
               {open ? 'Hide' : 'Show'}
             </button>
@@ -1996,73 +1921,170 @@ export function ExperimentSetOneSettingsDock() {
         </header>
 
         {open && (
-          <div className="experiment-one-settings-dock__body">
-            <div className="experiment-one-settings-dock__saves">
-              <div className="experiment-one-settings-dock__saves-head">
-                <span className="experiment-one-settings-dock__saves-title">Saves</span>
-                <div className="experiment-one-settings-dock__saves-actions">
+          <>
+            {/* ── Zone 2: Experiment tabs ── */}
+            <nav className="experiment-one-settings-dock__experiment-tabs" aria-label="Experiment selector">
+              {(
+                [
+                  ['one', 'E1'],
+                  ['two', 'E2'],
+                  ['three', 'E3'],
+                  ['four', 'E4'],
+                  ['five', 'E5'],
+                  ['six', 'E6'],
+                  ['seven', 'E7'],
+                  ['eight', 'E8'],
+                  ['nine', 'E9'],
+                  ['ten', 'E10'],
+                ] as const
+              ).map(([id, label]) => {
+                const hasSelectedSaves = (selectedSaveKeysByExperiment[id]?.length ?? 0) > 0;
+                const multiSelected = (selectedExperimentSet.has(id) && selectedExperimentCount > 1) || hasSelectedSaves;
+                const activeInMultiView = multiSelected;
+                const showActive = dockExperiment === id && (!anyMultiSelectionActive || activeInMultiView);
+                return (
                   <button
+                    key={id}
                     type="button"
-                    className={`experiment-one-settings-dock__toggle${saveSelectionMode ? ' experiment-one-settings-dock__toggle--active' : ''}`}
-                    onClick={() => setSaveSelectionMode((value) => !value)}
-                    aria-pressed={saveSelectionMode}
-                    title="When enabled, clicking save buttons adds or removes them from multi-select instead of loading them."
+                    className={`experiment-one-settings-dock__experiment-tab${showActive ? ' experiment-one-settings-dock__experiment-tab--active' : ''}${multiSelected ? ' experiment-one-settings-dock__experiment-tab--multi-selected' : ''}`}
+                    onClick={(event) => {
+                      const additive = event.metaKey || event.ctrlKey || event.shiftKey;
+                      toggleExperimentMultiSelection(id, additive);
+                    }}
+                    aria-pressed={multiSelected}
+                    title={`${label} settings · ⌘/Ctrl+click to multi-select`}
                   >
-                    {saveSelectionMode ? 'Selecting saves' : 'Select saves'}
+                    {label}
                   </button>
-                  <button type="button" className="experiment-one-settings-dock__toggle" onClick={saveCurrent}>
-                    Save
+                );
+              })}
+            </nav>
+
+            {/* ── Zone 3: Toolbar ── */}
+            <div className="experiment-one-settings-dock__toolbar" role="toolbar" aria-label="View controls">
+              <div className="experiment-one-settings-dock__toolbar-group">
+                <button
+                  type="button"
+                  className={`experiment-one-settings-dock__toolbar-btn${inspectMode ? ' experiment-one-settings-dock__toolbar-btn--active' : ''}`}
+                  onClick={() => setInspectMode(!inspectMode)}
+                  aria-pressed={inspectMode}
+                  title="Click panels to inspect their settings"
+                >
+                  Inspect
+                </button>
+                {selection && (
+                  <button type="button" className="experiment-one-settings-dock__toolbar-btn" onClick={clearSelection}>
+                    Clear
                   </button>
-                </div>
+                )}
               </div>
-              {(showMultiSelectionSummary || saveSelectionMode) && (
-                <div className="experiment-one-settings-dock__multi-summary">
-                  <div className="experiment-one-settings-dock__multi-summary-line">
-                    <span className="experiment-one-settings-dock__multi-summary-label">Multi-select</span>
-                    <span className="experiment-one-settings-dock__multi-summary-count">
-                      {multiSummaryExperimentCount} experiments · {selectedSaveCount} saves
-                    </span>
+              <div className="experiment-one-settings-dock__toolbar-group">
+                <button
+                  type="button"
+                  className={`experiment-one-settings-dock__toolbar-btn${hidePanelText ? ' experiment-one-settings-dock__toolbar-btn--active' : ''}`}
+                  onClick={() => setHidePanelText(!hidePanelText)}
+                  aria-pressed={hidePanelText}
+                  title="Hide text content on panels"
+                >
+                  Text
+                </button>
+                <button
+                  type="button"
+                  className={`experiment-one-settings-dock__toolbar-btn${referenceWallpaper ? ' experiment-one-settings-dock__toolbar-btn--active' : ''}`}
+                  onClick={toggleReferenceWallpaper}
+                  aria-pressed={referenceWallpaper}
+                  title="Overlay reference.png on aero-bg at matched scale"
+                >
+                  Ref bg
+                </button>
+              </div>
+              <div className="experiment-one-settings-dock__toolbar-group">
+                <button type="button" className="experiment-one-settings-dock__toolbar-btn" onClick={collapseAll} title="Collapse all sections">
+                  ▸ All
+                </button>
+                <button type="button" className="experiment-one-settings-dock__toolbar-btn" onClick={openAll} title="Expand all sections">
+                  ▾ All
+                </button>
+              </div>
+              <div className="experiment-one-settings-dock__toolbar-group">
+                <button type="button" className="experiment-one-settings-dock__toolbar-btn" onClick={resetLayoutPositions} title="Reset panel and settings dock positions to defaults">
+                  ↻ Layout
+                </button>
+                <button type="button" className="experiment-one-settings-dock__toolbar-btn" onClick={resetAll} title="Reset all experiments to master default">
+                  ↻ Reset
+                </button>
+              </div>
+            </div>
+
+            <div className="experiment-one-settings-dock__body">
+              {/* ── Zone 4: Saves ── */}
+              <div className="experiment-one-settings-dock__saves">
+                <div className="experiment-one-settings-dock__saves-head">
+                  <span className="experiment-one-settings-dock__saves-title">Saves</span>
+                  <div className="experiment-one-settings-dock__saves-actions">
+                    <button
+                      type="button"
+                      className={`experiment-one-settings-dock__save-selection-toggle${saveSelectionMode ? ' experiment-one-settings-dock__save-selection-toggle--active' : ''}`}
+                      onClick={() => setSaveSelectionMode((value) => !value)}
+                      aria-pressed={saveSelectionMode}
+                      title="When enabled, clicking saves adds/removes them from multi-select"
+                    >
+                      <span className="experiment-one-settings-dock__save-selection-check" aria-hidden="true" />
+                      {saveSelectionMode ? 'Selecting' : 'Select'}
+                    </button>
+                    <button type="button" className="experiment-one-settings-dock__toggle" onClick={saveCurrent}>
+                      Save +
+                    </button>
                   </div>
-                  <div className="experiment-one-settings-dock__multi-summary-note">
-                    {saveSelectionMode
-                      ? 'Select saves mode is on: click saves to add/remove them. Switch experiments like E8 or E9, then keep selecting.'
-                      : multiSummaryExperimentLabels.join(' · ')}
-                  </div>
-                  <button
-                    type="button"
-                    className="experiment-one-settings-dock__toggle"
-                    onClick={clearMultiSelection}
-                  >
-                    Clear multi-select
-                  </button>
                 </div>
-              )}
-              <div className="experiment-one-settings-dock__saves-list" role="group" aria-label="Experiment saves">
-                {branchSaveGroups.map(({ variant, saves: branchSaves }) => (
-                  <div key={variant.slug} className="experiment-one-settings-dock__branch-group">
-                    <span className="experiment-one-settings-dock__branch-label">{variant.label}</span>
-                    <div className="experiment-one-settings-dock__branch-saves">
-                      {branchSaves.map((save) => {
-                        const selectionKey = saveSelectionKey(save.id, variant.slug);
-                        const multiSelected = selectedSaveKeysForDockExperiment.includes(selectionKey);
-                        const current = isCurrentSaveActive(
-                          selectedSaveIdByExperiment[dockExperiment],
-                          activeRenderVariant,
-                          save.id,
-                          variant.slug,
-                        );
-                        const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
-                        const saveKey = selectionKey;
-                        const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
-                        const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
-                        const canReorderSave = multiSelected && selectedSaveInstanceOrder.length > 1 && selectedOrderIndex !== -1;
-                        const isFrontMost = selectedOrderIndex === 0;
-                        const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
-                        return (
-                          <div key={`${variant.slug}-${save.id}`} className="experiment-one-settings-dock__save-item">
+
+                {/* Multi-select inline badge */}
+                {(showMultiSelectionSummary || saveSelectionMode) && (
+                  <div className="experiment-one-settings-dock__saves-inline-badge">
+                    <span className="experiment-one-settings-dock__saves-inline-badge-text">
+                      {selectedSaveCount > 0
+                        ? `${multiSummaryExperimentCount} exp · ${selectedSaveCount} saves`
+                        : saveSelectionMode
+                          ? 'Click saves to select'
+                          : `${multiSummaryExperimentCount} experiments`}
+                    </span>
+                    <button
+                      type="button"
+                      className="experiment-one-settings-dock__toolbar-btn"
+                      onClick={clearMultiSelection}
+                    >
+                      Clear
+                    </button>
+                  </div>
+                )}
+
+                {/* Save chip list */}
+                <div className="experiment-one-settings-dock__saves-list" role="group" aria-label="Experiment saves">
+                  {branchSaveGroups.map(({ variant, saves: branchSaves }) => (
+                    <div key={variant.slug} className="experiment-one-settings-dock__branch-group">
+                      <span className="experiment-one-settings-dock__branch-label">{variant.label}</span>
+                      <div className="experiment-one-settings-dock__branch-saves">
+                        {branchSaves.map((save) => {
+                          const selectionKey = saveSelectionKey(save.id, variant.slug);
+                          const multiSelected = selectedSaveKeysForDockExperiment.includes(selectionKey);
+                          const current = isCurrentSaveActive(
+                            selectedSaveIdByExperiment[dockExperiment],
+                            activeRenderVariant,
+                            save.id,
+                            variant.slug,
+                          );
+                          const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
+                          const saveKey = selectionKey;
+                          const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
+                          const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
+                          const canReorderSave = multiSelected && selectedSaveInstanceOrder.length > 1 && selectedOrderIndex !== -1;
+                          const isFrontMost = selectedOrderIndex === 0;
+                          const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
+                          return (
                             <button
+                              key={`${variant.slug}-${save.id}`}
                               type="button"
-                              className={`experiment-one-settings-dock__toggle experiment-one-settings-dock__toggle--save${showCurrent ? ' experiment-one-settings-dock__toggle--save-current' : ''}${multiSelected ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
+                              className={`experiment-one-settings-dock__save-chip${showCurrent ? ' experiment-one-settings-dock__save-chip--current' : ''}${multiSelected ? ' experiment-one-settings-dock__save-chip--selected' : ''}`}
                               aria-pressed={multiSelected}
                               aria-current={showCurrent ? 'true' : undefined}
                               onClick={(event) => {
@@ -2083,62 +2105,63 @@ export function ExperimentSetOneSettingsDock() {
                                   toggleSaveMultiSelection(dockExperiment, selectionKey, true);
                                 }
                               }}
-                              title={`Click to restore ${save.label} (${variant.label} pipeline) from ${new Date(save.savedAt).toLocaleString()} · Select saves mode or Cmd/Ctrl/Shift-click to multi-select`}
+                              title={`${save.label} (${variant.label}) · click to load · ⌘+click to multi-select`}
                             >
                               {save.label}
+                              {canReorderSave && (
+                                <span className="experiment-one-settings-dock__save-context-actions" onClick={(e) => e.stopPropagation()}>
+                                  <button
+                                    type="button"
+                                    className="experiment-one-settings-dock__save-context-btn"
+                                    onClick={(e) => { e.stopPropagation(); bringSaveForward(dockExperiment, selectionKey); }}
+                                    disabled={isFrontMost}
+                                    title="Bring forward"
+                                  >
+                                    ▲
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="experiment-one-settings-dock__save-context-btn"
+                                    onClick={(e) => { e.stopPropagation(); sendSaveBackward(dockExperiment, selectionKey); }}
+                                    disabled={isBackMost}
+                                    title="Send backward"
+                                  >
+                                    ▼
+                                  </button>
+                                </span>
+                              )}
                             </button>
-                            <div className="experiment-one-settings-dock__save-controls" aria-label={`Visual order controls for ${save.label}`}>
-                              <button
-                                type="button"
-                                className="experiment-one-settings-dock__save-order-btn"
-                                onClick={() => bringSaveForward(dockExperiment, selectionKey)}
-                                disabled={!canReorderSave || isFrontMost}
-                                title="Bring forward"
-                              >
-                                Front
-                              </button>
-                              <button
-                                type="button"
-                                className="experiment-one-settings-dock__save-order-btn"
-                                onClick={() => sendSaveBackward(dockExperiment, selectionKey)}
-                                disabled={!canReorderSave || isBackMost}
-                                title="Send backward"
-                              >
-                                Back
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
-                {generalScopedSaves.length > 0 && (
-                  <div className="experiment-one-settings-dock__branch-group">
-                    <span className="experiment-one-settings-dock__branch-label">General</span>
-                    <div className="experiment-one-settings-dock__branch-saves">
-                      {generalScopedSaves.map((save) => {
-                        const branchVariant = save.branchVariant ?? null;
-                        const selectionKey = saveSelectionKey(save.id, branchVariant);
-                        const multiSelected = selectedSaveKeysForDockExperiment.includes(selectionKey);
-                        const current = isCurrentSaveActive(
-                          selectedSaveIdByExperiment[dockExperiment],
-                          activeRenderVariant,
-                          save.id,
-                          branchVariant,
-                        );
-                        const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
-                        const saveKey = selectionKey;
-                        const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
-                        const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
-                        const canReorderSave = multiSelected && selectedSaveInstanceOrder.length > 1 && selectedOrderIndex !== -1;
-                        const isFrontMost = selectedOrderIndex === 0;
-                        const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
-                        return (
-                          <div key={save.id} className="experiment-one-settings-dock__save-item">
+                  ))}
+                  {generalScopedSaves.length > 0 && (
+                    <div className="experiment-one-settings-dock__branch-group">
+                      <span className="experiment-one-settings-dock__branch-label">General</span>
+                      <div className="experiment-one-settings-dock__branch-saves">
+                        {generalScopedSaves.map((save) => {
+                          const branchVariant = save.branchVariant ?? null;
+                          const selectionKey = saveSelectionKey(save.id, branchVariant);
+                          const multiSelected = selectedSaveKeysForDockExperiment.includes(selectionKey);
+                          const current = isCurrentSaveActive(
+                            selectedSaveIdByExperiment[dockExperiment],
+                            activeRenderVariant,
+                            save.id,
+                            branchVariant,
+                          );
+                          const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
+                          const saveKey = selectionKey;
+                          const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
+                          const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
+                          const canReorderSave = multiSelected && selectedSaveInstanceOrder.length > 1 && selectedOrderIndex !== -1;
+                          const isFrontMost = selectedOrderIndex === 0;
+                          const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
+                          return (
                             <button
+                              key={save.id}
                               type="button"
-                              className={`experiment-one-settings-dock__toggle experiment-one-settings-dock__toggle--save${showCurrent ? ' experiment-one-settings-dock__toggle--save-current' : ''}${multiSelected ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
+                              className={`experiment-one-settings-dock__save-chip${showCurrent ? ' experiment-one-settings-dock__save-chip--current' : ''}${multiSelected ? ' experiment-one-settings-dock__save-chip--selected' : ''}`}
                               aria-pressed={multiSelected}
                               aria-current={showCurrent ? 'true' : undefined}
                               onClick={(event) => {
@@ -2159,61 +2182,62 @@ export function ExperimentSetOneSettingsDock() {
                                   toggleSaveMultiSelection(dockExperiment, selectionKey, true);
                                 }
                               }}
-                              title={`Click to restore ${save.label}${save.branchVariant ? ` (${save.branchVariant} pipeline)` : ''} from ${new Date(save.savedAt).toLocaleString()} · Select saves mode or Cmd/Ctrl/Shift-click to multi-select`}
+                              title={`${save.label}${save.branchVariant ? ` (${save.branchVariant})` : ''} · click to load · ⌘+click to multi-select`}
                             >
                               {save.label}
+                              {canReorderSave && (
+                                <span className="experiment-one-settings-dock__save-context-actions" onClick={(e) => e.stopPropagation()}>
+                                  <button
+                                    type="button"
+                                    className="experiment-one-settings-dock__save-context-btn"
+                                    onClick={(e) => { e.stopPropagation(); bringSaveForward(dockExperiment, selectionKey); }}
+                                    disabled={isFrontMost}
+                                    title="Bring forward"
+                                  >
+                                    ▲
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="experiment-one-settings-dock__save-context-btn"
+                                    onClick={(e) => { e.stopPropagation(); sendSaveBackward(dockExperiment, selectionKey); }}
+                                    disabled={isBackMost}
+                                    title="Send backward"
+                                  >
+                                    ▼
+                                  </button>
+                                </span>
+                              )}
                             </button>
-                            <div className="experiment-one-settings-dock__save-controls" aria-label={`Visual order controls for ${save.label}`}>
-                              <button
-                                type="button"
-                                className="experiment-one-settings-dock__save-order-btn"
-                                onClick={() => bringSaveForward(dockExperiment, selectionKey)}
-                                disabled={!canReorderSave || isFrontMost}
-                                title="Bring forward"
-                              >
-                                Front
-                              </button>
-                              <button
-                                type="button"
-                                className="experiment-one-settings-dock__save-order-btn"
-                                onClick={() => sendSaveBackward(dockExperiment, selectionKey)}
-                                disabled={!canReorderSave || isBackMost}
-                                title="Send backward"
-                              >
-                                Back
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )}
-                {otherScopedSaves.length > 0 && (branchSaveGroups.length > 0 || generalScopedSaves.length > 0) && (
-                  <span className="experiment-one-settings-dock__branch-label">Other saves</span>
-                )}
-                {otherScopedSaves.map((save) => {
-                  const branchVariant = save.branchVariant ?? null;
-                  const selectionKey = saveSelectionKey(save.id, branchVariant);
-                  const multiSelected = selectedSaveKeysForDockExperiment.includes(selectionKey);
-                  const current = isCurrentSaveActive(
-                    selectedSaveIdByExperiment[dockExperiment],
-                    activeRenderVariant,
-                    save.id,
-                    branchVariant,
-                  );
-                  const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
-                  const saveKey = selectionKey;
-                  const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
-                  const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
-                  const canReorderSave = multiSelected && selectedSaveInstanceOrder.length > 1 && selectedOrderIndex !== -1;
-                  const isFrontMost = selectedOrderIndex === 0;
-                  const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
-                  return (
-                    <div key={save.id} className="experiment-one-settings-dock__save-item">
+                  )}
+                  {otherScopedSaves.length > 0 && (branchSaveGroups.length > 0 || generalScopedSaves.length > 0) && (
+                    <span className="experiment-one-settings-dock__branch-label">Other saves</span>
+                  )}
+                  {otherScopedSaves.map((save) => {
+                    const branchVariant = save.branchVariant ?? null;
+                    const selectionKey = saveSelectionKey(save.id, branchVariant);
+                    const multiSelected = selectedSaveKeysForDockExperiment.includes(selectionKey);
+                    const current = isCurrentSaveActive(
+                      selectedSaveIdByExperiment[dockExperiment],
+                      activeRenderVariant,
+                      save.id,
+                      branchVariant,
+                    );
+                    const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
+                    const saveKey = selectionKey;
+                    const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
+                    const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
+                    const canReorderSave = multiSelected && selectedSaveInstanceOrder.length > 1 && selectedOrderIndex !== -1;
+                    const isFrontMost = selectedOrderIndex === 0;
+                    const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
+                    return (
                       <button
+                        key={save.id}
                         type="button"
-                        className={`experiment-one-settings-dock__toggle experiment-one-settings-dock__toggle--save${showCurrent ? ' experiment-one-settings-dock__toggle--save-current' : ''}${multiSelected ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
+                        className={`experiment-one-settings-dock__save-chip${showCurrent ? ' experiment-one-settings-dock__save-chip--current' : ''}${multiSelected ? ' experiment-one-settings-dock__save-chip--selected' : ''}`}
                         aria-pressed={multiSelected}
                         aria-current={showCurrent ? 'true' : undefined}
                         onClick={(event) => {
@@ -2234,84 +2258,81 @@ export function ExperimentSetOneSettingsDock() {
                             toggleSaveMultiSelection(dockExperiment, selectionKey, true);
                           }
                         }}
-                        title={`Click to restore ${save.label} from ${new Date(save.savedAt).toLocaleString()} · Select saves mode or Cmd/Ctrl/Shift-click to multi-select`}
+                        title={`${save.label} · click to load · ⌘+click to multi-select`}
                       >
                         {save.label}
+                        {canReorderSave && (
+                          <span className="experiment-one-settings-dock__save-context-actions" onClick={(e) => e.stopPropagation()}>
+                            <button
+                              type="button"
+                              className="experiment-one-settings-dock__save-context-btn"
+                              onClick={(e) => { e.stopPropagation(); bringSaveForward(dockExperiment, selectionKey); }}
+                              disabled={isFrontMost}
+                              title="Bring forward"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              className="experiment-one-settings-dock__save-context-btn"
+                              onClick={(e) => { e.stopPropagation(); sendSaveBackward(dockExperiment, selectionKey); }}
+                              disabled={isBackMost}
+                              title="Send backward"
+                            >
+                              ▼
+                            </button>
+                          </span>
+                        )}
                       </button>
-                      <div className="experiment-one-settings-dock__save-controls" aria-label={`Visual order controls for ${save.label}`}>
-                        <button
-                          type="button"
-                          className="experiment-one-settings-dock__save-order-btn"
-                          onClick={() => bringSaveForward(dockExperiment, selectionKey)}
-                          disabled={!canReorderSave || isFrontMost}
-                          title="Bring forward"
-                        >
-                          Front
-                        </button>
-                        <button
-                          type="button"
-                          className="experiment-one-settings-dock__save-order-btn"
-                          onClick={() => sendSaveBackward(dockExperiment, selectionKey)}
-                          disabled={!canReorderSave || isBackMost}
-                          title="Send backward"
-                        >
-                          Back
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div
-              className={`experiment-one-settings-dock__workspace${showLayerEditToggle ? ' experiment-one-settings-dock__workspace--layered' : ''}`}
-            >
-              {showLayerEditToggle && (
-                <aside className="experiment-one-settings-dock__layer-rail" aria-label="Layer controls">
-                  <span className="experiment-one-settings-dock__layer-rail-label">Edit</span>
-                  <LayerEditModeToggle
-                    value={layerEditMode}
-                    onChange={handleLayerEditModeChange}
-                    layout="side"
-                  showLayerC={dockExperiment === 'six' || dockExperiment === 'eight'}
-                  />
-                  <span className="experiment-one-settings-dock__layer-rail-label">Show</span>
-                  <LayerVisibilityToggles
-                    layerAVisible={layerAVisible}
-                    layerBVisible={layerBVisible}
-                    layerCVisible={layerCVisible}
-                    onToggleLayerA={toggleLayerAVisible}
-                    onToggleLayerB={toggleLayerBVisible}
-                    onToggleLayerC={toggleLayerCVisible}
-                    showLayerC={dockExperiment === 'six' || dockExperiment === 'eight'}
-                  />
-                </aside>
-              )}
-
-            <div ref={settingsScrollRef} className="experiment-one-settings-dock__settings-scroll">
-              {selection ? (
-                <div className="experiment-one-settings-dock__selection">
-                  <span className="experiment-one-settings-dock__selection-label">Inspecting</span>
-                  <strong className="experiment-one-settings-dock__selection-name">{selection.label}</strong>
-                  <span className="experiment-one-settings-dock__selection-meta">
-                    {relatedCount} settings for this layer
-                    {(() => {
-                      const key = selectionPersistKey(selection);
-                      const pos = loadDragPosition(key);
-                      if (!pos) return null;
-                      return ` · x ${Math.round(pos.x)} · y ${Math.round(pos.y)}`;
-                    })()}
-                  </span>
+                    );
+                  })}
                 </div>
-              ) : (
-                <p className="experiment-one-settings-dock__hint">
-                  {inspectMode
-                    ? 'Click a panel or layer to show only its settings here.'
-                    : 'Enable Inspect, then click a panel or layer.'}
-                </p>
-              )}
-              {note && <p className="experiment-one-settings-dock__note">{note}</p>}
+              </div>
+
+              {/* ── Zone 5: Properties ── */}
+              <div
+                className={`experiment-one-settings-dock__workspace${showLayerEditToggle ? ' experiment-one-settings-dock__workspace--layered' : ''}`}
+              >
+                {showLayerEditToggle && (
+                  <aside className="experiment-one-settings-dock__layer-rail" aria-label="Layer controls">
+                    <span className="experiment-one-settings-dock__layer-rail-label">Edit</span>
+                    <LayerEditModeToggle
+                      value={layerEditMode}
+                      onChange={handleLayerEditModeChange}
+                      layout="side"
+                    showLayerC={dockExperiment === 'six' || dockExperiment === 'eight'}
+                    />
+                    <span className="experiment-one-settings-dock__layer-rail-label">Show</span>
+                    <LayerVisibilityToggles
+                      layerAVisible={layerAVisible}
+                      layerBVisible={layerBVisible}
+                      layerCVisible={layerCVisible}
+                      onToggleLayerA={toggleLayerAVisible}
+                      onToggleLayerB={toggleLayerBVisible}
+                      onToggleLayerC={toggleLayerCVisible}
+                      showLayerC={dockExperiment === 'six' || dockExperiment === 'eight'}
+                    />
+                  </aside>
+                )}
+
+              <div ref={settingsScrollRef} className="experiment-one-settings-dock__settings-scroll">
+                {/* Inspect banner — compact, replaces old selection card */}
+                {selection ? (
+                  <div className="experiment-one-settings-dock__inspect-banner">
+                    <span className="experiment-one-settings-dock__inspect-banner-label">Inspecting</span>
+                    <strong className="experiment-one-settings-dock__inspect-banner-name">{selection.label}</strong>
+                    <span className="experiment-one-settings-dock__inspect-banner-meta">
+                      {relatedCount} settings
+                    </span>
+                  </div>
+                ) : (
+                  <p className="experiment-one-settings-dock__hint">
+                    {inspectMode
+                      ? 'Click a panel or layer to show only its settings here.'
+                      : 'Enable Inspect, then click a panel or layer.'}
+                  </p>
+                )}
+                {note && <p className="experiment-one-settings-dock__note">{note}</p>}
 
             {dockExperiment === 'one' && visibleE1Fields.length > 0 && (
             <section className="experiment-set-one-dock__experiment">
@@ -2606,6 +2627,7 @@ export function ExperimentSetOneSettingsDock() {
             </div>
             </div>
           </div>
+          </>
         )}
       </div>
     </ExperimentOneDraggableShell>
