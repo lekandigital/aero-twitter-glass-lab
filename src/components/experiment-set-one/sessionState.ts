@@ -15,6 +15,7 @@ import {
 } from './masterDefaults';
 import { applyExperimentEightPanelGeometry } from './experimentSevenPanelGeometry';
 import { applyShowcasePanelGeometry } from './showcasePanelGeometry';
+import { normalizeExperimentTenPanelGeometry } from './experimentTenPanelGeometry';
 
 import {
   DEFAULT_EXPERIMENT_VISIBILITY,
@@ -29,18 +30,6 @@ import type { E6LayerCLayoutSettings } from '../experiment-set-six/layerCMateria
 
 const SESSION_KEY = 'experiment-set-1-session';
 let memorySessionFallback: ExperimentSetOneSession | null = null;
-
-function applyExperimentTenPanelGeometry(raw: E4MaterialSettings): E4MaterialSettings {
-  return applyShowcasePanelGeometry({
-    ...normalizeE4MaterialSettings(raw),
-    layerAWidth: 652,
-    layerAHeight: 686,
-    layerACornerRadius: 20,
-    layerBWidth: 642,
-    layerBHeight: 674,
-    layerBCornerRadius: 16,
-  });
-}
 
 export type ExperimentSetOneSession = {
   e1: E1MaterialSettings;
@@ -145,7 +134,7 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       e7: parsed.e7 ? normalizeE4MaterialSettings(parsed.e7) : undefined,
       e8: parsed.e8 ? applyExperimentEightPanelGeometry(normalizeE4MaterialSettings(parsed.e8)) : undefined,
       e9: parsed.e9 ? applyShowcasePanelGeometry(normalizeE4MaterialSettings(parsed.e9)) : undefined,
-      e10: parsed.e10 ? applyExperimentTenPanelGeometry(parsed.e10) : undefined,
+      e10: parsed.e10 ? normalizeExperimentTenPanelGeometry(parsed.e10) : undefined,
       e6LayerC: parsed.e6LayerC,
       hidePanelText: typeof parsed.hidePanelText === 'boolean' ? parsed.hidePanelText : true,
       layerAVisible: parsed.layerAVisible !== false,
