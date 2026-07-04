@@ -692,6 +692,14 @@
   gap: 0.6rem;
 }
 
+.experiment-one-settings-dock__saves-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .experiment-one-settings-dock__multi-summary {
   display: flex;
   flex-direction: column;
@@ -896,6 +904,13 @@
   border-color: rgba(100, 220, 160, 0.35);
 }
 
+.experiment-one-settings-dock__toggle--save-current {
+  color: rgba(220, 255, 238, 0.98);
+  background: rgba(40, 160, 100, 0.28);
+  border-color: rgba(120, 240, 180, 0.58);
+  box-shadow: 0 0 0 1px rgba(170, 255, 210, 0.24);
+}
+
 .experiment-one-settings-dock__toggle--selected {
   color: #fff;
   background: rgba(40, 160, 100, 0.32);
@@ -903,9 +918,21 @@
   box-shadow: 0 0 0 1px rgba(170, 255, 210, 0.35), 0 10px 24px rgba(0, 24, 14, 0.35);
 }
 
+.experiment-one-settings-dock__toggle--save.experiment-one-settings-dock__toggle--selected {
+  color: #fff2dc;
+  background: rgba(246, 126, 36, 0.32);
+  border-color: rgba(255, 166, 79, 0.72);
+  box-shadow: 0 0 0 1px rgba(255, 179, 92, 0.42), 0 10px 24px rgba(72, 30, 0, 0.38);
+}
+
 .experiment-one-settings-dock__toggle--save:hover {
   background: rgba(40, 160, 100, 0.28);
   border-color: rgba(120, 240, 180, 0.5);
+}
+
+.experiment-one-settings-dock__toggle--save.experiment-one-settings-dock__toggle--selected:hover {
+  background: rgba(255, 139, 43, 0.4);
+  border-color: rgba(255, 184, 92, 0.82);
 }
 
 .experiment-one-settings-dock__section-title {

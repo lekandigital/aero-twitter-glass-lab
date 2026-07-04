@@ -19,5 +19,5 @@ export function applyExperimentTenPanelGeometry(raw: E4MaterialSettings): E4Mate
 }
 
 export function normalizeExperimentTenPanelGeometry(raw: E4MaterialSettings): E4MaterialSettings {
-  return applyShowcasePanelGeometry(normalizeE4MaterialSettings(raw));
+  return applyExperimentTenPanelGeometry(raw);
 }

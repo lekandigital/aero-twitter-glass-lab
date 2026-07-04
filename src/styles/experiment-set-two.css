@@ -98,6 +98,37 @@
   z-index: 4;
 }
 
+.experiment-set-one-stage__multi-shell {
+  position: absolute;
+  inset: 0;
+  transform-origin: top left;
+}
+
+.experiment-set-one-selected-save-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  transform-origin: top left;
+}
+
+.experiment-set-one-selected-save-stage__layer-a,
+.experiment-set-one-selected-save-stage__free-layer-b {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+
+.experiment-set-one-selected-save-stage .experiment-four-layer-a,
+.experiment-set-one-selected-save-stage .experiment-four-layer-b {
+  pointer-events: none;
+}
+
+.experiment-set-one-selected-save-stage .experiment-four-layer-a {
+  overflow: visible;
+}
+
 .experiment-set-one-page[data-hide-panel-text='true'] .experiment-one-panel__content,
 .experiment-set-one-page[data-hide-panel-text='true'] .experiment-two-sheet__content,
 .experiment-set-one-page[data-hide-panel-text='true'] .experiment-three-layer-a__content,

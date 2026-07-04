@@ -1,4 +1,5 @@
 /** Draggable panels for Experiment Set 1 — positions persist across refresh. */
+import type { CSSProperties, ReactNode } from 'react';
 import {
   ExperimentOneDraggablePanel,
   ExperimentOneGlassPanel,
@@ -12,19 +13,97 @@ import {
   ExperimentThreeDraggableLayerA,
   ExperimentThreeDraggableLayerB,
 } from '../experiment-set-three/primitives';
+import { e4SettingsToCssVars, type E4MaterialSettings } from '../experiment-set-four/materialSettings';
+import { useRenderVariant } from '../../render-variants/RenderVariantContext';
 import { EXPERIMENT_SET_ONE_POSITION_KEYS } from './dragPositions';
 import { useExperimentSetOne } from './combinedSettings';
 import { VariantPanelSlots } from './VariantPanelSlots';
+import { SelectedSaveStagePanels } from './SelectedSavePreviews';
+import type { ExperimentId } from './experimentVisibility';
+
+const STAGE_EXPERIMENTS: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const MULTI_EXPERIMENT_CASCADE_STEP = 28;
+
+function selectedSaveCount(selectedSaveKeysByExperiment: Partial<Record<ExperimentId, string[]>>) {
+  return Object.values(selectedSaveKeysByExperiment).reduce((count, keys) => count + (keys?.length ?? 0), 0);
+}
+
+function saveSelectionKey(id: number, branchSlug?: string | null): string {
+  return `${branchSlug ?? 'base'}:${id}`;
+}
 
 export function ExperimentSetOneStage() {
-  const { layoutResetVersion, activeExperiment, e4, e7, e9, e10 } = useExperimentSetOne();
+  const {
+    layoutResetVersion,
+    activeExperiment,
+    e4,
+    e5,
+    e6,
+    e7,
+    e8,
+    e9,
+    e10,
+    selectedExperimentIds,
+    selectedSaveIdByExperiment,
+    selectedSaveKeysByExperiment,
+  } = useExperimentSetOne();
+  const { slug: activeRenderVariant } = useRenderVariant();
   const nestedB = e4.layerBNestedInA;
-  const show = (id: 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten') => id === activeExperiment;
+  const saveMultiActive = selectedSaveCount(selectedSaveKeysByExperiment) > 0;
+  const experimentMultiActive = selectedExperimentIds.length > 1;
+  const activeSaveId = selectedSaveIdByExperiment[activeExperiment];
+  const activeSaveKey = activeSaveId == null ? null : saveSelectionKey(activeSaveId, activeRenderVariant);
+  const activeSaveIsMultiSelected =
+    activeSaveKey != null && (selectedSaveKeysByExperiment[activeExperiment] ?? []).includes(activeSaveKey);
+  const visibleExperimentIds = saveMultiActive
+    ? activeSaveIsMultiSelected
+      ? [activeExperiment]
+      : []
+    : experimentMultiActive
+      ? STAGE_EXPERIMENTS.filter((id) => selectedExperimentIds.includes(id))
+      : [activeExperiment];
+  const visibleExperimentSet = new Set(visibleExperimentIds);
+  const show = (id: ExperimentId) => visibleExperimentSet.has(id);
+  const multiExperimentLayout = !saveMultiActive && experimentMultiActive;
+  const materialForExperiment = (id: ExperimentId): E4MaterialSettings | null => {
+    if (id === 'four') return e4;
+    if (id === 'five') return e5;
+    if (id === 'six') return e6;
+    if (id === 'seven') return e7;
+    if (id === 'eight') return e8;
+    if (id === 'nine') return e9;
+    if (id === 'ten') return e10;
+    return null;
+  };
+  const stageShell = (id: ExperimentId, children: ReactNode) => {
+    const visibleIndex = visibleExperimentIds.indexOf(id);
+    if (visibleIndex === -1) return null;
+    const material = materialForExperiment(id);
+    const style = {
+      ...(material ? e4SettingsToCssVars(material) : {}),
+      ...(multiExperimentLayout
+        ? {
+            transform: `translate(${visibleIndex * MULTI_EXPERIMENT_CASCADE_STEP}px, ${visibleIndex * MULTI_EXPERIMENT_CASCADE_STEP}px)`,
+            zIndex: 12 + visibleExperimentIds.length - visibleIndex,
+          }
+        : {}),
+    } as CSSProperties;
+    return (
+      <div
+        className="experiment-set-one-stage__multi-shell"
+        data-stage-experiment={id}
+        data-stage-multi={multiExperimentLayout || saveMultiActive}
+        style={style}
+      >
+        {children}
+      </div>
+    );
+  };
 
   return (
     <main className="experiment-set-one-stage" aria-label="Experiment Set 1 panel stage">
       <div className="experiment-set-one-stage__canvas">
-        {show('one') && (
+        {show('one') && stageShell('one', (
           <ExperimentOneDraggablePanel
             initialPosition={{ x: 40, y: 40 }}
             persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.panelOne}
@@ -40,9 +119,9 @@ export function ExperimentSetOneStage() {
               <p className="experiment-one-panel__drag-hint">Hold and drag to sample background · click layers to inspect</p>
             </ExperimentOneGlassPanel>
           </ExperimentOneDraggablePanel>
-        )}
+        ))}
 
-        {show('two') && (
+        {show('two') && stageShell('two', (
           <>
             <ExperimentTwoDraggableSheet
               initialPosition={{ x: 520, y: 200 }}
@@ -63,9 +142,9 @@ export function ExperimentSetOneStage() {
               <ExperimentTwoFrostSheet />
             </ExperimentTwoDraggableSheet>
           </>
-        )}
+        ))}
 
-        {show('three') && (
+        {show('three') && stageShell('three', (
           <>
             <ExperimentThreeDraggableLayerA
               initialPosition={{ x: 120, y: 320 }}
@@ -78,64 +157,65 @@ export function ExperimentSetOneStage() {
               layoutResetVersion={layoutResetVersion}
             />
           </>
-        )}
+        ))}
 
-        {show('four') && (
+        {show('four') && stageShell('four', (
           <VariantPanelSlots
             experiment="four"
             layoutResetVersion={layoutResetVersion}
             nestedB={nestedB}
           />
-        )}
+        ))}
 
-        {show('five') && (
+        {show('five') && stageShell('five', (
           <VariantPanelSlots
             experiment="five"
             layoutResetVersion={layoutResetVersion}
             nestedB={nestedB}
           />
-        )}
+        ))}
 
-        {show('six') && (
+        {show('six') && stageShell('six', (
           <VariantPanelSlots
             experiment="six"
             layoutResetVersion={layoutResetVersion}
             nestedB={true}
           />
-        )}
+        ))}
 
-        {show('seven') && (
+        {show('seven') && stageShell('seven', (
           <VariantPanelSlots
             experiment="seven"
             layoutResetVersion={layoutResetVersion}
             nestedB={e7.layerBNestedInA}
           />
-        )}
+        ))}
 
-        {show('eight') && (
+        {show('eight') && stageShell('eight', (
           <VariantPanelSlots
             experiment="eight"
             layoutResetVersion={layoutResetVersion}
             nestedB={true}
           />
-        )}
+        ))}
 
-        {show('nine') && (
+        {show('nine') && stageShell('nine', (
           <VariantPanelSlots
             experiment="nine"
             layoutResetVersion={layoutResetVersion}
             nestedB={e9.layerBNestedInA}
           />
-        )}
+        ))}
 
-        {show('ten') && (
+        {show('ten') && stageShell('ten', (
           <VariantPanelSlots
             experiment="ten"
             layoutResetVersion={layoutResetVersion}
             nestedB={e10.layerBNestedInA}
           />
-        )}
+        ))}
 
+        <SelectedSaveStagePanels />
       </div>
     </main>
   );

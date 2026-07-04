@@ -188,15 +188,13 @@ function normalizeSaveSelectionKeys(
   return next;
 }
 
-function isSaveSelectionActive(
-  selectedKeys: readonly string[],
+function isCurrentSaveActive(
   selectedId: number | null,
   activeRenderVariant: RenderVariantSlug | null,
   id: number,
   branchSlug?: RenderVariantSlug | null,
 ): boolean {
-  if (selectedKeys.includes(saveSelectionKey(id, branchSlug))) return true;
-  if (selectedKeys.length > 0 || selectedId !== id) return false;
+  if (selectedId !== id) return false;
   return (branchSlug ?? null) === activeRenderVariant;
 }
 
@@ -210,14 +208,12 @@ function normalizeSaveVisualOrder(raw: number[] | undefined, saves: ExperimentSe
   return Array.from(new Set([...rawIds, ...availableIds]));
 }
 
-function moveIdInOrder(order: number[], id: number, direction: -1 | 1): number[] {
+function moveIdToOrderEdge(order: number[], id: number, edge: 'front' | 'back'): number[] {
   const index = order.indexOf(id);
   if (index === -1) return order;
-  const nextIndex = index + direction;
-  if (nextIndex < 0 || nextIndex >= order.length) return order;
-  const next = [...order];
-  [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
-  return next;
+  const next = order.filter((item) => item !== id);
+  if (edge === 'front') return [id, ...next];
+  return [...next, id];
 }
 
 function saveOrderIndex(order: number[], id: number): number {
@@ -591,7 +587,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     }
     if (activeExperiment === 'ten') {
       setE10State((prev) => {
-        const next = applyShowcasePanelGeometry(prev);
+        const next = applyExperimentTenPanelGeometry(prev);
         setE5State(next);
         return next;
       });
@@ -714,7 +710,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
 
   const setE10 = useCallback(<K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => {
     setE10State((prev) => {
-      const next = patchE4LayoutField(prev, id, value);
+      const next = applyExperimentTenPanelGeometry(patchE4LayoutField(prev, id, value));
       if (activeExperiment === 'ten') setE5State(next);
       return next;
     });
@@ -833,10 +829,8 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
           ? RENDER_VARIANTS.find((variant) => variant.slug === snapshotForLookup.branchVariant)
           : renderVariantForSaveId(lookupId);
       const loadedModule = setVariant(branchDef?.slug ?? null);
-      const selectedKey = saveSelectionKey(id, branchDef?.slug ?? null);
 
       setSelectedSaveIdByExperiment((prev) => ({ ...prev, [activeExperiment]: id }));
-      setSelectedSaveKeysByExperiment((prev) => ({ ...prev, [activeExperiment]: [selectedKey] }));
       const snapshot = snapshotForLookup;
       if (!snapshot) return;
       const normalize = loadedModule?.normalizeE4MaterialSettings ?? normalizeE4MaterialSettings;
@@ -848,7 +842,9 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         else if (activeExperiment === 'nine') {
           setE9State((prev) => applyExperimentNinePanelGeometry(applyReferenceCornerLighting(prev)));
         }
-        else if (activeExperiment === 'ten') setE10State((prev) => applyReferenceCornerLighting(prev));
+        else if (activeExperiment === 'ten') {
+          setE10State((prev) => applyExperimentTenPanelGeometry(applyReferenceCornerLighting(prev)));
+        }
         else setE4State((prev) => applyReferenceCornerLighting(prev));
         return;
       }
@@ -1039,11 +1035,11 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   }, []);
 
   const bringSaveForward = useCallback((id: number) => {
-    setSaveVisualOrder((prev) => moveIdInOrder(prev, id, -1));
+    setSaveVisualOrder((prev) => moveIdToOrderEdge(prev, id, 'front'));
   }, []);
 
   const sendSaveBackward = useCallback((id: number) => {
-    setSaveVisualOrder((prev) => moveIdInOrder(prev, id, 1));
+    setSaveVisualOrder((prev) => moveIdToOrderEdge(prev, id, 'back'));
   }, []);
 
   const toggleExperimentMultiSelection = useCallback((id: ExperimentId, additive: boolean) => {
@@ -1520,6 +1516,7 @@ export function ExperimentSetOneSettingsDock() {
   } = useExperimentSetOne();
   const { slug: activeRenderVariant } = useRenderVariant();
   const [open, setOpen] = useState(true);
+  const [saveSelectionMode, setSaveSelectionMode] = useState(false);
   const [layerEditMode, setLayerEditMode] = useState<LayerEditMode>(
     () => loadExperimentSetOneSession()?.layerEditMode ?? 'both',
   );
@@ -1613,7 +1610,9 @@ export function ExperimentSetOneSettingsDock() {
     [selectedSaveKeysByExperiment],
   );
   const selectedExperimentCount = selectedExperimentLabels.length;
-  const showMultiSelectionSummary = selectedExperimentCount > 1 || selectedSaveCount > 1;
+  const saveMultiSelectionActive = selectedSaveCount > 0;
+  const anyMultiSelectionActive = selectedExperimentCount > 1 || saveMultiSelectionActive;
+  const showMultiSelectionSummary = selectedExperimentCount > 1 || saveMultiSelectionActive;
   const selectedSaveKeysForDockExperiment = selectedSaveKeysByExperiment[dockExperiment] ?? [];
 
   const e1Highlight = useMemo(() => e1Highlighted(selection), [selection]);
@@ -1872,21 +1871,27 @@ export function ExperimentSetOneSettingsDock() {
                 ['nine', 'E9'],
                 ['ten', 'E10'],
                               ] as const
-            ).map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                className={`experiment-one-settings-dock__toggle${dockExperiment === id ? ' experiment-one-settings-dock__toggle--active' : ''}${selectedExperimentSet.has(id) ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
-                onClick={(event) => {
-                  const additive = event.metaKey || event.ctrlKey || event.shiftKey;
-                  toggleExperimentMultiSelection(id, additive);
-                }}
-                aria-pressed={selectedExperimentSet.has(id)}
-                title={`Show ${label} settings · Cmd/Ctrl-click to add to multi-select`}
-              >
-                {label}
-              </button>
-            ))}
+            ).map(([id, label]) => {
+              const hasSelectedSaves = (selectedSaveKeysByExperiment[id]?.length ?? 0) > 0;
+              const multiSelected = (selectedExperimentSet.has(id) && selectedExperimentCount > 1) || hasSelectedSaves;
+              const activeInMultiView = multiSelected;
+              const showActive = dockExperiment === id && (!anyMultiSelectionActive || activeInMultiView);
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  className={`experiment-one-settings-dock__toggle${showActive ? ' experiment-one-settings-dock__toggle--active' : ''}${multiSelected ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
+                  onClick={(event) => {
+                    const additive = event.metaKey || event.ctrlKey || event.shiftKey;
+                    toggleExperimentMultiSelection(id, additive);
+                  }}
+                  aria-pressed={multiSelected}
+                  title={`Show ${label} settings · Cmd/Ctrl/Shift-click to add or remove it from multi-select`}
+                >
+                  {label}
+                </button>
+              );
+            })}
             <button type="button" className="experiment-one-settings-dock__toggle" onClick={collapseAll}>
               Collapse
             </button>
@@ -1910,11 +1915,22 @@ export function ExperimentSetOneSettingsDock() {
             <div className="experiment-one-settings-dock__saves">
               <div className="experiment-one-settings-dock__saves-head">
                 <span className="experiment-one-settings-dock__saves-title">Saves</span>
-                <button type="button" className="experiment-one-settings-dock__toggle" onClick={saveCurrent}>
-                  Save
-                </button>
+                <div className="experiment-one-settings-dock__saves-actions">
+                  <button
+                    type="button"
+                    className={`experiment-one-settings-dock__toggle${saveSelectionMode ? ' experiment-one-settings-dock__toggle--active' : ''}`}
+                    onClick={() => setSaveSelectionMode((value) => !value)}
+                    aria-pressed={saveSelectionMode}
+                    title="When enabled, clicking save buttons adds or removes them from multi-select instead of loading them."
+                  >
+                    {saveSelectionMode ? 'Selecting saves' : 'Select saves'}
+                  </button>
+                  <button type="button" className="experiment-one-settings-dock__toggle" onClick={saveCurrent}>
+                    Save
+                  </button>
+                </div>
               </div>
-              {showMultiSelectionSummary && (
+              {(showMultiSelectionSummary || saveSelectionMode) && (
                 <div className="experiment-one-settings-dock__multi-summary">
                   <div className="experiment-one-settings-dock__multi-summary-line">
                     <span className="experiment-one-settings-dock__multi-summary-label">Multi-select</span>
@@ -1923,7 +1939,9 @@ export function ExperimentSetOneSettingsDock() {
                     </span>
                   </div>
                   <div className="experiment-one-settings-dock__multi-summary-note">
-                    {selectedExperimentLabels.join(' · ')}
+                    {saveSelectionMode
+                      ? 'Select saves mode is on: click saves to add/remove them. Switch experiments like E8 or E9, then keep selecting.'
+                      : selectedExperimentLabels.join(' · ')}
                   </div>
                   <button
                     type="button"
@@ -1941,13 +1959,14 @@ export function ExperimentSetOneSettingsDock() {
                     <div className="experiment-one-settings-dock__branch-saves">
                       {branchSaves.map((save) => {
                         const selectionKey = saveSelectionKey(save.id, variant.slug);
-                        const selected = isSaveSelectionActive(
-                          selectedSaveKeysForDockExperiment,
+                        const multiSelected = selectedSaveKeysForDockExperiment.includes(selectionKey);
+                        const current = isCurrentSaveActive(
                           selectedSaveIdByExperiment[dockExperiment],
                           activeRenderVariant,
                           save.id,
                           variant.slug,
                         );
+                        const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
                         const saveKey = selectionKey;
                         const isFrontMost = saveOrderIndex(saveVisualOrder, save.id) === 0;
                         const isBackMost = saveOrderIndex(saveVisualOrder, save.id) === saveVisualOrder.length - 1;
@@ -1955,9 +1974,16 @@ export function ExperimentSetOneSettingsDock() {
                           <div key={`${variant.slug}-${save.id}`} className="experiment-one-settings-dock__save-item">
                             <button
                               type="button"
-                              className={`experiment-one-settings-dock__toggle experiment-one-settings-dock__toggle--save${selected ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
-                              aria-pressed={selected}
+                              className={`experiment-one-settings-dock__toggle experiment-one-settings-dock__toggle--save${showCurrent ? ' experiment-one-settings-dock__toggle--save-current' : ''}${multiSelected ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
+                              aria-pressed={multiSelected}
+                              aria-current={showCurrent ? 'true' : undefined}
                               onClick={(event) => {
+                                if (saveSelectionMode || event.metaKey || event.ctrlKey || event.shiftKey) {
+                                  event.preventDefault();
+                                  cancelQueuedSaveLoad(saveKey);
+                                  toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                                  return;
+                                }
                                 if (event.detail !== 1) return;
                                 queueSaveLoad(saveKey, () => loadSave(save.id, variant.slug));
                               }}
@@ -1965,9 +1991,11 @@ export function ExperimentSetOneSettingsDock() {
                                 event.preventDefault();
                                 event.stopPropagation();
                                 cancelQueuedSaveLoad(saveKey);
-                                toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                                if (!saveSelectionMode) {
+                                  toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                                }
                               }}
-                              title={`Restore ${save.label} (${variant.label} pipeline) from ${new Date(save.savedAt).toLocaleString()} · Double-click to multi-select`}
+                              title={`Click to restore ${save.label} (${variant.label} pipeline) from ${new Date(save.savedAt).toLocaleString()} · Select saves mode or Cmd/Ctrl/Shift-click to multi-select`}
                             >
                               {save.label}
                             </button>
@@ -2004,13 +2032,14 @@ export function ExperimentSetOneSettingsDock() {
                       {generalScopedSaves.map((save) => {
                         const branchVariant = save.branchVariant ?? null;
                         const selectionKey = saveSelectionKey(save.id, branchVariant);
-                        const selected = isSaveSelectionActive(
-                          selectedSaveKeysForDockExperiment,
+                        const multiSelected = selectedSaveKeysForDockExperiment.includes(selectionKey);
+                        const current = isCurrentSaveActive(
                           selectedSaveIdByExperiment[dockExperiment],
                           activeRenderVariant,
                           save.id,
                           branchVariant,
                         );
+                        const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
                         const saveKey = selectionKey;
                         const isFrontMost = saveOrderIndex(saveVisualOrder, save.id) === 0;
                         const isBackMost = saveOrderIndex(saveVisualOrder, save.id) === saveVisualOrder.length - 1;
@@ -2018,9 +2047,16 @@ export function ExperimentSetOneSettingsDock() {
                           <div key={save.id} className="experiment-one-settings-dock__save-item">
                             <button
                               type="button"
-                              className={`experiment-one-settings-dock__toggle experiment-one-settings-dock__toggle--save${selected ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
-                              aria-pressed={selected}
+                              className={`experiment-one-settings-dock__toggle experiment-one-settings-dock__toggle--save${showCurrent ? ' experiment-one-settings-dock__toggle--save-current' : ''}${multiSelected ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
+                              aria-pressed={multiSelected}
+                              aria-current={showCurrent ? 'true' : undefined}
                               onClick={(event) => {
+                                if (saveSelectionMode || event.metaKey || event.ctrlKey || event.shiftKey) {
+                                  event.preventDefault();
+                                  cancelQueuedSaveLoad(saveKey);
+                                  toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                                  return;
+                                }
                                 if (event.detail !== 1) return;
                                 queueSaveLoad(saveKey, () => loadSave(save.id, save.branchVariant));
                               }}
@@ -2028,9 +2064,11 @@ export function ExperimentSetOneSettingsDock() {
                                 event.preventDefault();
                                 event.stopPropagation();
                                 cancelQueuedSaveLoad(saveKey);
-                                toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                                if (!saveSelectionMode) {
+                                  toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                                }
                               }}
-                              title={`Restore ${save.label}${save.branchVariant ? ` (${save.branchVariant} pipeline)` : ''} from ${new Date(save.savedAt).toLocaleString()} · Double-click to multi-select`}
+                              title={`Click to restore ${save.label}${save.branchVariant ? ` (${save.branchVariant} pipeline)` : ''} from ${new Date(save.savedAt).toLocaleString()} · Select saves mode or Cmd/Ctrl/Shift-click to multi-select`}
                             >
                               {save.label}
                             </button>
@@ -2066,13 +2104,14 @@ export function ExperimentSetOneSettingsDock() {
                 {otherScopedSaves.map((save) => {
                   const branchVariant = save.branchVariant ?? null;
                   const selectionKey = saveSelectionKey(save.id, branchVariant);
-                  const selected = isSaveSelectionActive(
-                    selectedSaveKeysForDockExperiment,
+                  const multiSelected = selectedSaveKeysForDockExperiment.includes(selectionKey);
+                  const current = isCurrentSaveActive(
                     selectedSaveIdByExperiment[dockExperiment],
                     activeRenderVariant,
                     save.id,
                     branchVariant,
                   );
+                  const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
                   const saveKey = selectionKey;
                   const isFrontMost = saveOrderIndex(saveVisualOrder, save.id) === 0;
                   const isBackMost = saveOrderIndex(saveVisualOrder, save.id) === saveVisualOrder.length - 1;
@@ -2080,9 +2119,16 @@ export function ExperimentSetOneSettingsDock() {
                     <div key={save.id} className="experiment-one-settings-dock__save-item">
                       <button
                         type="button"
-                        className={`experiment-one-settings-dock__toggle experiment-one-settings-dock__toggle--save${selected ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
-                        aria-pressed={selected}
+                        className={`experiment-one-settings-dock__toggle experiment-one-settings-dock__toggle--save${showCurrent ? ' experiment-one-settings-dock__toggle--save-current' : ''}${multiSelected ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
+                        aria-pressed={multiSelected}
+                        aria-current={showCurrent ? 'true' : undefined}
                         onClick={(event) => {
+                          if (saveSelectionMode || event.metaKey || event.ctrlKey || event.shiftKey) {
+                            event.preventDefault();
+                            cancelQueuedSaveLoad(saveKey);
+                            toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                            return;
+                          }
                           if (event.detail !== 1) return;
                           queueSaveLoad(saveKey, () => loadSave(save.id, save.branchVariant));
                         }}
@@ -2090,9 +2136,11 @@ export function ExperimentSetOneSettingsDock() {
                           event.preventDefault();
                           event.stopPropagation();
                           cancelQueuedSaveLoad(saveKey);
-                          toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                          if (!saveSelectionMode) {
+                            toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                          }
                         }}
-                        title={`Restore ${save.label} from ${new Date(save.savedAt).toLocaleString()} · Double-click to multi-select`}
+                        title={`Click to restore ${save.label} from ${new Date(save.savedAt).toLocaleString()} · Select saves mode or Cmd/Ctrl/Shift-click to multi-select`}
                       >
                         {save.label}
                       </button>
