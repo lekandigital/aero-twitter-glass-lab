@@ -67,6 +67,8 @@ export type ExperimentSetOneSession = {
   /** Legacy numeric multi-select keys; kept so older sessions migrate cleanly. */
   selectedSaveIdsByExperiment?: Partial<Record<ExperimentId, number[]>>;
   saveVisualOrder?: number[];
+  selectedSaveVisualOrder?: string[];
+  selectedSavePositions?: Record<string, { x: number; y: number }>;
   cornerPresetVersion?: number;
   e5BorderRefinementsVersion?: number;
   layerEditMode?: LayerEditMode;
@@ -92,6 +94,8 @@ export function defaultSession(): ExperimentSetOneSession {
     selectedExperimentIds: ['four'],
     selectedSaveKeysByExperiment: {},
     saveVisualOrder: [],
+    selectedSaveVisualOrder: [],
+    selectedSavePositions: {},
     cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
     layerEditMode: 'both',
   };
@@ -150,6 +154,42 @@ function normalizeSaveVisualOrder(raw: unknown): number[] {
   return Array.from(new Set(ids));
 }
 
+function selectedSaveInstanceKeys(keysByExperiment: Partial<Record<ExperimentId, string[]>>): string[] {
+  const allowed: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+  return allowed.flatMap((experiment) =>
+    (keysByExperiment[experiment] ?? []).map((key) => `${experiment}:${key}`),
+  );
+}
+
+function normalizeSelectedSaveVisualOrder(
+  raw: unknown,
+  keysByExperiment: Partial<Record<ExperimentId, string[]>>,
+): string[] {
+  const available = selectedSaveInstanceKeys(keysByExperiment);
+  const availableSet = new Set(available);
+  const rawKeys = Array.isArray(raw)
+    ? raw.filter((key): key is string => typeof key === 'string' && availableSet.has(key))
+    : [];
+  const ordered = Array.from(new Set(rawKeys));
+  for (const key of available) {
+    if (!ordered.includes(key)) ordered.push(key);
+  }
+  return ordered;
+}
+
+function normalizeSelectedSavePositions(raw: unknown): Record<string, { x: number; y: number }> {
+  if (!raw || typeof raw !== 'object') return {};
+  const next: Record<string, { x: number; y: number }> = {};
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (!value || typeof value !== 'object') continue;
+    const point = value as Partial<{ x: unknown; y: unknown }>;
+    if (typeof point.x !== 'number' || typeof point.y !== 'number') continue;
+    if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) continue;
+    next[key] = { x: point.x, y: point.y };
+  }
+  return next;
+}
+
 export function readSessionReferenceWallpaper(): boolean | null {
   try {
     const raw = localStorage.getItem(SESSION_KEY);
@@ -198,6 +238,13 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       parsed.activeExperiment === 'ten'
         ? parsed.activeExperiment
         : 'four';
+    const selectedSaveKeysByExperiment = normalizeSelectedSaveKeysByExperiment(
+      parsed.selectedSaveKeysByExperiment,
+      parsed.selectedSaveIdsByExperiment,
+      parsed.selectedSaveIdByExperiment,
+      activeExperiment,
+      parsed.activeRenderVariant,
+    );
     const session: ExperimentSetOneSession = {
       e1: parsed.e1,
       e2: parsed.e2,
@@ -220,14 +267,13 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       activeExperiment,
       selectedSaveIdByExperiment: parsed.selectedSaveIdByExperiment ?? undefined,
       selectedExperimentIds: normalizeSelectedExperimentIds(parsed.selectedExperimentIds, activeExperiment),
-      selectedSaveKeysByExperiment: normalizeSelectedSaveKeysByExperiment(
-        parsed.selectedSaveKeysByExperiment,
-        parsed.selectedSaveIdsByExperiment,
-        parsed.selectedSaveIdByExperiment,
-        activeExperiment,
-        parsed.activeRenderVariant,
-      ),
+      selectedSaveKeysByExperiment,
       saveVisualOrder: normalizeSaveVisualOrder(parsed.saveVisualOrder),
+      selectedSaveVisualOrder: normalizeSelectedSaveVisualOrder(
+        parsed.selectedSaveVisualOrder,
+        selectedSaveKeysByExperiment,
+      ),
+      selectedSavePositions: normalizeSelectedSavePositions(parsed.selectedSavePositions),
       cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
       e5BorderRefinementsVersion: parsed.e5BorderRefinementsVersion,
       layerEditMode:

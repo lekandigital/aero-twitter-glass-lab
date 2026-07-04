@@ -208,12 +208,38 @@ function normalizeSaveVisualOrder(raw: number[] | undefined, saves: ExperimentSe
   return Array.from(new Set([...rawIds, ...availableIds]));
 }
 
-function moveIdToOrderEdge(order: number[], id: number, edge: 'front' | 'back'): number[] {
-  const index = order.indexOf(id);
+function selectedSaveInstanceKey(experiment: ExperimentId, key: string): string {
+  return `${experiment}:${key}`;
+}
+
+function selectedSaveInstanceKeys(keysByExperiment: Partial<Record<ExperimentId, string[]>>): string[] {
+  return EXPERIMENT_ORDER.flatMap((experiment) =>
+    (keysByExperiment[experiment] ?? []).map((key) => selectedSaveInstanceKey(experiment, key)),
+  );
+}
+
+function normalizeSelectedSaveVisualOrder(
+  raw: string[] | undefined,
+  keysByExperiment: Partial<Record<ExperimentId, string[]>>,
+): string[] {
+  const available = selectedSaveInstanceKeys(keysByExperiment);
+  const availableSet = new Set(available);
+  const rawKeys = Array.isArray(raw)
+    ? raw.filter((key): key is string => typeof key === 'string' && availableSet.has(key))
+    : [];
+  const ordered = Array.from(new Set(rawKeys));
+  for (const key of available) {
+    if (!ordered.includes(key)) ordered.push(key);
+  }
+  return ordered;
+}
+
+function moveSelectedSaveToOrderEdge(order: string[], key: string, edge: 'front' | 'back'): string[] {
+  const index = order.indexOf(key);
   if (index === -1) return order;
-  const next = order.filter((item) => item !== id);
-  if (edge === 'front') return [id, ...next];
-  return [...next, id];
+  const next = order.filter((item) => item !== key);
+  if (edge === 'front') return [key, ...next];
+  return [...next, key];
 }
 
 function saveOrderIndex(order: number[], id: number): number {
@@ -272,13 +298,16 @@ type ExperimentSetOneContextValue = {
   selectedExperimentIds: ExperimentId[];
   selectedSaveKeysByExperiment: Partial<Record<ExperimentId, string[]>>;
   saveVisualOrder: number[];
+  selectedSaveVisualOrder: string[];
+  selectedSavePositions: Record<string, { x: number; y: number }>;
   selection: ExperimentSelection | null;
   clearSelection: () => void;
   clearMultiSelection: () => void;
   queueSaveLoad: (key: string, run: () => void) => void;
   cancelQueuedSaveLoad: (key: string) => void;
-  bringSaveForward: (id: number) => void;
-  sendSaveBackward: (id: number) => void;
+  bringSaveForward: (experiment: ExperimentId, key: string) => void;
+  sendSaveBackward: (experiment: ExperimentId, key: string) => void;
+  setSelectedSavePosition: (instanceKey: string, position: { x: number; y: number }) => void;
   toggleExperimentMultiSelection: (id: ExperimentId, additive: boolean) => void;
   toggleSaveMultiSelection: (experiment: ExperimentId, key: string, additive: boolean) => void;
   referenceWallpaper: boolean;
@@ -495,6 +524,12 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   const [saveVisualOrder, setSaveVisualOrder] = useState<number[]>(() =>
     normalizeSaveVisualOrder(boot.saveVisualOrder, loadExperimentSetOneSaves()),
   );
+  const [selectedSaveVisualOrder, setSelectedSaveVisualOrder] = useState<string[]>(() =>
+    normalizeSelectedSaveVisualOrder(boot.selectedSaveVisualOrder, boot.selectedSaveKeysByExperiment ?? {}),
+  );
+  const [selectedSavePositions, setSelectedSavePositions] = useState<Record<string, { x: number; y: number }>>(
+    () => boot.selectedSavePositions ?? {},
+  );
   const [selection, setSelection] = useState<ExperimentSelection | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   const selectedElRef = useRef<HTMLElement | null>(null);
@@ -518,6 +553,10 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   useEffect(() => {
     setSaveVisualOrder((prev) => normalizeSaveVisualOrder(prev, saves));
   }, [saves]);
+
+  useEffect(() => {
+    setSelectedSaveVisualOrder((prev) => normalizeSelectedSaveVisualOrder(prev, selectedSaveKeysByExperiment));
+  }, [selectedSaveKeysByExperiment]);
 
   useEffect(() => {
     try {
@@ -993,6 +1032,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
 
   const resetLayoutPositions = useCallback(() => {
     clearAllExperimentSetOnePositions();
+    setSelectedSavePositions({});
     try {
       saveDragPosition(EXPERIMENT_SET_ONE_POSITION_KEYS.layerA4, SHOWCASE_PANEL_SNAP);
     } catch {
@@ -1010,6 +1050,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   const clearMultiSelection = useCallback(() => {
     setSelectedExperimentIds([activeExperiment]);
     setSelectedSaveKeysByExperiment({});
+    setSelectedSaveVisualOrder([]);
   }, [activeExperiment]);
 
   const queueSaveLoad = useCallback(
@@ -1034,12 +1075,33 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     pendingSaveClickRef.current = null;
   }, []);
 
-  const bringSaveForward = useCallback((id: number) => {
-    setSaveVisualOrder((prev) => moveIdToOrderEdge(prev, id, 'front'));
-  }, []);
+  const bringSaveForward = useCallback((experiment: ExperimentId, key: string) => {
+    const instanceKey = selectedSaveInstanceKey(experiment, key);
+    setSelectedSaveVisualOrder((prev) =>
+      moveSelectedSaveToOrderEdge(
+        normalizeSelectedSaveVisualOrder(prev, selectedSaveKeysByExperiment),
+        instanceKey,
+        'front',
+      ),
+    );
+  }, [selectedSaveKeysByExperiment]);
 
-  const sendSaveBackward = useCallback((id: number) => {
-    setSaveVisualOrder((prev) => moveIdToOrderEdge(prev, id, 'back'));
+  const sendSaveBackward = useCallback((experiment: ExperimentId, key: string) => {
+    const instanceKey = selectedSaveInstanceKey(experiment, key);
+    setSelectedSaveVisualOrder((prev) =>
+      moveSelectedSaveToOrderEdge(
+        normalizeSelectedSaveVisualOrder(prev, selectedSaveKeysByExperiment),
+        instanceKey,
+        'back',
+      ),
+    );
+  }, [selectedSaveKeysByExperiment]);
+
+  const setSelectedSavePosition = useCallback((instanceKey: string, position: { x: number; y: number }) => {
+    setSelectedSavePositions((prev) => ({
+      ...prev,
+      [instanceKey]: position,
+    }));
   }, []);
 
   const toggleExperimentMultiSelection = useCallback((id: ExperimentId, additive: boolean) => {
@@ -1107,11 +1169,13 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       selectedExperimentIds,
       selectedSaveKeysByExperiment,
       saveVisualOrder,
+      selectedSaveVisualOrder,
+      selectedSavePositions,
       cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
       e5BorderRefinementsVersion,
       activeRenderVariant,
     });
-  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e6LayerC, hidePanelText, layerAVisible, layerBVisible, layerCVisible, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, e5BorderRefinementsVersion, activeRenderVariant]);
+  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e6LayerC, hidePanelText, layerAVisible, layerBVisible, layerCVisible, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, e5BorderRefinementsVersion, activeRenderVariant]);
 
   useEffect(() => {
     const page = pageRef.current;
@@ -1251,6 +1315,8 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       selectedExperimentIds,
       selectedSaveKeysByExperiment,
       saveVisualOrder,
+      selectedSaveVisualOrder,
+      selectedSavePositions,
       selection,
       clearSelection,
       clearMultiSelection,
@@ -1258,12 +1324,13 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       cancelQueuedSaveLoad,
       bringSaveForward,
       sendSaveBackward,
+      setSelectedSavePosition,
       toggleExperimentMultiSelection,
       toggleSaveMultiSelection,
       referenceWallpaper,
       toggleReferenceWallpaper,
     }),
-    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e6LayerC, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE6LayerC, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper],
+    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e6LayerC, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE6LayerC, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, setSelectedSavePosition, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper],
   );
 
   return (
@@ -1502,6 +1569,7 @@ export function ExperimentSetOneSettingsDock() {
     selectedExperimentIds,
     selectedSaveKeysByExperiment,
     saveVisualOrder,
+    selectedSaveVisualOrder,
     selection,
     clearSelection,
     clearMultiSelection,
@@ -1601,6 +1669,18 @@ export function ExperimentSetOneSettingsDock() {
       EXPERIMENT_ORDER.filter((id) => selectedExperimentSet.has(id)).map((id) => experimentTitle(id)),
     [selectedExperimentSet],
   );
+  const selectedSaveExperimentIds = useMemo(
+    () =>
+      EXPERIMENT_ORDER.filter(
+        (id) => (selectedSaveKeysByExperiment[id]?.length ?? 0) > 0,
+      ),
+    [selectedSaveKeysByExperiment],
+  );
+  const multiSummaryExperimentLabels = useMemo(() => {
+    const ids = new Set<ExperimentId>(selectedExperimentIds);
+    for (const id of selectedSaveExperimentIds) ids.add(id);
+    return EXPERIMENT_ORDER.filter((id) => ids.has(id)).map((id) => experimentTitle(id));
+  }, [selectedExperimentIds, selectedSaveExperimentIds]);
   const selectedSaveCount = useMemo(
     () =>
       Object.values(selectedSaveKeysByExperiment).reduce(
@@ -1610,10 +1690,15 @@ export function ExperimentSetOneSettingsDock() {
     [selectedSaveKeysByExperiment],
   );
   const selectedExperimentCount = selectedExperimentLabels.length;
+  const multiSummaryExperimentCount = multiSummaryExperimentLabels.length;
   const saveMultiSelectionActive = selectedSaveCount > 0;
   const anyMultiSelectionActive = selectedExperimentCount > 1 || saveMultiSelectionActive;
   const showMultiSelectionSummary = selectedExperimentCount > 1 || saveMultiSelectionActive;
   const selectedSaveKeysForDockExperiment = selectedSaveKeysByExperiment[dockExperiment] ?? [];
+  const selectedSaveInstanceOrder = useMemo(
+    () => normalizeSelectedSaveVisualOrder(selectedSaveVisualOrder, selectedSaveKeysByExperiment),
+    [selectedSaveVisualOrder, selectedSaveKeysByExperiment],
+  );
 
   const e1Highlight = useMemo(() => e1Highlighted(selection), [selection]);
   const e2Highlight = useMemo(() => e2Highlighted(selection), [selection]);
@@ -1935,13 +2020,13 @@ export function ExperimentSetOneSettingsDock() {
                   <div className="experiment-one-settings-dock__multi-summary-line">
                     <span className="experiment-one-settings-dock__multi-summary-label">Multi-select</span>
                     <span className="experiment-one-settings-dock__multi-summary-count">
-                      {selectedExperimentCount} experiments · {selectedSaveCount} saves
+                      {multiSummaryExperimentCount} experiments · {selectedSaveCount} saves
                     </span>
                   </div>
                   <div className="experiment-one-settings-dock__multi-summary-note">
                     {saveSelectionMode
                       ? 'Select saves mode is on: click saves to add/remove them. Switch experiments like E8 or E9, then keep selecting.'
-                      : selectedExperimentLabels.join(' · ')}
+                      : multiSummaryExperimentLabels.join(' · ')}
                   </div>
                   <button
                     type="button"
@@ -1968,8 +2053,11 @@ export function ExperimentSetOneSettingsDock() {
                         );
                         const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
                         const saveKey = selectionKey;
-                        const isFrontMost = saveOrderIndex(saveVisualOrder, save.id) === 0;
-                        const isBackMost = saveOrderIndex(saveVisualOrder, save.id) === saveVisualOrder.length - 1;
+                        const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
+                        const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
+                        const canReorderSave = multiSelected && selectedSaveInstanceOrder.length > 1 && selectedOrderIndex !== -1;
+                        const isFrontMost = selectedOrderIndex === 0;
+                        const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
                         return (
                           <div key={`${variant.slug}-${save.id}`} className="experiment-one-settings-dock__save-item">
                             <button
@@ -2003,8 +2091,8 @@ export function ExperimentSetOneSettingsDock() {
                               <button
                                 type="button"
                                 className="experiment-one-settings-dock__save-order-btn"
-                                onClick={() => bringSaveForward(save.id)}
-                                disabled={isFrontMost}
+                                onClick={() => bringSaveForward(dockExperiment, selectionKey)}
+                                disabled={!canReorderSave || isFrontMost}
                                 title="Bring forward"
                               >
                                 Front
@@ -2012,8 +2100,8 @@ export function ExperimentSetOneSettingsDock() {
                               <button
                                 type="button"
                                 className="experiment-one-settings-dock__save-order-btn"
-                                onClick={() => sendSaveBackward(save.id)}
-                                disabled={isBackMost}
+                                onClick={() => sendSaveBackward(dockExperiment, selectionKey)}
+                                disabled={!canReorderSave || isBackMost}
                                 title="Send backward"
                               >
                                 Back
@@ -2041,8 +2129,11 @@ export function ExperimentSetOneSettingsDock() {
                         );
                         const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
                         const saveKey = selectionKey;
-                        const isFrontMost = saveOrderIndex(saveVisualOrder, save.id) === 0;
-                        const isBackMost = saveOrderIndex(saveVisualOrder, save.id) === saveVisualOrder.length - 1;
+                        const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
+                        const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
+                        const canReorderSave = multiSelected && selectedSaveInstanceOrder.length > 1 && selectedOrderIndex !== -1;
+                        const isFrontMost = selectedOrderIndex === 0;
+                        const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
                         return (
                           <div key={save.id} className="experiment-one-settings-dock__save-item">
                             <button
@@ -2076,8 +2167,8 @@ export function ExperimentSetOneSettingsDock() {
                               <button
                                 type="button"
                                 className="experiment-one-settings-dock__save-order-btn"
-                                onClick={() => bringSaveForward(save.id)}
-                                disabled={isFrontMost}
+                                onClick={() => bringSaveForward(dockExperiment, selectionKey)}
+                                disabled={!canReorderSave || isFrontMost}
                                 title="Bring forward"
                               >
                                 Front
@@ -2085,8 +2176,8 @@ export function ExperimentSetOneSettingsDock() {
                               <button
                                 type="button"
                                 className="experiment-one-settings-dock__save-order-btn"
-                                onClick={() => sendSaveBackward(save.id)}
-                                disabled={isBackMost}
+                                onClick={() => sendSaveBackward(dockExperiment, selectionKey)}
+                                disabled={!canReorderSave || isBackMost}
                                 title="Send backward"
                               >
                                 Back
@@ -2113,8 +2204,11 @@ export function ExperimentSetOneSettingsDock() {
                   );
                   const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
                   const saveKey = selectionKey;
-                  const isFrontMost = saveOrderIndex(saveVisualOrder, save.id) === 0;
-                  const isBackMost = saveOrderIndex(saveVisualOrder, save.id) === saveVisualOrder.length - 1;
+                  const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
+                  const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
+                  const canReorderSave = multiSelected && selectedSaveInstanceOrder.length > 1 && selectedOrderIndex !== -1;
+                  const isFrontMost = selectedOrderIndex === 0;
+                  const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
                   return (
                     <div key={save.id} className="experiment-one-settings-dock__save-item">
                       <button
@@ -2148,8 +2242,8 @@ export function ExperimentSetOneSettingsDock() {
                         <button
                           type="button"
                           className="experiment-one-settings-dock__save-order-btn"
-                          onClick={() => bringSaveForward(save.id)}
-                          disabled={isFrontMost}
+                          onClick={() => bringSaveForward(dockExperiment, selectionKey)}
+                          disabled={!canReorderSave || isFrontMost}
                           title="Bring forward"
                         >
                           Front
@@ -2157,8 +2251,8 @@ export function ExperimentSetOneSettingsDock() {
                         <button
                           type="button"
                           className="experiment-one-settings-dock__save-order-btn"
-                          onClick={() => sendSaveBackward(save.id)}
-                          disabled={isBackMost}
+                          onClick={() => sendSaveBackward(dockExperiment, selectionKey)}
+                          disabled={!canReorderSave || isBackMost}
                           title="Send backward"
                         >
                           Back

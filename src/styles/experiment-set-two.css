@@ -118,6 +118,15 @@
   top: 0;
   left: 0;
   transform-origin: top left;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.experiment-set-one-selected-save-stage__layer-a:active,
+.experiment-set-one-selected-save-stage__free-layer-b:active {
+  cursor: grabbing;
 }
 
 .experiment-set-one-selected-save-stage .experiment-four-layer-a,

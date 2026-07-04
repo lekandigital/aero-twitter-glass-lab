@@ -24,6 +24,21 @@ export function WorkspaceShell({ children }: WorkspaceShellProps) {
   );
 }
 
+export function StandaloneWorkspaceShell({ children }: WorkspaceShellProps) {
+  useEffect(() => {
+    applyReferenceWallpaperDom(readReferenceWallpaperPreference());
+  }, []);
+
+  return (
+    <>
+      <AeroWallpaper />
+      <div className="workspace-page">
+        {children}
+      </div>
+    </>
+  );
+}
+
 type ExperimentShellProps = {
   title: string;
   technique: string;

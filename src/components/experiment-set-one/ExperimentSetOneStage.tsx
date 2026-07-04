@@ -14,7 +14,6 @@ import {
   ExperimentThreeDraggableLayerB,
 } from '../experiment-set-three/primitives';
 import { e4SettingsToCssVars, type E4MaterialSettings } from '../experiment-set-four/materialSettings';
-import { useRenderVariant } from '../../render-variants/RenderVariantContext';
 import { EXPERIMENT_SET_ONE_POSITION_KEYS } from './dragPositions';
 import { useExperimentSetOne } from './combinedSettings';
 import { VariantPanelSlots } from './VariantPanelSlots';
@@ -26,10 +25,6 @@ const MULTI_EXPERIMENT_CASCADE_STEP = 28;
 
 function selectedSaveCount(selectedSaveKeysByExperiment: Partial<Record<ExperimentId, string[]>>) {
   return Object.values(selectedSaveKeysByExperiment).reduce((count, keys) => count + (keys?.length ?? 0), 0);
-}
-
-function saveSelectionKey(id: number, branchSlug?: string | null): string {
-  return `${branchSlug ?? 'base'}:${id}`;
 }
 
 export function ExperimentSetOneStage() {
@@ -44,21 +39,13 @@ export function ExperimentSetOneStage() {
     e9,
     e10,
     selectedExperimentIds,
-    selectedSaveIdByExperiment,
     selectedSaveKeysByExperiment,
   } = useExperimentSetOne();
-  const { slug: activeRenderVariant } = useRenderVariant();
   const nestedB = e4.layerBNestedInA;
   const saveMultiActive = selectedSaveCount(selectedSaveKeysByExperiment) > 0;
   const experimentMultiActive = selectedExperimentIds.length > 1;
-  const activeSaveId = selectedSaveIdByExperiment[activeExperiment];
-  const activeSaveKey = activeSaveId == null ? null : saveSelectionKey(activeSaveId, activeRenderVariant);
-  const activeSaveIsMultiSelected =
-    activeSaveKey != null && (selectedSaveKeysByExperiment[activeExperiment] ?? []).includes(activeSaveKey);
   const visibleExperimentIds = saveMultiActive
-    ? activeSaveIsMultiSelected
-      ? [activeExperiment]
-      : []
+    ? []
     : experimentMultiActive
       ? STAGE_EXPERIMENTS.filter((id) => selectedExperimentIds.includes(id))
       : [activeExperiment];
