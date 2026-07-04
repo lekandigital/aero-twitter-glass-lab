@@ -692,6 +692,41 @@
   gap: 0.6rem;
 }
 
+.experiment-one-settings-dock__multi-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: 10px;
+  background: rgba(60, 160, 255, 0.1);
+  border: 1px solid rgba(126, 232, 255, 0.22);
+}
+
+.experiment-one-settings-dock__multi-summary-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.experiment-one-settings-dock__multi-summary-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(160, 220, 255, 0.8);
+}
+
+.experiment-one-settings-dock__multi-summary-count,
+.experiment-one-settings-dock__multi-summary-note {
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: rgba(200, 235, 255, 0.84);
+}
+
+.experiment-one-settings-dock__multi-summary-note {
+  color: rgba(180, 220, 255, 0.72);
+}
+
 .experiment-one-settings-dock__saves-title {
   font-size: 0.68rem;
   font-weight: 700;
@@ -734,6 +769,43 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
+}
+
+.experiment-one-settings-dock__save-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.22rem;
+}
+
+.experiment-one-settings-dock__save-controls {
+  display: flex;
+  gap: 0.18rem;
+}
+
+.experiment-one-settings-dock__save-order-btn {
+  flex: 1 1 0;
+  padding: 0.18rem 0.3rem;
+  font-family: inherit;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(210, 240, 255, 0.8);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.experiment-one-settings-dock__save-order-btn:hover:not(:disabled) {
+  background: rgba(126, 232, 255, 0.12);
+  border-color: rgba(126, 232, 255, 0.3);
+}
+
+.experiment-one-settings-dock__save-order-btn:disabled {
+  opacity: 0.28;
+  cursor: default;
 }
 
 .experiment-one-settings-dock__workspace {
