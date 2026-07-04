@@ -62,6 +62,9 @@ export type ExperimentSetOneSession = {
   referenceWallpaper: boolean;
   activeExperiment?: ExperimentId;
   selectedSaveIdByExperiment?: Partial<Record<ExperimentId, number | null>>;
+  selectedExperimentIds?: ExperimentId[];
+  selectedSaveIdsByExperiment?: Partial<Record<ExperimentId, number[]>>;
+  saveVisualOrder?: number[];
   cornerPresetVersion?: number;
   e5BorderRefinementsVersion?: number;
   layerEditMode?: LayerEditMode;
@@ -84,9 +87,55 @@ export function defaultSession(): ExperimentSetOneSession {
     referenceWallpaper: false,
     activeExperiment: 'four',
     selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: null, six: null, seven: null, eight: null, nine: null, ten: null },
+    selectedExperimentIds: ['four'],
+    selectedSaveIdsByExperiment: {},
+    saveVisualOrder: [],
     cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
     layerEditMode: 'both',
   };
+}
+
+function normalizeSelectedExperimentIds(raw: unknown, activeExperiment: ExperimentId): ExperimentId[] {
+  if (!Array.isArray(raw)) return [activeExperiment];
+  const allowed = new Set<ExperimentId>(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']);
+  const next = Array.from(new Set(raw.filter((id): id is ExperimentId => allowed.has(id))));
+  return next.length > 0 ? next : [activeExperiment];
+}
+
+function normalizeSelectedSaveIdsByExperiment(
+  raw: unknown,
+  selectedSaveIdByExperiment: Partial<Record<ExperimentId, number | null>> | undefined,
+): Partial<Record<ExperimentId, number[]>> {
+  const next: Partial<Record<ExperimentId, number[]>> = {};
+  const allowed = new Set<ExperimentId>(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']);
+  const rawRecord = raw && typeof raw === 'object' ? (raw as Partial<Record<ExperimentId, unknown>>) : undefined;
+
+  for (const experiment of allowed) {
+    const value = rawRecord?.[experiment];
+    if (!Array.isArray(value)) continue;
+    const ids = Array.from(
+      new Set(
+        value.filter((id): id is number => typeof id === 'number' && Number.isFinite(id)),
+      ),
+    );
+    if (ids.length > 0) next[experiment] = ids;
+  }
+
+  for (const experiment of allowed) {
+    const selected = selectedSaveIdByExperiment?.[experiment];
+    if (typeof selected === 'number' && Number.isFinite(selected)) {
+      const existing = next[experiment] ?? [];
+      if (!existing.includes(selected)) next[experiment] = [...existing, selected];
+    }
+  }
+
+  return next;
+}
+
+function normalizeSaveVisualOrder(raw: unknown): number[] {
+  if (!Array.isArray(raw)) return [];
+  const ids = raw.filter((id): id is number => typeof id === 'number' && Number.isFinite(id));
+  return Array.from(new Set(ids));
 }
 
 export function readSessionReferenceWallpaper(): boolean | null {
@@ -157,6 +206,12 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
           ? parsed.activeExperiment
           : 'four',
       selectedSaveIdByExperiment: parsed.selectedSaveIdByExperiment ?? undefined,
+      selectedExperimentIds: normalizeSelectedExperimentIds(parsed.selectedExperimentIds, parsed.activeExperiment ?? 'four'),
+      selectedSaveIdsByExperiment: normalizeSelectedSaveIdsByExperiment(
+        parsed.selectedSaveIdsByExperiment,
+        parsed.selectedSaveIdByExperiment,
+      ),
+      saveVisualOrder: normalizeSaveVisualOrder(parsed.saveVisualOrder),
       cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
       e5BorderRefinementsVersion: parsed.e5BorderRefinementsVersion,
       layerEditMode:
