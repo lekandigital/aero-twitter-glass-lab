@@ -63,6 +63,8 @@ export type ExperimentSetOneSession = {
   activeExperiment?: ExperimentId;
   selectedSaveIdByExperiment?: Partial<Record<ExperimentId, number | null>>;
   selectedExperimentIds?: ExperimentId[];
+  selectedSaveKeysByExperiment?: Partial<Record<ExperimentId, string[]>>;
+  /** Legacy numeric multi-select keys; kept so older sessions migrate cleanly. */
   selectedSaveIdsByExperiment?: Partial<Record<ExperimentId, number[]>>;
   saveVisualOrder?: number[];
   cornerPresetVersion?: number;
@@ -88,7 +90,7 @@ export function defaultSession(): ExperimentSetOneSession {
     activeExperiment: 'four',
     selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: null, six: null, seven: null, eight: null, nine: null, ten: null },
     selectedExperimentIds: ['four'],
-    selectedSaveIdsByExperiment: {},
+    selectedSaveKeysByExperiment: {},
     saveVisualOrder: [],
     cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
     layerEditMode: 'both',
@@ -102,30 +104,41 @@ function normalizeSelectedExperimentIds(raw: unknown, activeExperiment: Experime
   return next.length > 0 ? next : [activeExperiment];
 }
 
-function normalizeSelectedSaveIdsByExperiment(
-  raw: unknown,
+function normalizeSelectedSaveKeysByExperiment(
+  rawKeys: unknown,
+  rawIds: unknown,
   selectedSaveIdByExperiment: Partial<Record<ExperimentId, number | null>> | undefined,
-): Partial<Record<ExperimentId, number[]>> {
-  const next: Partial<Record<ExperimentId, number[]>> = {};
+  activeExperiment: ExperimentId,
+  activeRenderVariant: RenderVariantSlug | null | undefined,
+): Partial<Record<ExperimentId, string[]>> {
+  const next: Partial<Record<ExperimentId, string[]>> = {};
   const allowed = new Set<ExperimentId>(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']);
-  const rawRecord = raw && typeof raw === 'object' ? (raw as Partial<Record<ExperimentId, unknown>>) : undefined;
+  const rawKeyRecord = rawKeys && typeof rawKeys === 'object' ? (rawKeys as Partial<Record<ExperimentId, unknown>>) : undefined;
+  const rawIdRecord = rawIds && typeof rawIds === 'object' ? (rawIds as Partial<Record<ExperimentId, unknown>>) : undefined;
+  const legacyKeyFor = (experiment: ExperimentId, id: number) =>
+    `${experiment === activeExperiment && activeRenderVariant ? activeRenderVariant : 'base'}:${id}`;
 
   for (const experiment of allowed) {
-    const value = rawRecord?.[experiment];
-    if (!Array.isArray(value)) continue;
-    const ids = Array.from(
-      new Set(
-        value.filter((id): id is number => typeof id === 'number' && Number.isFinite(id)),
-      ),
-    );
-    if (ids.length > 0) next[experiment] = ids;
+    const keyValue = rawKeyRecord?.[experiment];
+    const idValue = rawIdRecord?.[experiment];
+    const keys = Array.isArray(keyValue)
+      ? keyValue.filter((key): key is string => typeof key === 'string' && key.length > 0)
+      : [];
+    const legacyKeys = Array.isArray(idValue)
+      ? idValue
+          .filter((id): id is number => typeof id === 'number' && Number.isFinite(id))
+          .map((id) => legacyKeyFor(experiment, id))
+      : [];
+    const normalized = Array.from(new Set([...keys, ...legacyKeys]));
+    if (normalized.length > 0) next[experiment] = normalized;
   }
 
   for (const experiment of allowed) {
     const selected = selectedSaveIdByExperiment?.[experiment];
     if (typeof selected === 'number' && Number.isFinite(selected)) {
       const existing = next[experiment] ?? [];
-      if (!existing.includes(selected)) next[experiment] = [...existing, selected];
+      const key = legacyKeyFor(experiment, selected);
+      if (!existing.includes(key)) next[experiment] = [...existing, key];
     }
   }
 
@@ -173,6 +186,19 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
     if (cornerPresetVersion < REFERENCE_CORNER_PRESET_VERSION) {
       e4 = applyReferenceCornerLighting(e4);
     }
+    const activeExperiment =
+      parsed.activeExperiment === 'one' ||
+      parsed.activeExperiment === 'two' ||
+      parsed.activeExperiment === 'three' ||
+      parsed.activeExperiment === 'four' ||
+      parsed.activeExperiment === 'five' ||
+      parsed.activeExperiment === 'six' ||
+      parsed.activeExperiment === 'seven' ||
+      parsed.activeExperiment === 'eight' ||
+      parsed.activeExperiment === 'nine' ||
+      parsed.activeExperiment === 'ten'
+        ? parsed.activeExperiment
+        : 'four';
     const session: ExperimentSetOneSession = {
       e1: parsed.e1,
       e2: parsed.e2,
@@ -192,24 +218,15 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       inspectMode: parsed.inspectMode !== false,
       experimentVisible: normalizeExperimentVisibility(parsed.experimentVisible),
       referenceWallpaper: Boolean(parsed.referenceWallpaper),
-      activeExperiment:
-        parsed.activeExperiment === 'one' ||
-        parsed.activeExperiment === 'two' ||
-        parsed.activeExperiment === 'three' ||
-        parsed.activeExperiment === 'four' ||
-        parsed.activeExperiment === 'five' ||
-        parsed.activeExperiment === 'six' ||
-        parsed.activeExperiment === 'seven' ||
-        parsed.activeExperiment === 'eight' ||
-        parsed.activeExperiment === 'nine' ||
-        parsed.activeExperiment === 'ten'
-          ? parsed.activeExperiment
-          : 'four',
+      activeExperiment,
       selectedSaveIdByExperiment: parsed.selectedSaveIdByExperiment ?? undefined,
-      selectedExperimentIds: normalizeSelectedExperimentIds(parsed.selectedExperimentIds, parsed.activeExperiment ?? 'four'),
-      selectedSaveIdsByExperiment: normalizeSelectedSaveIdsByExperiment(
+      selectedExperimentIds: normalizeSelectedExperimentIds(parsed.selectedExperimentIds, activeExperiment),
+      selectedSaveKeysByExperiment: normalizeSelectedSaveKeysByExperiment(
+        parsed.selectedSaveKeysByExperiment,
         parsed.selectedSaveIdsByExperiment,
         parsed.selectedSaveIdByExperiment,
+        activeExperiment,
+        parsed.activeRenderVariant,
       ),
       saveVisualOrder: normalizeSaveVisualOrder(parsed.saveVisualOrder),
       cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
