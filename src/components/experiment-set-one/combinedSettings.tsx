@@ -97,7 +97,7 @@ import {
 } from './experimentVisibility';
 import { clearInspectFlash, flashInspectElement } from '../shared/inspectFlash';
 import { useReferenceWallpaper } from '../shared/useReferenceWallpaper';
-import { applyShowcasePanelGeometry, SHOWCASE_PANEL_SNAP } from './showcasePanelGeometry';
+import { applyShowcasePanelGeometry, SHOWCASE_PANEL_LAYOUT, SHOWCASE_PANEL_SNAP } from './showcasePanelGeometry';
 import {
   applyExperimentTenPanelGeometry,
   normalizeExperimentTenPanelGeometry,
@@ -221,7 +221,11 @@ function applyE5OverridesStatic(
   raw: E4MaterialSettings,
   _variantModule: RenderVariantModule | null = null,
 ): E4MaterialSettings {
-  return applyShowcasePanelGeometry({ ...raw, layerBNestedInA: true });
+  return applyShowcasePanelGeometry({
+    ...raw,
+    ...SHOWCASE_PANEL_LAYOUT,
+    layerBNestedInA: true,
+  });
 }
 
 function applyE6OverridesStatic(
