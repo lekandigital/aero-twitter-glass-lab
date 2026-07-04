@@ -38,3 +38,19 @@ export function applyShowcasePanelGeometry(s: E4MaterialSettings): E4MaterialSet
     layerABezelInsetY: s.layerABezelInsetY ?? SHOWCASE_PANEL_LAYOUT.layerABezelInsetY,
   };
 }
+
+/** Experiment Nine panel dimensions — 1033×920 outer, 6px bezel → 1021×908 inner. */
+export const EXPERIMENT_NINE_PANEL_LAYOUT = {
+  layerAWidth: 1033,
+  layerAHeight: 920,
+  layerBWidth: 1021,
+  layerBHeight: 908,
+} as const;
+
+export function applyExperimentNinePanelGeometry(s: E4MaterialSettings): E4MaterialSettings {
+  return {
+    ...applyShowcasePanelGeometry(s),
+    ...EXPERIMENT_NINE_PANEL_LAYOUT,
+  };
+}
+

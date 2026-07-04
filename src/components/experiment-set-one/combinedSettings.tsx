@@ -97,7 +97,7 @@ import {
 } from './experimentVisibility';
 import { clearInspectFlash, flashInspectElement } from '../shared/inspectFlash';
 import { useReferenceWallpaper } from '../shared/useReferenceWallpaper';
-import { applyShowcasePanelGeometry, SHOWCASE_PANEL_LAYOUT, SHOWCASE_PANEL_SNAP } from './showcasePanelGeometry';
+import { applyShowcasePanelGeometry, applyExperimentNinePanelGeometry, SHOWCASE_PANEL_LAYOUT, SHOWCASE_PANEL_SNAP } from './showcasePanelGeometry';
 import {
   applyExperimentTenPanelGeometry,
   normalizeExperimentTenPanelGeometry,
@@ -300,11 +300,11 @@ function resolveInitialE9(boot: ExperimentSetOneSession): E4MaterialSettings {
   if (selectedSaveId != null) {
     const snapshot = loadExperimentSetOneSaves().find((save) => save.id === selectedSaveId);
     if (snapshot?.e4) {
-      return applyShowcasePanelGeometry(normalizeE4MaterialSettings(snapshot.e4));
+      return applyExperimentNinePanelGeometry(normalizeE4MaterialSettings(snapshot.e4));
     }
   }
-  if (boot.e9) return applyShowcasePanelGeometry(normalizeE4MaterialSettings(boot.e9));
-  return applyShowcasePanelGeometry(normalizeE4MaterialSettings(boot.e4));
+  if (boot.e9) return applyExperimentNinePanelGeometry(normalizeE4MaterialSettings(boot.e9));
+  return applyExperimentNinePanelGeometry(normalizeE4MaterialSettings(boot.e4));
 }
 
 function resolveInitialE10(boot: ExperimentSetOneSession): E4MaterialSettings {
@@ -483,7 +483,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     }
     if (activeExperiment === 'nine') {
       setE9State((prev) => {
-        const next = applyShowcasePanelGeometry(prev);
+        const next = applyExperimentNinePanelGeometry(prev);
         setE5State(next);
         return next;
       });
@@ -637,7 +637,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     setE6LayerCState(buildE6LayerCLayoutDefaults(nextE6));
     setE7State(applyE7OverridesStatic(E4_MASTER_DEFAULT));
     setE8State(applyExperimentEightPanelGeometry(applyE7OverridesStatic(E4_MASTER_DEFAULT)));
-    setE9State(applyShowcasePanelGeometry(E4_MASTER_DEFAULT));
+    setE9State(applyExperimentNinePanelGeometry(E4_MASTER_DEFAULT));
     setE10State(applyExperimentTenPanelGeometry(E4_MASTER_DEFAULT));
     setLayerAVisible(true);
     setLayerBVisible(true);
@@ -779,7 +779,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
             setE8State(e8Material);
             setE5State(e8Material);
           } else if (activeExperiment === 'nine') {
-            setE9State(applyShowcasePanelGeometry(material));
+            setE9State(applyExperimentNinePanelGeometry(material));
           } else if (activeExperiment === 'ten') {
             setE10State(applyExperimentTenPanelGeometry(material));
           } else {
@@ -843,7 +843,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       }
       if (snapshot.scope === 'nine') {
         if (snapshot.e4) {
-          setE9State(applyShowcasePanelGeometry(normalize(snapshot.e4)));
+          setE9State(applyExperimentNinePanelGeometry(normalize(snapshot.e4)));
         }
         return;
       }
