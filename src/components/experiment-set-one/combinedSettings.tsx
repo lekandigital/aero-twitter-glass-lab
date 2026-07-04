@@ -166,15 +166,38 @@ function normalizeExperimentSelectionIds(raw: ExperimentId[] | undefined, fallba
   return Array.from(new Set(raw.filter((id) => EXPERIMENT_ORDER.includes(id))));
 }
 
-function normalizeSaveSelectionIds(raw: Partial<Record<ExperimentId, number[]>> | undefined) {
-  const next: Partial<Record<ExperimentId, number[]>> = {};
+function saveSelectionKey(id: number, branchSlug?: RenderVariantSlug | null): string {
+  return `${branchSlug ?? 'base'}:${id}`;
+}
+
+function normalizeSaveSelectionKeys(
+  rawKeys: Partial<Record<ExperimentId, string[]>> | undefined,
+  rawIds: Partial<Record<ExperimentId, number[]>> | undefined,
+  activeExperiment: ExperimentId,
+  activeRenderVariant: RenderVariantSlug | null | undefined,
+) {
+  const next: Partial<Record<ExperimentId, string[]>> = {};
   for (const experiment of EXPERIMENT_ORDER) {
-    const ids = raw?.[experiment];
-    if (!ids || ids.length === 0) continue;
-    const normalized = Array.from(new Set(ids.filter((id) => Number.isFinite(id))));
+    const keys = rawKeys?.[experiment] ?? [];
+    const legacyKeys = rawIds?.[experiment]?.map((id) =>
+      saveSelectionKey(id, experiment === activeExperiment ? activeRenderVariant : null),
+    ) ?? [];
+    const normalized = Array.from(new Set([...keys, ...legacyKeys].filter((key) => key.length > 0)));
     if (normalized.length > 0) next[experiment] = normalized;
   }
   return next;
+}
+
+function isSaveSelectionActive(
+  selectedKeys: readonly string[],
+  selectedId: number | null,
+  activeRenderVariant: RenderVariantSlug | null,
+  id: number,
+  branchSlug?: RenderVariantSlug | null,
+): boolean {
+  if (selectedKeys.includes(saveSelectionKey(id, branchSlug))) return true;
+  if (selectedKeys.length > 0 || selectedId !== id) return false;
+  return (branchSlug ?? null) === activeRenderVariant;
 }
 
 function toggleId<T extends string | number>(items: readonly T[], value: T): T[] {
@@ -251,7 +274,7 @@ type ExperimentSetOneContextValue = {
   setActiveExperiment: (id: ExperimentId) => void;
   selectedSaveIdByExperiment: Record<ExperimentId, number | null>;
   selectedExperimentIds: ExperimentId[];
-  selectedSaveIdsByExperiment: Partial<Record<ExperimentId, number[]>>;
+  selectedSaveKeysByExperiment: Partial<Record<ExperimentId, string[]>>;
   saveVisualOrder: number[];
   selection: ExperimentSelection | null;
   clearSelection: () => void;
@@ -261,7 +284,7 @@ type ExperimentSetOneContextValue = {
   bringSaveForward: (id: number) => void;
   sendSaveBackward: (id: number) => void;
   toggleExperimentMultiSelection: (id: ExperimentId, additive: boolean) => void;
-  toggleSaveMultiSelection: (experiment: ExperimentId, id: number, additive: boolean) => void;
+  toggleSaveMultiSelection: (experiment: ExperimentId, key: string, additive: boolean) => void;
   referenceWallpaper: boolean;
   toggleReferenceWallpaper: () => void;
 };
@@ -463,9 +486,16 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   const [selectedExperimentIds, setSelectedExperimentIds] = useState<ExperimentId[]>(() =>
     normalizeExperimentSelectionIds(boot.selectedExperimentIds, boot.activeExperiment ?? 'four'),
   );
-  const [selectedSaveIdsByExperiment, setSelectedSaveIdsByExperiment] = useState<
-    Partial<Record<ExperimentId, number[]>>
-  >(() => normalizeSaveSelectionIds(boot.selectedSaveIdsByExperiment));
+  const [selectedSaveKeysByExperiment, setSelectedSaveKeysByExperiment] = useState<
+    Partial<Record<ExperimentId, string[]>>
+  >(() =>
+    normalizeSaveSelectionKeys(
+      boot.selectedSaveKeysByExperiment,
+      boot.selectedSaveIdsByExperiment,
+      boot.activeExperiment ?? 'four',
+      boot.activeRenderVariant,
+    ),
+  );
   const [saveVisualOrder, setSaveVisualOrder] = useState<number[]>(() =>
     normalizeSaveVisualOrder(boot.saveVisualOrder, loadExperimentSetOneSaves()),
   );
@@ -803,9 +833,10 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
           ? RENDER_VARIANTS.find((variant) => variant.slug === snapshotForLookup.branchVariant)
           : renderVariantForSaveId(lookupId);
       const loadedModule = setVariant(branchDef?.slug ?? null);
+      const selectedKey = saveSelectionKey(id, branchDef?.slug ?? null);
 
       setSelectedSaveIdByExperiment((prev) => ({ ...prev, [activeExperiment]: id }));
-      setSelectedSaveIdsByExperiment((prev) => ({ ...prev, [activeExperiment]: [id] }));
+      setSelectedSaveKeysByExperiment((prev) => ({ ...prev, [activeExperiment]: [selectedKey] }));
       const snapshot = snapshotForLookup;
       if (!snapshot) return;
       const normalize = loadedModule?.normalizeE4MaterialSettings ?? normalizeE4MaterialSettings;
@@ -982,7 +1013,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
 
   const clearMultiSelection = useCallback(() => {
     setSelectedExperimentIds([activeExperiment]);
-    setSelectedSaveIdsByExperiment({});
+    setSelectedSaveKeysByExperiment({});
   }, [activeExperiment]);
 
   const queueSaveLoad = useCallback(
@@ -1030,14 +1061,14 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   }, [activeExperiment, clearSelection]);
 
   const toggleSaveMultiSelection = useCallback(
-    (experiment: ExperimentId, id: number, additive: boolean) => {
+    (experiment: ExperimentId, key: string, additive: boolean) => {
       if (!additive) {
-        setSelectedSaveIdsByExperiment((prev) => ({ ...prev, [experiment]: [id] }));
+        setSelectedSaveKeysByExperiment((prev) => ({ ...prev, [experiment]: [key] }));
         return;
       }
-      setSelectedSaveIdsByExperiment((prev) => {
+      setSelectedSaveKeysByExperiment((prev) => {
         const next = prev[experiment] ?? [];
-        const toggled = toggleId(next, id);
+        const toggled = toggleId(next, key);
         const updated = { ...prev };
         if (toggled.length > 0) updated[experiment] = toggled;
         else delete updated[experiment];
@@ -1078,13 +1109,13 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       activeExperiment,
       selectedSaveIdByExperiment,
       selectedExperimentIds,
-      selectedSaveIdsByExperiment,
+      selectedSaveKeysByExperiment,
       saveVisualOrder,
       cornerPresetVersion: REFERENCE_CORNER_PRESET_VERSION,
       e5BorderRefinementsVersion,
       activeRenderVariant,
     });
-  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e6LayerC, hidePanelText, layerAVisible, layerBVisible, layerCVisible, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveIdsByExperiment, saveVisualOrder, e5BorderRefinementsVersion, activeRenderVariant]);
+  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e6LayerC, hidePanelText, layerAVisible, layerBVisible, layerCVisible, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, e5BorderRefinementsVersion, activeRenderVariant]);
 
   useEffect(() => {
     const page = pageRef.current;
@@ -1222,7 +1253,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       setActiveExperiment,
       selectedSaveIdByExperiment,
       selectedExperimentIds,
-      selectedSaveIdsByExperiment,
+      selectedSaveKeysByExperiment,
       saveVisualOrder,
       selection,
       clearSelection,
@@ -1236,7 +1267,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       referenceWallpaper,
       toggleReferenceWallpaper,
     }),
-    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e6LayerC, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE6LayerC, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveIdsByExperiment, saveVisualOrder, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper],
+    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e6LayerC, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE6LayerC, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper],
   );
 
   return (
@@ -1473,7 +1504,7 @@ export function ExperimentSetOneSettingsDock() {
     activeExperiment,
     selectedSaveIdByExperiment,
     selectedExperimentIds,
-    selectedSaveIdsByExperiment,
+    selectedSaveKeysByExperiment,
     saveVisualOrder,
     selection,
     clearSelection,
@@ -1575,15 +1606,15 @@ export function ExperimentSetOneSettingsDock() {
   );
   const selectedSaveCount = useMemo(
     () =>
-      Object.values(selectedSaveIdsByExperiment).reduce(
-        (count, ids) => count + (ids?.length ?? 0),
+      Object.values(selectedSaveKeysByExperiment).reduce(
+        (count, keys) => count + (keys?.length ?? 0),
         0,
       ),
-    [selectedSaveIdsByExperiment],
+    [selectedSaveKeysByExperiment],
   );
   const selectedExperimentCount = selectedExperimentLabels.length;
   const showMultiSelectionSummary = selectedExperimentCount > 1 || selectedSaveCount > 1;
-  const selectedSaveIdsForDockExperiment = selectedSaveIdsByExperiment[dockExperiment] ?? [];
+  const selectedSaveKeysForDockExperiment = selectedSaveKeysByExperiment[dockExperiment] ?? [];
 
   const e1Highlight = useMemo(() => e1Highlighted(selection), [selection]);
   const e2Highlight = useMemo(() => e2Highlighted(selection), [selection]);
@@ -1909,11 +1940,15 @@ export function ExperimentSetOneSettingsDock() {
                     <span className="experiment-one-settings-dock__branch-label">{variant.label}</span>
                     <div className="experiment-one-settings-dock__branch-saves">
                       {branchSaves.map((save) => {
-                        const selected =
-                          selectedSaveIdsForDockExperiment.includes(save.id) ||
-                          (selectedSaveIdByExperiment[dockExperiment] === save.id &&
-                            activeRenderVariant === variant.slug);
-                        const saveKey = `${variant.slug}-${save.id}`;
+                        const selectionKey = saveSelectionKey(save.id, variant.slug);
+                        const selected = isSaveSelectionActive(
+                          selectedSaveKeysForDockExperiment,
+                          selectedSaveIdByExperiment[dockExperiment],
+                          activeRenderVariant,
+                          save.id,
+                          variant.slug,
+                        );
+                        const saveKey = selectionKey;
                         const isFrontMost = saveOrderIndex(saveVisualOrder, save.id) === 0;
                         const isBackMost = saveOrderIndex(saveVisualOrder, save.id) === saveVisualOrder.length - 1;
                         return (
@@ -1930,7 +1965,7 @@ export function ExperimentSetOneSettingsDock() {
                                 event.preventDefault();
                                 event.stopPropagation();
                                 cancelQueuedSaveLoad(saveKey);
-                                toggleSaveMultiSelection(dockExperiment, save.id, true);
+                                toggleSaveMultiSelection(dockExperiment, selectionKey, true);
                               }}
                               title={`Restore ${save.label} (${variant.label} pipeline) from ${new Date(save.savedAt).toLocaleString()} · Double-click to multi-select`}
                             >
@@ -1967,11 +2002,16 @@ export function ExperimentSetOneSettingsDock() {
                     <span className="experiment-one-settings-dock__branch-label">General</span>
                     <div className="experiment-one-settings-dock__branch-saves">
                       {generalScopedSaves.map((save) => {
-                        const selected =
-                          (selectedSaveIdByExperiment[dockExperiment] === save.id &&
-                            (!save.branchVariant || activeRenderVariant === save.branchVariant)) ||
-                          selectedSaveIdsForDockExperiment.includes(save.id);
-                        const saveKey = `general-${save.id}`;
+                        const branchVariant = save.branchVariant ?? null;
+                        const selectionKey = saveSelectionKey(save.id, branchVariant);
+                        const selected = isSaveSelectionActive(
+                          selectedSaveKeysForDockExperiment,
+                          selectedSaveIdByExperiment[dockExperiment],
+                          activeRenderVariant,
+                          save.id,
+                          branchVariant,
+                        );
+                        const saveKey = selectionKey;
                         const isFrontMost = saveOrderIndex(saveVisualOrder, save.id) === 0;
                         const isBackMost = saveOrderIndex(saveVisualOrder, save.id) === saveVisualOrder.length - 1;
                         return (
@@ -1988,7 +2028,7 @@ export function ExperimentSetOneSettingsDock() {
                                 event.preventDefault();
                                 event.stopPropagation();
                                 cancelQueuedSaveLoad(saveKey);
-                                toggleSaveMultiSelection(dockExperiment, save.id, true);
+                                toggleSaveMultiSelection(dockExperiment, selectionKey, true);
                               }}
                               title={`Restore ${save.label}${save.branchVariant ? ` (${save.branchVariant} pipeline)` : ''} from ${new Date(save.savedAt).toLocaleString()} · Double-click to multi-select`}
                             >
@@ -2023,48 +2063,62 @@ export function ExperimentSetOneSettingsDock() {
                 {otherScopedSaves.length > 0 && (branchSaveGroups.length > 0 || generalScopedSaves.length > 0) && (
                   <span className="experiment-one-settings-dock__branch-label">Other saves</span>
                 )}
-                {otherScopedSaves.map((save) => (
-                  <div key={save.id} className="experiment-one-settings-dock__save-item">
-                    <button
-                      type="button"
-                      className={`experiment-one-settings-dock__toggle experiment-one-settings-dock__toggle--save${selectedSaveIdByExperiment[dockExperiment] === save.id || selectedSaveIdsForDockExperiment.includes(save.id) ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
-                      aria-pressed={selectedSaveIdByExperiment[dockExperiment] === save.id || selectedSaveIdsForDockExperiment.includes(save.id)}
-                      onClick={(event) => {
-                        if (event.detail !== 1) return;
-                        queueSaveLoad(`other-${save.id}`, () => loadSave(save.id));
-                      }}
-                      onDoubleClick={(event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        cancelQueuedSaveLoad(`other-${save.id}`);
-                        toggleSaveMultiSelection(dockExperiment, save.id, true);
-                      }}
-                      title={`Restore ${save.label} from ${new Date(save.savedAt).toLocaleString()} · Double-click to multi-select`}
-                    >
-                      {save.label}
-                    </button>
-                    <div className="experiment-one-settings-dock__save-controls" aria-label={`Visual order controls for ${save.label}`}>
+                {otherScopedSaves.map((save) => {
+                  const branchVariant = save.branchVariant ?? null;
+                  const selectionKey = saveSelectionKey(save.id, branchVariant);
+                  const selected = isSaveSelectionActive(
+                    selectedSaveKeysForDockExperiment,
+                    selectedSaveIdByExperiment[dockExperiment],
+                    activeRenderVariant,
+                    save.id,
+                    branchVariant,
+                  );
+                  const saveKey = selectionKey;
+                  const isFrontMost = saveOrderIndex(saveVisualOrder, save.id) === 0;
+                  const isBackMost = saveOrderIndex(saveVisualOrder, save.id) === saveVisualOrder.length - 1;
+                  return (
+                    <div key={save.id} className="experiment-one-settings-dock__save-item">
                       <button
                         type="button"
-                        className="experiment-one-settings-dock__save-order-btn"
-                        onClick={() => bringSaveForward(save.id)}
-                        disabled={saveOrderIndex(saveVisualOrder, save.id) === 0}
-                        title="Bring forward"
+                        className={`experiment-one-settings-dock__toggle experiment-one-settings-dock__toggle--save${selected ? ' experiment-one-settings-dock__toggle--selected' : ''}`}
+                        aria-pressed={selected}
+                        onClick={(event) => {
+                          if (event.detail !== 1) return;
+                          queueSaveLoad(saveKey, () => loadSave(save.id, save.branchVariant));
+                        }}
+                        onDoubleClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          cancelQueuedSaveLoad(saveKey);
+                          toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                        }}
+                        title={`Restore ${save.label} from ${new Date(save.savedAt).toLocaleString()} · Double-click to multi-select`}
                       >
-                        Front
+                        {save.label}
                       </button>
-                      <button
-                        type="button"
-                        className="experiment-one-settings-dock__save-order-btn"
-                        onClick={() => sendSaveBackward(save.id)}
-                        disabled={saveOrderIndex(saveVisualOrder, save.id) === saveVisualOrder.length - 1}
-                        title="Send backward"
-                      >
-                        Back
-                      </button>
+                      <div className="experiment-one-settings-dock__save-controls" aria-label={`Visual order controls for ${save.label}`}>
+                        <button
+                          type="button"
+                          className="experiment-one-settings-dock__save-order-btn"
+                          onClick={() => bringSaveForward(save.id)}
+                          disabled={isFrontMost}
+                          title="Bring forward"
+                        >
+                          Front
+                        </button>
+                        <button
+                          type="button"
+                          className="experiment-one-settings-dock__save-order-btn"
+                          onClick={() => sendSaveBackward(save.id)}
+                          disabled={isBackMost}
+                          title="Send backward"
+                        >
+                          Back
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
