@@ -1,4 +1,11 @@
-import { useMemo, type CSSProperties } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from 'react';
 import {
   e4LayerADimensionStyle,
   e4LayerBDimensionStyle,
@@ -9,7 +16,6 @@ import {
 import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/PwzzovOGlassCorners';
 import { RENDER_VARIANTS, type RenderVariantSlug } from '../../render-variants/manifest';
-import { useRenderVariant } from '../../render-variants/RenderVariantContext';
 import type { ExperimentId } from './experimentVisibility';
 import { useExperimentSetOne } from './combinedSettings';
 import { applyExperimentSixPanelGeometry } from './experimentSixPanelGeometry';
@@ -32,6 +38,7 @@ type PreviewExperiment = Extract<
 
 type SavePreview = {
   key: string;
+  selectionKey: string;
   id: number;
   experiment: PreviewExperiment;
   label: string;
@@ -43,14 +50,48 @@ type SavePreview = {
 const PREVIEW_EXPERIMENTS: PreviewExperiment[] = ['four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
 const FREE_LAYER_B_SNAP = { x: 52, y: 60 } as const;
 const SELECTED_SAVE_CASCADE_STEP = 28;
+const SELECTED_SAVE_DRAG_THRESHOLD = 4;
+const SELECTED_SAVE_DEFAULT_OFFSET = { x: 676, y: 0 } as const;
+
+type DragPoint = { x: number; y: number };
+type DragState = {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  originX: number;
+  originY: number;
+  pending: boolean;
+  active: boolean;
+};
 
 function experimentShortLabel(experiment: PreviewExperiment): string {
   return `E${PREVIEW_EXPERIMENTS.indexOf(experiment) + 4}`;
 }
 
-function visualOrderIndex(order: number[], id: number): number {
-  const index = order.indexOf(id);
+function visualOrderIndex(order: string[], key: string): number {
+  const index = order.indexOf(key);
   return index === -1 ? Number.MAX_SAFE_INTEGER : index;
+}
+
+function selectedSaveInstanceKeys(keysByExperiment: Partial<Record<ExperimentId, string[]>>): string[] {
+  return PREVIEW_EXPERIMENTS.flatMap((experiment) =>
+    (keysByExperiment[experiment] ?? []).map((key) => `${experiment}:${key}`),
+  );
+}
+
+function normalizeVisualOrder(order: string[], layoutOrder: string[]): string[] {
+  const layoutSet = new Set(layoutOrder);
+  const next = Array.from(new Set(order.filter((key) => layoutSet.has(key))));
+  for (const key of layoutOrder) {
+    if (!next.includes(key)) next.push(key);
+  }
+  return next;
+}
+
+function selectedSaveZIndex(order: string[], key: string): number {
+  const index = visualOrderIndex(order, key);
+  if (index === Number.MAX_SAFE_INTEGER) return 30;
+  return 30 + order.length - index;
 }
 
 function parseSaveSelectionKey(key: string): { branchSlug: RenderVariantSlug | null; id: number } | null {
@@ -77,19 +118,6 @@ function findSelectedSave(
   parsed: { branchSlug: RenderVariantSlug | null; id: number },
 ): ExperimentSetOneSnapshot | undefined {
   return saves.find((save) => save.id === parsed.id && saveMatchesBranch(save, parsed.branchSlug));
-}
-
-function saveIsCurrentStagePanel(
-  preview: SavePreview,
-  activeExperiment: ExperimentId,
-  selectedSaveIdByExperiment: Record<ExperimentId, number | null>,
-  activeRenderVariant: RenderVariantSlug | null,
-): boolean {
-  return (
-    preview.experiment === activeExperiment &&
-    preview.id === selectedSaveIdByExperiment[activeExperiment] &&
-    preview.branchSlug === activeRenderVariant
-  );
 }
 
 function materialForPreview(
@@ -205,13 +233,103 @@ function selectedSaveTransform(base: { x: number; y: number }, index: number) {
   return `translate(${base.x + cascade}px, ${base.y + cascade}px)`;
 }
 
-function SelectedSaveStagePanel({ preview, index, total }: { preview: SavePreview; index: number; total: number }) {
+function defaultSelectedSavePosition(): DragPoint {
+  return { ...SELECTED_SAVE_DEFAULT_OFFSET };
+}
+
+function emptyDragState(): DragState {
+  return {
+    pointerId: -1,
+    startX: 0,
+    startY: 0,
+    originX: 0,
+    originY: 0,
+    pending: false,
+    active: false,
+  };
+}
+
+function SelectedSaveStagePanel({
+  preview,
+  layoutIndex,
+  zIndex,
+  position,
+  onPositionCommit,
+  onBringForward,
+}: {
+  preview: SavePreview;
+  layoutIndex: number;
+  zIndex: number;
+  position: DragPoint;
+  onPositionCommit: (position: DragPoint) => void;
+  onBringForward: () => void;
+}) {
   const freeLayerB = !preview.material.layerBNestedInA;
+  const dragRef = useRef<DragState>(emptyDragState());
+  const [draftPosition, setDraftPosition] = useState(position);
+  const positionRef = useRef(position);
+  const draftPositionRef = useRef(position);
+
+  useEffect(() => {
+    positionRef.current = position;
+    setDraftPosition(position);
+    draftPositionRef.current = position;
+  }, [position.x, position.y]);
+
   const style = {
     ...e4SettingsToCssVars(preview.material),
-    zIndex: 30 + total - index,
+    transform: `translate(${draftPosition.x}px, ${draftPosition.y}px)`,
+    zIndex,
   } as CSSProperties;
   const label = `${experimentShortLabel(preview.experiment)} ${preview.label}${preview.branchLabel ? ` ${preview.branchLabel}` : ''}`;
+  const startDrag = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+    onBringForward();
+    dragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: positionRef.current.x,
+      originY: positionRef.current.y,
+      pending: true,
+      active: false,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const moveDrag = (event: PointerEvent<HTMLDivElement>) => {
+    const state = dragRef.current;
+    if (state.pointerId !== event.pointerId || (!state.pending && !state.active)) return;
+    const dx = event.clientX - state.startX;
+    const dy = event.clientY - state.startY;
+    if (state.pending) {
+      if (Math.abs(dx) < SELECTED_SAVE_DRAG_THRESHOLD && Math.abs(dy) < SELECTED_SAVE_DRAG_THRESHOLD) return;
+      state.pending = false;
+      state.active = true;
+    }
+    if (!state.active) return;
+    const next = { x: state.originX + dx, y: state.originY + dy };
+    draftPositionRef.current = next;
+    setDraftPosition(next);
+    event.preventDefault();
+  };
+  const endDrag = (event: PointerEvent<HTMLDivElement>) => {
+    const state = dragRef.current;
+    if (state.pointerId !== event.pointerId || (!state.pending && !state.active)) return;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (state.active) {
+      positionRef.current = draftPositionRef.current;
+      onPositionCommit(draftPositionRef.current);
+    }
+    dragRef.current = emptyDragState();
+  };
+  const dragHandlers = {
+    onPointerDown: startDrag,
+    onPointerMove: moveDrag,
+    onPointerUp: endDrag,
+    onPointerCancel: endDrag,
+  };
 
   return (
     <div
@@ -222,14 +340,16 @@ function SelectedSaveStagePanel({ preview, index, total }: { preview: SavePrevie
     >
       <div
         className="experiment-set-one-selected-save-stage__layer-a"
-        style={{ transform: selectedSaveTransform(SHOWCASE_PANEL_SNAP, index) }}
+        style={{ transform: selectedSaveTransform(SHOWCASE_PANEL_SNAP, layoutIndex) }}
+        {...dragHandlers}
       >
         <SelectedSaveLayerA material={preview.material} />
       </div>
       {freeLayerB && (
         <div
           className="experiment-set-one-selected-save-stage__free-layer-b"
-          style={{ transform: selectedSaveTransform(FREE_LAYER_B_SNAP, index) }}
+          style={{ transform: selectedSaveTransform(FREE_LAYER_B_SNAP, layoutIndex) }}
+          {...dragHandlers}
         >
           <SelectedSaveLayerB material={preview.material} />
         </div>
@@ -241,14 +361,16 @@ function SelectedSaveStagePanel({ preview, index, total }: { preview: SavePrevie
 export function SelectedSaveStagePanels() {
   const {
     saves,
-    activeExperiment,
-    selectedSaveIdByExperiment,
     selectedSaveKeysByExperiment,
-    saveVisualOrder,
+    selectedSaveVisualOrder,
+    selectedSavePositions,
+    setSelectedSavePosition,
+    bringSaveForward,
   } = useExperimentSetOne();
-  const { slug: activeRenderVariant } = useRenderVariant();
 
   const previews = useMemo(() => {
+    const layoutOrder = selectedSaveInstanceKeys(selectedSaveKeysByExperiment);
+    const visualOrder = normalizeVisualOrder(selectedSaveVisualOrder, layoutOrder);
     return PREVIEW_EXPERIMENTS.flatMap((experiment) =>
       (selectedSaveKeysByExperiment[experiment] ?? []).flatMap((key): SavePreview[] => {
         const parsed = parseSaveSelectionKey(key);
@@ -262,6 +384,7 @@ export function SelectedSaveStagePanels() {
           : null;
         return [{
           key: `${experiment}:${key}`,
+          selectionKey: key,
           id: snapshot.id,
           experiment,
           label: snapshot.label,
@@ -270,39 +393,34 @@ export function SelectedSaveStagePanels() {
           material,
         }];
       }),
-    ).filter(
-      (preview) =>
-        !saveIsCurrentStagePanel(
-          preview,
-          activeExperiment,
-          selectedSaveIdByExperiment,
-          activeRenderVariant,
-        ),
     ).sort(
       (a, b) =>
-        visualOrderIndex(saveVisualOrder, a.id) - visualOrderIndex(saveVisualOrder, b.id) ||
-        a.id - b.id ||
+        visualOrderIndex(layoutOrder, a.key) - visualOrderIndex(layoutOrder, b.key) ||
         a.key.localeCompare(b.key),
-    );
+    ).map((preview) => ({
+      preview,
+      layoutIndex: visualOrderIndex(layoutOrder, preview.key),
+      zIndex: selectedSaveZIndex(visualOrder, preview.key),
+    }));
   }, [
-    activeExperiment,
-    activeRenderVariant,
     saves,
-    selectedSaveIdByExperiment,
     selectedSaveKeysByExperiment,
-    saveVisualOrder,
+    selectedSaveVisualOrder,
   ]);
 
   if (previews.length === 0) return null;
 
   return (
     <>
-      {previews.map((preview, index) => (
+      {previews.map(({ preview, layoutIndex, zIndex }) => (
         <SelectedSaveStagePanel
           key={preview.key}
           preview={preview}
-          index={index}
-          total={previews.length}
+          layoutIndex={layoutIndex}
+          zIndex={zIndex}
+          position={selectedSavePositions[preview.key] ?? defaultSelectedSavePosition()}
+          onPositionCommit={(position) => setSelectedSavePosition(preview.key, position)}
+          onBringForward={() => bringSaveForward(preview.experiment, preview.selectionKey)}
         />
       ))}
     </>
