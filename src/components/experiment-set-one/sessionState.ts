@@ -14,7 +14,7 @@ import {
   E4_MASTER_DEFAULT,
 } from './masterDefaults';
 import { applyExperimentEightPanelGeometry } from './experimentSevenPanelGeometry';
-import { applyShowcasePanelGeometry } from './showcasePanelGeometry';
+import { applyShowcasePanelGeometry, applyExperimentNinePanelGeometry } from './showcasePanelGeometry';
 import { normalizeExperimentTenPanelGeometry } from './experimentTenPanelGeometry';
 
 import {
@@ -133,7 +133,7 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       e6: parsed.e6 ? normalizeE4MaterialSettings(parsed.e6) : undefined,
       e7: parsed.e7 ? normalizeE4MaterialSettings(parsed.e7) : undefined,
       e8: parsed.e8 ? applyExperimentEightPanelGeometry(normalizeE4MaterialSettings(parsed.e8)) : undefined,
-      e9: parsed.e9 ? applyShowcasePanelGeometry(normalizeE4MaterialSettings(parsed.e9)) : undefined,
+      e9: parsed.e9 ? applyExperimentNinePanelGeometry(normalizeE4MaterialSettings(parsed.e9)) : undefined,
       e10: parsed.e10 ? normalizeExperimentTenPanelGeometry(parsed.e10) : undefined,
       e6LayerC: parsed.e6LayerC,
       hidePanelText: typeof parsed.hidePanelText === 'boolean' ? parsed.hidePanelText : true,
