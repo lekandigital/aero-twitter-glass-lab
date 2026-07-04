@@ -33,6 +33,7 @@ const VARIANT_CSS: Record<RenderVariantSlug, string[]> = {
   'opus-4.8-max-mistake': [opusMaxMistake4, opusMaxMistakeGlass, opusMaxMistake2],
   'opus-4.8-max': [opusMax4, opusMaxGlass, opusMax2],
   'chatgpt-5.5': [chatgpt4, chatgptGlass, chatgpt2],
+  'chatgpt-5.5-two': [chatgpt4, chatgptGlass, chatgpt2],
   'mix-opus-composer': [mix4, mixGlass, mix2],
   'opus-4.8-max-two': [opusMaxTwo4, opusMaxTwoGlass, opusMaxTwo2],
   'composer-2-max': [composer4, composerGlass, composer2],

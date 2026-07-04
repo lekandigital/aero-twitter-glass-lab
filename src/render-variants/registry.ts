@@ -21,6 +21,7 @@ export const VARIANT_MODULES: Record<RenderVariantSlug, RenderVariantModule> = {
   'opus-4.8-max-mistake': opus48MaxMistake as unknown as RenderVariantModule,
   'opus-4.8-max': opus48Max as unknown as RenderVariantModule,
   'chatgpt-5.5': chatgpt55 as unknown as RenderVariantModule,
+  'chatgpt-5.5-two': chatgpt55 as unknown as RenderVariantModule,
   'mix-opus-composer': mixOpusComposer as unknown as RenderVariantModule,
   'opus-4.8-max-two': opus48MaxTwo as unknown as RenderVariantModule,
   'composer-2-max': composer2Max as unknown as RenderVariantModule,
