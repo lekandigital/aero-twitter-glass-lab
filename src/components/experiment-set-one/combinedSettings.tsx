@@ -83,7 +83,7 @@ import {
   E5_BORDER_REFINEMENTS_VERSION,
   refineExperimentFivePanels,
 } from '../experiment-set-five/borderCornerRefinements';
-import { clearAllExperimentSetOnePositions, EXPERIMENT_SET_ONE_POSITION_KEYS, loadDragPosition, saveDragPosition } from './dragPositions';
+import { clearAllExperimentSetOnePositions, EXPERIMENT_SET_ONE_POSITION_KEYS, saveDragPosition } from './dragPositions';
 import {
   defaultSession,
   loadExperimentSetOneSession,
@@ -176,6 +176,36 @@ function parseSelectionKey(key: string): { branchSlug: string | null; id: number
   const branchPart = key.slice(0, colonIndex);
   const idPart = Number(key.slice(colonIndex + 1));
   return { branchSlug: branchPart === 'base' ? null : branchPart, id: idPart };
+}
+
+function renderVariantLabel(branchSlug: string | null | undefined): string | null {
+  if (!branchSlug) return null;
+  return RENDER_VARIANTS.find((variant) => variant.slug === branchSlug)?.label ?? branchSlug;
+}
+
+function saveMatchesSelection(
+  snapshot: ExperimentSetOneSnapshot,
+  branchSlug: string | null,
+): boolean {
+  if (!branchSlug) return !snapshot.branchVariant;
+  if (snapshot.branchVariant === branchSlug) return true;
+  const variant = RENDER_VARIANTS.find((candidate) => candidate.slug === branchSlug);
+  return variant?.saveIds.includes(snapshot.sourceSaveId ?? snapshot.id) ?? false;
+}
+
+function formatSaveLabel(
+  snapshot: ExperimentSetOneSnapshot | undefined,
+  branchSlug: string | null,
+): string | null {
+  if (!snapshot) return null;
+  const variantLabel = renderVariantLabel(branchSlug);
+  return variantLabel ? `${snapshot.label} (${variantLabel})` : snapshot.label;
+}
+
+function saveVariantGroupLabel(save: ExperimentSetOneSnapshot): string {
+  const variant = RENDER_VARIANTS.find((candidate) => candidate.saveIds.includes(catalogSaveId(save)));
+  if (variant) return variant.label;
+  return save.scope === 'general' ? 'General' : 'Other saves';
 }
 
 function normalizeSaveSelectionKeys(
@@ -1486,40 +1516,6 @@ function experimentTitle(experiment: ExperimentSelection['experiment'] | Experim
   return 'Experiment Nine';
 }
 
-function selectionPersistKey(selection: ExperimentSelection) {
-  if (selection.experiment === 'one') return EXPERIMENT_SET_ONE_POSITION_KEYS.panelOne;
-  if (selection.experiment === 'two') {
-    return selection.target === 'trans-sheet'
-      ? EXPERIMENT_SET_ONE_POSITION_KEYS.transSheet
-      : EXPERIMENT_SET_ONE_POSITION_KEYS.frostSheet;
-  }
-  if (selection.experiment === 'three') {
-    return selection.target === 'layer-a' || selection.target === 'layer-a-rim'
-      ? EXPERIMENT_SET_ONE_POSITION_KEYS.layerA
-      : EXPERIMENT_SET_ONE_POSITION_KEYS.layerB;
-  }
-  if (selection.experiment === 'four' || selection.experiment === 'five' || selection.experiment === 'six' || selection.experiment === 'seven' || selection.experiment === 'eight' || selection.experiment === 'nine' || selection.experiment === 'ten') {
-    if (selection.experiment === 'six' && isE6LayerCInspectTarget(selection.target)) {
-      return EXPERIMENT_SET_ONE_POSITION_KEYS.layerC6;
-    }
-    if (selection.experiment === 'eight' && isE6LayerCInspectTarget(selection.target)) {
-      return EXPERIMENT_SET_ONE_POSITION_KEYS.layerC6;
-    }
-    if (selection.experiment === 'eight') {
-      return EXPERIMENT_SET_ONE_POSITION_KEYS.layerA8;
-    }
-    if (selection.experiment === 'ten') {
-      return selection.target.startsWith('layer-a')
-        ? EXPERIMENT_SET_ONE_POSITION_KEYS.layerA10
-        : EXPERIMENT_SET_ONE_POSITION_KEYS.layerB10;
-    }
-    return selection.target.startsWith('layer-a')
-      ? EXPERIMENT_SET_ONE_POSITION_KEYS.layerA4
-      : EXPERIMENT_SET_ONE_POSITION_KEYS.layerB4;
-  }
-  return EXPERIMENT_SET_ONE_POSITION_KEYS.layerA4;
-}
-
 function fieldsForSelection<T extends { id: string; section: string }>(
   allFields: T[],
   highlight: Set<string> | null,
@@ -1699,18 +1695,6 @@ export function ExperimentSetOneSettingsDock() {
       EXPERIMENT_ORDER.filter((id) => selectedExperimentSet.has(id)).map((id) => experimentTitle(id)),
     [selectedExperimentSet],
   );
-  const selectedSaveExperimentIds = useMemo(
-    () =>
-      EXPERIMENT_ORDER.filter(
-        (id) => (selectedSaveKeysByExperiment[id]?.length ?? 0) > 0,
-      ),
-    [selectedSaveKeysByExperiment],
-  );
-  const multiSummaryExperimentLabels = useMemo(() => {
-    const ids = new Set<ExperimentId>(selectedExperimentIds);
-    for (const id of selectedSaveExperimentIds) ids.add(id);
-    return EXPERIMENT_ORDER.filter((id) => ids.has(id)).map((id) => experimentTitle(id));
-  }, [selectedExperimentIds, selectedSaveExperimentIds]);
   const selectedSaveCount = useMemo(
     () =>
       Object.values(selectedSaveKeysByExperiment).reduce(
@@ -1720,10 +1704,8 @@ export function ExperimentSetOneSettingsDock() {
     [selectedSaveKeysByExperiment],
   );
   const selectedExperimentCount = selectedExperimentLabels.length;
-  const multiSummaryExperimentCount = multiSummaryExperimentLabels.length;
   const saveMultiSelectionActive = selectedSaveCount > 0;
   const anyMultiSelectionActive = selectedExperimentCount > 1 || saveMultiSelectionActive;
-  const showMultiSelectionSummary = selectedExperimentCount > 1 || saveMultiSelectionActive;
   const selectedSaveKeysForDockExperiment = selectedSaveKeysByExperiment[dockExperiment] ?? [];
   const selectedSaveInstanceOrder = useMemo(
     () => normalizeSelectedSaveVisualOrder(selectedSaveVisualOrder, selectedSaveKeysByExperiment),
@@ -1749,7 +1731,11 @@ export function ExperimentSetOneSettingsDock() {
     instanceKey: string;
     save: ExperimentSetOneSnapshot | undefined;
     branchSlug: string | null;
-    swapAlternatives: Array<{ save: ExperimentSetOneSnapshot; key: string; branchSlug: string | null }>;
+    swapAlternativeGroups: Array<{
+      key: string;
+      label: string;
+      items: Array<{ save: ExperimentSetOneSnapshot; key: string; branchSlug: string | null }>;
+    }>;
   };
 
   const rosterItems = useMemo(() => {
@@ -1760,16 +1746,25 @@ export function ExperimentSetOneSettingsDock() {
       const experimentSaves = getScopedSavesForExperiment(saves, experiment);
       for (const key of keys) {
         const parsed = parseSelectionKey(key);
-        const save = saves.find((s) => s.id === parsed.id);
+        const save = saves.find((s) => s.id === parsed.id && saveMatchesSelection(s, parsed.branchSlug));
         const instanceKey = selectedSaveInstanceKey(experiment, key);
         // Build swap alternatives: all saves for this experiment that are NOT currently selected
         const selectedKeysSet = new Set(keys);
-        const alternatives: RosterItem['swapAlternatives'] = [];
+        const alternativeGroups = new Map<string, RosterItem['swapAlternativeGroups'][number]>();
         for (const altSave of experimentSaves) {
-          const altBranch = altSave.branchVariant ?? null;
+          const altVariant = RENDER_VARIANTS.find((variant) => variant.saveIds.includes(catalogSaveId(altSave))) ?? null;
+          const altBranch = altSave.branchVariant ?? altVariant?.slug ?? null;
           const altKey = saveSelectionKey(altSave.id, altBranch);
           if (!selectedKeysSet.has(altKey)) {
-            alternatives.push({ save: altSave, key: altKey, branchSlug: altBranch });
+            const groupKey = altVariant?.slug ?? (altSave.scope === 'general' ? 'general' : 'other');
+            const groupLabel = altVariant?.label ?? saveVariantGroupLabel(altSave);
+            const group = alternativeGroups.get(groupKey) ?? {
+              key: groupKey,
+              label: groupLabel,
+              items: [],
+            };
+            group.items.push({ save: altSave, key: altKey, branchSlug: altBranch });
+            alternativeGroups.set(groupKey, group);
           }
         }
         items.push({
@@ -1779,7 +1774,7 @@ export function ExperimentSetOneSettingsDock() {
           instanceKey,
           save,
           branchSlug: parsed.branchSlug,
-          swapAlternatives: alternatives,
+          swapAlternativeGroups: Array.from(alternativeGroups.values()),
         });
       }
     }
@@ -2172,13 +2167,13 @@ export function ExperimentSetOneSettingsDock() {
                           return (
                             <div key={item.instanceKey}>
                               <div
-                                className={`experiment-one-settings-dock__roster-item${isExpanded ? ' experiment-one-settings-dock__roster-item--expanded' : ''}`}
-                                onClick={() => setExpandedSwapKey(isExpanded ? null : item.instanceKey)}
-                                title={`${item.save?.label ?? item.key} · click to swap with another save`}
+                              className={`experiment-one-settings-dock__roster-item${isExpanded ? ' experiment-one-settings-dock__roster-item--expanded' : ''}`}
+                              onClick={() => setExpandedSwapKey(isExpanded ? null : item.instanceKey)}
+                                title={`${formatSaveLabel(item.save, item.branchSlug) ?? item.key} · click to swap with another save`}
                               >
                                 <span className="experiment-one-settings-dock__roster-item-dot" />
                                 <span className="experiment-one-settings-dock__roster-item-label">
-                                  {item.save?.label ?? `Save ${parseSelectionKey(item.key).id}`}
+                                  {formatSaveLabel(item.save, item.branchSlug) ?? `Save ${parseSelectionKey(item.key).id}`}
                                 </span>
                                 {branchLabel && (
                                   <span className="experiment-one-settings-dock__roster-item-branch">{branchLabel}</span>
@@ -2220,38 +2215,45 @@ export function ExperimentSetOneSettingsDock() {
                                   </button>
                                 </span>
                               </div>
-                              {isExpanded && item.swapAlternatives.length > 0 && (
+                              {isExpanded && item.swapAlternativeGroups.length > 0 && (
                                 <div className="experiment-one-settings-dock__swap-dropdown">
-                                  <span className="experiment-one-settings-dock__swap-dropdown-title">Swap with</span>
-                                  {item.swapAlternatives.map((alt) => {
-                                    const altBranchLabel = alt.branchSlug
-                                      ? RENDER_VARIANTS.find((v) => v.slug === alt.branchSlug)?.label ?? alt.branchSlug
-                                      : null;
-                                    return (
-                                      <button
-                                        key={alt.key}
-                                        type="button"
-                                        className="experiment-one-settings-dock__swap-option"
-                                        onClick={() => {
-                                          // Swap: remove old, add new
-                                          toggleSaveMultiSelection(item.experiment, item.key, true);
-                                          toggleSaveMultiSelection(item.experiment, alt.key, true);
-                                          setExpandedSwapKey(null);
-                                        }}
-                                        title={`Swap to ${alt.save.label}`}
-                                      >
-                                        <span className="experiment-one-settings-dock__swap-option-label">
-                                          {alt.save.label}
-                                        </span>
-                                        {altBranchLabel && (
-                                          <span className="experiment-one-settings-dock__swap-option-branch">{altBranchLabel}</span>
-                                        )}
-                                      </button>
-                                    );
-                                  })}
+                                  <span className="experiment-one-settings-dock__swap-dropdown-title">
+                                    {`Swap with ${formatSaveLabel(item.save, item.branchSlug) ?? item.key}`}
+                                  </span>
+                                  {item.swapAlternativeGroups.map((group) => (
+                                    <div key={group.key} className="experiment-one-settings-dock__branch-group">
+                                      <span className="experiment-one-settings-dock__branch-label">{group.label}</span>
+                                      <div className="experiment-one-settings-dock__branch-saves">
+                                        {group.items.map((alt) => {
+                                          const altBranchLabel = renderVariantLabel(alt.branchSlug);
+                                          return (
+                                            <button
+                                              key={alt.key}
+                                              type="button"
+                                              className="experiment-one-settings-dock__swap-option"
+                                              onClick={() => {
+                                                // Swap: remove old, add new
+                                                toggleSaveMultiSelection(item.experiment, item.key, true);
+                                                toggleSaveMultiSelection(item.experiment, alt.key, true);
+                                                setExpandedSwapKey(null);
+                                              }}
+                                              title={`Swap to ${formatSaveLabel(alt.save, alt.branchSlug)}`}
+                                            >
+                                              <span className="experiment-one-settings-dock__swap-option-label">
+                                                {formatSaveLabel(alt.save, alt.branchSlug)}
+                                              </span>
+                                              {altBranchLabel && (
+                                                <span className="experiment-one-settings-dock__swap-option-branch">{altBranchLabel}</span>
+                                              )}
+                                            </button>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                  ))}
                                 </div>
                               )}
-                              {isExpanded && item.swapAlternatives.length === 0 && (
+                              {isExpanded && item.swapAlternativeGroups.length === 0 && (
                                 <div className="experiment-one-settings-dock__swap-dropdown">
                                   <span className="experiment-one-settings-dock__swap-dropdown-title">No other saves available</span>
                                 </div>
