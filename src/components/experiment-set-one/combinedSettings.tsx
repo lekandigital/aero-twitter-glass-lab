@@ -2358,137 +2358,139 @@ export function ExperimentSetOneSettingsDock() {
                         className="experiment-one-settings-dock__toolbar-btn"
                         onClick={() => { clearMultiSelection(); setExpandedSwapKey(null); }}
                         style={{ marginLeft: 'auto' }}
-                      >
-                        Clear
-                      </button>
-                    </div>
-                    {selectedSaveCount > 0 && rosterManifestEntries.length > 0 && (
-                      <div className="experiment-one-settings-dock__roster-manifest" aria-label="Saved panel set">
-                        {rosterManifestEntries.map((entry) => (
-                          <div key={entry.key} className="experiment-one-settings-dock__roster-manifest-row">
-                            <span className="experiment-one-settings-dock__roster-manifest-experiment">{entry.experiment}</span>
-                            <span className="experiment-one-settings-dock__roster-manifest-label">{entry.label}</span>
-                            {entry.placement && (
-                              <span className="experiment-one-settings-dock__roster-manifest-placement">{entry.placement}</span>
-                            )}
-                          </div>
-                        ))}
+                        >
+                          Clear
+                        </button>
                       </div>
-                    )}
-                    {rosterGroups.map((group) => (
-                      <div key={group.experiment} className="experiment-one-settings-dock__roster-group">
-                        <span className="experiment-one-settings-dock__roster-group-label">{group.label}</span>
-                        {group.items.map((item) => {
-                          const orderIndex = selectedSaveInstanceOrder.indexOf(item.instanceKey);
-                          const canReorder = selectedSaveInstanceOrder.length > 1 && orderIndex !== -1;
-                          const isFrontMost = orderIndex === 0;
-                          const isBackMost = orderIndex === selectedSaveInstanceOrder.length - 1;
-                          const isExpanded = expandedSwapKey === item.instanceKey;
-                          const branchLabel = item.branchSlug && item.branchSlug !== 'base'
-                            ? RENDER_VARIANTS.find((v) => v.slug === item.branchSlug)?.label ?? item.branchSlug
-                            : null;
-                          const placementLabel = formatSavePlacement(item.position, item.zIndex);
-                          return (
-                            <div key={item.instanceKey}>
-                              <div
-                              className={`experiment-one-settings-dock__roster-item${isExpanded ? ' experiment-one-settings-dock__roster-item--expanded' : ''}`}
-                              onClick={() => setExpandedSwapKey(isExpanded ? null : item.instanceKey)}
-                                title={`${formatSaveLabel(item.save, item.branchSlug) ?? item.key} · click to swap with another save`}
-                              >
-                                <span className="experiment-one-settings-dock__roster-item-dot" />
-                                <span className="experiment-one-settings-dock__roster-item-body">
-                                  <span className="experiment-one-settings-dock__roster-item-label">
-                                    {formatSaveLabel(item.save, item.branchSlug) ?? `Save ${parseSelectionKey(item.key).id}`}
-                                  </span>
-                                  <span className="experiment-one-settings-dock__roster-item-meta">
-                                    <span>{experimentShortLabel(item.experiment)}</span>
-                                    {branchLabel && <span>{branchLabel}</span>}
-                                    {placementLabel && <span>{placementLabel}</span>}
-                                  </span>
-                                </span>
-                                <span className="experiment-one-settings-dock__roster-item-actions" onClick={(e) => e.stopPropagation()}>
-                                  {canReorder && (
-                                    <>
-                                      <button
-                                        type="button"
-                                        className="experiment-one-settings-dock__save-context-btn"
-                                        onClick={(e) => { e.stopPropagation(); bringSaveForward(item.experiment, item.key); }}
-                                        disabled={isFrontMost}
-                                        title="Bring forward"
-                                      >
-                                        ▲
-                                      </button>
-                                      <button
-                                        type="button"
-                                        className="experiment-one-settings-dock__save-context-btn"
-                                        onClick={(e) => { e.stopPropagation(); sendSaveBackward(item.experiment, item.key); }}
-                                        disabled={isBackMost}
-                                        title="Send backward"
-                                      >
-                                        ▼
-                                      </button>
-                                    </>
-                                  )}
-                                  <button
-                                    type="button"
-                                    className="experiment-one-settings-dock__roster-remove"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      toggleSaveMultiSelection(item.experiment, item.key, true);
-                                      if (expandedSwapKey === item.instanceKey) setExpandedSwapKey(null);
-                                    }}
-                                    title="Remove from selection"
-                                  >
-                                    ✕
-                                  </button>
-                                </span>
-                              </div>
-                              {isExpanded && item.swapAlternativeGroups.length > 0 && (
-                                <div className="experiment-one-settings-dock__swap-dropdown">
-                                  <span className="experiment-one-settings-dock__swap-dropdown-title">
-                                    {`Swap with ${formatSaveLabel(item.save, item.branchSlug) ?? item.key}`}
-                                  </span>
-                                  {item.swapAlternativeGroups.map((group) => (
-                                    <div key={group.key} className="experiment-one-settings-dock__branch-group">
-                                      <span className="experiment-one-settings-dock__branch-label">{group.label}</span>
-                                      <div className="experiment-one-settings-dock__branch-saves">
-                                        {group.items.map((alt) => {
-                                          const altBranchLabel = renderVariantLabel(alt.branchSlug);
-                                          return (
-                                            <button
-                                              key={alt.key}
-                                              type="button"
-                                              className="experiment-one-settings-dock__swap-option"
-                                              onClick={() => {
-                                                replaceSaveMultiSelection(item.experiment, item.key, alt.key);
-                                                setExpandedSwapKey(null);
-                                              }}
-                                              title={`Swap to ${formatSaveLabel(alt.save, alt.branchSlug)}`}
-                                            >
-                                              <span className="experiment-one-settings-dock__swap-option-label">
-                                                {formatSaveLabel(alt.save, alt.branchSlug)}
-                                              </span>
-                                              {altBranchLabel && (
-                                                <span className="experiment-one-settings-dock__swap-option-branch">{altBranchLabel}</span>
-                                              )}
-                                            </button>
-                                          );
-                                        })}
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                              {isExpanded && item.swapAlternativeGroups.length === 0 && (
-                                <div className="experiment-one-settings-dock__swap-dropdown">
-                                  <span className="experiment-one-settings-dock__swap-dropdown-title">No other saves available</span>
-                                </div>
+                    <div className="experiment-one-settings-dock__roster-scroll">
+                      {selectedSaveCount > 0 && rosterManifestEntries.length > 0 && (
+                        <div className="experiment-one-settings-dock__roster-manifest" aria-label="Saved panel set">
+                          {rosterManifestEntries.map((entry) => (
+                            <div key={entry.key} className="experiment-one-settings-dock__roster-manifest-row">
+                              <span className="experiment-one-settings-dock__roster-manifest-experiment">{entry.experiment}</span>
+                              <span className="experiment-one-settings-dock__roster-manifest-label">{entry.label}</span>
+                              {entry.placement && (
+                                <span className="experiment-one-settings-dock__roster-manifest-placement">{entry.placement}</span>
                               )}
                             </div>
-                          );
-                        })}
-                      </div>
-                    ))}
+                          ))}
+                        </div>
+                      )}
+                      {rosterGroups.map((group) => (
+                        <div key={group.experiment} className="experiment-one-settings-dock__roster-group">
+                          <span className="experiment-one-settings-dock__roster-group-label">{group.label}</span>
+                          {group.items.map((item) => {
+                            const orderIndex = selectedSaveInstanceOrder.indexOf(item.instanceKey);
+                            const canReorder = selectedSaveInstanceOrder.length > 1 && orderIndex !== -1;
+                            const isFrontMost = orderIndex === 0;
+                            const isBackMost = orderIndex === selectedSaveInstanceOrder.length - 1;
+                            const isExpanded = expandedSwapKey === item.instanceKey;
+                            const branchLabel = item.branchSlug && item.branchSlug !== 'base'
+                              ? RENDER_VARIANTS.find((v) => v.slug === item.branchSlug)?.label ?? item.branchSlug
+                              : null;
+                            const placementLabel = formatSavePlacement(item.position, item.zIndex);
+                            return (
+                              <div key={item.instanceKey}>
+                                <div
+                                  className={`experiment-one-settings-dock__roster-item${isExpanded ? ' experiment-one-settings-dock__roster-item--expanded' : ''}`}
+                                  onClick={() => setExpandedSwapKey(isExpanded ? null : item.instanceKey)}
+                                  title={`${formatSaveLabel(item.save, item.branchSlug) ?? item.key} · click to swap with another save`}
+                                >
+                                  <span className="experiment-one-settings-dock__roster-item-dot" />
+                                  <span className="experiment-one-settings-dock__roster-item-body">
+                                    <span className="experiment-one-settings-dock__roster-item-label">
+                                      {formatSaveLabel(item.save, item.branchSlug) ?? `Save ${parseSelectionKey(item.key).id}`}
+                                    </span>
+                                    <span className="experiment-one-settings-dock__roster-item-meta">
+                                      <span>{experimentShortLabel(item.experiment)}</span>
+                                      {branchLabel && <span>{branchLabel}</span>}
+                                      {placementLabel && <span>{placementLabel}</span>}
+                                    </span>
+                                  </span>
+                                  <span className="experiment-one-settings-dock__roster-item-actions" onClick={(e) => e.stopPropagation()}>
+                                    {canReorder && (
+                                      <>
+                                        <button
+                                          type="button"
+                                          className="experiment-one-settings-dock__save-context-btn"
+                                          onClick={(e) => { e.stopPropagation(); bringSaveForward(item.experiment, item.key); }}
+                                          disabled={isFrontMost}
+                                          title="Bring forward"
+                                        >
+                                          ▲
+                                        </button>
+                                        <button
+                                          type="button"
+                                          className="experiment-one-settings-dock__save-context-btn"
+                                          onClick={(e) => { e.stopPropagation(); sendSaveBackward(item.experiment, item.key); }}
+                                          disabled={isBackMost}
+                                          title="Send backward"
+                                        >
+                                          ▼
+                                        </button>
+                                      </>
+                                    )}
+                                    <button
+                                      type="button"
+                                      className="experiment-one-settings-dock__roster-remove"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleSaveMultiSelection(item.experiment, item.key, true);
+                                        if (expandedSwapKey === item.instanceKey) setExpandedSwapKey(null);
+                                      }}
+                                      title="Remove from selection"
+                                    >
+                                      ✕
+                                    </button>
+                                  </span>
+                                </div>
+                                {isExpanded && item.swapAlternativeGroups.length > 0 && (
+                                  <div className="experiment-one-settings-dock__swap-dropdown">
+                                    <span className="experiment-one-settings-dock__swap-dropdown-title">
+                                      {`Swap with ${formatSaveLabel(item.save, item.branchSlug) ?? item.key}`}
+                                    </span>
+                                    {item.swapAlternativeGroups.map((group) => (
+                                      <div key={group.key} className="experiment-one-settings-dock__branch-group">
+                                        <span className="experiment-one-settings-dock__branch-label">{group.label}</span>
+                                        <div className="experiment-one-settings-dock__branch-saves">
+                                          {group.items.map((alt) => {
+                                            const altBranchLabel = renderVariantLabel(alt.branchSlug);
+                                            return (
+                                              <button
+                                                key={alt.key}
+                                                type="button"
+                                                className="experiment-one-settings-dock__swap-option"
+                                                onClick={() => {
+                                                  replaceSaveMultiSelection(item.experiment, item.key, alt.key);
+                                                  setExpandedSwapKey(null);
+                                                }}
+                                                title={`Swap to ${formatSaveLabel(alt.save, alt.branchSlug)}`}
+                                              >
+                                                <span className="experiment-one-settings-dock__swap-option-label">
+                                                  {formatSaveLabel(alt.save, alt.branchSlug)}
+                                                </span>
+                                                {altBranchLabel && (
+                                                  <span className="experiment-one-settings-dock__swap-option-branch">{altBranchLabel}</span>
+                                                )}
+                                              </button>
+                                            );
+                                          })}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                {isExpanded && item.swapAlternativeGroups.length === 0 && (
+                                  <div className="experiment-one-settings-dock__swap-dropdown">
+                                    <span className="experiment-one-settings-dock__swap-dropdown-title">No other saves available</span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 

@@ -1525,6 +1525,7 @@
   border-radius: 10px;
   background: rgba(30, 60, 110, 0.22);
   border: 1px solid rgba(126, 232, 255, 0.14);
+  min-height: 0;
 }
 
 .experiment-one-settings-dock__roster-header {
@@ -1532,6 +1533,16 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+}
+
+.experiment-one-settings-dock__roster-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: clamp(12rem, 34vh, 24rem);
+  overflow-y: auto;
+  padding-right: 0.2rem;
+  overscroll-behavior: contain;
 }
 
 .experiment-one-settings-dock__roster-manifest {
