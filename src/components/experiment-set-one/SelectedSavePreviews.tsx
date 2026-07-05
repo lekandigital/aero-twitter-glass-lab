@@ -255,14 +255,12 @@ function SelectedSaveStagePanel({
   zIndex,
   position,
   onPositionCommit,
-  onBringForward,
 }: {
   preview: SavePreview;
   layoutIndex: number;
   zIndex: number;
   position: DragPoint;
   onPositionCommit: (position: DragPoint) => void;
-  onBringForward: () => void;
 }) {
   const freeLayerB = !preview.material.layerBNestedInA;
   const dragRef = useRef<DragState>(emptyDragState());
@@ -284,7 +282,6 @@ function SelectedSaveStagePanel({
   const label = `${experimentShortLabel(preview.experiment)} ${preview.label}${preview.branchLabel ? ` ${preview.branchLabel}` : ''}`;
   const startDrag = (event: PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
-    onBringForward();
     dragRef.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
@@ -365,7 +362,6 @@ export function SelectedSaveStagePanels() {
     selectedSaveVisualOrder,
     selectedSavePositions,
     setSelectedSavePosition,
-    bringSaveForward,
   } = useExperimentSetOne();
 
   const previews = useMemo(() => {
@@ -420,7 +416,6 @@ export function SelectedSaveStagePanels() {
           zIndex={zIndex}
           position={selectedSavePositions[preview.key] ?? defaultSelectedSavePosition()}
           onPositionCommit={(position) => setSelectedSavePosition(preview.key, position)}
-          onBringForward={() => bringSaveForward(preview.experiment, preview.selectionKey)}
         />
       ))}
     </>
