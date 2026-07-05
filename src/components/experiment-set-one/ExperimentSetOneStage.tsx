@@ -71,7 +71,7 @@ export function ExperimentSetOneStage() {
       ...(multiExperimentLayout
         ? {
             transform: `translate(${visibleIndex * MULTI_EXPERIMENT_CASCADE_STEP}px, ${visibleIndex * MULTI_EXPERIMENT_CASCADE_STEP}px)`,
-            zIndex: 12 + visibleExperimentIds.length - visibleIndex,
+            zIndex: 12 + visibleIndex,
           }
         : {}),
     } as CSSProperties;
