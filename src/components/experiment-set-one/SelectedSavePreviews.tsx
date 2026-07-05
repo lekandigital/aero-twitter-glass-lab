@@ -228,11 +228,6 @@ function SelectedSaveLayerA({ material }: { material: E4MaterialSettings }) {
   );
 }
 
-function selectedSaveTransform(base: { x: number; y: number }, index: number) {
-  const cascade = index * SELECTED_SAVE_CASCADE_STEP;
-  return `translate(${base.x + cascade}px, ${base.y + cascade}px)`;
-}
-
 function defaultSelectedSavePosition(): DragPoint {
   return { ...SELECTED_SAVE_DEFAULT_OFFSET };
 }
@@ -251,13 +246,11 @@ function emptyDragState(): DragState {
 
 function SelectedSaveStagePanel({
   preview,
-  layoutIndex,
   zIndex,
   position,
   onPositionCommit,
 }: {
   preview: SavePreview;
-  layoutIndex: number;
   zIndex: number;
   position: DragPoint;
   onPositionCommit: (position: DragPoint) => void;
@@ -337,7 +330,7 @@ function SelectedSaveStagePanel({
     >
       <div
         className="experiment-set-one-selected-save-stage__layer-a"
-        style={{ transform: selectedSaveTransform(SHOWCASE_PANEL_SNAP, layoutIndex) }}
+        style={{ transform: `translate(${SHOWCASE_PANEL_SNAP.x}px, ${SHOWCASE_PANEL_SNAP.y}px)` }}
         {...dragHandlers}
       >
         <SelectedSaveLayerA material={preview.material} />
@@ -345,7 +338,7 @@ function SelectedSaveStagePanel({
       {freeLayerB && (
         <div
           className="experiment-set-one-selected-save-stage__free-layer-b"
-          style={{ transform: selectedSaveTransform(FREE_LAYER_B_SNAP, layoutIndex) }}
+          style={{ transform: `translate(${FREE_LAYER_B_SNAP.x}px, ${FREE_LAYER_B_SNAP.y}px)` }}
           {...dragHandlers}
         >
           <SelectedSaveLayerB material={preview.material} />
@@ -404,15 +397,24 @@ export function SelectedSaveStagePanels() {
     selectedSaveVisualOrder,
   ]);
 
+  useEffect(() => {
+    for (const { preview, layoutIndex } of previews) {
+      if (selectedSavePositions[preview.key]) continue;
+      setSelectedSavePosition(preview.key, {
+        x: SELECTED_SAVE_DEFAULT_OFFSET.x + layoutIndex * SELECTED_SAVE_CASCADE_STEP,
+        y: SELECTED_SAVE_DEFAULT_OFFSET.y + layoutIndex * SELECTED_SAVE_CASCADE_STEP,
+      });
+    }
+  }, [previews, selectedSavePositions, setSelectedSavePosition]);
+
   if (previews.length === 0) return null;
 
   return (
     <>
-      {previews.map(({ preview, layoutIndex, zIndex }) => (
+      {previews.map(({ preview, zIndex }) => (
         <SelectedSaveStagePanel
           key={preview.key}
           preview={preview}
-          layoutIndex={layoutIndex}
           zIndex={zIndex}
           position={selectedSavePositions[preview.key] ?? defaultSelectedSavePosition()}
           onPositionCommit={(position) => setSelectedSavePosition(preview.key, position)}
