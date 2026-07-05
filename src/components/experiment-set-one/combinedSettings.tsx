@@ -76,6 +76,7 @@ import {
   getFieldFromSnapshot,
   hydrateExperimentSetOneSaves,
   loadExperimentSetOneSaves,
+  type ExperimentSetOneLayoutSnapshot,
   type ExperimentSetOneSnapshot,
 } from './savedConfigs';
 import { applyReferenceCornerLighting, REFERENCE_CORNER_PRESET_VERSION } from '../experiment-set-four/referenceCornerLighting';
@@ -202,10 +203,99 @@ function formatSaveLabel(
   return variantLabel ? `${snapshot.label} (${variantLabel})` : snapshot.label;
 }
 
+function formatLayoutSummary(snapshot: ExperimentSetOneSnapshot): string | null {
+  const experimentCount = snapshot.selectedExperimentIds?.length ?? 0;
+  const saveCount = Object.values(snapshot.selectedSaveKeysByExperiment ?? {}).reduce(
+    (count, keys) => count + (keys?.length ?? 0),
+    0,
+  );
+  const orderCount = snapshot.selectedSaveVisualOrder?.length ?? 0;
+  const hasPositions = Object.keys(snapshot.selectedSavePositions ?? {}).length > 0;
+  if (experimentCount === 0 && saveCount === 0 && orderCount === 0 && !hasPositions) return null;
+
+  const parts: string[] = [];
+  if (experimentCount > 0) parts.push(`${experimentCount} experiments`);
+  if (saveCount > 0) parts.push(`${saveCount} saves`);
+  if (orderCount > 0) parts.push(`z-order ${orderCount}`);
+  if (hasPositions) parts.push('xy saved');
+  return parts.join(' · ');
+}
+
+function formatSavePlacement(
+  position: { x: number; y: number } | undefined,
+  zIndex: number | null,
+): string | null {
+  if (!position && zIndex == null) return null;
+  const parts: string[] = [];
+  if (position) parts.push(`x ${Math.round(position.x)}`, `y ${Math.round(position.y)}`);
+  if (zIndex != null) parts.push(`z ${zIndex}`);
+  return parts.join(' · ');
+}
+
+function experimentShortLabel(experiment: ExperimentId): string {
+  return `E${EXPERIMENT_ORDER.indexOf(experiment) + 1}`;
+}
+
+type PanelSetEntry = {
+  key: string;
+  experiment: string;
+  saveLabel: string;
+  placement: string | null;
+};
+
+function describePanelSetSnapshot(
+  snapshot: ExperimentSetOneSnapshot,
+  allSaves: ExperimentSetOneSnapshot[],
+): PanelSetEntry[] {
+  const keysByExperiment = snapshot.selectedSaveKeysByExperiment ?? {};
+  const visualOrder = normalizeSelectedSaveVisualOrder(snapshot.selectedSaveVisualOrder, keysByExperiment);
+  const instanceKeys = selectedSaveInstanceKeys(keysByExperiment);
+  const orderedInstanceKeys = [...instanceKeys].sort(
+    (a, b) => {
+      const orderA = visualOrder.indexOf(a);
+      const orderB = visualOrder.indexOf(b);
+      const normalizedA = orderA === -1 ? Number.MAX_SAFE_INTEGER : orderA;
+      const normalizedB = orderB === -1 ? Number.MAX_SAFE_INTEGER : orderB;
+      return normalizedA - normalizedB || a.localeCompare(b);
+    },
+  );
+
+  return orderedInstanceKeys.flatMap((instanceKey) => {
+    const [experiment, selectionKey] = instanceKey.split(':', 2);
+    if (!experiment || !selectionKey) return [];
+    const parsed = parseSelectionKey(selectionKey);
+    const parsedId = Number.isFinite(parsed.id) ? parsed.id : Number(selectionKey.slice(selectionKey.lastIndexOf(':') + 1));
+    const save = Number.isFinite(parsedId)
+      ? allSaves.find((candidate) => candidate.id === parsedId && saveMatchesSelection(candidate, parsed.branchSlug))
+      : undefined;
+    const placement = formatSavePlacement(snapshot.selectedSavePositions?.[instanceKey], selectedSaveRosterZIndex(visualOrder, instanceKey));
+    return [{
+      key: instanceKey,
+      experiment: experimentShortLabel(experiment as ExperimentId),
+      saveLabel: formatSaveLabel(save, parsed.branchSlug) ?? (Number.isFinite(parsedId) ? `Save ${parsedId}` : selectionKey),
+      placement,
+    }];
+  });
+}
+
 function saveVariantGroupLabel(save: ExperimentSetOneSnapshot): string {
   const variant = RENDER_VARIANTS.find((candidate) => candidate.saveIds.includes(catalogSaveId(save)));
   if (variant) return variant.label;
   return save.scope === 'general' ? 'General' : 'Other saves';
+}
+
+function panelSetSummary(entryCount: number): string {
+  return entryCount === 1 ? '1 panel' : `${entryCount} panels`;
+}
+
+function hasPanelSetLayout(save: ExperimentSetOneSnapshot): boolean {
+  const saveCount = Object.values(save.selectedSaveKeysByExperiment ?? {}).reduce(
+    (count, keys) => count + (keys?.length ?? 0),
+    0,
+  );
+  const orderCount = save.selectedSaveVisualOrder?.length ?? 0;
+  const hasPositions = Object.keys(save.selectedSavePositions ?? {}).length > 0;
+  return saveCount > 0 || orderCount > 0 || hasPositions;
 }
 
 function normalizeSaveSelectionKeys(
@@ -248,6 +338,12 @@ function normalizeSaveVisualOrder(raw: number[] | undefined, saves: ExperimentSe
 
 function selectedSaveInstanceKey(experiment: ExperimentId, key: string): string {
   return `${experiment}:${key}`;
+}
+
+function selectedSaveRosterZIndex(order: string[], key: string): number | null {
+  const index = order.indexOf(key);
+  if (index === -1) return null;
+  return 30 + order.length - index;
 }
 
 function selectedSaveInstanceKeys(keysByExperiment: Partial<Record<ExperimentId, string[]>>): string[] {
@@ -336,7 +432,7 @@ type ExperimentSetOneContextValue = {
   setE6LayerC: <K extends keyof E6LayerCLayoutSettings>(id: K, value: E6LayerCLayoutSettings[K]) => void;
   resetAll: () => void;
   saves: ExperimentSetOneSnapshot[];
-  saveCurrent: () => void;
+  saveCurrent: (layout?: ExperimentSetOneLayoutSnapshot) => void;
   loadSave: (id: number, branchSlug?: RenderVariantSlug) => void;
   layoutResetVersion: number;
   resetLayoutPositions: () => void;
@@ -368,6 +464,7 @@ type ExperimentSetOneContextValue = {
   bringSaveForward: (experiment: ExperimentId, key: string) => void;
   sendSaveBackward: (experiment: ExperimentId, key: string) => void;
   setSelectedSavePosition: (instanceKey: string, position: { x: number; y: number }) => void;
+  replaceSaveMultiSelection: (experiment: ExperimentId, fromKey: string, toKey: string) => void;
   toggleExperimentMultiSelection: (id: ExperimentId, additive: boolean) => void;
   toggleSaveMultiSelection: (experiment: ExperimentId, key: string, additive: boolean) => void;
   referenceWallpaper: boolean;
@@ -595,6 +692,31 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   const selectedElRef = useRef<HTMLElement | null>(null);
   const pendingSaveClickRef = useRef<{ key: string; timer: ReturnType<typeof setTimeout> } | null>(null);
   const prevActiveExperimentRef = useRef<ExperimentId>(boot.activeExperiment ?? 'four');
+  const latestLayoutSnapshotRef = useRef<ExperimentSetOneLayoutSnapshot>({
+    activeExperiment: boot.activeExperiment ?? 'four',
+    selectedExperimentIds: normalizeExperimentSelectionIds(boot.selectedExperimentIds, boot.activeExperiment ?? 'four'),
+    selectedSaveKeysByExperiment: normalizeSaveSelectionKeys(
+      boot.selectedSaveKeysByExperiment,
+      boot.selectedSaveIdsByExperiment,
+      boot.activeExperiment ?? 'four',
+      boot.activeRenderVariant,
+    ),
+    selectedSaveVisualOrder: normalizeSelectedSaveVisualOrder(
+      boot.selectedSaveVisualOrder,
+      boot.selectedSaveKeysByExperiment ?? {},
+    ),
+    selectedSavePositions: boot.selectedSavePositions ?? {},
+  });
+
+  useLayoutEffect(() => {
+    latestLayoutSnapshotRef.current = {
+      activeExperiment,
+      selectedExperimentIds,
+      selectedSaveKeysByExperiment,
+      selectedSaveVisualOrder,
+      selectedSavePositions,
+    };
+  }, [activeExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, selectedSaveVisualOrder, selectedSavePositions]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -852,11 +974,12 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     setLayerCVisible((visible) => !visible);
   }, []);
 
-  const saveCurrent = useCallback(() => {
+  const saveCurrent = useCallback((layout?: ExperimentSetOneLayoutSnapshot) => {
     const scope = selection ? selection.experiment : activeExperiment;
     const currentE8 = e8;
     const currentE9 = e9;
     const currentE10 = e10;
+    const layoutSnapshot = layout ?? latestLayoutSnapshotRef.current;
     const snapshot = addExperimentSetOneSave(
       e1,
       e2,
@@ -871,10 +994,11 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
               ? currentE8
               : activeExperiment === 'nine'
                 ? currentE9
-                : activeExperiment === 'ten'
-                  ? currentE10
+              : activeExperiment === 'ten'
+                ? currentE10
                 : e4,
       scope,
+      layoutSnapshot,
     );
     setSaveVisualOrder((prev) => (prev.includes(snapshot.id) ? prev : [...prev, snapshot.id]));
     setSaves(loadExperimentSetOneSaves());
@@ -892,9 +1016,10 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
               ? currentE8
               : activeExperiment === 'nine'
                 ? currentE9
-                : activeExperiment === 'ten'
-                  ? currentE10
-                : e4,
+            : activeExperiment === 'ten'
+              ? currentE10
+              : e4,
+      layoutSnapshot,
     );
   }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, selection, activeExperiment]);
 
@@ -933,6 +1058,18 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       const snapshot = snapshotForLookup;
       if (!snapshot) return;
       const normalize = loadedModule?.normalizeE4MaterialSettings ?? normalizeE4MaterialSettings;
+      if (Object.prototype.hasOwnProperty.call(snapshot, 'selectedExperimentIds')) {
+        setSelectedExperimentIds(snapshot.selectedExperimentIds ?? []);
+      }
+      if (Object.prototype.hasOwnProperty.call(snapshot, 'selectedSaveKeysByExperiment')) {
+        setSelectedSaveKeysByExperiment(snapshot.selectedSaveKeysByExperiment ?? {});
+      }
+      if (Object.prototype.hasOwnProperty.call(snapshot, 'selectedSaveVisualOrder')) {
+        setSelectedSaveVisualOrder(snapshot.selectedSaveVisualOrder ?? []);
+      }
+      if (Object.prototype.hasOwnProperty.call(snapshot, 'selectedSavePositions')) {
+        setSelectedSavePositions(snapshot.selectedSavePositions ?? {});
+      }
       if (snapshot.cornersOnly) {
         if (activeExperiment === 'five') setE5State((prev) => applyReferenceCornerLighting(prev));
         else if (activeExperiment === 'six') setE6State((prev) => applyReferenceCornerLighting(prev));
@@ -1196,6 +1333,40 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     [],
   );
 
+  const replaceSaveMultiSelection = useCallback((experiment: ExperimentId, fromKey: string, toKey: string) => {
+    const fromInstanceKey = selectedSaveInstanceKey(experiment, fromKey);
+    const toInstanceKey = selectedSaveInstanceKey(experiment, toKey);
+
+    setSelectedSaveKeysByExperiment((prev) => {
+      const currentKeys = prev[experiment] ?? [];
+      const replacedKeys = currentKeys.map((key) => (key === fromKey ? toKey : key));
+      const dedupedKeys = Array.from(new Set(replacedKeys));
+      const next = { ...prev };
+      if (dedupedKeys.length > 0) next[experiment] = dedupedKeys;
+      else delete next[experiment];
+      return next;
+    });
+
+    setSelectedSaveVisualOrder((prev) => {
+      const existingIndex = prev.indexOf(fromInstanceKey);
+      if (existingIndex === -1) {
+        if (prev.includes(toInstanceKey)) return prev;
+        return [...prev, toInstanceKey];
+      }
+
+      const next = prev.filter((key) => key !== fromInstanceKey && key !== toInstanceKey);
+      next.splice(existingIndex, 0, toInstanceKey);
+      return next;
+    });
+
+    setSelectedSavePositions((prev) => {
+      if (!(fromInstanceKey in prev)) return prev;
+      const next = { ...prev, [toInstanceKey]: prev[fromInstanceKey] };
+      delete next[fromInstanceKey];
+      return next;
+    });
+  }, []);
+
   const toggleExperimentVisible = useCallback((id: ExperimentId) => {
     setExperimentVisible((prev) => ({ ...prev, [id]: !prev[id] }));
     setSelection((prev) => (prev?.experiment === id ? null : prev));
@@ -1385,12 +1556,13 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       bringSaveForward,
       sendSaveBackward,
       setSelectedSavePosition,
+      replaceSaveMultiSelection,
       toggleExperimentMultiSelection,
       toggleSaveMultiSelection,
       referenceWallpaper,
       toggleReferenceWallpaper,
     }),
-    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e6LayerC, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE6LayerC, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, setSelectedSavePosition, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper],
+    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e6LayerC, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE6LayerC, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, setSelectedSavePosition, replaceSaveMultiSelection, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper],
   );
 
   return (
@@ -1596,6 +1768,7 @@ export function ExperimentSetOneSettingsDock() {
     selectedSaveKeysByExperiment,
     saveVisualOrder,
     selectedSaveVisualOrder,
+    selectedSavePositions,
     selection,
     clearSelection,
     clearMultiSelection,
@@ -1603,6 +1776,7 @@ export function ExperimentSetOneSettingsDock() {
     cancelQueuedSaveLoad,
     bringSaveForward,
     sendSaveBackward,
+    replaceSaveMultiSelection,
     toggleExperimentMultiSelection,
     toggleSaveMultiSelection,
     referenceWallpaper,
@@ -1658,6 +1832,14 @@ export function ExperimentSetOneSettingsDock() {
     () => new Set(RENDER_VARIANTS.flatMap((variant) => variant.saveIds)),
     [],
   );
+  const panelSetSaves = useMemo(
+    () => sortSavesByVisualOrder(saves.filter(hasPanelSetLayout), saveVisualOrder),
+    [saves, saveVisualOrder],
+  );
+  const panelSetSaveIds = useMemo(
+    () => new Set(panelSetSaves.map(catalogSaveId)),
+    [panelSetSaves],
+  );
   const branchSaveGroups = useMemo(
     () =>
       saveScope === 'four' || saveScope === 'five' || saveScope === 'six' || saveScope === 'seven' || saveScope === 'eight' || saveScope === 'nine' || saveScope === 'ten'
@@ -1665,25 +1847,25 @@ export function ExperimentSetOneSettingsDock() {
             variant,
             saves: scopedSaves
               .filter(
-                (save) => save.scope !== 'general' && variant.saveIds.includes(catalogSaveId(save)),
+                (save) => save.scope !== 'general' && !panelSetSaveIds.has(catalogSaveId(save)) && variant.saveIds.includes(catalogSaveId(save)),
               )
               .slice(),
           })).filter((group) => group.saves.length > 0)
         : [],
-    [scopedSaves, saveScope],
+    [scopedSaves, saveScope, panelSetSaveIds],
   );
   const generalScopedSaves = useMemo(
-    () => scopedSaves.filter((save) => save.scope === 'general'),
-    [scopedSaves],
+    () => scopedSaves.filter((save) => save.scope === 'general' && !panelSetSaveIds.has(catalogSaveId(save))),
+    [scopedSaves, panelSetSaveIds],
   );
   const otherScopedSaves = useMemo(
     () =>
       branchSaveGroups.length > 0
         ? scopedSaves.filter(
-            (save) => save.scope !== 'general' && !branchSaveIds.has(catalogSaveId(save)),
+            (save) => save.scope !== 'general' && !panelSetSaveIds.has(catalogSaveId(save)) && !branchSaveIds.has(catalogSaveId(save)),
           )
-        : scopedSaves.filter((save) => save.scope !== 'general'),
-    [scopedSaves, branchSaveGroups.length, branchSaveIds],
+        : scopedSaves.filter((save) => save.scope !== 'general' && !panelSetSaveIds.has(catalogSaveId(save))),
+    [scopedSaves, branchSaveGroups.length, branchSaveIds, panelSetSaveIds],
   );
   const dockExperiment = selection ? selection.experiment : activeExperiment;
   const selectedExperimentSet = useMemo(
@@ -1731,6 +1913,8 @@ export function ExperimentSetOneSettingsDock() {
     instanceKey: string;
     save: ExperimentSetOneSnapshot | undefined;
     branchSlug: string | null;
+    position: { x: number; y: number } | undefined;
+    zIndex: number | null;
     swapAlternativeGroups: Array<{
       key: string;
       label: string;
@@ -1748,6 +1932,8 @@ export function ExperimentSetOneSettingsDock() {
         const parsed = parseSelectionKey(key);
         const save = saves.find((s) => s.id === parsed.id && saveMatchesSelection(s, parsed.branchSlug));
         const instanceKey = selectedSaveInstanceKey(experiment, key);
+        const position = selectedSavePositions[instanceKey];
+        const zIndex = selectedSaveRosterZIndex(selectedSaveInstanceOrder, instanceKey);
         // Build swap alternatives: all saves for this experiment that are NOT currently selected
         const selectedKeysSet = new Set(keys);
         const alternativeGroups = new Map<string, RosterItem['swapAlternativeGroups'][number]>();
@@ -1774,12 +1960,14 @@ export function ExperimentSetOneSettingsDock() {
           instanceKey,
           save,
           branchSlug: parsed.branchSlug,
+          position,
+          zIndex,
           swapAlternativeGroups: Array.from(alternativeGroups.values()),
         });
       }
     }
     return items;
-  }, [selectedSaveKeysByExperiment, saves]);
+  }, [selectedSaveKeysByExperiment, saves, selectedSavePositions, selectedSaveInstanceOrder]);
 
   // Group roster items by experiment for rendering
   const rosterGroups = useMemo(() => {
@@ -1794,6 +1982,16 @@ export function ExperimentSetOneSettingsDock() {
     }
     return groups;
   }, [rosterItems]);
+  const rosterManifestEntries = useMemo(
+    () =>
+      rosterItems.map((item) => ({
+        key: item.instanceKey,
+        label: formatSaveLabel(item.save, item.branchSlug) ?? item.key,
+        experiment: experimentShortLabel(item.experiment),
+        placement: formatSavePlacement(item.position, item.zIndex),
+      })),
+    [rosterItems],
+  );
 
   const e1Highlight = useMemo(() => e1Highlighted(selection), [selection]);
   const e2Highlight = useMemo(() => e2Highlighted(selection), [selection]);
@@ -2127,7 +2325,19 @@ export function ExperimentSetOneSettingsDock() {
                       <span className="experiment-one-settings-dock__save-selection-check" aria-hidden="true" />
                       {saveSelectionMode ? 'Selecting' : 'Select'}
                     </button>
-                    <button type="button" className="experiment-one-settings-dock__toggle" onClick={saveCurrent}>
+                    <button
+                      type="button"
+                      className="experiment-one-settings-dock__toggle"
+                      onClick={() =>
+                        saveCurrent({
+                          activeExperiment,
+                          selectedExperimentIds,
+                          selectedSaveKeysByExperiment,
+                          selectedSaveVisualOrder,
+                          selectedSavePositions,
+                        })
+                      }
+                    >
                       Save +
                     </button>
                   </div>
@@ -2152,6 +2362,19 @@ export function ExperimentSetOneSettingsDock() {
                         Clear
                       </button>
                     </div>
+                    {selectedSaveCount > 0 && rosterManifestEntries.length > 0 && (
+                      <div className="experiment-one-settings-dock__roster-manifest" aria-label="Saved panel set">
+                        {rosterManifestEntries.map((entry) => (
+                          <div key={entry.key} className="experiment-one-settings-dock__roster-manifest-row">
+                            <span className="experiment-one-settings-dock__roster-manifest-experiment">{entry.experiment}</span>
+                            <span className="experiment-one-settings-dock__roster-manifest-label">{entry.label}</span>
+                            {entry.placement && (
+                              <span className="experiment-one-settings-dock__roster-manifest-placement">{entry.placement}</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     {rosterGroups.map((group) => (
                       <div key={group.experiment} className="experiment-one-settings-dock__roster-group">
                         <span className="experiment-one-settings-dock__roster-group-label">{group.label}</span>
@@ -2164,6 +2387,7 @@ export function ExperimentSetOneSettingsDock() {
                           const branchLabel = item.branchSlug && item.branchSlug !== 'base'
                             ? RENDER_VARIANTS.find((v) => v.slug === item.branchSlug)?.label ?? item.branchSlug
                             : null;
+                          const placementLabel = formatSavePlacement(item.position, item.zIndex);
                           return (
                             <div key={item.instanceKey}>
                               <div
@@ -2172,12 +2396,16 @@ export function ExperimentSetOneSettingsDock() {
                                 title={`${formatSaveLabel(item.save, item.branchSlug) ?? item.key} · click to swap with another save`}
                               >
                                 <span className="experiment-one-settings-dock__roster-item-dot" />
-                                <span className="experiment-one-settings-dock__roster-item-label">
-                                  {formatSaveLabel(item.save, item.branchSlug) ?? `Save ${parseSelectionKey(item.key).id}`}
+                                <span className="experiment-one-settings-dock__roster-item-body">
+                                  <span className="experiment-one-settings-dock__roster-item-label">
+                                    {formatSaveLabel(item.save, item.branchSlug) ?? `Save ${parseSelectionKey(item.key).id}`}
+                                  </span>
+                                  <span className="experiment-one-settings-dock__roster-item-meta">
+                                    <span>{experimentShortLabel(item.experiment)}</span>
+                                    {branchLabel && <span>{branchLabel}</span>}
+                                    {placementLabel && <span>{placementLabel}</span>}
+                                  </span>
                                 </span>
-                                {branchLabel && (
-                                  <span className="experiment-one-settings-dock__roster-item-branch">{branchLabel}</span>
-                                )}
                                 <span className="experiment-one-settings-dock__roster-item-actions" onClick={(e) => e.stopPropagation()}>
                                   {canReorder && (
                                     <>
@@ -2232,9 +2460,7 @@ export function ExperimentSetOneSettingsDock() {
                                               type="button"
                                               className="experiment-one-settings-dock__swap-option"
                                               onClick={() => {
-                                                // Swap: remove old, add new
-                                                toggleSaveMultiSelection(item.experiment, item.key, true);
-                                                toggleSaveMultiSelection(item.experiment, alt.key, true);
+                                                replaceSaveMultiSelection(item.experiment, item.key, alt.key);
                                                 setExpandedSwapKey(null);
                                               }}
                                               title={`Swap to ${formatSaveLabel(alt.save, alt.branchSlug)}`}
@@ -2268,6 +2494,107 @@ export function ExperimentSetOneSettingsDock() {
 
                 {/* Save chip list */}
                 <div className="experiment-one-settings-dock__saves-list" role="group" aria-label="Experiment saves">
+                  {panelSetSaves.length > 0 && (
+                    <div className="experiment-one-settings-dock__branch-group">
+                      <span className="experiment-one-settings-dock__branch-label">Panel sets</span>
+                      <div className="experiment-one-settings-dock__branch-saves">
+                        {panelSetSaves.map((save) => {
+                          const branchVariant = save.branchVariant ?? null;
+                          const selectionKey = saveSelectionKey(save.id, branchVariant);
+                          const multiSelected = selectedSaveKeysForDockExperiment.includes(selectionKey);
+                          const current = isCurrentSaveActive(
+                            selectedSaveIdByExperiment[dockExperiment],
+                            activeRenderVariant,
+                            save.id,
+                            branchVariant,
+                          );
+                          const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
+                          const saveKey = selectionKey;
+                          const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
+                          const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
+                          const canReorderSave = multiSelected && selectedSaveInstanceOrder.length > 1 && selectedOrderIndex !== -1;
+                          const isFrontMost = selectedOrderIndex === 0;
+                          const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
+                          const panelSetEntries = describePanelSetSnapshot(save, saves);
+                          return (
+                            <button
+                              key={`panel-set-${save.id}`}
+                              type="button"
+                              className={`experiment-one-settings-dock__save-chip experiment-one-settings-dock__save-chip--panel-set${showCurrent ? ' experiment-one-settings-dock__save-chip--current' : ''}${multiSelected ? ' experiment-one-settings-dock__save-chip--selected' : ''}`}
+                              aria-pressed={multiSelected}
+                              aria-current={showCurrent ? 'true' : undefined}
+                              onClick={(event) => {
+                                if (saveSelectionMode || event.metaKey || event.ctrlKey || event.shiftKey) {
+                                  event.preventDefault();
+                                  cancelQueuedSaveLoad(saveKey);
+                                  toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                                  return;
+                                }
+                                if (event.detail !== 1) return;
+                                queueSaveLoad(saveKey, () => loadSave(save.id, save.branchVariant));
+                              }}
+                              onDoubleClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                cancelQueuedSaveLoad(saveKey);
+                                if (!saveSelectionMode) {
+                                  toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                                }
+                              }}
+                              title={`${save.label}${save.branchVariant ? ` (${save.branchVariant})` : ''} · click to load · ⌘+click to multi-select`}
+                            >
+                              <span className="experiment-one-settings-dock__save-chip-main">
+                                <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
+                                {formatLayoutSummary(save) && (
+                                  <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
+                                )}
+                              </span>
+                              {panelSetEntries.length > 0 && (
+                                <span className="experiment-one-settings-dock__save-chip-panel-set" aria-label="Saved panel set">
+                                  <span className="experiment-one-settings-dock__save-chip-panel-set-title">
+                                    {`Saved panel set · ${panelSetSummary(panelSetEntries.length)}`}
+                                  </span>
+                                  <span className="experiment-one-settings-dock__save-chip-panel-set-list">
+                                    {panelSetEntries.map((entry) => (
+                                      <span key={entry.key} className="experiment-one-settings-dock__save-chip-panel-set-row">
+                                        <span className="experiment-one-settings-dock__save-chip-panel-set-experiment">{entry.experiment}</span>
+                                        <span className="experiment-one-settings-dock__save-chip-panel-set-save">{entry.saveLabel}</span>
+                                        {entry.placement && (
+                                          <span className="experiment-one-settings-dock__save-chip-panel-set-placement">{entry.placement}</span>
+                                        )}
+                                      </span>
+                                    ))}
+                                  </span>
+                                </span>
+                              )}
+                              {canReorderSave && (
+                                <span className="experiment-one-settings-dock__save-context-actions" onClick={(e) => e.stopPropagation()}>
+                                  <button
+                                    type="button"
+                                    className="experiment-one-settings-dock__save-context-btn"
+                                    onClick={(e) => { e.stopPropagation(); bringSaveForward(dockExperiment, selectionKey); }}
+                                    disabled={isFrontMost}
+                                    title="Bring forward"
+                                  >
+                                    ▲
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="experiment-one-settings-dock__save-context-btn"
+                                    onClick={(e) => { e.stopPropagation(); sendSaveBackward(dockExperiment, selectionKey); }}
+                                    disabled={isBackMost}
+                                    title="Send backward"
+                                  >
+                                    ▼
+                                  </button>
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                   {branchSaveGroups.map(({ variant, saves: branchSaves }) => (
                     <div key={variant.slug} className="experiment-one-settings-dock__branch-group">
                       <span className="experiment-one-settings-dock__branch-label">{variant.label}</span>
@@ -2315,7 +2642,12 @@ export function ExperimentSetOneSettingsDock() {
                               }}
                               title={`${save.label} (${variant.label}) · click to load · ⌘+click to multi-select`}
                             >
-                              {save.label}
+                              <span className="experiment-one-settings-dock__save-chip-main">
+                                <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
+                                {formatLayoutSummary(save) && (
+                                  <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
+                                )}
+                              </span>
                               {canReorderSave && (
                                 <span className="experiment-one-settings-dock__save-context-actions" onClick={(e) => e.stopPropagation()}>
                                   <button
@@ -2392,7 +2724,12 @@ export function ExperimentSetOneSettingsDock() {
                               }}
                               title={`${save.label}${save.branchVariant ? ` (${save.branchVariant})` : ''} · click to load · ⌘+click to multi-select`}
                             >
-                              {save.label}
+                              <span className="experiment-one-settings-dock__save-chip-main">
+                                <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
+                                {formatLayoutSummary(save) && (
+                                  <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
+                                )}
+                              </span>
                               {canReorderSave && (
                                 <span className="experiment-one-settings-dock__save-context-actions" onClick={(e) => e.stopPropagation()}>
                                   <button
@@ -2468,7 +2805,12 @@ export function ExperimentSetOneSettingsDock() {
                         }}
                         title={`${save.label} · click to load · ⌘+click to multi-select`}
                       >
-                        {save.label}
+                        <span className="experiment-one-settings-dock__save-chip-main">
+                          <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
+                          {formatLayoutSummary(save) && (
+                            <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
+                          )}
+                        </span>
                         {canReorderSave && (
                           <span className="experiment-one-settings-dock__save-context-actions" onClick={(e) => e.stopPropagation()}>
                             <button
