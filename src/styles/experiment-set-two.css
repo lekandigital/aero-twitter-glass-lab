@@ -139,6 +139,20 @@
   overflow: visible;
 }
 
+.experiment-set-one-selected-save-stage {
+  --e4-layerA-rim-border-px: 0px;
+  --e4-layerB-rim-edge-height-px: 0px;
+  --e4-layerA-rim-top-border: 0;
+  --e4-layerA-rim-bottom-border: 0;
+  --e4-layerB-rim-top-border: 0;
+  --e4-layerB-rim-bottom-border: 0;
+}
+
+.experiment-set-one-selected-save-stage .experiment-four-layer-a__bezel-rim-edge,
+.experiment-set-one-selected-save-stage .experiment-four-layer-b__rim-edge {
+  opacity: 0.12;
+}
+
 .experiment-set-one-page[data-hide-panel-text='true'] .experiment-one-panel__content,
 .experiment-set-one-page[data-hide-panel-text='true'] .experiment-two-sheet__content,
 .experiment-set-one-page[data-hide-panel-text='true'] .experiment-three-layer-a__content,
