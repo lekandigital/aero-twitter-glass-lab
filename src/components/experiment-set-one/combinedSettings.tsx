@@ -1065,10 +1065,14 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
           : renderVariantForSaveId(lookupId);
       const loadedModule = setVariant(branchDef?.slug ?? null);
 
-      setSelectedSaveIdByExperiment((prev) => ({ ...prev, [activeExperiment]: id }));
       const snapshot = snapshotForLookup;
+      const selectionExperiment = snapshot?.activeExperiment ?? activeExperiment;
+      setSelectedSaveIdByExperiment((prev) => ({ ...prev, [selectionExperiment]: id }));
       if (!snapshot) return;
       const normalize = loadedModule?.normalizeE4MaterialSettings ?? normalizeE4MaterialSettings;
+      if (snapshot.activeExperiment) {
+        setActiveExperiment(snapshot.activeExperiment);
+      }
       if (Object.prototype.hasOwnProperty.call(snapshot, 'selectedExperimentIds')) {
         setSelectedExperimentIds(snapshot.selectedExperimentIds ?? []);
       }
