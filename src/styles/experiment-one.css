@@ -554,7 +554,7 @@
 .experiment-one-settings-dock__shell {
   display: flex;
   flex-direction: column;
-  width: min(96vw, 860px);
+  width: min(98vw, 1180px);
   height: 98vh;
   border-radius: 16px;
   background: rgba(6, 18, 42, 0.82);
@@ -570,7 +570,7 @@
 .experiment-one-settings-dock__shell--collapsed {
   min-height: 0;
   width: auto;
-  min-width: 220px;
+  min-width: 260px;
 }
 
 .experiment-one-settings-dock__header {

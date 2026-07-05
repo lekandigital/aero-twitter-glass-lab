@@ -236,6 +236,17 @@ function experimentShortLabel(experiment: ExperimentId): string {
   return `E${EXPERIMENT_ORDER.indexOf(experiment) + 1}`;
 }
 
+function experimentPaneLabel(experiment: ExperimentId): string {
+  if (experiment === 'four') return 'left long pane 1';
+  if (experiment === 'five') return 'left long pane 2';
+  if (experiment === 'six') return 'left short pane';
+  if (experiment === 'seven') return 'search pill 1';
+  if (experiment === 'eight') return 'search pill 2';
+  if (experiment === 'nine') return 'center large pane';
+  if (experiment === 'ten') return 'center overlap pane';
+  return experimentTitle(experiment);
+}
+
 type PanelSetEntry = {
   key: string;
   experiment: string;
@@ -1895,7 +1906,7 @@ export function ExperimentSetOneSettingsDock() {
   );
 
   // ── Roster panel state ──
-  const [expandedSwapKey, setExpandedSwapKey] = useState<string | null>(null);
+  const [expandedSwapKeys, setExpandedSwapKeys] = useState<string[]>([]);
 
   // Close swap dropdown when selection changes
   const prevSaveCountRef = useRef(selectedSaveCount);
@@ -1955,7 +1966,7 @@ export function ExperimentSetOneSettingsDock() {
         }
         items.push({
           experiment,
-          experimentLabel: experimentTitle(experiment),
+          experimentLabel: experimentPaneLabel(experiment),
           key,
           instanceKey,
           save,
@@ -1987,7 +1998,7 @@ export function ExperimentSetOneSettingsDock() {
       rosterItems.map((item) => ({
         key: item.instanceKey,
         label: formatSaveLabel(item.save, item.branchSlug) ?? item.key,
-        experiment: experimentShortLabel(item.experiment),
+        experiment: experimentPaneLabel(item.experiment),
         placement: formatSavePlacement(item.position, item.zIndex),
       })),
     [rosterItems],
@@ -2356,7 +2367,7 @@ export function ExperimentSetOneSettingsDock() {
                       <button
                         type="button"
                         className="experiment-one-settings-dock__toolbar-btn"
-                        onClick={() => { clearMultiSelection(); setExpandedSwapKey(null); }}
+                        onClick={() => { clearMultiSelection(); setExpandedSwapKeys([]); }}
                         style={{ marginLeft: 'auto' }}
                         >
                           Clear
@@ -2384,7 +2395,7 @@ export function ExperimentSetOneSettingsDock() {
                             const canReorder = selectedSaveInstanceOrder.length > 1 && orderIndex !== -1;
                             const isFrontMost = orderIndex === 0;
                             const isBackMost = orderIndex === selectedSaveInstanceOrder.length - 1;
-                            const isExpanded = expandedSwapKey === item.instanceKey;
+                            const isExpanded = expandedSwapKeys.includes(item.instanceKey);
                             const branchLabel = item.branchSlug && item.branchSlug !== 'base'
                               ? RENDER_VARIANTS.find((v) => v.slug === item.branchSlug)?.label ?? item.branchSlug
                               : null;
@@ -2393,7 +2404,13 @@ export function ExperimentSetOneSettingsDock() {
                               <div key={item.instanceKey}>
                                 <div
                                   className={`experiment-one-settings-dock__roster-item${isExpanded ? ' experiment-one-settings-dock__roster-item--expanded' : ''}`}
-                                  onClick={() => setExpandedSwapKey(isExpanded ? null : item.instanceKey)}
+                                  onClick={() =>
+                                    setExpandedSwapKeys((prev) =>
+                                      isExpanded
+                                        ? prev.filter((key) => key !== item.instanceKey)
+                                        : Array.from(new Set([...prev, item.instanceKey])),
+                                    )
+                                  }
                                   title={`${formatSaveLabel(item.save, item.branchSlug) ?? item.key} · click to swap with another save`}
                                 >
                                   <span className="experiment-one-settings-dock__roster-item-dot" />
@@ -2436,7 +2453,7 @@ export function ExperimentSetOneSettingsDock() {
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         toggleSaveMultiSelection(item.experiment, item.key, true);
-                                        if (expandedSwapKey === item.instanceKey) setExpandedSwapKey(null);
+                                        setExpandedSwapKeys((prev) => prev.filter((key) => key !== item.instanceKey));
                                       }}
                                       title="Remove from selection"
                                     >
@@ -2462,7 +2479,7 @@ export function ExperimentSetOneSettingsDock() {
                                                 className="experiment-one-settings-dock__swap-option"
                                                 onClick={() => {
                                                   replaceSaveMultiSelection(item.experiment, item.key, alt.key);
-                                                  setExpandedSwapKey(null);
+                                                  // Keep other swap dropdowns open while switching saves.
                                                 }}
                                                 title={`Swap to ${formatSaveLabel(alt.save, alt.branchSlug)}`}
                                               >
