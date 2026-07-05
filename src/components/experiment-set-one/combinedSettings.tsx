@@ -2222,13 +2222,13 @@ export function ExperimentSetOneSettingsDock() {
                   ['one', 'E1'],
                   ['two', 'E2'],
                   ['three', 'E3'],
-                  ['four', 'E4'],
-                  ['five', 'E5'],
-                  ['six', 'E6'],
-                  ['seven', 'E7'],
-                  ['eight', 'E8'],
-                  ['nine', 'E9'],
-                  ['ten', 'E10'],
+                  ['four', 'left long pane 1'],
+                  ['five', 'left long pane 2'],
+                  ['six', 'left short pane'],
+                  ['seven', 'search pill 1'],
+                  ['eight', 'search pill 2'],
+                  ['nine', 'center large pane'],
+                  ['ten', 'center overlap pane'],
                 ] as const
               ).map(([id, label]) => {
                 const hasSelectedSaves = (selectedSaveKeysByExperiment[id]?.length ?? 0) > 0;
