@@ -2322,7 +2322,11 @@ export function ExperimentSetOneSettingsDock() {
 
             <div className="experiment-one-settings-dock__body">
               {/* ── Zone 4: Saves ── */}
-              <div className="experiment-one-settings-dock__saves">
+              <div
+                className={`experiment-one-settings-dock__saves${
+                  selectedSaveCount > 0 || saveSelectionMode ? ' experiment-one-settings-dock__saves--with-roster' : ''
+                }`}
+              >
                 <div className="experiment-one-settings-dock__saves-head">
                   <span className="experiment-one-settings-dock__saves-title">Saves</span>
                   <div className="experiment-one-settings-dock__saves-actions">
