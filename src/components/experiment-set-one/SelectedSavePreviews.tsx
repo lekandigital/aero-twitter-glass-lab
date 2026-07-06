@@ -94,7 +94,7 @@ function normalizeVisualOrder(order: string[], layoutOrder: string[]): string[] 
 function selectedSaveZIndex(order: string[], key: string): number {
   const index = visualOrderIndex(order, key);
   if (index === Number.MAX_SAFE_INTEGER) return 30;
-  return 30 + order.length - index;
+  return 60 + order.length - index;
 }
 
 function parseSaveSelectionKey(key: string): { branchSlug: RenderVariantSlug | null; id: number } | null {
@@ -172,6 +172,13 @@ function layerBackdropReflexEnabled(prefix: 'layerA' | 'layerB', settings: E4Mat
   ]);
 }
 
+function selectedSaveLayerCMaterial(material: E4MaterialSettings): E4MaterialSettings {
+  return {
+    ...material,
+    layerBHeight: Math.max(1, Math.round((material.layerBHeight as number) / 5)),
+  };
+}
+
 function SelectedSaveLayerB({ material, nested = false }: { material: E4MaterialSettings; nested?: boolean }) {
   return (
     <div
@@ -200,8 +207,38 @@ function SelectedSaveLayerB({ material, nested = false }: { material: E4Material
   );
 }
 
-function SelectedSaveLayerA({ material }: { material: E4MaterialSettings }) {
+function SelectedSaveLayerC({ material }: { material: E4MaterialSettings }) {
+  const layerCMaterial = useMemo(() => selectedSaveLayerCMaterial(material), [material]);
+  return (
+    <div
+      className="experiment-four-layer-b experiment-eleven-layer-c"
+      role="presentation"
+      style={{ ...e4LayerBDimensionStyle(layerCMaterial, false), position: 'absolute', top: 0, left: 0 }}
+    >
+      <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />
+      <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--bottom" aria-hidden="true" />
+      <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--left" aria-hidden="true" />
+      <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--right" aria-hidden="true" />
+      <GlassFrostSurface />
+      <span className="experiment-four-layer-b__shine" aria-hidden="true" />
+      <span className="experiment-four-layer-b__radial-corners" aria-hidden="true" />
+      <PwzzovOGlassCorners
+        layerClass="experiment-four-layer-b"
+        inspectTarget="layer-b-corners"
+        edgeReflexEnabled={layerBackdropReflexEnabled('layerB', layerCMaterial)}
+        rimSideGapTop={layerCMaterial.layerBRimSideGapTop}
+        rimSideGapBottom={layerCMaterial.layerBRimSideGapBottom}
+        backdropLights={layerBackdropLights('layerB', layerCMaterial)}
+      />
+      <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--a" aria-hidden="true" />
+      <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--b" aria-hidden="true" />
+    </div>
+  );
+}
+
+function SelectedSaveLayerA({ material, showLayerC }: { material: E4MaterialSettings; showLayerC: boolean }) {
   const showNestedB = material.layerBNestedInA;
+  const showInset = showNestedB || showLayerC;
   return (
     <div
       className="experiment-four-layer-a"
@@ -223,9 +260,9 @@ function SelectedSaveLayerA({ material }: { material: E4MaterialSettings }) {
         rimSideGapBottom={material.layerARimSideGapBottom}
         backdropLights={layerBackdropLights('layerA', material)}
       />
-      {showNestedB && (
+      {showInset && (
         <div className="experiment-four-layer-a__bezel-inset">
-          <SelectedSaveLayerB material={material} nested />
+          {showNestedB && <SelectedSaveLayerB material={material} nested />}
         </div>
       )}
     </div>
@@ -341,7 +378,7 @@ function SelectedSaveStagePanel({
         style={{ transform: `translate(${SHOWCASE_PANEL_SNAP.x}px, ${SHOWCASE_PANEL_SNAP.y}px)` }}
         {...dragHandlers}
       >
-        <SelectedSaveLayerA material={preview.material} />
+        <SelectedSaveLayerA material={preview.material} showLayerC={preview.experiment === 'eleven'} />
       </div>
       {freeLayerB && (
         <div
@@ -350,6 +387,15 @@ function SelectedSaveStagePanel({
           {...dragHandlers}
         >
           <SelectedSaveLayerB material={preview.material} />
+        </div>
+      )}
+      {preview.experiment === 'eleven' && (
+        <div
+          className="experiment-set-one-selected-save-stage__layer-c"
+          style={{ transform: `translate(${SHOWCASE_PANEL_SNAP.x}px, ${SHOWCASE_PANEL_SNAP.y}px)` }}
+          {...dragHandlers}
+        >
+          <SelectedSaveLayerC material={preview.material} />
         </div>
       )}
     </div>

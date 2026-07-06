@@ -4,6 +4,7 @@ import { ExperimentFiveDraggableLayerA as DefaultExperimentFiveLayerA } from '..
 import { ExperimentSixDraggableLayerA as DefaultExperimentSixLayerA } from '../experiment-set-six/primitives';
 import { ExperimentSevenDraggableLayerA as DefaultExperimentSevenLayerA } from '../experiment-set-seven/primitives';
 import { ExperimentSixLayerCBezelPortal } from '../experiment-set-six/layerCBezelPortal';
+import { ExperimentElevenLayerCBezelPortal } from './experimentElevenLayerC';
 import {
   ExperimentFourDraggableLayerA,
   ExperimentFourDraggableLayerB,
@@ -562,8 +563,9 @@ function ExperimentElevenLayerBSheet({ nested = false }: { nested?: boolean }) {
 }
 
 function ExperimentElevenLayerASheet({ nestedB = false }: { nestedB?: boolean }) {
-  const { e11, layerBVisible } = useExperimentSetOne();
+  const { e11, layerBVisible, layerCVisible } = useExperimentSetOne();
   const showNestedB = nestedB && layerBVisible;
+  const showInset = layerBVisible || layerCVisible;
   return (
     <div
       className="experiment-four-layer-a"
@@ -597,9 +599,9 @@ function ExperimentElevenLayerASheet({ nestedB = false }: { nestedB?: boolean })
         rimSideGapBottom={e11.layerARimSideGapBottom}
         backdropLights={layerBackdropLights('layerA', e11)}
       />
-      {showNestedB && (
+      {showInset && (
         <div className="experiment-four-layer-a__bezel-inset">
-          <ExperimentElevenLayerBSheet nested />
+          {layerBVisible && <ExperimentElevenLayerBSheet nested />}
         </div>
       )}
       <div className="experiment-four-layer-a__content">
@@ -804,6 +806,7 @@ function DefaultPanels({ layoutResetVersion, nestedB, experiment }: VariantPanel
             layoutResetVersion={layoutResetVersion}
           />
         )}
+        <ExperimentElevenLayerCBezelPortal layoutResetVersion={layoutResetVersion} />
       </>
     );
   }
@@ -915,6 +918,7 @@ export function VariantPanelSlots(props: VariantPanelSlotsProps) {
             layoutResetVersion={layoutResetVersion}
           />
         )}
+        <ExperimentElevenLayerCBezelPortal layoutResetVersion={layoutResetVersion} />
       </>
     ) : experiment === 'nine' ? (
       <>

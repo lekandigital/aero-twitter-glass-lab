@@ -1391,6 +1391,7 @@
 }
 
 .experiment-one-settings-dock__save-chip {
+  position: relative;
   display: flex;
   align-items: stretch;
   flex-direction: column;
@@ -1421,6 +1422,26 @@
   gap: 0.75rem;
   min-width: 0;
   text-align: left;
+}
+
+.experiment-one-settings-dock__save-chip-preview {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.75rem;
+  width: 68px;
+  height: 28px;
+  overflow: hidden;
+  border-radius: 9px;
+  pointer-events: none;
+  opacity: 0.92;
+  z-index: 1;
+}
+
+.experiment-one-settings-dock__save-chip-preview-surface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
 }
 
 .experiment-one-settings-dock__save-chip-label {
