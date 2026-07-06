@@ -18,6 +18,8 @@ export const EXPERIMENT_SET_ONE_POSITION_KEYS = {
   layerA8: 'exp-set-1:layer-a-8',
   layerA10: 'exp-set-1:layer-a-10',
   layerB10: 'exp-set-1:layer-b-10',
+  layerA11: 'exp-set-1:layer-a-11',
+  layerB11: 'exp-set-1:layer-b-11',
 } as const;
 
 export const EXPERIMENT_SET_ONE_POSITION_KEY_LIST = Object.values(EXPERIMENT_SET_ONE_POSITION_KEYS);

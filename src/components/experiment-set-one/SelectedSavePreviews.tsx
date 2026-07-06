@@ -29,11 +29,12 @@ import {
   SHOWCASE_PANEL_SNAP,
 } from './showcasePanelGeometry';
 import { normalizeExperimentTenPanelGeometry } from './experimentTenPanelGeometry';
+import { applyExperimentElevenPanelGeometry } from './experimentElevenPanelGeometry';
 import type { ExperimentSetOneSnapshot } from './savedConfigs';
 
 type PreviewExperiment = Extract<
   ExperimentId,
-  'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten'
+  'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten' | 'eleven'
 >;
 
 type SavePreview = {
@@ -49,7 +50,7 @@ type SavePreview = {
   bezelStyle: string | null;
 };
 
-const PREVIEW_EXPERIMENTS: PreviewExperiment[] = ['four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const PREVIEW_EXPERIMENTS: PreviewExperiment[] = ['four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
 const FREE_LAYER_B_SNAP = { x: 52, y: 60 } as const;
 const SELECTED_SAVE_CASCADE_STEP = 28;
 const SELECTED_SAVE_DRAG_THRESHOLD = 4;
@@ -133,6 +134,7 @@ function materialForPreview(
   if (experiment === 'eight') return applyExperimentEightPanelGeometry(material);
   if (experiment === 'nine') return applyExperimentNinePanelGeometry(material);
   if (experiment === 'ten') return normalizeExperimentTenPanelGeometry(material);
+  if (experiment === 'eleven') return applyExperimentElevenPanelGeometry(material);
   return applyShowcasePanelGeometry(material);
 }
 

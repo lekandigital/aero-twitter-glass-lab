@@ -20,7 +20,7 @@ import { VariantPanelSlots } from './VariantPanelSlots';
 import { SelectedSaveStagePanels } from './SelectedSavePreviews';
 import type { ExperimentId } from './experimentVisibility';
 
-const STAGE_EXPERIMENTS: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const STAGE_EXPERIMENTS: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
 const MULTI_EXPERIMENT_CASCADE_STEP = 28;
 
 function selectedSaveCount(selectedSaveKeysByExperiment: Partial<Record<ExperimentId, string[]>>) {
@@ -38,6 +38,7 @@ export function ExperimentSetOneStage() {
     e8,
     e9,
     e10,
+    e11,
     selectedExperimentIds,
     selectedSaveKeysByExperiment,
   } = useExperimentSetOne();
@@ -60,6 +61,7 @@ export function ExperimentSetOneStage() {
     if (id === 'eight') return e8;
     if (id === 'nine') return e9;
     if (id === 'ten') return e10;
+    if (id === 'eleven') return e11;
     return null;
   };
   const stageShell = (id: ExperimentId, children: ReactNode) => {
@@ -199,6 +201,14 @@ export function ExperimentSetOneStage() {
             experiment="ten"
             layoutResetVersion={layoutResetVersion}
             nestedB={e10.layerBNestedInA}
+          />
+        ))}
+
+        {show('eleven') && stageShell('eleven', (
+          <VariantPanelSlots
+            experiment="eleven"
+            layoutResetVersion={layoutResetVersion}
+            nestedB={e11.layerBNestedInA}
           />
         ))}
 
