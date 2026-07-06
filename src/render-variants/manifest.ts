@@ -30,7 +30,7 @@ export const RENDER_VARIANTS: RenderVariantDef[] = [
   { slug: 'opus-4.8-max', label: "Opus 4.8 Max", gitBranch: 'claude-opus-4.8-max-experiment-five-attempt', saveId: 32, saveIds: [20, 21, 22, 29, 31, 32] },
   { slug: 'chatgpt-5.5', label: "ChatGPT 5.5 veryhigh", gitBranch: 'chatgpt-5.5-veryhigh-experiment-five-attempt', saveId: 45, saveIds: [20, 21, 22, 44, 45] },
   { slug: 'chatgpt-5.5-two', label: "ChatGPT 5.5 2", gitBranch: 'chatgpt-5.5-2-experiment-ten-white-pane-attempt', saveId: 201, saveIds: [201] },
-  { slug: 'chatgpt-5.5-three', label: "ChatGPT 5.5 3", gitBranch: 'chatgpt-5.5-3-experiment-ten-white-pane-attempt', saveId: 219, saveIds: [219] },
+  { slug: 'chatgpt-5.5-three', label: "ChatGPT 5.5 3", gitBranch: 'chatgpt-5.5-3-experiment-ten-white-pane-attempt', saveId: 219, saveIds: [219, 221] },
   { slug: 'mix-opus-composer', label: "Mix · Opus 4.8 + Composer 2.5", gitBranch: 'mix-claude-opus-4.8-max-composer-2.5-experiment-five-attempt', saveId: 55, saveIds: [20, 21, 22, 54, 55] },
   { slug: 'opus-4.8-max-two', label: "Opus 4.8 Max (two)", gitBranch: 'claude-opus-4.8-max-experiment-five-attempt-two', saveId: 66, saveIds: [20, 21, 22, 54, 66] },
   { slug: 'composer-2-max', label: "Composer 2 Max", gitBranch: 'composer-2-max-experiment-five-attempt-two', saveId: 76, saveIds: [20, 21, 22, 74, 76] },
