@@ -106,6 +106,7 @@ import {
 import {
   applyExperimentElevenPanelGeometry,
   normalizeExperimentElevenPanelGeometry,
+  seedExperimentElevenPanelGeometry,
 } from './experimentElevenPanelGeometry';
 import { applyExperimentSixPanelGeometry } from './experimentSixPanelGeometry';
 import {
@@ -625,7 +626,7 @@ function resolveInitialE11(boot: ExperimentSetOneSession): E4MaterialSettings {
     }
   }
   if (boot.e11) return normalizeExperimentElevenPanelGeometry(boot.e11);
-  return applyExperimentElevenPanelGeometry(boot.e10 ?? boot.e9 ?? boot.e4);
+  return seedExperimentElevenPanelGeometry(boot.e10 ?? boot.e9 ?? boot.e4);
 }
 
 function resolveInitialE5(boot: ExperimentSetOneSession): E4MaterialSettings {
@@ -870,9 +871,8 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     }
     if (activeExperiment === 'eleven') {
       setE11State((prev) => {
-        const next = applyExperimentElevenPanelGeometry(prev);
-        setE5State(next);
-        return next;
+        setE5State(prev);
+        return prev;
       });
     }
   }, [activeExperiment, saves, selectedSaveIdByExperiment]);
@@ -1048,7 +1048,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     setE8State(applyExperimentEightPanelGeometry(applyE7OverridesStatic(E4_MASTER_DEFAULT)));
     setE9State(applyExperimentNinePanelGeometry(E4_MASTER_DEFAULT));
     setE10State(applyExperimentTenPanelGeometry(E4_MASTER_DEFAULT));
-    setE11State(applyExperimentElevenPanelGeometry(E4_MASTER_DEFAULT));
+    setE11State(seedExperimentElevenPanelGeometry(E4_MASTER_DEFAULT));
     setLayerAVisible(true);
     setLayerBVisible(true);
     setLayerCVisible(true);

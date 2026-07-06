@@ -12,13 +12,17 @@ export const EXPERIMENT_ELEVEN_PANEL_LAYOUT = {
   layerBCornerRadius: 16,
 } as const;
 
-export function applyExperimentElevenPanelGeometry(raw: E4MaterialSettings): E4MaterialSettings {
+export function seedExperimentElevenPanelGeometry(raw: E4MaterialSettings): E4MaterialSettings {
   return applyExperimentTenPanelGeometry({
     ...normalizeE4MaterialSettings(raw),
     ...EXPERIMENT_ELEVEN_PANEL_LAYOUT,
   });
 }
 
+export function applyExperimentElevenPanelGeometry(raw: E4MaterialSettings): E4MaterialSettings {
+  return normalizeE4MaterialSettings(raw);
+}
+
 export function normalizeExperimentElevenPanelGeometry(raw: E4MaterialSettings): E4MaterialSettings {
-  return applyExperimentElevenPanelGeometry(raw);
+  return normalizeE4MaterialSettings(raw);
 }
