@@ -207,6 +207,8 @@ export function useHoldDrag({
     if (event.button !== 0) return;
     if (!isDragTarget(event.target as HTMLElement)) return;
 
+    event.currentTarget.setPointerCapture(event.pointerId);
+
     dragRef.current = {
       pending: true,
       active: false,

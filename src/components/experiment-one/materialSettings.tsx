@@ -356,13 +356,17 @@ export function ExperimentOneSettingsDock() {
   return (
     <ExperimentOneDraggableShell
       className="experiment-one-settings-dock"
-      dragHandleSelector=".experiment-one-settings-dock__header"
+      dragHandleSelector=".experiment-one-settings-dock__header, .experiment-one-settings-dock__edge-grab"
       dragExcludeSelector="button, input, textarea, select, .experiment-one-settings-dock__body, .mat-setting-control"
       initialPosition={{ x: 20, y: 96 }}
       bounds="viewport"
       ariaLabel="Material settings"
     >
       <div className={`experiment-one-settings-dock__shell${open ? '' : ' experiment-one-settings-dock__shell--collapsed'}`}>
+        <span className="experiment-one-settings-dock__edge-grab experiment-one-settings-dock__edge-grab--top" aria-hidden="true" />
+        <span className="experiment-one-settings-dock__edge-grab experiment-one-settings-dock__edge-grab--right" aria-hidden="true" />
+        <span className="experiment-one-settings-dock__edge-grab experiment-one-settings-dock__edge-grab--bottom" aria-hidden="true" />
+        <span className="experiment-one-settings-dock__edge-grab experiment-one-settings-dock__edge-grab--left" aria-hidden="true" />
         <header className="experiment-one-settings-dock__header">
           <div className="experiment-one-settings-dock__drag-handle" title="Drag settings panel">
             <span className="experiment-one-settings-dock__grip" aria-hidden="true" />

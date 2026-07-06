@@ -552,6 +552,7 @@
 }
 
 .experiment-one-settings-dock__shell {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: min(94vw, 1100px);
@@ -580,6 +581,42 @@
   height: auto;
 }
 
+.experiment-one-settings-dock__edge-grab {
+  position: absolute;
+  z-index: 2;
+  background: transparent;
+  touch-action: none;
+  cursor: grab;
+}
+
+.experiment-one-draggable--active .experiment-one-settings-dock__edge-grab {
+  cursor: grabbing;
+}
+
+.experiment-one-settings-dock__edge-grab--top {
+  inset: 0 14px auto 14px;
+  height: 14px;
+  border-radius: 20px 20px 0 0;
+}
+
+.experiment-one-settings-dock__edge-grab--right {
+  inset: 14px 0 14px auto;
+  width: 14px;
+  border-radius: 0 20px 20px 0;
+}
+
+.experiment-one-settings-dock__edge-grab--bottom {
+  inset: auto 14px 0 14px;
+  height: 14px;
+  border-radius: 0 0 20px 20px;
+}
+
+.experiment-one-settings-dock__edge-grab--left {
+  inset: 14px auto 14px 0;
+  width: 14px;
+  border-radius: 20px 0 0 20px;
+}
+
 .experiment-one-settings-dock__header {
   display: flex;
   flex-direction: row;
@@ -594,6 +631,8 @@
     rgba(255, 255, 255, 0.02);
   cursor: grab;
   touch-action: none;
+  position: relative;
+  z-index: 3;
 }
 
 .experiment-one-draggable--active .experiment-one-settings-dock__header {
