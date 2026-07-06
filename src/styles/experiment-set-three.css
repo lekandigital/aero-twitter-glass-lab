@@ -144,7 +144,7 @@
     );
 }
 
-.experiment-set-one-page[data-e3-layerB-show-sparkles='false'] .experiment-three-layer-b__sparkle {
+.experiment-set-one-page[data-e3-layerb-show-sparkles='false'] .experiment-three-layer-b__sparkle {
   display: none;
 }
 

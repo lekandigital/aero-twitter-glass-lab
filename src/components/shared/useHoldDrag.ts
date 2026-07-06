@@ -24,6 +24,13 @@ type HoldDragState = {
   pointerId: number;
 };
 
+type DragBounds = {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+};
+
 type UseHoldDragOptions = {
   shellRef: RefObject<HTMLDivElement | null>;
   boundsRef: RefObject<HTMLElement | null>;
@@ -93,20 +100,26 @@ export function useHoldDrag({
     initialPositionRef.current = initialPosition;
   }
 
-  const getBounds = useCallback(() => {
+  const getBounds = useCallback((): DragBounds => {
     const shell = shellRef.current;
-    if (!shell) return { maxX: 0, maxY: 0 };
+    if (!shell) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
 
     if (bounds === 'viewport') {
+      const slackX = Math.max(160, Math.round(shell.offsetWidth * 0.85));
+      const slackY = Math.max(120, Math.round(shell.offsetHeight * 0.45));
       return {
-        maxX: Math.max(0, window.innerWidth - shell.offsetWidth),
-        maxY: Math.max(0, window.innerHeight - shell.offsetHeight),
+        minX: -slackX,
+        minY: -slackY,
+        maxX: Math.max(0, window.innerWidth - shell.offsetWidth) + slackX,
+        maxY: Math.max(0, window.innerHeight - shell.offsetHeight) + slackY,
       };
     }
 
     const container = boundsRef.current;
-    if (!container) return { maxX: 0, maxY: 0 };
+    if (!container) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
     return {
+      minX: 0,
+      minY: 0,
       maxX: Math.max(0, container.clientWidth - shell.offsetWidth),
       maxY: Math.max(0, container.clientHeight - shell.offsetHeight),
     };
@@ -114,10 +127,10 @@ export function useHoldDrag({
 
   const clampPosition = useCallback(
     (x: number, y: number): DragPoint => {
-      const { maxX, maxY } = getBounds();
+      const { minX, minY, maxX, maxY } = getBounds();
       return {
-        x: Math.min(Math.max(0, x), maxX),
-        y: Math.min(Math.max(0, y), maxY),
+        x: Math.min(Math.max(minX, x), maxX),
+        y: Math.min(Math.max(minY, y), maxY),
       };
     },
     [getBounds],
@@ -141,10 +154,10 @@ export function useHoldDrag({
       return;
     }
 
-    const { maxX, maxY } = getBounds();
+    const { minX, minY, maxX, maxY } = getBounds();
     setPosition({
-      x: Math.max(0, maxX / 2),
-      y: Math.max(0, maxY / 2),
+      x: Math.max(minX, maxX / 2),
+      y: Math.max(minY, maxY / 2),
     });
     initialized.current = true;
   }, [clampPosition, getBounds, persistKey, shellRef]);

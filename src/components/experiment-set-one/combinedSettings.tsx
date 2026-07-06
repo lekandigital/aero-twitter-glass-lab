@@ -610,12 +610,16 @@ function resolveInitialE5(boot: ExperimentSetOneSession): E4MaterialSettings {
 function bootRenderVariant(boot: ExperimentSetOneSession): RenderVariantSlug | null {
   if (boot.activeRenderVariant) return boot.activeRenderVariant;
   const saveId =
+    boot.selectedSaveIdByExperiment?.ten ??
+    boot.selectedSaveIdByExperiment?.nine ??
+    boot.selectedSaveIdByExperiment?.eight ??
     boot.selectedSaveIdByExperiment?.seven ??
     boot.selectedSaveIdByExperiment?.six ??
     boot.selectedSaveIdByExperiment?.five ??
     boot.selectedSaveIdByExperiment?.four;
   if (saveId != null) {
     const snapshot = loadExperimentSetOneSaves().find((save) => save.id === saveId);
+    if (snapshot?.branchVariant) return snapshot.branchVariant;
     const lookupId = snapshot ? catalogSaveId(snapshot) : saveId;
     return renderVariantForSaveId(lookupId)?.slug ?? null;
   }
@@ -676,6 +680,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     nine: boot.selectedSaveIdByExperiment?.nine ?? null,
     ten: boot.selectedSaveIdByExperiment?.ten ?? null,
   });
+  const [selectedPanelSetSaveId, setSelectedPanelSetSaveId] = useState<number | null>(null);
   const [selectedExperimentIds, setSelectedExperimentIds] = useState<ExperimentId[]>(() =>
     normalizeExperimentSelectionIds(boot.selectedExperimentIds, boot.activeExperiment ?? 'four'),
   );
@@ -1067,6 +1072,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
 
       const snapshot = snapshotForLookup;
       const selectionExperiment = snapshot?.activeExperiment ?? activeExperiment;
+      setSelectedPanelSetSaveId(snapshot && hasPanelSetLayout(snapshot) ? snapshot.id : null);
       setSelectedSaveIdByExperiment((prev) => ({ ...prev, [selectionExperiment]: id }));
       if (!snapshot) return;
       const normalize = loadedModule?.normalizeE4MaterialSettings ?? normalizeE4MaterialSettings;
@@ -1587,11 +1593,11 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         className="experiment-set-one-page experiment-one-page"
         style={style}
         data-e1-show-sparkles={e1.showSparkles}
-        data-e3-layerB-show-sparkles={e3.layerBShowSparkles}
-        data-e4-layerB-show-sparkles={activeE4Materials.layerBShowSparkles}
-        data-e4-layerB-nested={activeE4Materials.layerBNestedInA}
-        data-e4-layerA-radial-layout={e4RadialLayoutAttr(activeE4Materials.layerARadialCornerMode)}
-        data-e4-layerB-radial-layout={e4RadialLayoutAttr(activeE4Materials.layerBRadialCornerMode)}
+        data-e3-layerb-show-sparkles={e3.layerBShowSparkles}
+        data-e4-layerb-show-sparkles={activeE4Materials.layerBShowSparkles}
+        data-e4-layerb-nested={activeE4Materials.layerBNestedInA}
+        data-e4-layera-radial-layout={e4RadialLayoutAttr(activeE4Materials.layerARadialCornerMode)}
+        data-e4-layerb-radial-layout={e4RadialLayoutAttr(activeE4Materials.layerBRadialCornerMode)}
         data-e1-visible={experimentVisible.one}
         data-e2-visible={experimentVisible.two}
         data-e3-visible={experimentVisible.three}
@@ -1630,6 +1636,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         data-selected-save-eight={selectedSaveIdByExperiment.eight ?? ''}
         data-selected-save-nine={selectedSaveIdByExperiment.nine ?? ''}
         data-selected-save-ten={selectedSaveIdByExperiment.ten ?? ''}
+        data-selected-panel-set-save-id={selectedPanelSetSaveId ?? ''}
       >
         {children}
       </div>
@@ -2522,7 +2529,7 @@ export function ExperimentSetOneSettingsDock() {
                 {/* Save chip list */}
                 <div className="experiment-one-settings-dock__saves-list" role="group" aria-label="Experiment saves">
                   {panelSetSaves.length > 0 && (
-                    <div className="experiment-one-settings-dock__branch-group">
+                    <div className="experiment-one-settings-dock__branch-group experiment-one-settings-dock__branch-group--panel-sets">
                       <span className="experiment-one-settings-dock__branch-label">Panel sets</span>
                       <div className="experiment-one-settings-dock__branch-saves">
                         {panelSetSaves.map((save) => {
@@ -2544,9 +2551,10 @@ export function ExperimentSetOneSettingsDock() {
                           const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
                           const panelSetEntries = describePanelSetSnapshot(save, saves);
                           return (
-                            <button
+                            <div
                               key={`panel-set-${save.id}`}
-                              type="button"
+                              role="button"
+                              tabIndex={0}
                               className={`experiment-one-settings-dock__save-chip experiment-one-settings-dock__save-chip--panel-set${showCurrent ? ' experiment-one-settings-dock__save-chip--current' : ''}${multiSelected ? ' experiment-one-settings-dock__save-chip--selected' : ''}`}
                               aria-pressed={multiSelected}
                               aria-current={showCurrent ? 'true' : undefined}
@@ -2566,6 +2574,12 @@ export function ExperimentSetOneSettingsDock() {
                                 cancelQueuedSaveLoad(saveKey);
                                 if (!saveSelectionMode) {
                                   toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                                }
+                              }}
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                  event.preventDefault();
+                                  event.currentTarget.click();
                                 }
                               }}
                               title={`${save.label}${save.branchVariant ? ` (${save.branchVariant})` : ''} · click to load · ⌘+click to multi-select`}
@@ -2616,7 +2630,7 @@ export function ExperimentSetOneSettingsDock() {
                                   </button>
                                 </span>
                               )}
-                            </button>
+                            </div>
                           );
                         })}
                       </div>
@@ -2643,9 +2657,10 @@ export function ExperimentSetOneSettingsDock() {
                           const isFrontMost = selectedOrderIndex === 0;
                           const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
                           return (
-                            <button
+                            <div
                               key={`${variant.slug}-${save.id}`}
-                              type="button"
+                              role="button"
+                              tabIndex={0}
                               className={`experiment-one-settings-dock__save-chip${showCurrent ? ' experiment-one-settings-dock__save-chip--current' : ''}${multiSelected ? ' experiment-one-settings-dock__save-chip--selected' : ''}`}
                               aria-pressed={multiSelected}
                               aria-current={showCurrent ? 'true' : undefined}
@@ -2665,6 +2680,12 @@ export function ExperimentSetOneSettingsDock() {
                                 cancelQueuedSaveLoad(saveKey);
                                 if (!saveSelectionMode) {
                                   toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                                }
+                              }}
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                  event.preventDefault();
+                                  event.currentTarget.click();
                                 }
                               }}
                               title={`${save.label} (${variant.label}) · click to load · ⌘+click to multi-select`}
@@ -2697,7 +2718,7 @@ export function ExperimentSetOneSettingsDock() {
                                   </button>
                                 </span>
                               )}
-                            </button>
+                            </div>
                           );
                         })}
                       </div>
@@ -2725,9 +2746,10 @@ export function ExperimentSetOneSettingsDock() {
                           const isFrontMost = selectedOrderIndex === 0;
                           const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
                           return (
-                            <button
+                            <div
                               key={save.id}
-                              type="button"
+                              role="button"
+                              tabIndex={0}
                               className={`experiment-one-settings-dock__save-chip${showCurrent ? ' experiment-one-settings-dock__save-chip--current' : ''}${multiSelected ? ' experiment-one-settings-dock__save-chip--selected' : ''}`}
                               aria-pressed={multiSelected}
                               aria-current={showCurrent ? 'true' : undefined}
@@ -2747,6 +2769,12 @@ export function ExperimentSetOneSettingsDock() {
                                 cancelQueuedSaveLoad(saveKey);
                                 if (!saveSelectionMode) {
                                   toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                                }
+                              }}
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                  event.preventDefault();
+                                  event.currentTarget.click();
                                 }
                               }}
                               title={`${save.label}${save.branchVariant ? ` (${save.branchVariant})` : ''} · click to load · ⌘+click to multi-select`}
@@ -2779,7 +2807,7 @@ export function ExperimentSetOneSettingsDock() {
                                   </button>
                                 </span>
                               )}
-                            </button>
+                            </div>
                           );
                         })}
                       </div>
@@ -2806,9 +2834,10 @@ export function ExperimentSetOneSettingsDock() {
                     const isFrontMost = selectedOrderIndex === 0;
                     const isBackMost = selectedOrderIndex === selectedSaveInstanceOrder.length - 1;
                     return (
-                      <button
+                      <div
                         key={save.id}
-                        type="button"
+                        role="button"
+                        tabIndex={0}
                         className={`experiment-one-settings-dock__save-chip${showCurrent ? ' experiment-one-settings-dock__save-chip--current' : ''}${multiSelected ? ' experiment-one-settings-dock__save-chip--selected' : ''}`}
                         aria-pressed={multiSelected}
                         aria-current={showCurrent ? 'true' : undefined}
@@ -2828,6 +2857,12 @@ export function ExperimentSetOneSettingsDock() {
                           cancelQueuedSaveLoad(saveKey);
                           if (!saveSelectionMode) {
                             toggleSaveMultiSelection(dockExperiment, selectionKey, true);
+                          }
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            event.currentTarget.click();
                           }
                         }}
                         title={`${save.label} · click to load · ⌘+click to multi-select`}
@@ -2860,7 +2895,7 @@ export function ExperimentSetOneSettingsDock() {
                             </button>
                           </span>
                         )}
-                      </button>
+                      </div>
                     );
                   })}
                 </div>

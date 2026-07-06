@@ -554,9 +554,10 @@
 .experiment-one-settings-dock__shell {
   display: flex;
   flex-direction: column;
-  width: min(90vw, 920px);
-  min-height: clamp(1400px, 135vh, 1900px);
-  height: auto;
+  width: min(94vw, 1100px);
+  height: min(100dvh, 100vh);
+  min-height: min(100dvh, 100vh);
+  max-height: min(100dvh, 100vh);
   border-radius: 20px;
   background:
     radial-gradient(circle at top right, rgba(126, 232, 255, 0.18), transparent 34%),
@@ -569,7 +570,7 @@
     0 0 0 1px rgba(0, 0, 0, 0.22) inset;
   backdrop-filter: blur(18px) saturate(1.08);
   -webkit-backdrop-filter: blur(18px) saturate(1.08);
-  overflow: visible;
+  overflow: hidden;
 }
 
 .experiment-one-settings-dock__shell--collapsed {
@@ -673,20 +674,20 @@
 
 .experiment-one-settings-dock__body {
   display: grid;
-  grid-template-rows: auto auto auto 1fr;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
   gap: 0.7rem;
   flex: 1 1 auto;
   min-height: 0;
   padding: 0.85rem;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .experiment-one-settings-dock__saves {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  max-height: clamp(20rem, 40vh, 30rem);
+  gap: 0.72rem;
+  max-height: none;
   min-height: 0;
   padding: 0.75rem;
   border-radius: 16px;
@@ -694,12 +695,12 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03)),
     rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(160, 215, 255, 0.14);
-  overflow: visible;
+  overflow: hidden;
 }
 
 .experiment-one-settings-dock__saves--with-roster {
-  min-height: clamp(42rem, 82vh, 56rem);
-  max-height: clamp(50rem, 104vh, 70rem);
+  min-height: 0;
+  max-height: none;
 }
 
 .experiment-one-settings-dock__saves-head {
@@ -764,7 +765,7 @@
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  gap: 0.6rem;
+  gap: 0.9rem;
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
@@ -776,10 +777,14 @@
 .experiment-one-settings-dock__branch-group {
   display: flex;
   flex-direction: column;
-  gap: 0.34rem;
+  gap: 0.5rem;
   flex: 0 0 auto;
   width: 100%;
   padding: 0.1rem 0 0.2rem;
+}
+
+.experiment-one-settings-dock__branch-group--panel-sets {
+  min-height: clamp(46rem, 88vh, 78rem);
 }
 
 .experiment-one-settings-dock__branch-label {
@@ -795,7 +800,7 @@
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  gap: 0.45rem;
+  gap: 0.7rem;
 }
 
 .experiment-one-settings-dock__save-item {
@@ -881,7 +886,8 @@
 .experiment-one-settings-dock__settings-scroll {
   flex: 1 1 auto;
   min-height: 0;
-  overflow: visible;
+  overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
@@ -1401,6 +1407,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  width: 100%;
   padding: 0.6rem 0.7rem;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.03);
@@ -1419,11 +1426,12 @@
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  width: 100%;
 }
 
 .experiment-one-settings-dock__save-chip-panel-set-row {
   display: grid;
-  grid-template-columns: minmax(2.8rem, auto) 1fr auto;
+  grid-template-columns: minmax(4.25rem, 18%) minmax(0, 1fr) auto;
   gap: 0.5rem;
   align-items: baseline;
   min-width: 0;
