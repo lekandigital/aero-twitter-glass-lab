@@ -1,9 +1,9 @@
-import { useLayoutEffect, useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useExperimentSetOne } from './combinedSettings';
 import { useRenderVariant } from '../../render-variants/RenderVariantContext';
 import { EXPERIMENT_SET_ONE_POSITION_KEYS } from './dragPositions';
-import { ExperimentSetTwoDraggableShell } from '../experiment-set-two/primitives';
+import { useHoldDrag } from '../shared/useHoldDrag';
 import {
   e4InspectAttrs,
   e4LayerBDimensionStyle,
@@ -93,25 +93,42 @@ function ExperimentElevenLayerCSheet() {
   );
 }
 
-export function ExperimentElevenLayerCDragInBezel({
+function ExperimentElevenLayerCDraggablePane({
   initialPosition,
   layoutResetVersion = 0,
 }: {
   initialPosition: { x: number; y: number };
   layoutResetVersion?: number;
 }) {
+  const boundsRef = useRef<HTMLDivElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
+  const { position, dragging, onPointerDown, onPointerMove, endDrag } = useHoldDrag({
+    shellRef,
+    boundsRef,
+    initialPosition,
+    bounds: 'viewport',
+    persistKey: EXPERIMENT_SET_ONE_POSITION_KEYS.layerC11,
+    layoutResetVersion,
+  });
+
   return (
-    <div className="experiment-six-layer-c-drag-bounds experiment-set-two-drag-bounds">
-      <ExperimentSetTwoDraggableShell
-        bounds="parent"
-        initialPosition={initialPosition}
-        persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerC11}
-        layoutResetVersion={layoutResetVersion}
-        ariaLabel="Experiment Eleven — layer C"
-        className="experiment-six-layer-c-draggable"
-      >
-        <ExperimentElevenLayerCSheet />
-      </ExperimentSetTwoDraggableShell>
+    <div
+      ref={shellRef}
+      className={`experiment-set-two-draggable experiment-six-layer-c-draggable${dragging ? ' experiment-set-two-draggable--active' : ''}`}
+      style={{
+        position: 'fixed',
+        left: position?.x ?? initialPosition.x,
+        top: position?.y ?? initialPosition.y,
+      }}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      role="application"
+      aria-label="Experiment Eleven — layer C"
+      aria-roledescription="draggable"
+    >
+      <ExperimentElevenLayerCSheet />
     </div>
   );
 }
@@ -144,9 +161,7 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
   if (!layerCVisible || !inset) return null;
 
   return createPortal(
-    <div className="experiment-set-one-stage__slot experiment-set-one-stage__slot--raised">
-      <ExperimentElevenLayerCDragInBezel initialPosition={initialPosition} layoutResetVersion={layoutResetVersion} />
-    </div>,
+    <ExperimentElevenLayerCDraggablePane initialPosition={initialPosition} layoutResetVersion={layoutResetVersion} />,
     inset,
   );
 }

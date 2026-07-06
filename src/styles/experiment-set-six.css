@@ -37,3 +37,10 @@
 .experiment-six-layer-c-draggable.experiment-set-two-draggable--active {
   z-index: 7;
 }
+
+.experiment-six-layer-c-draggable {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  outline: none;
+}
