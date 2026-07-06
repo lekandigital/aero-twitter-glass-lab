@@ -30,6 +30,7 @@ import {
 } from './showcasePanelGeometry';
 import { normalizeExperimentTenPanelGeometry } from './experimentTenPanelGeometry';
 import { applyExperimentElevenPanelGeometry } from './experimentElevenPanelGeometry';
+import { experimentElevenLayerCDisplayMaterial } from './experimentElevenLayerCMaterial';
 import type { ExperimentSetOneSnapshot } from './savedConfigs';
 
 type PreviewExperiment = Extract<
@@ -46,6 +47,7 @@ type SavePreview = {
   branchSlug: RenderVariantSlug | null;
   branchLabel: string | null;
   material: E4MaterialSettings;
+  layerCOverride: Partial<E4MaterialSettings> | null;
   /** Semantic appearance opt-in, driven by the save's own field — not its id. */
   bezelStyle: string | null;
 };
@@ -172,11 +174,11 @@ function layerBackdropReflexEnabled(prefix: 'layerA' | 'layerB', settings: E4Mat
   ]);
 }
 
-function selectedSaveLayerCMaterial(material: E4MaterialSettings): E4MaterialSettings {
-  return {
-    ...material,
-    layerBHeight: Math.max(1, Math.round((material.layerBHeight as number) / 5)),
-  };
+function selectedSaveLayerCMaterial(
+  material: E4MaterialSettings,
+  override: Partial<E4MaterialSettings> | null,
+): E4MaterialSettings {
+  return experimentElevenLayerCDisplayMaterial(material, override);
 }
 
 function SelectedSaveLayerB({ material, nested = false }: { material: E4MaterialSettings; nested?: boolean }) {
@@ -207,13 +209,28 @@ function SelectedSaveLayerB({ material, nested = false }: { material: E4Material
   );
 }
 
-function SelectedSaveLayerC({ material }: { material: E4MaterialSettings }) {
-  const layerCMaterial = useMemo(() => selectedSaveLayerCMaterial(material), [material]);
+function SelectedSaveLayerC({
+  material,
+  layerCOverride,
+}: {
+  material: E4MaterialSettings;
+  layerCOverride: Partial<E4MaterialSettings> | null;
+}) {
+  const layerCMaterial = useMemo(
+    () => selectedSaveLayerCMaterial(material, layerCOverride),
+    [material, layerCOverride],
+  );
   return (
     <div
       className="experiment-four-layer-b experiment-eleven-layer-c"
       role="presentation"
-      style={{ ...e4LayerBDimensionStyle(layerCMaterial, false), position: 'absolute', top: 0, left: 0 }}
+      style={{
+        ...e4SettingsToCssVars(layerCMaterial),
+        ...e4LayerBDimensionStyle(layerCMaterial, false),
+        position: 'absolute',
+        top: 0,
+        left: 0,
+      }}
     >
       <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />
       <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--bottom" aria-hidden="true" />
@@ -395,7 +412,7 @@ function SelectedSaveStagePanel({
           style={{ transform: `translate(${SHOWCASE_PANEL_SNAP.x}px, ${SHOWCASE_PANEL_SNAP.y}px)` }}
           {...dragHandlers}
         >
-          <SelectedSaveLayerC material={preview.material} />
+          <SelectedSaveLayerC material={preview.material} layerCOverride={preview.layerCOverride} />
         </div>
       )}
     </div>
@@ -434,6 +451,7 @@ export function SelectedSaveStagePanels() {
           branchSlug: parsed.branchSlug,
           branchLabel,
           material,
+          layerCOverride: snapshot.e11LayerC ?? null,
           bezelStyle: snapshot.bezelStyle ?? null,
         }];
       }),

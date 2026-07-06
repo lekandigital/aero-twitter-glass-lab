@@ -4,9 +4,15 @@ import { useExperimentSetOne } from './combinedSettings';
 import { useRenderVariant } from '../../render-variants/RenderVariantContext';
 import { EXPERIMENT_SET_ONE_POSITION_KEYS } from './dragPositions';
 import { ExperimentSetTwoDraggableShell } from '../experiment-set-two/primitives';
-import { e4InspectAttrs, e4LayerBDimensionStyle, type E4MaterialSettings } from '../experiment-set-four/materialSettings';
+import {
+  e4InspectAttrs,
+  e4LayerBDimensionStyle,
+  e4SettingsToCssVars,
+  type E4MaterialSettings,
+} from '../experiment-set-four/materialSettings';
 import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/PwzzovOGlassCorners';
+import { experimentElevenLayerCDisplayMaterial } from './experimentElevenLayerCMaterial';
 
 function layerBackdropLights(prefix: 'layerA' | 'layerB', settings: E4MaterialSettings) {
   return {
@@ -43,13 +49,15 @@ function layerBackdropReflexEnabled(prefix: 'layerA' | 'layerB', settings: E4Mat
 }
 
 function ExperimentElevenLayerCSheet() {
-  const { e11 } = useExperimentSetOne();
+  const { e11, saves, selectedSaveIdByExperiment } = useExperimentSetOne();
+  const selectedSaveId = selectedSaveIdByExperiment.eleven;
+  const selectedSave = useMemo(
+    () => (selectedSaveId == null ? undefined : saves.find((save) => save.id === selectedSaveId)),
+    [saves, selectedSaveId],
+  );
   const layerCSettings: E4MaterialSettings = useMemo(
-    () => ({
-      ...e11,
-      layerBHeight: Math.max(1, Math.round((e11.layerBHeight as number) / 5)),
-    }),
-    [e11],
+    () => experimentElevenLayerCDisplayMaterial(e11, selectedSave?.e11LayerC),
+    [e11, selectedSave?.e11LayerC],
   );
 
   return (
@@ -57,7 +65,7 @@ function ExperimentElevenLayerCSheet() {
       className="experiment-four-layer-b experiment-eleven-layer-c"
       role="region"
       aria-label="Experiment Eleven layer C"
-      style={e4LayerBDimensionStyle(layerCSettings, false)}
+      style={{ ...e4SettingsToCssVars(layerCSettings), ...e4LayerBDimensionStyle(layerCSettings, false) }}
       {...e4InspectAttrs('layer-b')}
     >
       <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />

@@ -111,6 +111,7 @@ import {
   normalizeExperimentElevenPanelGeometry,
   seedExperimentElevenPanelGeometry,
 } from './experimentElevenPanelGeometry';
+import { experimentElevenLayerCDisplayMaterial } from './experimentElevenLayerCMaterial';
 import { applyExperimentSixPanelGeometry } from './experimentSixPanelGeometry';
 import {
   applyExperimentEightPanelGeometry,
@@ -257,11 +258,7 @@ function formatSavePlacement(
 
 function elevenSaveLayerCMaterial(save: ExperimentSetOneSnapshot): E4MaterialSettings | null {
   if (!save.e4) return null;
-  const material = normalizeE4MaterialSettings(save.e4);
-  return {
-    ...material,
-    layerBHeight: Math.max(1, Math.round((material.layerBHeight as number) / 5)),
-  };
+  return experimentElevenLayerCDisplayMaterial(normalizeE4MaterialSettings(save.e4), save.e11LayerC);
 }
 
 function ElevenSaveLayerCPreview({ save }: { save: ExperimentSetOneSnapshot }) {
@@ -273,6 +270,7 @@ function ElevenSaveLayerCPreview({ save }: { save: ExperimentSetOneSnapshot }) {
       <div
         className="experiment-four-layer-b experiment-eleven-layer-c experiment-one-settings-dock__save-chip-preview-surface"
         style={{
+          ...e4SettingsToCssVars(material),
           ...e4LayerBDimensionStyle(material, false),
           position: 'relative',
           transform: 'scale(0.18)',
