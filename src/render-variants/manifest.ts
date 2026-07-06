@@ -35,7 +35,7 @@ export const RENDER_VARIANTS: RenderVariantDef[] = [
   { slug: 'mix-opus-composer', label: "Mix · Opus 4.8 + Composer 2.5", gitBranch: 'mix-claude-opus-4.8-max-composer-2.5-experiment-five-attempt', saveId: 55, saveIds: [20, 21, 22, 54, 55] },
   { slug: 'opus-4.8-max-two', label: "Opus 4.8 Max (two)", gitBranch: 'claude-opus-4.8-max-experiment-five-attempt-two', saveId: 66, saveIds: [20, 21, 22, 54, 66] },
   { slug: 'composer-2-max', label: "Composer 2 Max", gitBranch: 'composer-2-max-experiment-five-attempt-two', saveId: 76, saveIds: [20, 21, 22, 74, 76] },
-  { slug: 'center-overlap-pane', label: "Center Overlap Pane", gitBranch: 'chatgpt-5.5-3-experiment-ten-white-pane-attempt', saveId: 231, saveIds: [231] },
+  { slug: 'center-overlap-pane', label: "Center Overlap Pane", gitBranch: 'chatgpt-5.5-3-experiment-ten-white-pane-attempt', saveId: 231, saveIds: [231, 232, 233, 234, 235, 236] },
 ];
 
 const showcaseSaveIds = new Set<number>(RENDER_VARIANTS.map((v) => v.saveId));
