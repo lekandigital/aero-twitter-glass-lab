@@ -198,6 +198,11 @@ function renderVariantLabel(branchSlug: string | null | undefined): string | nul
   return RENDER_VARIANTS.find((variant) => variant.slug === branchSlug)?.label ?? branchSlug;
 }
 
+function displayVariantGroupLabel(variant: { slug: string; label: string }, experiment: ExperimentId): string {
+  if (experiment === 'eleven' && variant.slug === 'center-overlap-pane') return 'Right Overlap Pane';
+  return variant.label;
+}
+
 function saveMatchesSelection(
   snapshot: ExperimentSetOneSnapshot,
   branchSlug: string | null,
@@ -304,9 +309,9 @@ function describePanelSetSnapshot(
   });
 }
 
-function saveVariantGroupLabel(save: ExperimentSetOneSnapshot): string {
+function saveVariantGroupLabel(save: ExperimentSetOneSnapshot, experiment: ExperimentId): string {
   const variant = RENDER_VARIANTS.find((candidate) => candidate.saveIds.includes(catalogSaveId(save)));
-  if (variant) return variant.label;
+  if (variant) return displayVariantGroupLabel(variant, experiment);
   return save.scope === 'general' ? 'General' : 'Other saves';
 }
 
@@ -1976,7 +1981,7 @@ export function ExperimentSetOneSettingsDock() {
   );
   const branchSaveGroups = useMemo(
     () =>
-      saveScope === 'four' || saveScope === 'five' || saveScope === 'six' || saveScope === 'seven' || saveScope === 'eight' || saveScope === 'nine' || saveScope === 'ten'
+    saveScope === 'four' || saveScope === 'five' || saveScope === 'six' || saveScope === 'seven' || saveScope === 'eight' || saveScope === 'nine' || saveScope === 'ten' || saveScope === 'eleven'
           ? RENDER_VARIANTS.map((variant) => ({
             variant,
             saves: scopedSaves
@@ -2077,7 +2082,7 @@ export function ExperimentSetOneSettingsDock() {
           const altKey = saveSelectionKey(altSave.id, altBranch);
           if (!selectedKeysSet.has(altKey)) {
             const groupKey = altVariant?.slug ?? (altSave.scope === 'general' ? 'general' : 'other');
-            const groupLabel = altVariant?.label ?? saveVariantGroupLabel(altSave);
+            const groupLabel = altVariant ? displayVariantGroupLabel(altVariant, experiment) : saveVariantGroupLabel(altSave, experiment);
             const group = alternativeGroups.get(groupKey) ?? {
               key: groupKey,
               label: groupLabel,
@@ -2756,7 +2761,7 @@ export function ExperimentSetOneSettingsDock() {
                   )}
                   {branchSaveGroups.map(({ variant, saves: branchSaves }) => (
                     <div key={variant.slug} className="experiment-one-settings-dock__branch-group">
-                      <span className="experiment-one-settings-dock__branch-label">{variant.label}</span>
+                      <span className="experiment-one-settings-dock__branch-label">{displayVariantGroupLabel(variant, dockExperiment)}</span>
                       <div className="experiment-one-settings-dock__branch-saves">
                         {branchSaves.map((save) => {
                           const selectionKey = saveSelectionKey(save.id, variant.slug);
