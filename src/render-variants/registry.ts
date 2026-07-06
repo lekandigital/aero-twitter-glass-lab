@@ -26,6 +26,7 @@ export const VARIANT_MODULES: Record<RenderVariantSlug, RenderVariantModule> = {
   'mix-opus-composer': mixOpusComposer as unknown as RenderVariantModule,
   'opus-4.8-max-two': opus48MaxTwo as unknown as RenderVariantModule,
   'composer-2-max': composer2Max as unknown as RenderVariantModule,
+  'center-overlap-pane': chatgpt55 as unknown as RenderVariantModule,
 };
 
 export function getRenderVariantModule(slug: RenderVariantSlug): RenderVariantModule {

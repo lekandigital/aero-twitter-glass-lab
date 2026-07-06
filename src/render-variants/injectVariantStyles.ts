@@ -259,6 +259,8 @@ const VARIANT_CSS: Record<RenderVariantSlug, string[]> = {
   'mix-opus-composer': [mix4, mixGlass, mix2],
   'opus-4.8-max-two': [opusMaxTwo4, opusMaxTwoGlass, opusMaxTwo2],
   'composer-2-max': [composer4, composerGlass, composer2],
+  // Renders 230's raw material as-is (matches how 228 shows it — no white-pane override)
+  'center-overlap-pane': [chatgpt4, chatgptGlass, chatgpt2],
 };
 
 let injected = false;
