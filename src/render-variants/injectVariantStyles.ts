@@ -34,37 +34,37 @@ const chatgpt55ThreeWhitePane = `
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.92) 0%,
-      rgba(242, 251, 255, 0.84) 36%,
-      rgba(232, 247, 255, 0.74) 100%
+      rgba(255, 255, 255, 0.86) 0%,
+      rgba(236, 249, 255, 0.74) 36%,
+      rgba(218, 242, 255, 0.62) 100%
     ),
     radial-gradient(
       ellipse 105% 54% at 48% -6%,
-      rgba(255, 255, 255, 0.36),
+      rgba(255, 255, 255, 0.32),
       transparent 66%
     ),
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(240, 250, 255, 0.16) 56%,
-      rgba(232, 248, 255, 0.26) 100%
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(232, 248, 255, 0.12) 56%,
+      rgba(216, 242, 255, 0.2) 100%
     );
-  backdrop-filter: blur(26px) saturate(0.92) brightness(1.18);
-  -webkit-backdrop-filter: blur(26px) saturate(0.92) brightness(1.18);
+  backdrop-filter: blur(34px) saturate(0.86) brightness(1.2);
+  -webkit-backdrop-filter: blur(34px) saturate(0.86) brightness(1.2);
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.82),
-    inset 0 1px 3px rgba(255, 255, 255, 0.48),
-    inset 1.25px 0 2px rgba(255, 255, 255, 0.48),
-    inset -1.25px 0 2px rgba(255, 255, 255, 0.34),
-    inset 0 -1.25px 2px rgba(235, 250, 255, 0.38),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
-    inset 0 -12px 24px rgba(0, 72, 165, 0.035),
-    0 10px 24px rgba(0, 42, 95, 0.045);
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.78),
+    inset 0 1px 3px rgba(255, 255, 255, 0.44),
+    inset 1.25px 0 2px rgba(255, 255, 255, 0.46),
+    inset -1.25px 0 2px rgba(255, 255, 255, 0.3),
+    inset 0 -1.25px 2px rgba(218, 245, 255, 0.34),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.24),
+    inset 0 -12px 24px rgba(0, 72, 165, 0.028),
+    0 10px 24px rgba(0, 42, 95, 0.04);
 }
 
 .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-b__shine,
 .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-b__shine {
-  opacity: 0.2;
+  opacity: 0.18;
 }
 `;
 
