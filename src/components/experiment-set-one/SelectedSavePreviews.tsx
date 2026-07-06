@@ -327,6 +327,9 @@ function SelectedSaveStagePanel({
       style={style}
       role="group"
       aria-label={label}
+      data-selected-save-id={preview.id}
+      data-selected-save-experiment={preview.experiment}
+      data-selected-save-branch={preview.branchSlug ?? 'base'}
     >
       <div
         className="experiment-set-one-selected-save-stage__layer-a"

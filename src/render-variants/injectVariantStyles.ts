@@ -69,8 +69,10 @@ const chatgpt55ThreeWhitePane = `
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a {
   background:
     radial-gradient(
       ellipse 108% 44% at 18% -8%,
@@ -104,8 +106,10 @@ const chatgpt55ThreeWhitePane = `
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a::before,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a::before,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a::before,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a::before,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a::before {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a::before,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a::before {
   opacity: 0.34;
   box-shadow:
     inset 0 0 0 1px rgba(215, 241, 255, 0.34),
@@ -117,8 +121,10 @@ const chatgpt55ThreeWhitePane = `
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a::after,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a::after,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a::after,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a::after,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a::after {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a::after,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a::after {
   opacity: 0.035;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, transparent 18%),
@@ -129,22 +135,28 @@ const chatgpt55ThreeWhitePane = `
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a .glass-frost-matte,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a .glass-frost-matte,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a .glass-frost-matte,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a .glass-frost-matte,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a .glass-frost-matte {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a .glass-frost-matte,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a .glass-frost-matte {
   opacity: 0.34;
 }
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a .glass-frost-gloss,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a .glass-frost-gloss,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a .glass-frost-gloss,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a .glass-frost-gloss,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a .glass-frost-gloss {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a .glass-frost-gloss,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a .glass-frost-gloss {
   opacity: 0.025;
 }
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim {
   background:
     radial-gradient(ellipse 54px 48px at 0% 0%, rgba(255, 255, 255, 0.34), rgba(218, 247, 255, 0.24) 44%, transparent 78%),
     radial-gradient(ellipse 44px 38px at 100% 0%, rgba(235, 250, 255, 0.18), rgba(184, 224, 246, 0.1) 48%, transparent 80%),
@@ -154,8 +166,10 @@ const chatgpt55ThreeWhitePane = `
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-edge,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-edge,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-edge,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-edge,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-edge {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-edge,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-edge {
   background: linear-gradient(
     90deg,
     rgba(215, 243, 255, 0.2) 0%,
@@ -167,22 +181,28 @@ const chatgpt55ThreeWhitePane = `
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-edge--top,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-edge--top,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-edge--top,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-edge--top,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-edge--top {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-edge--top,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-edge--top {
   opacity: 0.24;
 }
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-edge--bottom,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-edge--bottom,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-edge--bottom,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-edge--bottom,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-edge--bottom {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-edge--bottom,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-edge--bottom {
   opacity: 0.1;
 }
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-side,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-side,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-side,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-side,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-side {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-side,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-side {
   background:
     linear-gradient(180deg, transparent 0%, rgba(225, 248, 255, 0.32) 16%, rgba(199, 235, 252, 0.22) 54%, rgba(168, 213, 238, 0.08) 86%, transparent 100%),
     linear-gradient(90deg, rgba(231, 250, 255, 0.24), rgba(204, 235, 252, 0.05));
@@ -190,32 +210,40 @@ const chatgpt55ThreeWhitePane = `
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-side--left,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-side--left,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-side--left,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-side--left,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-side--left {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-side--left,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-side--left {
   opacity: 0.24;
   box-shadow: none;
 }
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-side--right,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-side--right,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__bezel-rim-side--right,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-side--right,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-side--right {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-side--right,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__bezel-rim-side--right {
   opacity: 0.14;
   box-shadow: none;
 }
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__radial-corners,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__radial-corners,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__radial-corners,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__radial-corners,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__radial-corners {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__radial-corners,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__radial-corners {
   opacity: 0.32;
   mix-blend-mode: screen;
 }
 
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__pwzzovO-glass,
 .experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__pwzzovO-glass,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-selected-save-stage[aria-label^="E10 "] .experiment-four-layer-a__pwzzovO-glass,
 .experiment-set-one-page[data-selected-save-ten="226"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__pwzzovO-glass,
-.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__pwzzovO-glass {
+.experiment-set-one-page[data-selected-save-ten="227"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__pwzzovO-glass,
+.experiment-set-one-page[data-selected-save-ten="229"] .experiment-set-one-stage__multi-shell[data-stage-experiment="ten"] .experiment-four-layer-a__pwzzovO-glass {
   opacity: calc(var(--pwzzovO-corner-opacity, 0) * 0.25);
   filter: blur(0.35px) saturate(0.9);
 }

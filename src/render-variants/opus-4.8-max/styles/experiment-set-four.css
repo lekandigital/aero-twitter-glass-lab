@@ -1103,7 +1103,7 @@
     );
 }
 
-.experiment-set-one-page[data-e4-layerA-radial-layout='individual'] .experiment-four-layer-a__radial-corners {
+.experiment-set-one-page[data-e4-layera-radial-layout='individual'] .experiment-four-layer-a__radial-corners {
   opacity: 1;
   background:
     radial-gradient(
@@ -1132,7 +1132,7 @@
     );
 }
 
-.experiment-set-one-page[data-e4-layerB-radial-layout='individual'] .experiment-four-layer-b__radial-corners {
+.experiment-set-one-page[data-e4-layerb-radial-layout='individual'] .experiment-four-layer-b__radial-corners {
   opacity: 1;
   background:
     radial-gradient(
@@ -1288,7 +1288,7 @@
     );
 }
 
-.experiment-set-one-page[data-e4-layerB-show-sparkles='false'] .experiment-four-layer-b__sparkle {
+.experiment-set-one-page[data-e4-layerb-show-sparkles='false'] .experiment-four-layer-b__sparkle {
   display: none;
 }
 
