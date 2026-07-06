@@ -107,7 +107,7 @@ function saveMatchesBranch(
   snapshot: ExperimentSetOneSnapshot,
   branchSlug: RenderVariantSlug | null,
 ): boolean {
-  if (!branchSlug) return !snapshot.branchVariant;
+  if (!branchSlug) return true;
   if (snapshot.branchVariant === branchSlug) return true;
   const variant = RENDER_VARIANTS.find((candidate) => candidate.slug === branchSlug);
   return variant?.saveIds.includes(snapshot.sourceSaveId ?? snapshot.id) ?? false;
