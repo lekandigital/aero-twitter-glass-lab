@@ -97,7 +97,7 @@
 
 /* E5/E7 nested — hide when A and B are both off (no layer C on stage). */
 .experiment-set-one-page[data-layer-a-visible='false'][data-layer-b-visible='false']
-  .experiment-set-two-draggable:has(.experiment-four-layer-a__bezel-inset):not(:has(.experiment-six-layer-c)) {
+  .experiment-set-two-draggable:has(.experiment-four-layer-a__bezel-inset):not(:has(.experiment-six-layer-c)):not(:has(.experiment-eleven-layer-c)) {
   display: none !important;
 }
 
@@ -123,6 +123,19 @@
   overflow: visible !important;
 }
 
+.experiment-set-one-page[data-layer-a-visible='false'][data-layer-c-visible='true'] .experiment-four-layer-a:has(.experiment-eleven-layer-c) > :not(.experiment-four-layer-a__bezel-inset) {
+  display: none !important;
+}
+
+.experiment-set-one-page[data-layer-a-visible='false'][data-layer-c-visible='true'] .experiment-four-layer-a:has(.experiment-eleven-layer-c) {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  overflow: visible !important;
+}
+
 /* Hide nested B rect only — layer C circle stays visible when B is toggled off. */
 .experiment-set-one-page[data-layer-b-visible='false'] .experiment-four-layer-a__bezel-inset > .experiment-four-layer-b:not(.experiment-six-layer-c) {
   display: none !important;
@@ -132,7 +145,7 @@
   display: none !important;
 }
 
-.experiment-set-one-page[data-layer-b-visible='false'] .experiment-set-two-draggable:has(> .experiment-four-layer-b:not(.experiment-six-layer-c)),
+.experiment-set-one-page[data-layer-b-visible='false'] .experiment-set-two-draggable:has(> .experiment-four-layer-b:not(.experiment-six-layer-c):not(.experiment-eleven-layer-c)),
 .experiment-set-one-page[data-layer-b-visible='false'] .experiment-set-two-draggable:has(> .experiment-three-layer-b) {
   display: none !important;
 }

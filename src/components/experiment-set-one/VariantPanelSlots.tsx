@@ -318,9 +318,9 @@ function ExperimentNineDraggableLayerA({
   layoutResetVersion?: number;
   nestedB?: boolean;
 }) {
-  const { layerAVisible, layerBVisible } = useLayerStageVisibility();
+  const { layerAVisible, layerBVisible, layerCVisible } = useLayerStageVisibility();
   const keepNestedComposite = nestedB && layerBVisible;
-  if (!layerAVisible && !keepNestedComposite) return null;
+  if (!layerAVisible && !keepNestedComposite && !layerCVisible) return null;
 
   return (
     <ExperimentTwoDraggableSheet
@@ -474,9 +474,9 @@ function ExperimentTenDraggableLayerA({
   layoutResetVersion?: number;
   nestedB?: boolean;
 }) {
-  const { layerAVisible, layerBVisible } = useLayerStageVisibility();
+  const { layerAVisible, layerBVisible, layerCVisible } = useLayerStageVisibility();
   const keepNestedComposite = nestedB && layerBVisible;
-  if (!layerAVisible && !keepNestedComposite) return null;
+  if (!layerAVisible && !keepNestedComposite && !layerCVisible) return null;
 
   return (
     <ExperimentTwoDraggableSheet
@@ -631,9 +631,9 @@ function ExperimentElevenDraggableLayerA({
   layoutResetVersion?: number;
   nestedB?: boolean;
 }) {
-  const { layerAVisible, layerBVisible } = useLayerStageVisibility();
+  const { layerAVisible, layerBVisible, layerCVisible } = useLayerStageVisibility();
   const keepNestedComposite = nestedB && layerBVisible;
-  if (!layerAVisible && !keepNestedComposite) return null;
+  if (!layerAVisible && !keepNestedComposite && !layerCVisible) return null;
 
   return (
     <ExperimentTwoDraggableSheet
