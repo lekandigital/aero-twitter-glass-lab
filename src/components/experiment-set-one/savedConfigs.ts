@@ -45,10 +45,12 @@ export type ExperimentSetOneSnapshot = {
   scope?: SaveScope;
   /** When true, loading only merges Experiment Four corner lighting fields. */
   cornersOnly?: boolean;
-  /** When set, loading this save activates the branch render pipeline. */
+  /** When set, loading this save activates the branch render pipeline. Authoritative — never overwritten at load. */
   branchVariant?: RenderVariantSlug;
-  /** Experiment Six clone — original branch save id for variant routing. */
+  /** Provenance: this save is a derived panel of another and inherits that source's variant-group membership. Never a dedupe/uniqueness device. */
   sourceSaveId?: number;
+  /** Semantic appearance opt-in (e.g. "frosted-blue-matte"). Drives a data attribute so CSS keys on the style, not the save's id. */
+  bezelStyle?: string;
   /** General-scope preset id (e.g. accidental glitch captures). */
   generalPreset?: string;
   /** Stage drag position for general presets (experiment-four layer A slot). */
@@ -70,12 +72,6 @@ function builtInReferenceCornerSave(): ExperimentSetOneSnapshot {
     scope: 'four',
     cornersOnly: true,
   };
-}
-
-function sortedRecord<T extends Record<string, unknown>>(value: T): Record<string, unknown> {
-  const out: Record<string, unknown> = {};
-  for (const key of Object.keys(value).sort()) out[key] = value[key];
-  return out;
 }
 
 function selectedSaveInstanceKeys(keysByExperiment: Partial<Record<ExperimentId, string[]>>): string[] {
@@ -191,36 +187,30 @@ function normalizeLayoutSnapshot(raw: unknown): ExperimentSetOneLayoutSnapshot {
   };
 }
 
-function snapshotFingerprint(snapshot: ExperimentSetOneSnapshot): string {
-  return JSON.stringify({
-    scope: snapshot.scope ?? null,
-    sourceSaveId: snapshot.sourceSaveId ?? null,
-    activeExperiment: snapshot.activeExperiment ?? null,
-    selectedExperimentIds: snapshot.selectedExperimentIds ?? null,
-    selectedSaveKeysByExperiment: snapshot.selectedSaveKeysByExperiment ?? null,
-    selectedSaveVisualOrder: snapshot.selectedSaveVisualOrder ?? null,
-    selectedSavePositions: snapshot.selectedSavePositions ?? null,
-    e1: sortedRecord(snapshot.e1 as Record<string, unknown>),
-    e2: sortedRecord(snapshot.e2 as Record<string, unknown>),
-    e3: sortedRecord(snapshot.e3 as Record<string, unknown>),
-    e4: snapshot.e4 ? sortedRecord(snapshot.e4 as Record<string, unknown>) : null,
-  });
-}
-
+/**
+ * Dedupe by identity (id), not by content. A save is unique because of its id —
+ * two saves that happen to hold identical material/layout are still two distinct
+ * saves and must both survive. This only collapses genuine id collisions, which
+ * arise when legacy localStorage saves are merged with committed repo saves
+ * (see hydrateExperimentSetOneSaves); the last write for a given id wins.
+ *
+ * Previously this keyed on a content fingerprint, which silently dropped any save
+ * that looked like an earlier one — the single biggest source of "my save won't
+ * appear" glitches when authoring duplicates or variants.
+ */
 function dedupeSnapshots(saves: ExperimentSetOneSnapshot[]) {
-  const seen = new Set<string>();
-  const next: ExperimentSetOneSnapshot[] = [];
+  const byId = new Map<number, ExperimentSetOneSnapshot>();
+  const cornerSaves: ExperimentSetOneSnapshot[] = [];
+  const order: number[] = [];
   for (const save of saves) {
     if (save.cornersOnly) {
-      next.push(save);
+      cornerSaves.push(save);
       continue;
     }
-    const fp = snapshotFingerprint(save);
-    if (seen.has(fp)) continue;
-    seen.add(fp);
-    next.push(save);
+    if (!byId.has(save.id)) order.push(save.id);
+    byId.set(save.id, save); // last write for an id wins (merge semantics)
   }
-  return next;
+  return [...cornerSaves, ...order.map((id) => byId.get(id)!)];
 }
 
 function migrateSnapshotScope(save: ExperimentSetOneSnapshot): ExperimentSetOneSnapshot {
@@ -264,7 +254,18 @@ function clearLegacyStorage() {
   }
 }
 
+/**
+ * Attach a render pipeline (branchVariant) to a save.
+ *
+ * A save that already declares its own branchVariant is authoritative — it is
+ * NOT overwritten. We only infer a pipeline from the manifest for legacy saves
+ * that never recorded one. Previously this always overwrote branchVariant from
+ * manifest membership, so adding a save to a group's saveIds silently changed
+ * that save's identity out from under everything referencing it (e.g. it broke a
+ * panel set whose slot pointed at the save under its original branch).
+ */
 function withBranchVariant(save: ExperimentSetOneSnapshot): ExperimentSetOneSnapshot {
+  if (save.branchVariant) return save;
   const variant = renderVariantForSaveId(save.id);
   return variant ? { ...save, branchVariant: variant.slug } : save;
 }

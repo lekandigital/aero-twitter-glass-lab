@@ -151,6 +151,15 @@ type ExperimentSelection =
 
 const EXPERIMENT_ORDER: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
 
+/**
+ * The id used for variant-group / manifest lookup.
+ *
+ * `sourceSaveId` means ONE thing: "this save is a derived panel of another save
+ * and inherits that source's variant-group membership" (e.g. the scope-six/seven
+ * derived panels 133–158 inherit showcase saves 20/22/… ). It is NOT a dedupe or
+ * uniqueness device — saves are unique by `id` (see dedupeSnapshots). Never set
+ * `sourceSaveId` to a save's own id; that carries no meaning.
+ */
 function catalogSaveId(save: { id: number; sourceSaveId?: number }) {
   return save.sourceSaveId ?? save.id;
 }
@@ -892,6 +901,14 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     if (activeExperiment === 'ten') return e10;
     return e4;
   }, [activeExperiment, e4, e5, e6, e7, e8, e9, e10]);
+
+  // Semantic bezel style for the active center-overlap (E10) save, so the
+  // main stage keys appearance CSS on the style, not on the save's literal id.
+  const activeTenBezelStyle = useMemo(() => {
+    const tenId = selectedSaveIdByExperiment.ten;
+    if (tenId == null) return null;
+    return saves.find((save) => save.id === tenId)?.bezelStyle ?? null;
+  }, [saves, selectedSaveIdByExperiment.ten]);
 
   const setE1 = useCallback(<K extends keyof E1MaterialSettings>(id: K, value: E1MaterialSettings[K]) => {
     setE1State((prev) => ({ ...prev, [id]: value }));
@@ -1637,6 +1654,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         data-selected-save-nine={selectedSaveIdByExperiment.nine ?? ''}
         data-selected-save-ten={selectedSaveIdByExperiment.ten ?? ''}
         data-selected-panel-set-save-id={selectedPanelSetSaveId ?? ''}
+        data-e10-bezel-style={activeTenBezelStyle ?? undefined}
       >
         {children}
       </div>
