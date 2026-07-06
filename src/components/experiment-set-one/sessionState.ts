@@ -16,6 +16,7 @@ import {
 import { applyExperimentEightPanelGeometry } from './experimentSevenPanelGeometry';
 import { applyShowcasePanelGeometry, applyExperimentNinePanelGeometry } from './showcasePanelGeometry';
 import { normalizeExperimentTenPanelGeometry } from './experimentTenPanelGeometry';
+import { applyExperimentElevenPanelGeometry } from './experimentElevenPanelGeometry';
 
 import {
   DEFAULT_EXPERIMENT_VISIBILITY,
@@ -48,6 +49,8 @@ export type ExperimentSetOneSession = {
   e9?: E4MaterialSettings;
   /** Live Experiment Ten working copy — duplicate of Experiment Nine. */
   e10?: E4MaterialSettings;
+  /** Live Experiment Eleven working copy — duplicate of Experiment Ten / right overlap pane. */
+  e11?: E4MaterialSettings;
   /** Experiment Six layer C circle layout (diameter, inset position). */
   e6LayerC?: E6LayerCLayoutSettings;
   hidePanelText: boolean;
@@ -82,6 +85,7 @@ export function defaultSession(): ExperimentSetOneSession {
     e2: E2_MASTER_DEFAULT,
     e3: E3_MASTER_DEFAULT,
     e4: applyShowcasePanelGeometry(applyReferenceCornerLighting(E4_MASTER_DEFAULT)),
+    e11: applyExperimentElevenPanelGeometry(E4_MASTER_DEFAULT),
     hidePanelText: true,
     layerAVisible: true,
     layerBVisible: true,
@@ -90,7 +94,7 @@ export function defaultSession(): ExperimentSetOneSession {
     experimentVisible: DEFAULT_EXPERIMENT_VISIBILITY,
     referenceWallpaper: false,
     activeExperiment: 'four',
-    selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: null, six: null, seven: null, eight: null, nine: null, ten: null },
+    selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: null, six: null, seven: null, eight: null, nine: null, ten: null, eleven: null },
     selectedExperimentIds: ['four'],
     selectedSaveKeysByExperiment: {},
     saveVisualOrder: [],
@@ -103,7 +107,7 @@ export function defaultSession(): ExperimentSetOneSession {
 
 function normalizeSelectedExperimentIds(raw: unknown, activeExperiment: ExperimentId): ExperimentId[] {
   if (!Array.isArray(raw)) return [activeExperiment];
-  const allowed = new Set<ExperimentId>(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']);
+  const allowed = new Set<ExperimentId>(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven']);
   const next = Array.from(new Set(raw.filter((id): id is ExperimentId => allowed.has(id))));
   return next.length > 0 ? next : [activeExperiment];
 }
@@ -116,7 +120,7 @@ function normalizeSelectedSaveKeysByExperiment(
   activeRenderVariant: RenderVariantSlug | null | undefined,
 ): Partial<Record<ExperimentId, string[]>> {
   const next: Partial<Record<ExperimentId, string[]>> = {};
-  const allowed = new Set<ExperimentId>(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']);
+  const allowed = new Set<ExperimentId>(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven']);
   const rawKeyRecord = rawKeys && typeof rawKeys === 'object' ? (rawKeys as Partial<Record<ExperimentId, unknown>>) : undefined;
   const rawIdRecord = rawIds && typeof rawIds === 'object' ? (rawIds as Partial<Record<ExperimentId, unknown>>) : undefined;
   const legacyKeyFor = (experiment: ExperimentId, id: number) =>
@@ -162,7 +166,7 @@ function normalizeSaveVisualOrder(raw: unknown): number[] {
 }
 
 function selectedSaveInstanceKeys(keysByExperiment: Partial<Record<ExperimentId, string[]>>): string[] {
-  const allowed: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+  const allowed: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
   return allowed.flatMap((experiment) =>
     (keysByExperiment[experiment] ?? []).map((key) => `${experiment}:${key}`),
   );
@@ -242,7 +246,8 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       parsed.activeExperiment === 'seven' ||
       parsed.activeExperiment === 'eight' ||
       parsed.activeExperiment === 'nine' ||
-      parsed.activeExperiment === 'ten'
+      parsed.activeExperiment === 'ten' ||
+      parsed.activeExperiment === 'eleven'
         ? parsed.activeExperiment
         : 'four';
     const selectedSaveKeysByExperiment = normalizeSelectedSaveKeysByExperiment(
@@ -263,6 +268,7 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       e8: parsed.e8 ? applyExperimentEightPanelGeometry(normalizeE4MaterialSettings(parsed.e8)) : undefined,
       e9: parsed.e9 ? applyExperimentNinePanelGeometry(normalizeE4MaterialSettings(parsed.e9)) : undefined,
       e10: parsed.e10 ? normalizeExperimentTenPanelGeometry(parsed.e10) : undefined,
+      e11: parsed.e11 ? applyExperimentElevenPanelGeometry(normalizeE4MaterialSettings(parsed.e11)) : undefined,
       e6LayerC: parsed.e6LayerC,
       hidePanelText: typeof parsed.hidePanelText === 'boolean' ? parsed.hidePanelText : true,
       layerAVisible: parsed.layerAVisible !== false,

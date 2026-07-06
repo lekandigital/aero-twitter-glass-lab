@@ -21,7 +21,7 @@ import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/Pwzz
 type VariantPanelSlotsProps = {
   layoutResetVersion: number;
   nestedB: boolean;
-  experiment: 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten';
+  experiment: 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten' | 'eleven';
 };
 
 const COMPACT_PANEL_SNAP = EXPERIMENT_SIX_PANEL_SNAP;
@@ -514,6 +514,162 @@ function ExperimentTenDraggableLayerB({
   );
 }
 
+function ExperimentElevenLayerBSheet({ nested = false }: { nested?: boolean }) {
+  const { e11 } = useExperimentSetOne();
+  return (
+    <div
+      className="experiment-four-layer-b"
+      role="region"
+      aria-label="Experiment Eleven layer B"
+      style={e4LayerBDimensionStyle(e11, nested)}
+      {...e4InspectAttrs('layer-b')}
+    >
+      <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />
+      <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--bottom" aria-hidden="true" />
+      <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--left" aria-hidden="true" />
+      <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--right" aria-hidden="true" />
+      <GlassFrostSurface />
+      <span className="experiment-four-layer-b__shine" aria-hidden="true" {...e4InspectAttrs('layer-b-shine')} />
+      <span
+        className="experiment-four-layer-b__radial-corners"
+        aria-hidden="true"
+        {...e4InspectAttrs('layer-b-radial')}
+      />
+      <PwzzovOGlassCorners
+        layerClass="experiment-four-layer-b"
+        inspectTarget="layer-b-corners"
+        edgeReflexEnabled={layerBackdropReflexEnabled('layerB', e11)}
+        rimSideGapTop={e11.layerBRimSideGapTop}
+        rimSideGapBottom={e11.layerBRimSideGapBottom}
+        backdropLights={layerBackdropLights('layerB', e11)}
+      />
+      <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--a" aria-hidden="true" />
+      <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--b" aria-hidden="true" />
+      <div className="experiment-four-layer-b__content">
+        <LayerCopy
+          eyebrow="Reference frost"
+          title="Layer B"
+          subtitle="Experiment Eleven · frost body"
+          body={
+            nested
+              ? 'Nested inside layer A bezel — inset and corner radius follow bezel layout settings.'
+              : 'Duplicate of Experiment Ten frost body with independent E11 state.'
+          }
+        />
+      </div>
+    </div>
+  );
+}
+
+function ExperimentElevenLayerASheet({ nestedB = false }: { nestedB?: boolean }) {
+  const { e11, layerBVisible } = useExperimentSetOne();
+  const showNestedB = nestedB && layerBVisible;
+  return (
+    <div
+      className="experiment-four-layer-a"
+      role="region"
+      aria-label="Experiment Eleven layer A"
+      style={e4LayerADimensionStyle(e11)}
+      {...e4InspectAttrs('layer-a')}
+    >
+      <span className="experiment-four-layer-a__bezel-rim" aria-hidden="true" {...e4InspectAttrs('layer-a-rim')} />
+      <GlassFrostSurface />
+      <span className="experiment-four-layer-a__bezel-rim-edge experiment-four-layer-a__bezel-rim-edge--top" aria-hidden="true" />
+      <span className="experiment-four-layer-a__bezel-rim-edge experiment-four-layer-a__bezel-rim-edge--bottom" aria-hidden="true" />
+      <span
+        className="experiment-four-layer-a__bezel-rim-side experiment-four-layer-a__bezel-rim-side--left"
+        aria-hidden="true"
+      />
+      <span
+        className="experiment-four-layer-a__bezel-rim-side experiment-four-layer-a__bezel-rim-side--right"
+        aria-hidden="true"
+      />
+      <span
+        className="experiment-four-layer-a__radial-corners"
+        aria-hidden="true"
+        {...e4InspectAttrs('layer-a-radial')}
+      />
+      <PwzzovOGlassCorners
+        layerClass="experiment-four-layer-a"
+        inspectTarget="layer-a-corners"
+        edgeReflexEnabled={layerBackdropReflexEnabled('layerA', e11)}
+        rimSideGapTop={e11.layerARimSideGapTop}
+        rimSideGapBottom={e11.layerARimSideGapBottom}
+        backdropLights={layerBackdropLights('layerA', e11)}
+      />
+      {showNestedB && (
+        <div className="experiment-four-layer-a__bezel-inset">
+          <ExperimentElevenLayerBSheet nested />
+        </div>
+      )}
+      <div className="experiment-four-layer-a__content">
+        <LayerCopy
+          eyebrow="Reference left panel"
+          title="Layer A"
+          subtitle="Experiment Eleven · right overlap pane"
+          body={
+            showNestedB
+              ? 'Composite reference shell — layer B is nested inside with configurable bezel inset.'
+              : 'Duplicate of Experiment Ten bezel frame with independent E11 state.'
+          }
+        />
+      </div>
+    </div>
+  );
+}
+
+function ExperimentElevenDraggableLayerA({
+  initialPosition = SHOWCASE_PANEL_SNAP,
+  persistKey,
+  layoutResetVersion = 0,
+  nestedB = false,
+}: {
+  initialPosition?: { x: number; y: number };
+  persistKey?: string;
+  layoutResetVersion?: number;
+  nestedB?: boolean;
+}) {
+  const { layerAVisible, layerBVisible } = useLayerStageVisibility();
+  const keepNestedComposite = nestedB && layerBVisible;
+  if (!layerAVisible && !keepNestedComposite) return null;
+
+  return (
+    <ExperimentTwoDraggableSheet
+      initialPosition={initialPosition}
+      ariaLabel={nestedB ? 'Experiment Eleven — right overlap pane' : 'Experiment Eleven — layer A'}
+      persistKey={persistKey}
+      layoutResetVersion={layoutResetVersion}
+    >
+      <ExperimentElevenLayerASheet nestedB={nestedB} />
+    </ExperimentTwoDraggableSheet>
+  );
+}
+
+function ExperimentElevenDraggableLayerB({
+  initialPosition = { x: 52, y: 60 },
+  persistKey,
+  layoutResetVersion = 0,
+}: {
+  initialPosition?: { x: number; y: number };
+  persistKey?: string;
+  layoutResetVersion?: number;
+}) {
+  const { layerBVisible } = useLayerStageVisibility();
+  if (!layerBVisible) return null;
+
+  return (
+    <ExperimentTwoDraggableSheet
+      initialPosition={initialPosition}
+      raised
+      ariaLabel="Experiment Eleven — layer B"
+      persistKey={persistKey}
+      layoutResetVersion={layoutResetVersion}
+    >
+      <ExperimentElevenLayerBSheet />
+    </ExperimentTwoDraggableSheet>
+  );
+}
+
 /**
  * Render the default (main-branch) panels if the active variant pipeline throws,
  * instead of letting one bad branch crash the whole page. Keyed by `resetKey` so a
@@ -632,6 +788,25 @@ function DefaultPanels({ layoutResetVersion, nestedB, experiment }: VariantPanel
       </>
     );
   }
+  if (experiment === 'eleven') {
+    return (
+      <>
+        <ExperimentElevenDraggableLayerA
+          initialPosition={SHOWCASE_PANEL_SNAP}
+          persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerA11}
+          layoutResetVersion={layoutResetVersion}
+          nestedB={showNestedB}
+        />
+        {!nestedB && (
+          <ExperimentElevenDraggableLayerB
+            initialPosition={{ x: 52, y: 60 }}
+            persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerB11}
+            layoutResetVersion={layoutResetVersion}
+          />
+        )}
+      </>
+    );
+  }
   return (
     <>
       <ExperimentFourDraggableLayerA
@@ -721,6 +896,22 @@ export function VariantPanelSlots(props: VariantPanelSlotsProps) {
           <ExperimentTenDraggableLayerB
             initialPosition={{ x: 52, y: 60 }}
             persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerB10}
+            layoutResetVersion={layoutResetVersion}
+          />
+        )}
+      </>
+    ) : experiment === 'eleven' ? (
+      <>
+        <ExperimentElevenDraggableLayerA
+          initialPosition={SHOWCASE_PANEL_SNAP}
+          persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerA11}
+          layoutResetVersion={layoutResetVersion}
+          nestedB={showNestedB}
+        />
+        {!nestedB && (
+          <ExperimentElevenDraggableLayerB
+            initialPosition={{ x: 52, y: 60 }}
+            persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerB11}
             layoutResetVersion={layoutResetVersion}
           />
         )}

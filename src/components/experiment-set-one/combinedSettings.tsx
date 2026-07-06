@@ -103,6 +103,10 @@ import {
   applyExperimentTenPanelGeometry,
   normalizeExperimentTenPanelGeometry,
 } from './experimentTenPanelGeometry';
+import {
+  applyExperimentElevenPanelGeometry,
+  normalizeExperimentElevenPanelGeometry,
+} from './experimentElevenPanelGeometry';
 import { applyExperimentSixPanelGeometry } from './experimentSixPanelGeometry';
 import {
   applyExperimentEightPanelGeometry,
@@ -147,9 +151,10 @@ type ExperimentSelection =
   | { experiment: 'seven'; target: E4InspectTarget; label: string }
   | { experiment: 'eight'; target: E4InspectTarget | E6LayerCInspectTarget; label: string }
   | { experiment: 'nine'; target: E4InspectTarget; label: string }
-  | { experiment: 'ten'; target: E4InspectTarget; label: string };
+  | { experiment: 'ten'; target: E4InspectTarget; label: string }
+  | { experiment: 'eleven'; target: E4InspectTarget; label: string };
 
-const EXPERIMENT_ORDER: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const EXPERIMENT_ORDER: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
 
 /**
  * The id used for variant-group / manifest lookup.
@@ -164,8 +169,8 @@ function catalogSaveId(save: { id: number; sourceSaveId?: number }) {
   return save.sourceSaveId ?? save.id;
 }
 
-function e4DockExperiment(activeExperiment: ExperimentId): 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten' {
-  if (activeExperiment === 'five' || activeExperiment === 'six' || activeExperiment === 'seven' || activeExperiment === 'eight' || activeExperiment === 'nine' || activeExperiment === 'ten') {
+function e4DockExperiment(activeExperiment: ExperimentId): 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten' | 'eleven' {
+  if (activeExperiment === 'five' || activeExperiment === 'six' || activeExperiment === 'seven' || activeExperiment === 'eight' || activeExperiment === 'nine' || activeExperiment === 'ten' || activeExperiment === 'eleven') {
     return activeExperiment;
   }
   return 'four';
@@ -253,6 +258,7 @@ function experimentPaneLabel(experiment: ExperimentId): string {
   if (experiment === 'eight') return 'search pill 2';
   if (experiment === 'nine') return 'center large pane';
   if (experiment === 'ten') return 'center overlap pane';
+  if (experiment === 'eleven') return 'right overlap pane';
   return experimentTitle(experiment);
 }
 
@@ -424,6 +430,8 @@ function getScopedSavesForExperiment(
     return allSaves.filter(
       (s) => s.scope === 'four' || s.scope === 'nine' || s.scope === 'ten' || s.scope === 'general' || s.cornersOnly,
     );
+  if (experiment === 'eleven')
+    return allSaves.filter((s) => s.scope === 'eleven' || s.scope === 'general' || s.cornersOnly);
   return allSaves.filter((s) => s.scope === experiment || s.cornersOnly);
 }
 
@@ -438,6 +446,7 @@ type ExperimentSetOneContextValue = {
   e8: E4MaterialSettings;
   e9: E4MaterialSettings;
   e10: E4MaterialSettings;
+  e11: E4MaterialSettings;
   e6LayerC: E6LayerCLayoutSettings;
   setE1: <K extends keyof E1MaterialSettings>(id: K, value: E1MaterialSettings[K]) => void;
   setE2: <K extends keyof E2MaterialSettings>(id: K, value: E2MaterialSettings[K]) => void;
@@ -449,6 +458,7 @@ type ExperimentSetOneContextValue = {
   setE8: <K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => void;
   setE9: <K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => void;
   setE10: <K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => void;
+  setE11: <K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => void;
   setE6LayerC: <K extends keyof E6LayerCLayoutSettings>(id: K, value: E6LayerCLayoutSettings[K]) => void;
   resetAll: () => void;
   saves: ExperimentSetOneSnapshot[];
@@ -601,6 +611,18 @@ function resolveInitialE10(boot: ExperimentSetOneSession): E4MaterialSettings {
   return applyExperimentTenPanelGeometry(boot.e9 ?? boot.e4);
 }
 
+function resolveInitialE11(boot: ExperimentSetOneSession): E4MaterialSettings {
+  const selectedSaveId = boot.selectedSaveIdByExperiment?.eleven;
+  if (selectedSaveId != null) {
+    const snapshot = loadExperimentSetOneSaves().find((save) => save.id === selectedSaveId);
+    if (snapshot?.e4) {
+      return normalizeExperimentElevenPanelGeometry(snapshot.e4 as E4MaterialSettings);
+    }
+  }
+  if (boot.e11) return normalizeExperimentElevenPanelGeometry(boot.e11);
+  return applyExperimentElevenPanelGeometry(boot.e10 ?? boot.e9 ?? boot.e4);
+}
+
 function resolveInitialE5(boot: ExperimentSetOneSession): E4MaterialSettings {
   const active = boot.activeExperiment ?? 'four';
   if (active === 'six') return resolveInitialE6(boot);
@@ -619,6 +641,7 @@ function resolveInitialE5(boot: ExperimentSetOneSession): E4MaterialSettings {
 function bootRenderVariant(boot: ExperimentSetOneSession): RenderVariantSlug | null {
   if (boot.activeRenderVariant) return boot.activeRenderVariant;
   const saveId =
+    boot.selectedSaveIdByExperiment?.eleven ??
     boot.selectedSaveIdByExperiment?.ten ??
     boot.selectedSaveIdByExperiment?.nine ??
     boot.selectedSaveIdByExperiment?.eight ??
@@ -659,6 +682,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   const [e8, setE8State] = useState<E4MaterialSettings>(() => resolveInitialE8(boot));
   const [e9, setE9State] = useState<E4MaterialSettings>(() => resolveInitialE9(boot));
   const [e10, setE10State] = useState<E4MaterialSettings>(() => resolveInitialE10(boot));
+  const [e11, setE11State] = useState<E4MaterialSettings>(() => resolveInitialE11(boot));
   const [e6LayerC, setE6LayerCState] = useState<E6LayerCLayoutSettings>(() =>
     resolveInitialE6LayerC(boot, resolveInitialE6(boot)),
   );
@@ -688,6 +712,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     eight: boot.selectedSaveIdByExperiment?.eight ?? null,
     nine: boot.selectedSaveIdByExperiment?.nine ?? null,
     ten: boot.selectedSaveIdByExperiment?.ten ?? null,
+    eleven: boot.selectedSaveIdByExperiment?.eleven ?? null,
   });
   const [selectedPanelSetSaveId, setSelectedPanelSetSaveId] = useState<number | null>(null);
   const [selectedExperimentIds, setSelectedExperimentIds] = useState<ExperimentId[]>(() =>
@@ -774,7 +799,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (activeExperiment !== 'four' && activeExperiment !== 'five' && activeExperiment !== 'six' && activeExperiment !== 'seven' && activeExperiment !== 'eight' && activeExperiment !== 'nine' && activeExperiment !== 'ten') return;
+    if (activeExperiment !== 'four' && activeExperiment !== 'five' && activeExperiment !== 'six' && activeExperiment !== 'seven' && activeExperiment !== 'eight' && activeExperiment !== 'nine' && activeExperiment !== 'ten' && activeExperiment !== 'eleven') return;
     if (prevActiveExperimentRef.current === activeExperiment) return;
     prevActiveExperimentRef.current = activeExperiment;
     setE4State((prev) => applyShowcasePanelGeometry(prev));
@@ -838,6 +863,13 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         return next;
       });
     }
+    if (activeExperiment === 'eleven') {
+      setE11State((prev) => {
+        const next = applyExperimentElevenPanelGeometry(prev);
+        setE5State(next);
+        return next;
+      });
+    }
   }, [activeExperiment, saves, selectedSaveIdByExperiment]);
 
   useEffect(() => {
@@ -865,6 +897,10 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   }, [activeExperiment, e10]);
 
   useEffect(() => {
+    if (activeExperiment === 'eleven') setE5State(e11);
+  }, [activeExperiment, e11]);
+
+  useEffect(() => {
     setE6LayerCState((prev) => clampE6LayerCLayout(prev, e6));
   }, [e6.layerBWidth, e6.layerBHeight]);
 
@@ -887,9 +923,11 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
                     ? e4CssVars(e9)
                     : activeExperiment === 'ten'
                       ? e4CssVars(e10)
+                      : activeExperiment === 'eleven'
+                        ? e4CssVars(e11)
                       : e4CssVars(e4)),
       }) as CSSProperties,
-    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, activeExperiment, e4CssVars],
+    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, activeExperiment, e4CssVars],
   );
 
   const activeE4Materials = useMemo(() => {
@@ -899,8 +937,9 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     if (activeExperiment === 'eight') return e8;
     if (activeExperiment === 'nine') return e9;
     if (activeExperiment === 'ten') return e10;
+    if (activeExperiment === 'eleven') return e11;
     return e4;
-  }, [activeExperiment, e4, e5, e6, e7, e8, e9, e10]);
+  }, [activeExperiment, e4, e5, e6, e7, e8, e9, e10, e11]);
 
   // Semantic bezel style for the active center-overlap (E10) save, so the
   // main stage keys appearance CSS on the style, not on the save's literal id.
@@ -909,6 +948,12 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     if (tenId == null) return null;
     return saves.find((save) => save.id === tenId)?.bezelStyle ?? null;
   }, [saves, selectedSaveIdByExperiment.ten]);
+
+  const activeElevenBezelStyle = useMemo(() => {
+    const elevenId = selectedSaveIdByExperiment.eleven;
+    if (elevenId == null) return null;
+    return saves.find((save) => save.id === elevenId)?.bezelStyle ?? null;
+  }, [saves, selectedSaveIdByExperiment.eleven]);
 
   const setE1 = useCallback(<K extends keyof E1MaterialSettings>(id: K, value: E1MaterialSettings[K]) => {
     setE1State((prev) => ({ ...prev, [id]: value }));
@@ -970,6 +1015,14 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     });
   }, [activeExperiment]);
 
+  const setE11 = useCallback(<K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => {
+    setE11State((prev) => {
+      const next = applyExperimentElevenPanelGeometry(patchE4LayoutField(prev, id, value));
+      if (activeExperiment === 'eleven') setE5State(next);
+      return next;
+    });
+  }, [activeExperiment]);
+
   const setE6LayerC = useCallback(
     <K extends keyof E6LayerCLayoutSettings>(id: K, value: E6LayerCLayoutSettings[K]) => {
       setE6LayerCState((prev) => clampE6LayerCLayout({ ...prev, [id]: value }, e6));
@@ -990,6 +1043,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     setE8State(applyExperimentEightPanelGeometry(applyE7OverridesStatic(E4_MASTER_DEFAULT)));
     setE9State(applyExperimentNinePanelGeometry(E4_MASTER_DEFAULT));
     setE10State(applyExperimentTenPanelGeometry(E4_MASTER_DEFAULT));
+    setE11State(applyExperimentElevenPanelGeometry(E4_MASTER_DEFAULT));
     setLayerAVisible(true);
     setLayerBVisible(true);
     setLayerCVisible(true);
@@ -1012,6 +1066,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     const currentE8 = e8;
     const currentE9 = e9;
     const currentE10 = e10;
+    const currentE11 = e11;
     const layoutSnapshot = layout ?? latestLayoutSnapshotRef.current;
     const snapshot = addExperimentSetOneSave(
       e1,
@@ -1027,9 +1082,11 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
               ? currentE8
               : activeExperiment === 'nine'
                 ? currentE9
-              : activeExperiment === 'ten'
-                ? currentE10
-                : e4,
+                : activeExperiment === 'ten'
+                  ? currentE10
+                  : activeExperiment === 'eleven'
+                    ? currentE11
+                  : e4,
       scope,
       layoutSnapshot,
     );
@@ -1049,12 +1106,14 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
               ? currentE8
               : activeExperiment === 'nine'
                 ? currentE9
-            : activeExperiment === 'ten'
-              ? currentE10
-              : e4,
+                : activeExperiment === 'ten'
+                  ? currentE10
+                  : activeExperiment === 'eleven'
+                    ? e11
+                    : e4,
       layoutSnapshot,
     );
-  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, selection, activeExperiment]);
+  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, selection, activeExperiment]);
 
   const borderRefineVersion = variantModule?.E5_BORDER_REFINEMENTS_VERSION ?? E5_BORDER_REFINEMENTS_VERSION;
   const borderRefine = variantModule?.refineExperimentFivePanels ?? refineExperimentFivePanels;
@@ -1119,6 +1178,9 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         else if (activeExperiment === 'ten') {
           setE10State((prev) => applyExperimentTenPanelGeometry(applyReferenceCornerLighting(prev)));
         }
+        else if (activeExperiment === 'eleven') {
+          setE11State((prev) => applyExperimentElevenPanelGeometry(applyReferenceCornerLighting(prev)));
+        }
         else setE4State((prev) => applyReferenceCornerLighting(prev));
         return;
       }
@@ -1158,6 +1220,8 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
             setE9State(applyExperimentNinePanelGeometry(material));
           } else if (activeExperiment === 'ten') {
             setE10State(applyExperimentTenPanelGeometry(material));
+          } else if (activeExperiment === 'eleven') {
+            setE11State(applyExperimentElevenPanelGeometry(material));
           } else {
             setE4State(applyShowcasePanelGeometry(material));
           }
@@ -1189,6 +1253,10 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
             setE8State(applyExperimentEightPanelGeometry(normalized));
           } else if (activeExperiment === 'nine') {
             setE9State(applyExperimentNinePanelGeometry(normalized));
+          } else if (activeExperiment === 'ten') {
+            setE10State(normalizeExperimentTenPanelGeometry(normalized));
+          } else if (activeExperiment === 'eleven') {
+            setE11State(normalizeExperimentElevenPanelGeometry(normalized));
           } else {
             setE4State(normalized);
           }
@@ -1229,6 +1297,12 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         }
         return;
       }
+      if (snapshot.scope === 'eleven') {
+        if (snapshot.e4) {
+          setE11State(normalizeExperimentElevenPanelGeometry(normalize(snapshot.e4)));
+        }
+        return;
+      }
       if (snapshot.scope === 'seven') {
         if (snapshot.e4) {
           setLayerCVisible(false);
@@ -1259,6 +1333,8 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
           setE9State(applyExperimentNinePanelGeometry(normalized));
         } else if (activeExperiment === 'ten') {
           setE10State(applyExperimentTenPanelGeometry(normalized));
+        } else if (activeExperiment === 'eleven') {
+          setE11State(applyExperimentElevenPanelGeometry(normalized));
         }
       }
     },
@@ -1425,6 +1501,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       e8,
       e9,
       e10,
+      e11,
       e6LayerC,
       hidePanelText,
       layerAVisible,
@@ -1444,7 +1521,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       e5BorderRefinementsVersion,
       activeRenderVariant,
     });
-  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e6LayerC, hidePanelText, layerAVisible, layerBVisible, layerCVisible, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, e5BorderRefinementsVersion, activeRenderVariant]);
+  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, hidePanelText, layerAVisible, layerBVisible, layerCVisible, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, e5BorderRefinementsVersion, activeRenderVariant]);
 
   useEffect(() => {
     const page = pageRef.current;
@@ -1548,6 +1625,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       e8,
       e9,
       e10,
+      e11,
       e6LayerC,
       setE1,
       setE2,
@@ -1559,6 +1637,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       setE8,
       setE9,
       setE10,
+      setE11,
       setE6LayerC,
       resetAll,
       saves,
@@ -1600,7 +1679,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       referenceWallpaper,
       toggleReferenceWallpaper,
     }),
-    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e6LayerC, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE6LayerC, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, setSelectedSavePosition, replaceSaveMultiSelection, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper],
+    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE11, setE6LayerC, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, setSelectedSavePosition, replaceSaveMultiSelection, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper],
   );
 
   return (
@@ -1625,6 +1704,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         data-e8-visible={experimentVisible.eight}
         data-e9-visible={experimentVisible.nine}
         data-e10-visible={experimentVisible.ten}
+        data-e11-visible={experimentVisible.eleven}
         data-e1-inspect-mode={inspectMode}
         data-e2-inspect-mode={inspectMode}
         data-e3-inspect-mode={inspectMode}
@@ -1634,6 +1714,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         data-e8-inspect-mode={inspectMode}
         data-e9-inspect-mode={inspectMode}
         data-e10-inspect-mode={inspectMode}
+        data-e11-inspect-mode={inspectMode}
         data-showcase-align={
           activeExperiment === 'four' ||
           activeExperiment === 'five' ||
@@ -1641,7 +1722,8 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
           activeExperiment === 'seven' ||
           activeExperiment === 'eight' ||
           activeExperiment === 'nine' ||
-          activeExperiment === 'ten'
+          activeExperiment === 'ten' ||
+          activeExperiment === 'eleven'
         }
         data-hide-panel-text={hidePanelText ? 'true' : 'false'}
         data-layer-a-visible={layerAVisible ? 'true' : 'false'}
@@ -1653,8 +1735,10 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         data-selected-save-eight={selectedSaveIdByExperiment.eight ?? ''}
         data-selected-save-nine={selectedSaveIdByExperiment.nine ?? ''}
         data-selected-save-ten={selectedSaveIdByExperiment.ten ?? ''}
+        data-selected-save-eleven={selectedSaveIdByExperiment.eleven ?? ''}
         data-selected-panel-set-save-id={selectedPanelSetSaveId ?? ''}
         data-e10-bezel-style={activeTenBezelStyle ?? undefined}
+        data-e11-bezel-style={activeElevenBezelStyle ?? undefined}
       >
         {children}
       </div>
@@ -1685,7 +1769,8 @@ function e4Highlighted(selection: ExperimentSelection | null) {
       selection.experiment !== 'six' &&
       selection.experiment !== 'seven' &&
       selection.experiment !== 'nine' &&
-      selection.experiment !== 'ten')
+      selection.experiment !== 'ten' &&
+      selection.experiment !== 'eleven')
   ) {
     return null;
   }
@@ -1725,6 +1810,7 @@ function experimentTitle(experiment: ExperimentSelection['experiment'] | Experim
   if (experiment === 'seven') return 'Experiment Seven';
   if (experiment === 'eight') return 'Experiment Eight';
   if (experiment === 'ten') return 'Experiment Ten';
+  if (experiment === 'eleven') return 'Experiment Eleven';
   return 'Experiment Nine';
 }
 
@@ -1749,7 +1835,7 @@ function sectionsForFields<T extends { section: string }>(
 
 function fieldResetTargets<T extends string | number | boolean>(
   masterValue: T,
-  experiment: 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten',
+  experiment: 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten' | 'eleven',
   fieldId: string,
   saves: ExperimentSetOneSnapshot[],
 ) {
@@ -1774,6 +1860,7 @@ export function ExperimentSetOneSettingsDock() {
     e8,
     e9,
     e10,
+    e11,
     e6LayerC,
     setE1,
     setE2,
@@ -1785,6 +1872,7 @@ export function ExperimentSetOneSettingsDock() {
     setE8,
     setE9,
     setE10,
+    setE11,
     setE6LayerC,
     resetAll,
     saves,
@@ -1863,6 +1951,12 @@ export function ExperimentSetOneSettingsDock() {
     if (saveScope === 'ten') {
       return sortSavesByVisualOrder(
         saves.filter((s) => s.scope === 'four' || s.scope === 'nine' || s.scope === 'ten' || s.scope === 'general' || s.cornersOnly),
+        saveVisualOrder,
+      );
+    }
+    if (saveScope === 'eleven') {
+      return sortSavesByVisualOrder(
+        saves.filter((s) => s.scope === 'eleven' || s.scope === 'general' || s.cornersOnly),
         saveVisualOrder,
       );
     }
@@ -2170,7 +2264,7 @@ export function ExperimentSetOneSettingsDock() {
                 ? visibleE6Fields.length
                   : selection?.experiment === 'seven'
                     ? visibleE7Fields.length
-                    : selection?.experiment === 'nine' || selection?.experiment === 'ten'
+                    : selection?.experiment === 'nine' || selection?.experiment === 'ten' || selection?.experiment === 'eleven'
                     ? visibleE4Fields.length
                     : 0;
   const dockTitle = selection ? experimentTitle(selection.experiment) : 'Experiment Set 1';
@@ -2223,7 +2317,8 @@ export function ExperimentSetOneSettingsDock() {
     dockExperiment === 'seven' ||
     dockExperiment === 'eight' ||
     dockExperiment === 'nine' ||
-    dockExperiment === 'ten';
+    dockExperiment === 'ten' ||
+    dockExperiment === 'eleven';
 
   return (
     <ExperimentOneDraggableShell
@@ -2273,6 +2368,7 @@ export function ExperimentSetOneSettingsDock() {
                   ['eight', 'search pill 2'],
                   ['nine', 'center large pane'],
                   ['ten', 'center overlap pane'],
+                  ['eleven', 'right overlap pane'],
                 ] as const
               ).map(([id, label]) => {
                 const hasSelectedSaves = (selectedSaveKeysByExperiment[id]?.length ?? 0) > 0;
@@ -3254,6 +3350,29 @@ export function ExperimentSetOneSettingsDock() {
                 resetTargets={fieldResetTargets}
                 scopedSaves={scopedSaves}
                 saveExperiment="ten"
+                isOpen={isOpen}
+                onToggle={toggle}
+              />
+            )}
+            {dockExperiment === 'eleven' && (
+              <ExperimentMultiLayerSettings
+                experimentKey="e11"
+                title="Experiment Eleven"
+                description="Duplicate of Experiment Ten with the right overlap pane and its own working state and saves."
+                filtering={filtering}
+                fields={visibleE4Fields}
+                sectionOrder={E4_SECTION_ORDER}
+                settings={e11}
+                masterDefault={E4_MASTER_DEFAULT}
+                layerEditMode={dockLayerEditMode}
+                onChange={(id, value) => setE11(id as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings])}
+                onPairedChange={(suffix, value) => {
+                  setE11(`layerA${suffix}` as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings]);
+                  setE11(`layerB${suffix}` as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings]);
+                }}
+                resetTargets={fieldResetTargets}
+                scopedSaves={scopedSaves}
+                saveExperiment="eleven"
                 isOpen={isOpen}
                 onToggle={toggle}
               />
