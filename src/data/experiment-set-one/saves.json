@@ -9075,7 +9075,8 @@
       "layerBNestedInA": true,
       "layerBRimEdgeHeightPx": 0
     },
-    "scope": "five"
+    "scope": "five",
+    "branchVariant": "opus-4.8-max"
   },
   {
     "id": 32,
@@ -9409,7 +9410,8 @@
       "layerBNestedInA": true,
       "layerBRimEdgeHeightPx": 0
     },
-    "scope": "five"
+    "scope": "five",
+    "branchVariant": "opus-4.8-max"
   },
   {
     "id": 33,
@@ -12470,7 +12472,8 @@
       "layerBGlow": 18,
       "layerBRefraction": 14
     },
-    "scope": "four"
+    "scope": "four",
+    "branchVariant": "chatgpt-5.5"
   },
   {
     "id": 45,
@@ -12818,7 +12821,8 @@
       "layerBFrostSurfaceSoftness": 76,
       "layerBRimEdgeHeightPx": 0
     },
-    "scope": "five"
+    "scope": "five",
+    "branchVariant": "chatgpt-5.5"
   },
   {
     "id": 46,
@@ -15198,7 +15202,8 @@
       "layerBGlow": 24,
       "layerBRefraction": 22
     },
-    "scope": "four"
+    "scope": "four",
+    "branchVariant": "mix-opus-composer"
   },
   {
     "id": 56,
@@ -16289,7 +16294,8 @@
       "layerBGlow": 28,
       "layerBRefraction": 25
     },
-    "scope": "four"
+    "scope": "four",
+    "branchVariant": "opus-4.8-max-two"
   },
   {
     "id": 74,
@@ -16623,7 +16629,8 @@
       "layerBBorderRightOpacity": 30,
       "layerBRimEdgeHeightPx": 0
     },
-    "scope": "five"
+    "scope": "five",
+    "branchVariant": "composer-2-max"
   },
   {
     "id": 76,
@@ -16971,7 +16978,8 @@
       "layerBFrostSurfaceSoftness": 74,
       "layerBRimEdgeHeightPx": 0
     },
-    "scope": "five"
+    "scope": "five",
+    "branchVariant": "composer-2-max"
   },
   {
     "id": 132,
@@ -20635,7 +20643,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "six",
-    "sourceSaveId": 31
+    "sourceSaveId": 31,
+    "branchVariant": "opus-4.8-max"
   },
   {
     "id": 142,
@@ -20970,7 +20979,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "seven",
-    "sourceSaveId": 31
+    "sourceSaveId": 31,
+    "branchVariant": "opus-4.8-max"
   },
   {
     "id": 143,
@@ -21305,7 +21315,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "six",
-    "sourceSaveId": 32
+    "sourceSaveId": 32,
+    "branchVariant": "opus-4.8-max"
   },
   {
     "id": 144,
@@ -21640,7 +21651,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "seven",
-    "sourceSaveId": 32
+    "sourceSaveId": 32,
+    "branchVariant": "opus-4.8-max"
   },
   {
     "id": 145,
@@ -21991,7 +22003,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "six",
-    "sourceSaveId": 44
+    "sourceSaveId": 44,
+    "branchVariant": "chatgpt-5.5"
   },
   {
     "id": 146,
@@ -22342,7 +22355,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "seven",
-    "sourceSaveId": 44
+    "sourceSaveId": 44,
+    "branchVariant": "chatgpt-5.5"
   },
   {
     "id": 147,
@@ -22691,7 +22705,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "six",
-    "sourceSaveId": 45
+    "sourceSaveId": 45,
+    "branchVariant": "chatgpt-5.5"
   },
   {
     "id": 148,
@@ -23040,7 +23055,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "seven",
-    "sourceSaveId": 45
+    "sourceSaveId": 45,
+    "branchVariant": "chatgpt-5.5"
   },
   {
     "id": 149,
@@ -24133,7 +24149,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "six",
-    "sourceSaveId": 55
+    "sourceSaveId": 55,
+    "branchVariant": "mix-opus-composer"
   },
   {
     "id": 152,
@@ -24484,7 +24501,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "seven",
-    "sourceSaveId": 55
+    "sourceSaveId": 55,
+    "branchVariant": "mix-opus-composer"
   },
   {
     "id": 153,
@@ -24855,7 +24873,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "six",
-    "sourceSaveId": 66
+    "sourceSaveId": 66,
+    "branchVariant": "opus-4.8-max-two"
   },
   {
     "id": 154,
@@ -25226,7 +25245,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "seven",
-    "sourceSaveId": 66
+    "sourceSaveId": 66,
+    "branchVariant": "opus-4.8-max-two"
   },
   {
     "id": 155,
@@ -25561,7 +25581,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "six",
-    "sourceSaveId": 74
+    "sourceSaveId": 74,
+    "branchVariant": "composer-2-max"
   },
   {
     "id": 156,
@@ -25896,7 +25917,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "seven",
-    "sourceSaveId": 74
+    "sourceSaveId": 74,
+    "branchVariant": "composer-2-max"
   },
   {
     "id": 157,
@@ -26245,7 +26267,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "six",
-    "sourceSaveId": 76
+    "sourceSaveId": 76,
+    "branchVariant": "composer-2-max"
   },
   {
     "id": 158,
@@ -26594,7 +26617,8 @@
       "layerBRimEdgeHeightPx": 0
     },
     "scope": "seven",
-    "sourceSaveId": 76
+    "sourceSaveId": 76,
+    "branchVariant": "composer-2-max"
   },
   {
     "id": 159,
@@ -47697,7 +47721,6 @@
     },
     "scope": "ten",
     "branchVariant": "chatgpt-5.5-three",
-    "sourceSaveId": 221,
     "selectedExperimentIds": [
       "ten"
     ],
@@ -48514,7 +48537,6 @@
     },
     "scope": "ten",
     "branchVariant": "chatgpt-5.5-three",
-    "sourceSaveId": 223,
     "activeExperiment": "ten",
     "selectedExperimentIds": [
       "ten"
@@ -49745,7 +49767,7 @@
       "ten"
     ],
     "branchVariant": "chatgpt-5.5-three",
-    "sourceSaveId": 226
+    "bezelStyle": "frosted-blue-matte"
   },
   {
     "id": 227,
@@ -50924,7 +50946,7 @@
     "selectedSaveVisualOrder": null,
     "selectedSavePositions": null,
     "branchVariant": "chatgpt-5.5-three",
-    "sourceSaveId": 229
+    "bezelStyle": "frosted-blue-matte"
   },
   {
     "id": 230,
@@ -52342,8 +52364,7 @@
       "ten"
     ],
     "activeExperiment": "ten",
-    "sourceCenterPaneFrom": 221,
-    "sourceSaveId": 233
+    "sourceCenterPaneFrom": 221
   },
   {
     "id": 234,
@@ -52699,8 +52720,7 @@
     "selectedExperimentIds": [
       "ten"
     ],
-    "sourceCenterPaneFrom": 222,
-    "sourceSaveId": 234
+    "sourceCenterPaneFrom": 222
   },
   {
     "id": 235,
@@ -53058,8 +53078,7 @@
     "selectedExperimentIds": [
       "ten"
     ],
-    "sourceCenterPaneFrom": 223,
-    "sourceSaveId": 235
+    "sourceCenterPaneFrom": 223
   },
   {
     "id": 236,
@@ -53417,6 +53436,7 @@
       "ten"
     ],
     "branchVariant": "center-overlap-pane",
-    "sourceCenterPaneFrom": 226
+    "sourceCenterPaneFrom": 226,
+    "bezelStyle": "frosted-blue-matte"
   }
 ]

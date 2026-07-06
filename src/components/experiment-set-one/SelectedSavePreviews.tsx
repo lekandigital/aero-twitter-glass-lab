@@ -45,6 +45,8 @@ type SavePreview = {
   branchSlug: RenderVariantSlug | null;
   branchLabel: string | null;
   material: E4MaterialSettings;
+  /** Semantic appearance opt-in, driven by the save's own field — not its id. */
+  bezelStyle: string | null;
 };
 
 const PREVIEW_EXPERIMENTS: PreviewExperiment[] = ['four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
@@ -330,6 +332,7 @@ function SelectedSaveStagePanel({
       data-selected-save-id={preview.id}
       data-selected-save-experiment={preview.experiment}
       data-selected-save-branch={preview.branchSlug ?? 'base'}
+      data-bezel-style={preview.bezelStyle ?? undefined}
     >
       <div
         className="experiment-set-one-selected-save-stage__layer-a"
@@ -383,6 +386,7 @@ export function SelectedSaveStagePanels() {
           branchSlug: parsed.branchSlug,
           branchLabel,
           material,
+          bezelStyle: snapshot.bezelStyle ?? null,
         }];
       }),
     ).sort(
