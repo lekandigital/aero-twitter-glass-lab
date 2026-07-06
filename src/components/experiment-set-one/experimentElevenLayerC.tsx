@@ -1,0 +1,144 @@
+import { useLayoutEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useExperimentSetOne } from './combinedSettings';
+import { useRenderVariant } from '../../render-variants/RenderVariantContext';
+import { EXPERIMENT_SET_ONE_POSITION_KEYS } from './dragPositions';
+import { ExperimentSetTwoDraggableShell } from '../experiment-set-two/primitives';
+import { e4InspectAttrs, e4LayerBDimensionStyle, type E4MaterialSettings } from '../experiment-set-four/materialSettings';
+import { GlassFrostSurface } from '../shared/GlassFrostSurface';
+import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/PwzzovOGlassCorners';
+
+function layerBackdropLights(prefix: 'layerA' | 'layerB', settings: E4MaterialSettings) {
+  return {
+    tlLight: settings[`${prefix}GlassReflexTlLight`],
+    trLight: settings[`${prefix}GlassReflexTrLight`],
+    blLight: settings[`${prefix}GlassReflexBlLight`],
+    brLight: settings[`${prefix}GlassReflexBrLight`],
+    topLight: settings[`${prefix}GlassReflexTopLight`],
+    bottomLight: settings[`${prefix}GlassReflexBottomLight`],
+    leftLight: settings[`${prefix}GlassReflexLeftLight`],
+    rightLight: settings[`${prefix}GlassReflexRightLight`],
+  };
+}
+
+function layerBackdropReflexEnabled(prefix: 'layerA' | 'layerB', settings: E4MaterialSettings): boolean {
+  return pwzzovBackdropReflexEnabled(settings[`${prefix}GlassReflexMode`], [
+    settings[`${prefix}GlassReflexTlLight`],
+    settings[`${prefix}GlassReflexTlDark`],
+    settings[`${prefix}GlassReflexTrLight`],
+    settings[`${prefix}GlassReflexTrDark`],
+    settings[`${prefix}GlassReflexBlLight`],
+    settings[`${prefix}GlassReflexBlDark`],
+    settings[`${prefix}GlassReflexBrLight`],
+    settings[`${prefix}GlassReflexBrDark`],
+    settings[`${prefix}GlassReflexTopLight`],
+    settings[`${prefix}GlassReflexTopDark`],
+    settings[`${prefix}GlassReflexBottomLight`],
+    settings[`${prefix}GlassReflexBottomDark`],
+    settings[`${prefix}GlassReflexLeftLight`],
+    settings[`${prefix}GlassReflexLeftDark`],
+    settings[`${prefix}GlassReflexRightLight`],
+    settings[`${prefix}GlassReflexRightDark`],
+  ]);
+}
+
+function ExperimentElevenLayerCSheet() {
+  const { e11 } = useExperimentSetOne();
+  const layerCSettings: E4MaterialSettings = useMemo(
+    () => ({
+      ...e11,
+      layerBHeight: Math.max(1, Math.round((e11.layerBHeight as number) / 5)),
+    }),
+    [e11],
+  );
+
+  return (
+    <div
+      className="experiment-four-layer-b experiment-eleven-layer-c"
+      role="region"
+      aria-label="Experiment Eleven layer C"
+      style={e4LayerBDimensionStyle(layerCSettings, false)}
+      {...e4InspectAttrs('layer-b')}
+    >
+      <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />
+      <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--bottom" aria-hidden="true" />
+      <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--left" aria-hidden="true" />
+      <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--right" aria-hidden="true" />
+      <GlassFrostSurface />
+      <span className="experiment-four-layer-b__shine" aria-hidden="true" {...e4InspectAttrs('layer-b-shine')} />
+      <span
+        className="experiment-four-layer-b__radial-corners"
+        aria-hidden="true"
+        {...e4InspectAttrs('layer-b-radial')}
+      />
+      <PwzzovOGlassCorners
+        layerClass="experiment-four-layer-b"
+        inspectTarget="layer-b-corners"
+        edgeReflexEnabled={layerBackdropReflexEnabled('layerB', layerCSettings)}
+        rimSideGapTop={layerCSettings.layerBRimSideGapTop}
+        rimSideGapBottom={layerCSettings.layerBRimSideGapBottom}
+        backdropLights={layerBackdropLights('layerB', layerCSettings)}
+      />
+      <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--a" aria-hidden="true" />
+      <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--b" aria-hidden="true" />
+    </div>
+  );
+}
+
+export function ExperimentElevenLayerCDragInBezel({
+  initialPosition,
+  layoutResetVersion = 0,
+}: {
+  initialPosition: { x: number; y: number };
+  layoutResetVersion?: number;
+}) {
+  return (
+    <div className="experiment-six-layer-c-drag-bounds experiment-set-two-drag-bounds">
+      <ExperimentSetTwoDraggableShell
+        bounds="parent"
+        initialPosition={initialPosition}
+        persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerC11}
+        layoutResetVersion={layoutResetVersion}
+        ariaLabel="Experiment Eleven — layer C"
+        className="experiment-six-layer-c-draggable"
+      >
+        <ExperimentElevenLayerCSheet />
+      </ExperimentSetTwoDraggableShell>
+    </div>
+  );
+}
+
+export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layoutResetVersion: number }) {
+  const { layerCVisible } = useExperimentSetOne();
+  const { slug } = useRenderVariant();
+  const [inset, setInset] = useState<HTMLElement | null>(null);
+
+  const initialPosition = useMemo(
+    () => ({
+      x: 0,
+      y: 0,
+    }),
+    [],
+  );
+
+  useLayoutEffect(() => {
+    if (!layerCVisible) {
+      setInset(null);
+      return;
+    }
+    const found = document.querySelector<HTMLElement>(
+      '.experiment-set-one-stage__canvas .experiment-four-layer-a__bezel-inset',
+    );
+    setInset(found);
+    return () => setInset(null);
+  }, [layoutResetVersion, slug, layerCVisible]);
+
+  if (!layerCVisible || !inset) return null;
+
+  return createPortal(
+    <div className="experiment-set-one-stage__slot experiment-set-one-stage__slot--raised">
+      <ExperimentElevenLayerCDragInBezel initialPosition={initialPosition} layoutResetVersion={layoutResetVersion} />
+    </div>,
+    inset,
+  );
+}

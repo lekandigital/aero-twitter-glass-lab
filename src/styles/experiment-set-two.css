@@ -111,10 +111,12 @@
   left: 0;
   pointer-events: none;
   transform-origin: top left;
+  z-index: 60;
 }
 
 .experiment-set-one-selected-save-stage__layer-a,
-.experiment-set-one-selected-save-stage__free-layer-b {
+.experiment-set-one-selected-save-stage__free-layer-b,
+.experiment-set-one-selected-save-stage__layer-c {
   position: absolute;
   top: 0;
   left: 0;
@@ -126,8 +128,13 @@
 }
 
 .experiment-set-one-selected-save-stage__layer-a:active,
-.experiment-set-one-selected-save-stage__free-layer-b:active {
+.experiment-set-one-selected-save-stage__free-layer-b:active,
+.experiment-set-one-selected-save-stage__layer-c:active {
   cursor: grabbing;
+}
+
+.experiment-set-one-selected-save-stage__layer-c {
+  z-index: 5;
 }
 
 .experiment-set-one-selected-save-stage .experiment-four-layer-a,

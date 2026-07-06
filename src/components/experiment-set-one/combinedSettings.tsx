@@ -41,6 +41,7 @@ import {
   E4_SECTION_ORDER,
   E4_SETTING_FIELDS,
   e4FieldsVisibleForSettings,
+  e4LayerBDimensionStyle,
   e4RadialLayoutAttr,
   e4SettingsToCssVars,
   isE4InspectTarget,
@@ -49,6 +50,8 @@ import {
   type E4InspectTarget,
   type E4MaterialSettings,
 } from '../experiment-set-four/materialSettings';
+import { GlassFrostSurface } from '../shared/GlassFrostSurface';
+import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/PwzzovOGlassCorners';
 import {
   E1_MASTER_DEFAULT,
   E2_MASTER_DEFAULT,
@@ -250,6 +253,76 @@ function formatSavePlacement(
   if (position) parts.push(`x ${Math.round(position.x)}`, `y ${Math.round(position.y)}`);
   if (zIndex != null) parts.push(`z ${zIndex}`);
   return parts.join(' · ');
+}
+
+function elevenSaveLayerCMaterial(save: ExperimentSetOneSnapshot): E4MaterialSettings | null {
+  if (!save.e4) return null;
+  const material = normalizeE4MaterialSettings(save.e4);
+  return {
+    ...material,
+    layerBHeight: Math.max(1, Math.round((material.layerBHeight as number) / 5)),
+  };
+}
+
+function ElevenSaveLayerCPreview({ save }: { save: ExperimentSetOneSnapshot }) {
+  const material = elevenSaveLayerCMaterial(save);
+  if (!material) return null;
+
+  return (
+    <div className="experiment-one-settings-dock__save-chip-preview" aria-hidden="true">
+      <div
+        className="experiment-four-layer-b experiment-eleven-layer-c experiment-one-settings-dock__save-chip-preview-surface"
+        style={{
+          ...e4LayerBDimensionStyle(material, false),
+          position: 'relative',
+          transform: 'scale(0.18)',
+          transformOrigin: 'top left',
+        }}
+      >
+        <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />
+        <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--bottom" aria-hidden="true" />
+        <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--left" aria-hidden="true" />
+        <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--right" aria-hidden="true" />
+        <GlassFrostSurface />
+        <span className="experiment-four-layer-b__shine" aria-hidden="true" />
+        <span className="experiment-four-layer-b__radial-corners" aria-hidden="true" />
+        <PwzzovOGlassCorners
+          layerClass="experiment-four-layer-b"
+          inspectTarget="layer-b-corners"
+          edgeReflexEnabled={pwzzovBackdropReflexEnabled(material.layerBGlassReflexMode, [
+            material.layerBGlassReflexTlLight,
+            material.layerBGlassReflexTlDark,
+            material.layerBGlassReflexTrLight,
+            material.layerBGlassReflexTrDark,
+            material.layerBGlassReflexBlLight,
+            material.layerBGlassReflexBlDark,
+            material.layerBGlassReflexBrLight,
+            material.layerBGlassReflexBrDark,
+            material.layerBGlassReflexTopLight,
+            material.layerBGlassReflexTopDark,
+            material.layerBGlassReflexBottomLight,
+            material.layerBGlassReflexBottomDark,
+            material.layerBGlassReflexLeftLight,
+            material.layerBGlassReflexLeftDark,
+            material.layerBGlassReflexRightLight,
+            material.layerBGlassReflexRightDark,
+          ])}
+          rimSideGapTop={material.layerBRimSideGapTop}
+          rimSideGapBottom={material.layerBRimSideGapBottom}
+          backdropLights={{
+            tlLight: material.layerBGlassReflexTlLight,
+            trLight: material.layerBGlassReflexTrLight,
+            blLight: material.layerBGlassReflexBlLight,
+            brLight: material.layerBGlassReflexBrLight,
+            topLight: material.layerBGlassReflexTopLight,
+            bottomLight: material.layerBGlassReflexBottomLight,
+            leftLight: material.layerBGlassReflexLeftLight,
+            rightLight: material.layerBGlassReflexRightLight,
+          }}
+        />
+      </div>
+    </div>
+  );
 }
 
 function experimentShortLabel(experiment: ExperimentId): string {
@@ -2142,7 +2215,9 @@ export function ExperimentSetOneSettingsDock() {
   const e6LayerCMode = layerEditMode === 'layerC' || (inspectingLayerC && layerEditMode === 'both');
   const e6LayerEditMode: LayerEditMode = e6LayerCMode ? 'layerC' : layerEditMode;
   const dockLayerEditMode: LayerEditMode =
-    layerEditMode === 'layerC' && dockExperiment !== 'six' ? 'both' : layerEditMode;
+    layerEditMode === 'layerC' && dockExperiment !== 'six' && dockExperiment !== 'eleven'
+      ? 'both'
+      : layerEditMode;
   const note = selectionNote(selection);
   const filtering = selection !== null;
   const visibleE1Fields = useMemo(
@@ -2713,6 +2788,7 @@ export function ExperimentSetOneSettingsDock() {
                                   <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
                                 )}
                               </span>
+                              {dockExperiment === 'eleven' && save.e4 && <ElevenSaveLayerCPreview save={save} />}
                               {panelSetEntries.length > 0 && (
                                 <span className="experiment-one-settings-dock__save-chip-panel-set" aria-label="Saved panel set">
                                   <span className="experiment-one-settings-dock__save-chip-panel-set-title">
@@ -2819,6 +2895,7 @@ export function ExperimentSetOneSettingsDock() {
                                   <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
                                 )}
                               </span>
+                              {dockExperiment === 'eleven' && save.e4 && <ElevenSaveLayerCPreview save={save} />}
                               {canReorderSave && (
                                 <span className="experiment-one-settings-dock__save-context-actions" onClick={(e) => e.stopPropagation()}>
                                   <button
@@ -2908,6 +2985,7 @@ export function ExperimentSetOneSettingsDock() {
                                   <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
                                 )}
                               </span>
+                              {dockExperiment === 'eleven' && save.e4 && <ElevenSaveLayerCPreview save={save} />}
                               {canReorderSave && (
                                 <span className="experiment-one-settings-dock__save-context-actions" onClick={(e) => e.stopPropagation()}>
                                   <button
@@ -2996,6 +3074,7 @@ export function ExperimentSetOneSettingsDock() {
                             <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
                           )}
                         </span>
+                        {dockExperiment === 'eleven' && save.e4 && <ElevenSaveLayerCPreview save={save} />}
                         {canReorderSave && (
                           <span className="experiment-one-settings-dock__save-context-actions" onClick={(e) => e.stopPropagation()}>
                             <button
@@ -3035,7 +3114,7 @@ export function ExperimentSetOneSettingsDock() {
                       value={layerEditMode}
                       onChange={handleLayerEditModeChange}
                       layout="side"
-                    showLayerC={dockExperiment === 'six' || dockExperiment === 'eight'}
+                      showLayerC={dockExperiment === 'six' || dockExperiment === 'eight' || dockExperiment === 'eleven'}
                     />
                     <span className="experiment-one-settings-dock__layer-rail-label">Show</span>
                     <LayerVisibilityToggles
@@ -3045,7 +3124,7 @@ export function ExperimentSetOneSettingsDock() {
                       onToggleLayerA={toggleLayerAVisible}
                       onToggleLayerB={toggleLayerBVisible}
                       onToggleLayerC={toggleLayerCVisible}
-                      showLayerC={dockExperiment === 'six' || dockExperiment === 'eight'}
+                      showLayerC={dockExperiment === 'six' || dockExperiment === 'eight' || dockExperiment === 'eleven'}
                     />
                   </aside>
                 )}
