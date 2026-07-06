@@ -151,7 +151,14 @@ function normalizeSelectedSaveKeysByExperiment(
 function normalizeSaveVisualOrder(raw: unknown): number[] {
   if (!Array.isArray(raw)) return [];
   const ids = raw.filter((id): id is number => typeof id === 'number' && Number.isFinite(id));
-  return Array.from(new Set(ids));
+  const ordered = Array.from(new Set(ids));
+  const index221 = ordered.indexOf(221);
+  const index222 = ordered.indexOf(222);
+  if (index221 !== -1 && index222 !== -1 && index222 < index221) {
+    ordered.splice(index221, 1);
+    ordered.splice(ordered.indexOf(222) + 1, 0, 221);
+  }
+  return ordered;
 }
 
 function selectedSaveInstanceKeys(keysByExperiment: Partial<Record<ExperimentId, string[]>>): string[] {
