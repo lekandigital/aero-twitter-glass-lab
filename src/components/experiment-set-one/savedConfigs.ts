@@ -41,6 +41,8 @@ export type ExperimentSetOneSnapshot = {
   e2: E2MaterialSettings;
   e3: E3MaterialSettings;
   e4?: Partial<E4MaterialSettings>;
+  /** Optional E11-only material override for the horizontal right-overlap Layer C strip. */
+  e11LayerC?: Partial<E4MaterialSettings>;
   /** Which experiment this save is meant for (used to filter saves list + load behavior). */
   scope?: SaveScope;
   /** When true, loading only merges Experiment Four corner lighting fields. */

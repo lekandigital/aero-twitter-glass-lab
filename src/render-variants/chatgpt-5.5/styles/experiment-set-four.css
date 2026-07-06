@@ -1295,6 +1295,127 @@
     );
 }
 
+.experiment-eleven-layer-c {
+  background:
+    radial-gradient(
+      ellipse 38px 20px at 89% 9%,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.34) 38%,
+      transparent 72%
+    ),
+    linear-gradient(0deg, rgba(145, 184, 220, 0.22), rgba(145, 184, 220, 0.22)),
+    radial-gradient(
+      ellipse 150px 88px at 78% 62%,
+      rgba(52, 197, 245, calc(0.36 + var(--e4-layerB-transparency) * 0.08)) 0%,
+      rgba(116, 220, 255, calc(0.18 + var(--e4-layerB-transparency) * 0.06)) 48%,
+      transparent 80%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, calc(0.12 + var(--e4-layerB-fill-top) * var(--e4-layerB-transparency) * 0.14)) 0%,
+      rgba(221, 247, 255, calc(0.09 + var(--e4-layerB-fill-mid) * var(--e4-layerB-transparency) * 0.1)) 35%,
+      rgba(88, 199, 247, calc(0.16 + var(--e4-layerB-fill-bottom) * var(--e4-layerB-transparency) * 0.12)) 100%
+    ),
+    rgba(118, 214, 252, calc(0.16 + var(--e4-layerB-body-tint) * var(--e4-layerB-transparency) * 0.18));
+  backdrop-filter: blur(calc(var(--e4-layerB-frost) * 0.58)) saturate(150%) brightness(108%);
+  -webkit-backdrop-filter: blur(calc(var(--e4-layerB-frost) * 0.58)) saturate(150%) brightness(108%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.56),
+    inset 1px 0 2px rgba(255, 255, 255, calc(0.3 * var(--e4-layerB-rim-strength))),
+    inset 0 -12px 24px rgba(38, 145, 220, calc(0.11 + var(--e4-layerB-inner-depth) * 0.16)),
+    0 9px 22px rgba(0, 55, 125, calc(0.08 + var(--e4-layerB-outer-shadow) * var(--e4-layerB-depth-strength) * 0.2));
+}
+
+.experiment-eleven-layer-c::before,
+.experiment-eleven-layer-c::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.experiment-eleven-layer-c::before {
+  top: 14px;
+  bottom: 10px;
+  left: 9px;
+  width: min(105px, calc(100% - 22px));
+  max-width: calc(100% - 22px);
+  z-index: 8;
+  border-radius: max(11px, calc(var(--e4-layerB-radius) - 5px));
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  background:
+    linear-gradient(0deg, rgba(145, 184, 220, 0.16), rgba(145, 184, 220, 0.16)),
+    radial-gradient(
+      ellipse 106% 96% at 72% 56%,
+      rgba(58, 195, 246, 0.22) 0%,
+      rgba(161, 231, 255, 0.14) 60%,
+      transparent 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(225, 248, 255, 0.18) 48%,
+      rgba(140, 220, 252, 0.14) 100%
+    ),
+    rgba(205, 242, 255, 0.14);
+  backdrop-filter: blur(calc(var(--e4-layerB-frost) * 0.72)) saturate(var(--e4-layerB-saturate)) brightness(var(--e4-layerB-brightness));
+  -webkit-backdrop-filter: blur(calc(var(--e4-layerB-frost) * 0.72)) saturate(var(--e4-layerB-saturate)) brightness(var(--e4-layerB-brightness));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    inset 1px 0 0 rgba(255, 255, 255, 0.42),
+    inset 0 0 0 1px rgba(130, 205, 235, 0.14),
+    inset 0 -8px 18px rgba(35, 130, 205, 0.14),
+    0 1px 8px rgba(0, 54, 118, 0.18),
+    0 0 0 1px rgba(75, 160, 214, 0.1);
+}
+
+.experiment-eleven-layer-c::after {
+  inset: 0;
+  z-index: 5;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(ellipse 38px 14px at 88% 8%, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.28) 36%, transparent 74%),
+    radial-gradient(ellipse 20px 48px at 98% 8%, rgba(255, 255, 255, 0.5), transparent 72%),
+    linear-gradient(124deg, transparent 68%, rgba(255, 255, 255, 0.36) 77%, rgba(255, 255, 255, 0.12) 84%, transparent 94%);
+  opacity: calc(0.54 + var(--e4-layerB-shine-opacity) * 0.24);
+}
+
+.experiment-eleven-layer-c .experiment-four-layer-b__shine {
+  opacity: calc(var(--e4-layerB-shine-opacity) * 0.42);
+  background:
+    radial-gradient(
+      ellipse 88% 62% at 53% -7%,
+      rgba(255, 255, 255, calc(var(--e4-layerB-top-shine) * var(--e4-layerB-rim-strength) * 0.44)),
+      rgba(255, 255, 255, calc(var(--e4-layerB-top-radial) * var(--e4-layerB-rim-strength) * 0.14)) 36%,
+      transparent 74%
+    ),
+    linear-gradient(
+      116deg,
+      transparent 55%,
+      rgba(255, 255, 255, calc(var(--e4-layerB-diagonal-gloss) * var(--e4-layerB-rim-strength) * 0.26)) 72%,
+      rgba(255, 255, 255, 0.1) 78%,
+      transparent 90%
+    );
+}
+
+.experiment-eleven-layer-c .glass-frost-matte {
+  opacity: 0.04;
+  mix-blend-mode: soft-light;
+}
+
+.experiment-eleven-layer-c .glass-frost-gloss {
+  opacity: 0.1;
+}
+
+.experiment-eleven-layer-c .experiment-four-layer-b__radial-corners {
+  opacity: 0.16;
+}
+
+.experiment-eleven-layer-c .experiment-four-layer-b__pwzzovO-glass-wrap {
+  opacity: 0.54;
+}
+
 .experiment-set-one-page[data-e4-layerb-show-sparkles='false'] .experiment-four-layer-b__sparkle {
   display: none;
 }
