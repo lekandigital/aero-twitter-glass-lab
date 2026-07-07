@@ -111,7 +111,12 @@ import {
   normalizeExperimentElevenPanelGeometry,
   seedExperimentElevenPanelGeometry,
 } from './experimentElevenPanelGeometry';
-import { experimentElevenLayerCDisplayMaterial } from './experimentElevenLayerCMaterial';
+import {
+  EXPERIMENT_ELEVEN_LAYER_C_LAYOUT,
+  experimentElevenLayerCDisplayMaterial,
+  experimentElevenLayerCLayoutFromMaterial,
+  type ExperimentElevenLayerCLayoutSettings,
+} from './experimentElevenLayerCMaterial';
 import { applyExperimentSixPanelGeometry } from './experimentSixPanelGeometry';
 import {
   applyExperimentEightPanelGeometry,
@@ -122,10 +127,13 @@ import {
   buildE6LayerCLayoutDefaults,
   clampE6LayerCLayout,
   E6_LAYER_C_INSPECT_CATALOG,
+  E6_LAYER_C_LAYOUT_SECTION,
   E6_LAYER_C_LAYOUT_FIELDS,
   e6SectionOrderForLayerC,
   experimentSixLayerCLayoutCentered,
-  experimentSixLayerCMaxDiameter,
+  experimentSixLayerCMaxHeight,
+  experimentSixLayerCMaxWidth,
+  normalizeE6LayerCLayout,
   isE6LayerCInspectTarget,
   transformE6FieldsForLayerC,
   type E6LayerCInspectTarget,
@@ -157,7 +165,7 @@ type ExperimentSelection =
   | { experiment: 'eight'; target: E4InspectTarget | E6LayerCInspectTarget; label: string }
   | { experiment: 'nine'; target: E4InspectTarget; label: string }
   | { experiment: 'ten'; target: E4InspectTarget; label: string }
-  | { experiment: 'eleven'; target: E4InspectTarget; label: string };
+  | { experiment: 'eleven'; target: E4InspectTarget | E6LayerCInspectTarget; label: string };
 
 const EXPERIMENT_ORDER: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
 
@@ -525,6 +533,7 @@ type ExperimentSetOneContextValue = {
   e10: E4MaterialSettings;
   e11: E4MaterialSettings;
   e6LayerC: E6LayerCLayoutSettings;
+  e11LayerCLayout: ExperimentElevenLayerCLayoutSettings;
   setE1: <K extends keyof E1MaterialSettings>(id: K, value: E1MaterialSettings[K]) => void;
   setE2: <K extends keyof E2MaterialSettings>(id: K, value: E2MaterialSettings[K]) => void;
   setE3: <K extends keyof E3MaterialSettings>(id: K, value: E3MaterialSettings[K]) => void;
@@ -537,6 +546,7 @@ type ExperimentSetOneContextValue = {
   setE10: <K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => void;
   setE11: <K extends keyof E4MaterialSettings>(id: K, value: E4MaterialSettings[K]) => void;
   setE6LayerC: <K extends keyof E6LayerCLayoutSettings>(id: K, value: E6LayerCLayoutSettings[K]) => void;
+  setE11LayerCLayout: <K extends keyof ExperimentElevenLayerCLayoutSettings>(id: K, value: ExperimentElevenLayerCLayoutSettings[K]) => void;
   resetAll: () => void;
   saves: ExperimentSetOneSnapshot[];
   saveCurrent: (layout?: ExperimentSetOneLayoutSnapshot) => void;
@@ -623,7 +633,7 @@ function finalizeE7Material(
 }
 
 function resolveInitialE6LayerC(boot: ExperimentSetOneSession, e6: E4MaterialSettings): E6LayerCLayoutSettings {
-  if (boot.e6LayerC) return clampE6LayerCLayout(boot.e6LayerC, e6);
+  if (boot.e6LayerC) return normalizeE6LayerCLayout(boot.e6LayerC as Partial<E6LayerCLayoutSettings> & { diameter?: number }, e6);
   return buildE6LayerCLayoutDefaults(e6);
 }
 
@@ -700,6 +710,14 @@ function resolveInitialE11(boot: ExperimentSetOneSession): E4MaterialSettings {
   return seedExperimentElevenPanelGeometry(boot.e10 ?? boot.e9 ?? boot.e4);
 }
 
+function resolveInitialE11LayerCLayout(
+  boot: ExperimentSetOneSession,
+  _e11: E4MaterialSettings,
+): ExperimentElevenLayerCLayoutSettings {
+  if (boot.e11LayerCLayout) return boot.e11LayerCLayout;
+  return { ...EXPERIMENT_ELEVEN_LAYER_C_LAYOUT };
+}
+
 function resolveInitialE5(boot: ExperimentSetOneSession): E4MaterialSettings {
   const active = boot.activeExperiment ?? 'four';
   if (active === 'six') return resolveInitialE6(boot);
@@ -762,6 +780,9 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   const [e11, setE11State] = useState<E4MaterialSettings>(() => resolveInitialE11(boot));
   const [e6LayerC, setE6LayerCState] = useState<E6LayerCLayoutSettings>(() =>
     resolveInitialE6LayerC(boot, resolveInitialE6(boot)),
+  );
+  const [e11LayerCLayout, setE11LayerCLayoutState] = useState<ExperimentElevenLayerCLayoutSettings>(() =>
+    resolveInitialE11LayerCLayout(boot, resolveInitialE11(boot)),
   );
   const [e5BorderRefinementsVersion, setE5BorderRefinementsVersion] = useState(
     boot.e5BorderRefinementsVersion ?? 0,
@@ -1106,6 +1127,22 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     [e6],
   );
 
+  const setE11LayerCLayout = useCallback(
+    <K extends keyof ExperimentElevenLayerCLayoutSettings>(
+      id: K,
+      value: ExperimentElevenLayerCLayoutSettings[K],
+    ) => {
+      setE11LayerCLayoutState((prev) => {
+        const next = { ...prev, [id]: value };
+        const width = Math.max(16, Math.round(next.width));
+        const height = Math.max(1, Math.round(next.height));
+        const radius = Math.min(Math.max(0, Math.round(next.radius)), Math.floor(Math.min(width, height) / 2));
+        return { width, height, radius };
+      });
+    },
+    [],
+  );
+
   const resetAll = useCallback(() => {
     setE1State(E1_MASTER_DEFAULT);
     setE2State(E2_MASTER_DEFAULT);
@@ -1119,7 +1156,9 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     setE8State(applyExperimentEightPanelGeometry(applyE7OverridesStatic(E4_MASTER_DEFAULT)));
     setE9State(applyExperimentNinePanelGeometry(E4_MASTER_DEFAULT));
     setE10State(applyExperimentTenPanelGeometry(E4_MASTER_DEFAULT));
-    setE11State(seedExperimentElevenPanelGeometry(E4_MASTER_DEFAULT));
+    const nextE11 = seedExperimentElevenPanelGeometry(E4_MASTER_DEFAULT);
+    setE11State(nextE11);
+    setE11LayerCLayoutState({ ...EXPERIMENT_ELEVEN_LAYER_C_LAYOUT });
     setLayerAVisible(true);
     setLayerBVisible(true);
     setLayerCVisible(true);
@@ -1255,7 +1294,11 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
           setE10State((prev) => applyExperimentTenPanelGeometry(applyReferenceCornerLighting(prev)));
         }
         else if (activeExperiment === 'eleven') {
-          setE11State((prev) => applyExperimentElevenPanelGeometry(applyReferenceCornerLighting(prev)));
+          setE11State((prev) => {
+            const next = applyExperimentElevenPanelGeometry(applyReferenceCornerLighting(prev));
+            setE11LayerCLayoutState({ ...EXPERIMENT_ELEVEN_LAYER_C_LAYOUT });
+            return next;
+          });
         }
         else setE4State((prev) => applyReferenceCornerLighting(prev));
         return;
@@ -1297,7 +1340,9 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
           } else if (activeExperiment === 'ten') {
             setE10State(applyExperimentTenPanelGeometry(material));
           } else if (activeExperiment === 'eleven') {
-            setE11State(applyExperimentElevenPanelGeometry(material));
+            const next = applyExperimentElevenPanelGeometry(material);
+            setE11State(next);
+            setE11LayerCLayoutState({ ...EXPERIMENT_ELEVEN_LAYER_C_LAYOUT });
           } else {
             setE4State(applyShowcasePanelGeometry(material));
           }
@@ -1332,7 +1377,9 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
           } else if (activeExperiment === 'ten') {
             setE10State(normalizeExperimentTenPanelGeometry(normalized));
           } else if (activeExperiment === 'eleven') {
-            setE11State(normalizeExperimentElevenPanelGeometry(normalized));
+            const next = normalizeExperimentElevenPanelGeometry(normalized);
+            setE11State(next);
+            setE11LayerCLayoutState({ ...EXPERIMENT_ELEVEN_LAYER_C_LAYOUT });
           } else {
             setE4State(normalized);
           }
@@ -1375,7 +1422,9 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       }
       if (snapshot.scope === 'eleven') {
         if (snapshot.e4) {
-          setE11State(normalizeExperimentElevenPanelGeometry(normalize(snapshot.e4)));
+          const next = normalizeExperimentElevenPanelGeometry(normalize(snapshot.e4));
+          setE11State(next);
+          setE11LayerCLayoutState({ ...EXPERIMENT_ELEVEN_LAYER_C_LAYOUT });
         }
         return;
       }
@@ -1410,7 +1459,9 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         } else if (activeExperiment === 'ten') {
           setE10State(applyExperimentTenPanelGeometry(normalized));
         } else if (activeExperiment === 'eleven') {
-          setE11State(applyExperimentElevenPanelGeometry(normalized));
+          const next = applyExperimentElevenPanelGeometry(normalized);
+          setE11State(next);
+          setE11LayerCLayoutState({ ...EXPERIMENT_ELEVEN_LAYER_C_LAYOUT });
         }
       }
     },
@@ -1579,6 +1630,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       e10,
       e11,
       e6LayerC,
+      e11LayerCLayout,
       hidePanelText,
       layerAVisible,
       layerBVisible,
@@ -1597,7 +1649,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       e5BorderRefinementsVersion,
       activeRenderVariant,
     });
-  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, hidePanelText, layerAVisible, layerBVisible, layerCVisible, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, e5BorderRefinementsVersion, activeRenderVariant]);
+  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, e11LayerCLayout, hidePanelText, layerAVisible, layerBVisible, layerCVisible, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, e5BorderRefinementsVersion, activeRenderVariant]);
 
   useEffect(() => {
     const page = pageRef.current;
@@ -1626,10 +1678,14 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
 
       const e6Target = el.dataset.e6Inspect;
       if (e6Target && isE6LayerCInspectTarget(e6Target)) {
+        const e6Experiment =
+          el.dataset.e6InspectExperiment === 'eight' || el.dataset.e6InspectExperiment === 'eleven'
+            ? el.dataset.e6InspectExperiment
+            : 'six';
         flashInspectElement(el, 'four');
-        setActiveExperiment('six');
+        setActiveExperiment(e6Experiment);
         setSelection({
-          experiment: 'six',
+          experiment: e6Experiment,
           target: e6Target,
           label: el.dataset.e6InspectLabel ?? E6_LAYER_C_INSPECT_CATALOG[e6Target].label,
         });
@@ -1703,6 +1759,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       e10,
       e11,
       e6LayerC,
+      e11LayerCLayout,
       setE1,
       setE2,
       setE3,
@@ -1715,6 +1772,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       setE10,
       setE11,
       setE6LayerC,
+      setE11LayerCLayout,
       resetAll,
       saves,
       saveCurrent,
@@ -1755,7 +1813,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       referenceWallpaper,
       toggleReferenceWallpaper,
     }),
-    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE11, setE6LayerC, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, setSelectedSavePosition, replaceSaveMultiSelection, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper],
+    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, e11LayerCLayout, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE11, setE6LayerC, setE11LayerCLayout, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, setSelectedSavePosition, replaceSaveMultiSelection, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper],
   );
 
   return (
@@ -1844,24 +1902,40 @@ function e4Highlighted(selection: ExperimentSelection | null) {
       selection.experiment !== 'five' &&
       selection.experiment !== 'six' &&
       selection.experiment !== 'seven' &&
+      selection.experiment !== 'eight' &&
       selection.experiment !== 'nine' &&
       selection.experiment !== 'ten' &&
       selection.experiment !== 'eleven')
   ) {
     return null;
   }
-  if (selection.experiment === 'six' && isE6LayerCInspectTarget(selection.target)) return null;
+  if (
+    (selection.experiment === 'six' ||
+      selection.experiment === 'eight' ||
+      selection.experiment === 'eleven') &&
+    isE6LayerCInspectTarget(selection.target)
+  ) return null;
   return new Set(E4_INSPECT_CATALOG[selection.target as E4InspectTarget].fields);
 }
 
 function e6Highlighted(selection: ExperimentSelection | null) {
-  if (!selection || selection.experiment !== 'six') return e4Highlighted(selection);
+  if (
+    !selection ||
+    (selection.experiment !== 'six' &&
+      selection.experiment !== 'eight' &&
+      selection.experiment !== 'eleven')
+  ) return e4Highlighted(selection);
   if (isE6LayerCInspectTarget(selection.target)) {
-    const fields = new Set(E4_INSPECT_CATALOG['layer-b'].fields);
-    fields.delete('layerBWidth');
-    fields.delete('layerBHeight');
-    fields.delete('layerBCornerRadius');
-    for (const field of E6_LAYER_C_LAYOUT_FIELDS) fields.add(field.id);
+    const fields =
+      selection.experiment === 'eleven'
+        ? new Set<string>(['width', 'height', 'radius'])
+        : new Set(E4_INSPECT_CATALOG['layer-b'].fields);
+    if (selection.experiment !== 'eleven') {
+      fields.delete('layerBWidth');
+      fields.delete('layerBHeight');
+      fields.delete('layerBCornerRadius');
+      for (const field of E6_LAYER_C_LAYOUT_FIELDS) fields.add(field.id);
+    }
     return fields;
   }
   return e4Highlighted(selection);
@@ -1872,7 +1946,12 @@ function selectionNote(selection: ExperimentSelection | null) {
   if (selection.experiment === 'one') return E1_INSPECT_CATALOG[selection.target].note;
   if (selection.experiment === 'two') return E2_INSPECT_CATALOG[selection.target].note;
   if (selection.experiment === 'three') return E3_INSPECT_CATALOG[selection.target].note;
-  if (selection.experiment === 'six' && isE6LayerCInspectTarget(selection.target)) return undefined;
+  if (
+    (selection.experiment === 'six' ||
+      selection.experiment === 'eight' ||
+      selection.experiment === 'eleven') &&
+    isE6LayerCInspectTarget(selection.target)
+  ) return undefined;
   return E4_INSPECT_CATALOG[selection.target as E4InspectTarget].note;
 }
 
@@ -1938,6 +2017,7 @@ export function ExperimentSetOneSettingsDock() {
     e10,
     e11,
     e6LayerC,
+    e11LayerCLayout,
     setE1,
     setE2,
     setE3,
@@ -1950,6 +2030,7 @@ export function ExperimentSetOneSettingsDock() {
     setE10,
     setE11,
     setE6LayerC,
+    setE11LayerCLayout,
     resetAll,
     saves,
     saveCurrent,
@@ -2209,13 +2290,28 @@ export function ExperimentSetOneSettingsDock() {
   const e4Highlight = useMemo(() => e4Highlighted(selection), [selection]);
   const e6Highlight = useMemo(() => e6Highlighted(selection), [selection]);
   const inspectingLayerC =
-    selection?.experiment === 'six' && isE6LayerCInspectTarget(selection.target);
-  const e6LayerCMode = layerEditMode === 'layerC' || (inspectingLayerC && layerEditMode === 'both');
-  const e6LayerEditMode: LayerEditMode = e6LayerCMode ? 'layerC' : layerEditMode;
+    (selection?.experiment === 'six' ||
+      selection?.experiment === 'eight' ||
+      selection?.experiment === 'eleven') &&
+    isE6LayerCInspectTarget(selection.target);
+  const inspectingE6LayerC =
+    (selection?.experiment === 'six' || selection?.experiment === 'eight') &&
+    isE6LayerCInspectTarget(selection.target);
+  const inspectingE11LayerC =
+    selection?.experiment === 'eleven' &&
+    isE6LayerCInspectTarget(selection.target);
   const dockLayerEditMode: LayerEditMode =
     layerEditMode === 'layerC' && dockExperiment !== 'six' && dockExperiment !== 'eleven'
       ? 'both'
       : layerEditMode;
+  const e6LayerCMode =
+    (dockExperiment === 'six' || dockExperiment === 'eight') &&
+    (layerEditMode === 'layerC' || (inspectingE6LayerC && layerEditMode === 'both'));
+  const e6LayerEditMode: LayerEditMode = e6LayerCMode ? 'layerC' : layerEditMode;
+  const e11LayerCMode =
+    dockExperiment === 'eleven' &&
+    (layerEditMode === 'layerC' || (inspectingE11LayerC && layerEditMode === 'both'));
+  const e11LayerEditMode: LayerEditMode = e11LayerCMode ? 'layerC' : dockLayerEditMode;
   const note = selectionNote(selection);
   const filtering = selection !== null;
   const visibleE1Fields = useMemo(
@@ -2243,18 +2339,24 @@ export function ExperimentSetOneSettingsDock() {
   const e6LayerCLayoutFields = useMemo(
     () =>
       E6_LAYER_C_LAYOUT_FIELDS.map((field) => {
-        if (field.id === 'diameter') {
-          return { ...field, max: experimentSixLayerCMaxDiameter(e6) };
+        if (field.id === 'width') {
+          return { ...field, max: experimentSixLayerCMaxWidth(e6) };
+        }
+        if (field.id === 'height') {
+          return { ...field, max: experimentSixLayerCMaxHeight(e6) };
+        }
+        if (field.id === 'radius') {
+          return { ...field, max: Math.floor(Math.min(e6LayerC.width, e6LayerC.height) / 2) };
         }
         if (field.id === 'offsetX') {
-          return { ...field, max: Math.max(0, (e6.layerBWidth as number) - e6LayerC.diameter) };
+          return { ...field, max: Math.max(0, (e6.layerBWidth as number) - e6LayerC.width) };
         }
         if (field.id === 'offsetY') {
-          return { ...field, max: Math.max(0, (e6.layerBHeight as number) - e6LayerC.diameter) };
+          return { ...field, max: Math.max(0, (e6.layerBHeight as number) - e6LayerC.height) };
         }
         return field;
       }),
-    [e6, e6LayerC.diameter],
+    [e6, e6LayerC.width, e6LayerC.height],
   );
   const contextualE6Fields = useMemo(() => {
     const base = e4FieldsVisibleForSettings(e6);
@@ -2285,7 +2387,7 @@ export function ExperimentSetOneSettingsDock() {
         if (key === 'offsetX' || key === 'offsetY') {
           targets.push({
             label: 'Center in B',
-            value: experimentSixLayerCLayoutCentered(e6, e6LayerC.diameter)[key],
+            value: experimentSixLayerCLayoutCentered(e6, e6LayerC.width, e6LayerC.height)[key],
           });
         }
         return targets;
@@ -2321,9 +2423,46 @@ export function ExperimentSetOneSettingsDock() {
     () => sectionsForLayerMode(visibleE7Fields, E4_SECTION_ORDER, dockLayerEditMode),
     [visibleE7Fields, dockLayerEditMode],
   );
+  const e11LayerCLayoutFields = useMemo(
+    () =>
+      E6_LAYER_C_LAYOUT_FIELDS.filter(
+        (field) => field.id === 'width' || field.id === 'height' || field.id === 'radius',
+      ).map((field) => {
+        if (field.id === 'width') {
+          return { ...field, max: e11.layerAWidth as number };
+        }
+        if (field.id === 'height') {
+          return { ...field, max: e11.layerAHeight as number };
+        }
+        return { ...field, max: Math.floor(Math.min(e11LayerCLayout.width, e11LayerCLayout.height) / 2) };
+      }),
+    [e11, e11LayerCLayout.width, e11LayerCLayout.height],
+  );
+  const selectedElevenSave = useMemo(
+    () =>
+      selectedSaveIdByExperiment.eleven == null
+        ? undefined
+        : saves.find((save) => save.id === selectedSaveIdByExperiment.eleven),
+    [saves, selectedSaveIdByExperiment.eleven],
+  );
+  const e11LayerCDefaults = useMemo(
+    () =>
+      experimentElevenLayerCLayoutFromMaterial(
+        experimentElevenLayerCDisplayMaterial(e11, selectedElevenSave?.e11LayerC),
+      ),
+    [e11, selectedElevenSave?.e11LayerC],
+  );
+  const visibleE11Fields = useMemo(() => {
+    if (e11LayerCMode) return e11LayerCLayoutFields;
+    return fieldsForSelection(contextualE4Fields, e6Highlight, selection, dockLayerEditMode);
+  }, [e11LayerCMode, e11LayerCLayoutFields, contextualE4Fields, e6Highlight, selection, dockLayerEditMode]);
   const visibleE6SectionsForMode = useMemo(
     () => sectionsForLayerMode(visibleE6Fields, e6SectionOrder, e6LayerEditMode),
     [visibleE6Fields, e6SectionOrder, e6LayerEditMode],
+  );
+  const visibleE11SectionsForMode = useMemo(
+    () => (e11LayerCMode ? [E6_LAYER_C_LAYOUT_SECTION] : sectionsForLayerMode(visibleE11Fields, E4_SECTION_ORDER, dockLayerEditMode)),
+    [e11LayerCMode, visibleE11Fields, dockLayerEditMode],
   );
   const totalCount =
     E1_SETTING_FIELDS.length + E2_SETTING_FIELDS.length + E3_SETTING_FIELDS.length + E4_SETTING_FIELDS.length;
@@ -2340,9 +2479,13 @@ export function ExperimentSetOneSettingsDock() {
               ? visibleE5Fields.length
               : selection?.experiment === 'six'
                 ? visibleE6Fields.length
+                : selection?.experiment === 'eight'
+                  ? visibleE6Fields.length
+                  : selection?.experiment === 'eleven'
+                    ? visibleE11Fields.length
                   : selection?.experiment === 'seven'
                     ? visibleE7Fields.length
-                    : selection?.experiment === 'nine' || selection?.experiment === 'ten' || selection?.experiment === 'eleven'
+                    : selection?.experiment === 'nine' || selection?.experiment === 'ten'
                     ? visibleE4Fields.length
                     : 0;
   const dockTitle = selection ? experimentTitle(selection.experiment) : 'Experiment Set 1';
@@ -2357,8 +2500,9 @@ export function ExperimentSetOneSettingsDock() {
       ...visibleE5SectionsForMode.map((s) => foldableSectionId('e5', s)),
       ...visibleE6SectionsForMode.map((s) => foldableSectionId('e6', s)),
       ...visibleE7SectionsForMode.map((s) => foldableSectionId('e7', s)),
+      ...visibleE11SectionsForMode.map((s) => foldableSectionId('e11', s)),
     ],
-    [visibleE1Sections, visibleE2Sections, visibleE3SectionsForMode, visibleE4SectionsForMode, visibleE5SectionsForMode, visibleE6SectionsForMode, visibleE7SectionsForMode],
+    [visibleE1Sections, visibleE2Sections, visibleE3SectionsForMode, visibleE4SectionsForMode, visibleE5SectionsForMode, visibleE6SectionsForMode, visibleE7SectionsForMode, visibleE11SectionsForMode],
   );
   const { isOpen, toggle, openAll, collapseAll } = useFoldableSections(foldableSectionIds, false);
   const settingsScrollRef = useRef<HTMLDivElement>(null);
@@ -2379,7 +2523,7 @@ export function ExperimentSetOneSettingsDock() {
     if (!container || !anchor) return;
     pendingScrollAnchorRef.current = null;
     restoreSettingsScrollAnchor(container, anchor);
-  }, [layerEditMode, visibleE3SectionsForMode, visibleE4SectionsForMode, visibleE5SectionsForMode, visibleE6SectionsForMode, visibleE7SectionsForMode]);
+  }, [layerEditMode, visibleE3SectionsForMode, visibleE4SectionsForMode, visibleE5SectionsForMode, visibleE6SectionsForMode, visibleE7SectionsForMode, visibleE11SectionsForMode]);
 
   useEffect(() => {
     const session = loadExperimentSetOneSession();
@@ -3320,7 +3464,7 @@ export function ExperimentSetOneSettingsDock() {
                 title="Experiment Six"
                 description={
                   e6LayerCMode
-                    ? 'Layer C circle — branch save materials with circle layout (diameter & inset).'
+                    ? 'Layer C panel — branch save materials with width, height, radius, and inset.'
                     : 'Branch save materials for layers A/B.'
                 }
                 filtering={e6DockFiltering}
@@ -3440,13 +3584,17 @@ export function ExperimentSetOneSettingsDock() {
               <ExperimentMultiLayerSettings
                 experimentKey="e11"
                 title="Experiment Eleven"
-                description="Duplicate of Experiment Ten with the right overlap pane and its own working state and saves."
-                filtering={filtering}
-                fields={visibleE4Fields}
-                sectionOrder={E4_SECTION_ORDER}
+                description={
+                  e11LayerCMode
+                    ? 'Layer C strip — editable width, height, and radius for the right overlap pane.'
+                    : 'Duplicate of Experiment Ten with the right overlap pane and its own working state and saves.'
+                }
+                filtering={inspectingE11LayerC ? filtering : e11LayerCMode ? false : filtering}
+                fields={e11LayerCMode ? e11LayerCLayoutFields : visibleE11Fields}
+                sectionOrder={e11LayerCMode ? [E6_LAYER_C_LAYOUT_SECTION] : E4_SECTION_ORDER}
                 settings={e11}
                 masterDefault={E4_MASTER_DEFAULT}
-                layerEditMode={dockLayerEditMode}
+                layerEditMode={e11LayerEditMode}
                 onChange={(id, value) => setE11(id as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings])}
                 onPairedChange={(suffix, value) => {
                   setE11(`layerA${suffix}` as keyof E4MaterialSettings, value as E4MaterialSettings[keyof E4MaterialSettings]);
@@ -3457,6 +3605,20 @@ export function ExperimentSetOneSettingsDock() {
                 saveExperiment="eleven"
                 isOpen={isOpen}
                 onToggle={toggle}
+                alternateFields={
+                  e11LayerCMode
+                    ? {
+                        values: e11LayerCLayout as Record<string, unknown>,
+                        defaults: e11LayerCDefaults as Record<string, unknown>,
+                        fieldIds: new Set(['width', 'height', 'radius']),
+                        onChange: (id: string, value: unknown) =>
+                          setE11LayerCLayout(
+                            id as keyof ExperimentElevenLayerCLayoutSettings,
+                            value as ExperimentElevenLayerCLayoutSettings[keyof ExperimentElevenLayerCLayoutSettings],
+                          ),
+                      }
+                    : undefined
+                }
               />
             )}
             </div>

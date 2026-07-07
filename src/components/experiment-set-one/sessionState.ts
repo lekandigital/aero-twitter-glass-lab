@@ -24,10 +24,14 @@ import {
   type ExperimentId,
   type ExperimentVisibility,
 } from './experimentVisibility';
+import {
+  EXPERIMENT_ELEVEN_LAYER_C_LAYOUT,
+  type ExperimentElevenLayerCLayoutSettings,
+} from './experimentElevenLayerCMaterial';
 
 import type { LayerEditMode } from '../shared/layerEditMode';
 import type { RenderVariantSlug } from '../../render-variants/manifest';
-import type { E6LayerCLayoutSettings } from '../experiment-set-six/layerCMaterialSettings';
+import { normalizeE6LayerCLayout, type E6LayerCLayoutSettings } from '../experiment-set-six/layerCMaterialSettings';
 
 const SESSION_KEY = 'experiment-set-1-session';
 let memorySessionFallback: ExperimentSetOneSession | null = null;
@@ -51,14 +55,16 @@ export type ExperimentSetOneSession = {
   e10?: E4MaterialSettings;
   /** Live Experiment Eleven working copy — duplicate of Experiment Ten / right overlap pane. */
   e11?: E4MaterialSettings;
-  /** Experiment Six layer C circle layout (diameter, inset position). */
+  /** Experiment Six layer C layout (width, height, radius, inset position). */
   e6LayerC?: E6LayerCLayoutSettings;
+  /** Experiment Eleven layer C layout (display width, height, radius). */
+  e11LayerCLayout?: ExperimentElevenLayerCLayoutSettings;
   hidePanelText: boolean;
   /** Stage visibility for layer A draggable (E3/E4/E5). */
   layerAVisible?: boolean;
   /** Stage visibility for layer B draggable or nested inset (E3/E4/E5/E6). */
   layerBVisible?: boolean;
-  /** Stage visibility for layer C circle on E6 (independent of layer B). */
+  /** Stage visibility for layer C on E6 (independent of layer B). */
   layerCVisible?: boolean;
   inspectMode: boolean;
   experimentVisible: ExperimentVisibility;
@@ -86,6 +92,7 @@ export function defaultSession(): ExperimentSetOneSession {
     e3: E3_MASTER_DEFAULT,
     e4: applyShowcasePanelGeometry(applyReferenceCornerLighting(E4_MASTER_DEFAULT)),
     e11: seedExperimentElevenPanelGeometry(E4_MASTER_DEFAULT),
+    e11LayerCLayout: { ...EXPERIMENT_ELEVEN_LAYER_C_LAYOUT },
     hidePanelText: true,
     layerAVisible: true,
     layerBVisible: true,
@@ -269,7 +276,20 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       e9: parsed.e9 ? applyExperimentNinePanelGeometry(normalizeE4MaterialSettings(parsed.e9)) : undefined,
       e10: parsed.e10 ? normalizeExperimentTenPanelGeometry(parsed.e10) : undefined,
       e11: parsed.e11 ? normalizeE4MaterialSettings(parsed.e11) : undefined,
-      e6LayerC: parsed.e6LayerC,
+      e6LayerC: parsed.e6LayerC
+        ? normalizeE6LayerCLayout(parsed.e6LayerC as Partial<E6LayerCLayoutSettings> & { diameter?: number }, e4)
+        : undefined,
+      e11LayerCLayout:
+        parsed.e11LayerCLayout &&
+        typeof parsed.e11LayerCLayout.width === 'number' &&
+        typeof parsed.e11LayerCLayout.height === 'number' &&
+        typeof parsed.e11LayerCLayout.radius === 'number'
+          ? {
+              width: parsed.e11LayerCLayout.width,
+              height: parsed.e11LayerCLayout.height,
+              radius: parsed.e11LayerCLayout.radius,
+            }
+          : { ...EXPERIMENT_ELEVEN_LAYER_C_LAYOUT },
       hidePanelText: typeof parsed.hidePanelText === 'boolean' ? parsed.hidePanelText : true,
       layerAVisible: parsed.layerAVisible !== false,
       layerBVisible: parsed.layerBVisible !== false,

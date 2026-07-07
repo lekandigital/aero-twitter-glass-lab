@@ -16,7 +16,7 @@ export function ExperimentSixLayerCDragInBezel({
         initialPosition={initialPosition}
         persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerC6}
         layoutResetVersion={layoutResetVersion}
-        ariaLabel="Experiment Six — branch circle on layer B"
+        ariaLabel="Experiment Six — branch panel on layer B"
         className="experiment-six-layer-c-draggable"
       >
         <ExperimentSixLayerCSheet />
