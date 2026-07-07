@@ -5,38 +5,47 @@ import type { MaterialFieldBase } from '../shared/MaterialSettingControl';
 export type E6LayerCInspectTarget = 'layer-c';
 
 export type E6LayerCLayoutSettings = {
-  /** Circle diameter in px (width = height). */
-  diameter: number;
+  /** Panel width in px. */
+  width: number;
+  /** Panel height in px. */
+  height: number;
+  /** Corner radius in px. */
+  radius: number;
   /** Default X within nested B inset (drag persist overrides). */
   offsetX: number;
   /** Default Y within nested B inset (drag persist overrides). */
   offsetY: number;
 };
 
-export function experimentSixLayerCMaxDiameter(s: E4MaterialSettings): number {
-  return Math.min(s.layerBWidth as number, s.layerBHeight as number);
+export function experimentSixLayerCMaxWidth(s: E4MaterialSettings): number {
+  return s.layerBWidth as number;
 }
 
-export function experimentSixLayerCDefaultDiameter(s: E4MaterialSettings): number {
-  return Math.min(72, experimentSixLayerCMaxDiameter(s));
+export function experimentSixLayerCMaxHeight(s: E4MaterialSettings): number {
+  return s.layerBHeight as number;
 }
 
 export function buildE6LayerCLayoutDefaults(s: E4MaterialSettings): E6LayerCLayoutSettings {
-  const diameter = experimentSixLayerCDefaultDiameter(s);
-  return experimentSixLayerCLayoutCentered(s, diameter);
+  const width = Math.min(72, experimentSixLayerCMaxWidth(s));
+  const height = Math.min(72, experimentSixLayerCMaxHeight(s));
+  return experimentSixLayerCLayoutCentered(s, width, height);
 }
 
 export function experimentSixLayerCLayoutCentered(
   s: E4MaterialSettings,
-  diameter: number,
+  width: number,
+  height: number,
 ): E6LayerCLayoutSettings {
   const layerBWidth = s.layerBWidth as number;
   const layerBHeight = s.layerBHeight as number;
-  const d = Math.min(diameter, experimentSixLayerCMaxDiameter(s));
+  const w = Math.min(width, experimentSixLayerCMaxWidth(s));
+  const h = Math.min(height, experimentSixLayerCMaxHeight(s));
   return {
-    diameter: d,
-    offsetX: Math.max(0, Math.round((layerBWidth - d) / 2)),
-    offsetY: Math.max(0, Math.round((layerBHeight - d) / 2)),
+    width: w,
+    height: h,
+    radius: Math.max(0, Math.round(Math.min(w, h) / 2)),
+    offsetX: Math.max(0, Math.round((layerBWidth - w) / 2)),
+    offsetY: Math.max(0, Math.round((layerBHeight - h) / 2)),
   };
 }
 
@@ -44,31 +53,35 @@ export function clampE6LayerCLayout(
   layout: E6LayerCLayoutSettings,
   s: E4MaterialSettings,
 ): E6LayerCLayoutSettings {
-  const maxD = experimentSixLayerCMaxDiameter(s);
-  const diameter = Math.min(Math.max(16, layout.diameter), maxD);
-  const maxX = Math.max(0, (s.layerBWidth as number) - diameter);
-  const maxY = Math.max(0, (s.layerBHeight as number) - diameter);
+  const width = Math.min(Math.max(16, layout.width), experimentSixLayerCMaxWidth(s));
+  const height = Math.min(Math.max(16, layout.height), experimentSixLayerCMaxHeight(s));
+  const radiusMax = Math.max(0, Math.floor(Math.min(width, height) / 2));
+  const radius = Math.min(Math.max(0, layout.radius), radiusMax);
+  const maxX = Math.max(0, (s.layerBWidth as number) - width);
+  const maxY = Math.max(0, (s.layerBHeight as number) - height);
   return {
-    diameter,
+    width,
+    height,
+    radius,
     offsetX: Math.min(Math.max(0, layout.offsetX), maxX),
     offsetY: Math.min(Math.max(0, layout.offsetY), maxY),
   };
 }
 
 /** Layout-only; branch save materials come from page CSS vars on e6. */
-export function experimentSixLayerCCircleStyle(
+export function experimentSixLayerCPanelStyle(
   layout: E6LayerCLayoutSettings,
   s: E4MaterialSettings,
 ): CSSProperties {
-  const { diameter } = clampE6LayerCLayout(layout, s);
-  const radius = diameter / 2;
+  const { width, height, radius } = clampE6LayerCLayout(layout, s);
   return {
-    width: diameter,
-    height: diameter,
-    minHeight: diameter,
-    borderRadius: '50%',
-    ['--e4-layerB-width' as string]: `${diameter}px`,
-    ['--e4-layerB-height' as string]: `${diameter}px`,
+    width,
+    height,
+    minWidth: width,
+    minHeight: height,
+    borderRadius: `${radius}px`,
+    ['--e4-layerB-width' as string]: `${width}px`,
+    ['--e4-layerB-height' as string]: `${height}px`,
     ['--e4-layerB-radius' as string]: `${radius}px`,
   };
 }
@@ -82,17 +95,22 @@ export function experimentSixLayerCDefaultOffset(
 }
 
 export const E6_LAYER_C_INSPECT_CATALOG: Record<E6LayerCInspectTarget, { label: string }> = {
-  'layer-c': { label: 'Layer C · circle' },
+  'layer-c': { label: 'Layer C · panel' },
 };
 
 export function isE6LayerCInspectTarget(value: string): value is E6LayerCInspectTarget {
   return value in E6_LAYER_C_INSPECT_CATALOG;
 }
 
-export function e6LayerCInspectAttrs(target: E6LayerCInspectTarget, label?: string) {
+export function e6LayerCInspectAttrs(
+  target: E6LayerCInspectTarget,
+  label?: string,
+  experiment?: 'six' | 'eight' | 'eleven',
+) {
   return {
     'data-e6-inspect': target,
     'data-e6-inspect-label': label ?? E6_LAYER_C_INSPECT_CATALOG[target].label,
+    'data-e6-inspect-experiment': experiment,
   };
 }
 
@@ -100,7 +118,7 @@ export type E6LayerCLayoutField = MaterialFieldBase<keyof E6LayerCLayoutSettings
 
 export const E6_LAYER_C_LAYOUT_SECTION = 'Layer C · Layout';
 
-/** Layer B rect fields replaced by circle layout when editing layer C. */
+/** Layer B rect fields replaced by panel layout when editing layer C. */
 export const E6_LAYER_B_RECT_LAYOUT_SHAPE_IDS = [
   'layerBWidth',
   'layerBHeight',
@@ -109,14 +127,37 @@ export const E6_LAYER_B_RECT_LAYOUT_SHAPE_IDS = [
 
 export const E6_LAYER_C_LAYOUT_FIELDS: E6LayerCLayoutField[] = [
   {
-    id: 'diameter',
-    label: 'Diameter',
+    id: 'width',
+    label: 'Width',
     dataType: 'number',
     section: E6_LAYER_C_LAYOUT_SECTION,
     min: 16,
     max: 400,
     step: 1,
-    hint: 'Circle size — replaces layer B width and height.',
+    unit: 'px',
+    hint: 'Panel width — replaces layer B width in Layer C edit mode.',
+  },
+  {
+    id: 'height',
+    label: 'Height',
+    dataType: 'number',
+    section: E6_LAYER_C_LAYOUT_SECTION,
+    min: 16,
+    max: 400,
+    step: 1,
+    unit: 'px',
+    hint: 'Panel height — replaces layer B height in Layer C edit mode.',
+  },
+  {
+    id: 'radius',
+    label: 'Radius',
+    dataType: 'number',
+    section: E6_LAYER_C_LAYOUT_SECTION,
+    min: 0,
+    max: 200,
+    step: 1,
+    unit: 'px',
+    hint: 'Corner radius for the Layer C panel.',
   },
   {
     id: 'offsetX',
@@ -126,6 +167,7 @@ export const E6_LAYER_C_LAYOUT_FIELDS: E6LayerCLayoutField[] = [
     min: 0,
     max: 400,
     step: 1,
+    unit: 'px',
     hint: 'Default horizontal position inside layer B. Drag on stage overrides until layout reset.',
   },
   {
@@ -136,6 +178,7 @@ export const E6_LAYER_C_LAYOUT_FIELDS: E6LayerCLayoutField[] = [
     min: 0,
     max: 400,
     step: 1,
+    unit: 'px',
     hint: 'Default vertical position inside layer B. Drag on stage overrides until layout reset.',
   },
 ];
@@ -187,5 +230,29 @@ export function e6SectionOrderForLayerC(baseOrder: readonly string[]): string[] 
 }
 
 export function e6LayerCLayoutHighlight(): Set<keyof E6LayerCLayoutSettings> {
-  return new Set(['diameter', 'offsetX', 'offsetY']);
+  return new Set(['width', 'height', 'radius', 'offsetX', 'offsetY']);
+}
+
+export function normalizeE6LayerCLayout(
+  raw: Partial<E6LayerCLayoutSettings> & { diameter?: number },
+  s: E4MaterialSettings,
+): E6LayerCLayoutSettings {
+  const diameter = typeof raw.diameter === 'number' ? raw.diameter : undefined;
+  const width = typeof raw.width === 'number' ? raw.width : diameter;
+  const height = typeof raw.height === 'number' ? raw.height : diameter;
+  const radius = typeof raw.radius === 'number'
+    ? raw.radius
+    : diameter !== undefined
+      ? Math.max(0, Math.round(diameter / 2))
+      : undefined;
+  return clampE6LayerCLayout(
+    {
+      width: width ?? Math.min(72, experimentSixLayerCMaxWidth(s)),
+      height: height ?? Math.min(72, experimentSixLayerCMaxHeight(s)),
+      radius: radius ?? 0,
+      offsetX: typeof raw.offsetX === 'number' ? raw.offsetX : 0,
+      offsetY: typeof raw.offsetY === 'number' ? raw.offsetY : 0,
+    },
+    s,
+  );
 }

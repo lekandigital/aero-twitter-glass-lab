@@ -1,4 +1,4 @@
-/* Experiment Six — branch circle (layer C) stacked on nested B. */
+/* Experiment Six — branch panel (layer C) stacked on nested B. */
 
 .experiment-set-one-page[data-layer-c-visible='false'] .experiment-six-layer-c-drag-bounds {
   display: none !important;
@@ -15,7 +15,7 @@
 }
 
 .experiment-six-layer-c.experiment-four-layer-b {
-  border-radius: 50% !important;
+  border-radius: var(--e4-layerB-radius, 50%) !important;
   position: relative;
   z-index: 2;
 }
@@ -27,11 +27,11 @@
 }
 
 .experiment-six-layer-c .experiment-four-layer-b__radial-corners {
-  border-radius: 50%;
+  border-radius: inherit;
 }
 
 .experiment-six-layer-c .experiment-four-layer-b__pwzzovO-glass-wrap {
-  border-radius: 50%;
+  border-radius: inherit;
 }
 
 .experiment-six-layer-c-draggable.experiment-set-two-draggable--active {

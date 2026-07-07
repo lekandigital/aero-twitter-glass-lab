@@ -12,7 +12,11 @@ import {
 } from '../experiment-set-four/materialSettings';
 import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/PwzzovOGlassCorners';
-import { experimentElevenLayerCDisplayMaterial } from './experimentElevenLayerCMaterial';
+import {
+  applyExperimentElevenLayerCLayout,
+  experimentElevenLayerCDisplayMaterial,
+} from './experimentElevenLayerCMaterial';
+import { e6LayerCInspectAttrs } from '../experiment-set-six/layerCMaterialSettings';
 
 function layerBackdropLights(prefix: 'layerA' | 'layerB', settings: E4MaterialSettings) {
   return {
@@ -49,15 +53,19 @@ function layerBackdropReflexEnabled(prefix: 'layerA' | 'layerB', settings: E4Mat
 }
 
 function ExperimentElevenLayerCSheet() {
-  const { e11, saves, selectedSaveIdByExperiment } = useExperimentSetOne();
+  const { e11, e11LayerCLayout, saves, selectedSaveIdByExperiment } = useExperimentSetOne();
   const selectedSaveId = selectedSaveIdByExperiment.eleven;
   const selectedSave = useMemo(
     () => (selectedSaveId == null ? undefined : saves.find((save) => save.id === selectedSaveId)),
     [saves, selectedSaveId],
   );
   const layerCSettings: E4MaterialSettings = useMemo(
-    () => experimentElevenLayerCDisplayMaterial(e11, selectedSave?.e11LayerC),
-    [e11, selectedSave?.e11LayerC],
+    () =>
+      applyExperimentElevenLayerCLayout(
+        experimentElevenLayerCDisplayMaterial(e11, selectedSave?.e11LayerC),
+        e11LayerCLayout,
+      ),
+    [e11, e11LayerCLayout, selectedSave?.e11LayerC],
   );
 
   return (
@@ -66,7 +74,7 @@ function ExperimentElevenLayerCSheet() {
       role="region"
       aria-label="Experiment Eleven layer C"
       style={{ ...e4SettingsToCssVars(layerCSettings), ...e4LayerBDimensionStyle(layerCSettings, false) }}
-      {...e4InspectAttrs('layer-b')}
+      {...e6LayerCInspectAttrs('layer-c', 'Layer C · panel', 'eleven')}
     >
       <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />
       <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--bottom" aria-hidden="true" />

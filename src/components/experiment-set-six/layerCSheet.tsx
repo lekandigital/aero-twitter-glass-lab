@@ -3,7 +3,7 @@ import { useExperimentSetOne } from '../experiment-set-one/combinedSettings';
 import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/PwzzovOGlassCorners';
 import type { E4MaterialSettings } from '../experiment-set-four/materialSettings';
-import { experimentSixLayerCCircleStyle, e6LayerCInspectAttrs } from './layerCMaterialSettings';
+import { experimentSixLayerCPanelStyle, e6LayerCInspectAttrs } from './layerCMaterialSettings';
 
 function layerBackdropLights(prefix: 'layerA' | 'layerB', settings: E4MaterialSettings) {
   return {
@@ -39,7 +39,7 @@ function layerBackdropReflexEnabled(prefix: 'layerA' | 'layerB', settings: E4Mat
   ]);
 }
 
-/** Branch save layer B materials as a draggable circle on top of nested B. */
+/** Branch save layer B materials as a draggable panel on top of nested B. */
 export function ExperimentSixLayerCSheet() {
   const { e6, e6LayerC } = useExperimentSetOne();
   return (
@@ -47,7 +47,7 @@ export function ExperimentSixLayerCSheet() {
       className="experiment-four-layer-b experiment-six-layer-c"
       role="region"
       aria-label="Experiment Six layer C"
-      style={experimentSixLayerCCircleStyle(e6LayerC, e6)}
+      style={experimentSixLayerCPanelStyle(e6LayerC, e6)}
       {...e6LayerCInspectAttrs('layer-c')}
     >
       <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />
