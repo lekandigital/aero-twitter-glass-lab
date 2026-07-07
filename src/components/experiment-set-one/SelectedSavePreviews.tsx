@@ -229,7 +229,8 @@ function SelectedSaveLayerC({
         ...e4LayerBDimensionStyle(layerCMaterial, false),
         position: 'absolute',
         top: 0,
-        left: 0,
+        left: '50%',
+        transform: 'translateX(-50%)',
       }}
     >
       <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />
