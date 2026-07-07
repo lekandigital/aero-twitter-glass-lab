@@ -153,7 +153,7 @@
 }
 
 /* Hide nested B rect only — layer C circle stays visible when B is toggled off. */
-.experiment-set-one-page[data-layer-b-visible='false'] .experiment-four-layer-a__bezel-inset > .experiment-four-layer-b:not(.experiment-six-layer-c) {
+.experiment-set-one-page[data-layer-b-visible='false'] .experiment-four-layer-a__bezel-inset > .experiment-four-layer-b:not(.experiment-six-layer-c):not(.experiment-eleven-layer-c) {
   display: none !important;
 }
 
