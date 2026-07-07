@@ -1245,28 +1245,40 @@
 .experiment-eleven-layer-c {
   background:
     radial-gradient(
-      ellipse 38px 20px at 89% 9%,
-      rgba(255, 255, 255, 0.9) 0%,
-      rgba(255, 255, 255, 0.34) 38%,
+      ellipse 42px 19px at 89% 9%,
+      rgba(255, 255, 255, 0.78) 0%,
+      rgba(255, 255, 255, 0.22) 39%,
       transparent 72%
     ),
-    linear-gradient(0deg, rgba(145, 184, 220, 0.22), rgba(145, 184, 220, 0.22)),
+    linear-gradient(0deg, rgba(96, 164, 221, 0.22), rgba(96, 164, 221, 0.22)),
     radial-gradient(
-      ellipse 150px 88px at 78% 62%,
-      rgba(52, 197, 245, calc(0.36 + var(--e4-layerB-transparency) * 0.08)) 0%,
-      rgba(116, 220, 255, calc(0.18 + var(--e4-layerB-transparency) * 0.06)) 48%,
-      transparent 80%
+      ellipse 190px 95px at 77% 61%,
+      rgba(64, 190, 242, calc(0.3 + var(--e4-layerB-transparency) * 0.08)) 0%,
+      rgba(120, 218, 252, calc(0.16 + var(--e4-layerB-transparency) * 0.05)) 48%,
+      transparent 82%
+    ),
+    radial-gradient(
+      ellipse 130px 82px at 17% 19%,
+      rgba(255, 255, 255, calc(0.08 + var(--e4-layerB-transparency) * 0.03)) 0%,
+      rgba(225, 247, 255, calc(0.05 + var(--e4-layerB-transparency) * 0.02)) 50%,
+      transparent 82%
     ),
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, calc(0.12 + var(--e4-layerB-fill-top) * var(--e4-layerB-transparency) * 0.14)) 0%,
-      rgba(221, 247, 255, calc(0.09 + var(--e4-layerB-fill-mid) * var(--e4-layerB-transparency) * 0.1)) 35%,
-      rgba(88, 199, 247, calc(0.16 + var(--e4-layerB-fill-bottom) * var(--e4-layerB-transparency) * 0.12)) 100%
+      rgba(255, 255, 255, calc(0.08 + var(--e4-layerB-fill-top) * var(--e4-layerB-transparency) * 0.06)) 0%,
+      rgba(216, 244, 255, calc(0.08 + var(--e4-layerB-fill-mid) * var(--e4-layerB-transparency) * 0.06)) 42%,
+      rgba(126, 215, 250, calc(0.16 + var(--e4-layerB-fill-bottom) * var(--e4-layerB-transparency) * 0.1)) 100%
     ),
-    rgba(118, 214, 252, calc(0.16 + var(--e4-layerB-body-tint) * var(--e4-layerB-transparency) * 0.18));
-  backdrop-filter: blur(calc(var(--e4-layerB-frost) * 0.58)) saturate(150%) brightness(108%);
-  -webkit-backdrop-filter: blur(calc(var(--e4-layerB-frost) * 0.58)) saturate(150%) brightness(108%);
-  box-shadow: inset 0 -12px 24px rgba(38, 145, 220, calc(0.11 + var(--e4-layerB-inner-depth) * 0.16));
+    rgba(145, 220, 250, calc(0.16 + var(--e4-layerB-body-tint) * var(--e4-layerB-transparency) * 0.12));
+  backdrop-filter: blur(calc(var(--e4-layerB-frost) * 0.68)) saturate(118%) brightness(103%);
+  -webkit-backdrop-filter: blur(calc(var(--e4-layerB-frost) * 0.68)) saturate(118%) brightness(103%);
+  box-shadow:
+    inset 1px 0 0 rgba(255, 255, 255, calc(0.3 + var(--e4-layerB-rim-strength) * 0.24)),
+    inset 0 -1px 0 rgba(255, 255, 255, calc(0.42 + var(--e4-layerB-rim-strength) * 0.22)),
+    inset 0 1px 0 rgba(255, 255, 255, calc(0.18 + var(--e4-layerB-rim-strength) * 0.18)),
+    inset 0 -16px 26px rgba(74, 166, 220, calc(0.05 + var(--e4-layerB-inner-depth) * 0.12)),
+    -2px 3px 7px rgba(72, 128, 172, calc(0.08 + var(--e4-layerB-outer-shadow) * 0.08)),
+    0 8px 18px rgba(36, 96, 145, calc(0.035 + var(--e4-layerB-outer-shadow) * 0.06));
 }
 
 .experiment-eleven-layer-c::before {
@@ -1286,45 +1298,83 @@
   z-index: 5;
   mix-blend-mode: screen;
   background:
-    radial-gradient(ellipse 38px 14px at 88% 8%, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.28) 36%, transparent 74%),
-    radial-gradient(ellipse 20px 48px at 98% 8%, rgba(255, 255, 255, 0.5), transparent 72%),
-    linear-gradient(124deg, transparent 68%, rgba(255, 255, 255, 0.36) 77%, rgba(255, 255, 255, 0.12) 84%, transparent 94%);
-  opacity: calc(0.54 + var(--e4-layerB-shine-opacity) * 0.24);
+    linear-gradient(90deg, rgba(255, 255, 255, 0.62) 0 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.68) 0 1px, transparent 1px),
+    radial-gradient(ellipse 42px 15px at 88% 8%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.24) 37%, transparent 74%),
+    radial-gradient(ellipse 18px 48px at 99% 8%, rgba(255, 255, 255, 0.42), transparent 72%),
+    linear-gradient(124deg, transparent 69%, rgba(255, 255, 255, 0.32) 78%, rgba(255, 255, 255, 0.1) 85%, transparent 94%);
+  opacity: calc(0.48 + var(--e4-layerB-shine-opacity) * 0.22);
 }
 
 .experiment-eleven-layer-c .experiment-four-layer-b__shine {
-  opacity: calc(var(--e4-layerB-shine-opacity) * 0.42);
+  opacity: calc(var(--e4-layerB-shine-opacity) * 0.38);
   background:
     radial-gradient(
-      ellipse 88% 62% at 53% -7%,
-      rgba(255, 255, 255, calc(var(--e4-layerB-top-shine) * var(--e4-layerB-rim-strength) * 0.44)),
-      rgba(255, 255, 255, calc(var(--e4-layerB-top-radial) * var(--e4-layerB-rim-strength) * 0.14)) 36%,
+      ellipse 90% 58% at 50% -8%,
+      rgba(255, 255, 255, calc(var(--e4-layerB-top-shine) * var(--e4-layerB-rim-strength) * 0.38)),
+      rgba(255, 255, 255, calc(var(--e4-layerB-top-radial) * var(--e4-layerB-rim-strength) * 0.12)) 38%,
       transparent 74%
     ),
     linear-gradient(
       116deg,
-      transparent 55%,
-      rgba(255, 255, 255, calc(var(--e4-layerB-diagonal-gloss) * var(--e4-layerB-rim-strength) * 0.26)) 72%,
-      rgba(255, 255, 255, 0.1) 78%,
+      transparent 56%,
+      rgba(255, 255, 255, calc(var(--e4-layerB-diagonal-gloss) * var(--e4-layerB-rim-strength) * 0.24)) 72%,
+      rgba(255, 255, 255, 0.08) 78%,
       transparent 90%
     );
 }
 
 .experiment-eleven-layer-c .glass-frost-matte {
-  opacity: 0.04;
+  opacity: 0.07;
   mix-blend-mode: soft-light;
 }
 
 .experiment-eleven-layer-c .glass-frost-gloss {
-  opacity: 0.1;
+  opacity: 0.13;
 }
 
 .experiment-eleven-layer-c .experiment-four-layer-b__radial-corners {
-  opacity: 0.16;
+  opacity: 0.12;
 }
 
 .experiment-eleven-layer-c .experiment-four-layer-b__pwzzovO-glass-wrap {
-  opacity: 0.54;
+  opacity: 0.48;
+}
+
+.experiment-eleven-layer-c .experiment-four-layer-b__rim-edge,
+.experiment-eleven-layer-c .experiment-four-layer-b__rim-side {
+  z-index: 6;
+  mix-blend-mode: screen;
+}
+
+.experiment-eleven-layer-c .experiment-four-layer-b__rim-edge--top {
+  opacity: 0.2;
+}
+
+.experiment-eleven-layer-c .experiment-four-layer-b__rim-edge--bottom {
+  opacity: 0.56;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.64) 0%,
+    rgba(255, 255, 255, 0.42) 24%,
+    rgba(226, 247, 255, 0.28) 78%,
+    rgba(255, 255, 255, 0.44) 100%
+  );
+}
+
+.experiment-eleven-layer-c .experiment-four-layer-b__rim-side--left {
+  opacity: 0.58;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.62) 16%,
+    rgba(255, 255, 255, 0.42) 76%,
+    transparent 100%
+  );
+}
+
+.experiment-eleven-layer-c .experiment-four-layer-b__rim-side--right {
+  opacity: 0.22;
 }
 
 .experiment-four-layer-b__shine {
