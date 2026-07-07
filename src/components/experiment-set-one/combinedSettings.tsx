@@ -2834,7 +2834,11 @@ export function ExperimentSetOneSettingsDock() {
                                                 className="experiment-one-settings-dock__swap-option"
                                                 onClick={() => {
                                                   replaceSaveMultiSelection(item.experiment, item.key, alt.key);
-                                                  // Keep other swap dropdowns open while switching saves.
+                                                  setExpandedSwapKeys((prev) => {
+                                                    const nextInstanceKey = selectedSaveInstanceKey(item.experiment, alt.key);
+                                                    const next = prev.map((key) => (key === item.instanceKey ? nextInstanceKey : key));
+                                                    return next.includes(nextInstanceKey) ? next : [...next, nextInstanceKey];
+                                                  });
                                                 }}
                                                 title={`Swap to ${formatSaveLabel(alt.save, alt.branchSlug)}`}
                                               >
