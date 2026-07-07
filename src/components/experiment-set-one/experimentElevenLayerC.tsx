@@ -1,9 +1,9 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useExperimentSetOne } from './combinedSettings';
 import { useRenderVariant } from '../../render-variants/RenderVariantContext';
 import { EXPERIMENT_SET_ONE_POSITION_KEYS } from './dragPositions';
-import { useHoldDrag } from '../shared/useHoldDrag';
+import { ExperimentSetTwoDraggableShell } from '../experiment-set-two/primitives';
 import {
   e4InspectAttrs,
   e4LayerBDimensionStyle,
@@ -52,22 +52,8 @@ function layerBackdropReflexEnabled(prefix: 'layerA' | 'layerB', settings: E4Mat
   ]);
 }
 
-function ExperimentElevenLayerCSheet() {
-  const { e11, e11LayerCLayout, saves, selectedSaveIdByExperiment } = useExperimentSetOne();
-  const selectedSaveId = selectedSaveIdByExperiment.eleven;
-  const selectedSave = useMemo(
-    () => (selectedSaveId == null ? undefined : saves.find((save) => save.id === selectedSaveId)),
-    [saves, selectedSaveId],
-  );
-  const layerCSettings: E4MaterialSettings = useMemo(
-    () =>
-      applyExperimentElevenLayerCLayout(
-        experimentElevenLayerCDisplayMaterial(e11, selectedSave?.e11LayerC),
-        e11LayerCLayout,
-      ),
-    [e11, e11LayerCLayout, selectedSave?.e11LayerC],
-  );
-
+function ExperimentElevenLayerCSheet({ material }: { material: E4MaterialSettings }) {
+  const layerCSettings = material;
   return (
     <div
       className="experiment-four-layer-b experiment-eleven-layer-c"
@@ -102,56 +88,51 @@ function ExperimentElevenLayerCSheet() {
 }
 
 function ExperimentElevenLayerCDraggablePane({
+  material,
   initialPosition,
   layoutResetVersion = 0,
 }: {
+  material: E4MaterialSettings;
   initialPosition: { x: number; y: number };
   layoutResetVersion?: number;
 }) {
-  const boundsRef = useRef<HTMLDivElement>(null);
-  const shellRef = useRef<HTMLDivElement>(null);
-  const { position, dragging, onPointerDown, onPointerMove, endDrag } = useHoldDrag({
-    shellRef,
-    boundsRef,
-    initialPosition,
-    bounds: 'viewport',
-    persistKey: EXPERIMENT_SET_ONE_POSITION_KEYS.layerC11,
-    layoutResetVersion,
-  });
-
   return (
-    <div
-      ref={shellRef}
-      className={`experiment-set-two-draggable experiment-six-layer-c-draggable${dragging ? ' experiment-set-two-draggable--active' : ''}`}
-      style={{
-        position: 'fixed',
-        left: position?.x ?? initialPosition.x,
-        top: position?.y ?? initialPosition.y,
-      }}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={endDrag}
-      onPointerCancel={endDrag}
-      role="application"
-      aria-label="Experiment Eleven — layer C"
-      aria-roledescription="draggable"
+    <ExperimentSetTwoDraggableShell
+      bounds="parent"
+      initialPosition={initialPosition}
+      persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerC11}
+      layoutResetVersion={layoutResetVersion}
+      ariaLabel="Experiment Eleven — layer C"
+      className="experiment-six-layer-c-draggable"
     >
-      <ExperimentElevenLayerCSheet />
-    </div>
+      <ExperimentElevenLayerCSheet material={material} />
+    </ExperimentSetTwoDraggableShell>
   );
 }
 
 export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layoutResetVersion: number }) {
-  const { layerCVisible } = useExperimentSetOne();
+  const { layerCVisible, e11, e11LayerCLayout, saves, selectedSaveIdByExperiment } = useExperimentSetOne();
   const { slug } = useRenderVariant();
   const [inset, setInset] = useState<HTMLElement | null>(null);
-
+  const selectedSaveId = selectedSaveIdByExperiment.eleven;
+  const selectedSave = useMemo(
+    () => (selectedSaveId == null ? undefined : saves.find((save) => save.id === selectedSaveId)),
+    [saves, selectedSaveId],
+  );
+  const layerCSettings: E4MaterialSettings = useMemo(
+    () =>
+      applyExperimentElevenLayerCLayout(
+        experimentElevenLayerCDisplayMaterial(e11, selectedSave?.e11LayerC),
+        e11LayerCLayout,
+      ),
+    [e11, e11LayerCLayout, selectedSave?.e11LayerC],
+  );
   const initialPosition = useMemo(
     () => ({
-      x: 0,
+      x: Math.max(0, Math.round((e11.layerBWidth as number - (layerCSettings.layerBWidth as number)) / 2)),
       y: 0,
     }),
-    [],
+    [e11.layerBWidth, layerCSettings.layerBWidth],
   );
 
   useLayoutEffect(() => {
@@ -169,7 +150,11 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
   if (!layerCVisible || !inset) return null;
 
   return createPortal(
-    <ExperimentElevenLayerCDraggablePane initialPosition={initialPosition} layoutResetVersion={layoutResetVersion} />,
+    <ExperimentElevenLayerCDraggablePane
+      material={layerCSettings}
+      initialPosition={initialPosition}
+      layoutResetVersion={layoutResetVersion}
+    />,
     inset,
   );
 }
