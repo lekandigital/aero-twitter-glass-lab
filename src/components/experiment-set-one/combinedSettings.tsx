@@ -2886,7 +2886,7 @@ export function ExperimentSetOneSettingsDock() {
                             save.id,
                             branchVariant,
                           );
-                          const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
+                          const showCurrent = current;
                           const saveKey = selectionKey;
                           const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
                           const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
@@ -2927,13 +2927,14 @@ export function ExperimentSetOneSettingsDock() {
                                 }
                               }}
                               title={`${save.label}${save.branchVariant ? ` (${save.branchVariant})` : ''} · click to load · ⌘+click to multi-select`}
-                            >
-                              <span className="experiment-one-settings-dock__save-chip-main">
-                                <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
-                                {formatLayoutSummary(save) && (
-                                  <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
-                                )}
-                              </span>
+                              >
+                                <span className="experiment-one-settings-dock__save-chip-main">
+                                  <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
+                                  {formatLayoutSummary(save) && (
+                                    <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
+                                  )}
+                                </span>
+                              {showCurrent && <span className="experiment-one-settings-dock__save-chip-current-badge">Current</span>}
                               {dockExperiment === 'eleven' && save.e4 && <ElevenSaveLayerCPreview save={save} />}
                               {panelSetEntries.length > 0 && (
                                 <span className="experiment-one-settings-dock__save-chip-panel-set" aria-label="Saved panel set">
@@ -2994,7 +2995,7 @@ export function ExperimentSetOneSettingsDock() {
                             save.id,
                             variant.slug,
                           );
-                          const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
+                          const showCurrent = current;
                           const saveKey = selectionKey;
                           const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
                           const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
@@ -3034,13 +3035,14 @@ export function ExperimentSetOneSettingsDock() {
                                 }
                               }}
                               title={`${save.label} (${variant.label}) · click to load · ⌘+click to multi-select`}
-                            >
-                              <span className="experiment-one-settings-dock__save-chip-main">
-                                <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
-                                {formatLayoutSummary(save) && (
-                                  <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
-                                )}
-                              </span>
+                              >
+                                <span className="experiment-one-settings-dock__save-chip-main">
+                                  <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
+                                  {formatLayoutSummary(save) && (
+                                    <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
+                                  )}
+                                </span>
+                              {showCurrent && <span className="experiment-one-settings-dock__save-chip-current-badge">Current</span>}
                               {dockExperiment === 'eleven' && save.e4 && <ElevenSaveLayerCPreview save={save} />}
                               {canReorderSave && (
                                 <span className="experiment-one-settings-dock__save-context-actions" onClick={(e) => e.stopPropagation()}>
@@ -3084,7 +3086,7 @@ export function ExperimentSetOneSettingsDock() {
                             save.id,
                             branchVariant,
                           );
-                          const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
+                          const showCurrent = current;
                           const saveKey = selectionKey;
                           const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
                           const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
@@ -3124,13 +3126,14 @@ export function ExperimentSetOneSettingsDock() {
                                 }
                               }}
                               title={`${save.label}${save.branchVariant ? ` (${save.branchVariant})` : ''} · click to load · ⌘+click to multi-select`}
-                            >
-                              <span className="experiment-one-settings-dock__save-chip-main">
-                                <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
-                                {formatLayoutSummary(save) && (
-                                  <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
-                                )}
-                              </span>
+                              >
+                                <span className="experiment-one-settings-dock__save-chip-main">
+                                  <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
+                                  {formatLayoutSummary(save) && (
+                                    <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
+                                  )}
+                                </span>
+                              {showCurrent && <span className="experiment-one-settings-dock__save-chip-current-badge">Current</span>}
                               {dockExperiment === 'eleven' && save.e4 && <ElevenSaveLayerCPreview save={save} />}
                               {canReorderSave && (
                                 <span className="experiment-one-settings-dock__save-context-actions" onClick={(e) => e.stopPropagation()}>
@@ -3173,7 +3176,7 @@ export function ExperimentSetOneSettingsDock() {
                       save.id,
                       branchVariant,
                     );
-                    const showCurrent = current && (!saveMultiSelectionActive || multiSelected);
+                    const showCurrent = current;
                     const saveKey = selectionKey;
                     const saveInstanceKey = selectedSaveInstanceKey(dockExperiment, selectionKey);
                     const selectedOrderIndex = selectedSaveInstanceOrder.indexOf(saveInstanceKey);
@@ -3220,6 +3223,7 @@ export function ExperimentSetOneSettingsDock() {
                             <span className="experiment-one-settings-dock__save-chip-meta">{formatLayoutSummary(save)}</span>
                           )}
                         </span>
+                        {showCurrent && <span className="experiment-one-settings-dock__save-chip-current-badge">Current</span>}
                         {dockExperiment === 'eleven' && save.e4 && <ElevenSaveLayerCPreview save={save} />}
                         {canReorderSave && (
                           <span className="experiment-one-settings-dock__save-context-actions" onClick={(e) => e.stopPropagation()}>
