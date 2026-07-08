@@ -32,6 +32,7 @@ import { normalizeExperimentTenPanelGeometry } from './experimentTenPanelGeometr
 import { applyExperimentElevenPanelGeometry } from './experimentElevenPanelGeometry';
 import { experimentElevenLayerCDisplayMaterial } from './experimentElevenLayerCMaterial';
 import type { ExperimentSetOneSnapshot } from './savedConfigs';
+import { useRenderVariant } from '../../render-variants/RenderVariantContext';
 
 type PreviewExperiment = Extract<
   ExperimentId,
@@ -50,6 +51,7 @@ type SavePreview = {
   layerCOverride: Partial<E4MaterialSettings> | null;
   /** Semantic appearance opt-in, driven by the save's own field — not its id. */
   bezelStyle: string | null;
+  current: boolean;
 };
 
 const PREVIEW_EXPERIMENTS: PreviewExperiment[] = ['four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
@@ -181,6 +183,16 @@ function selectedSaveLayerCMaterial(
   return experimentElevenLayerCDisplayMaterial(material, override);
 }
 
+function isPreviewSaveCurrent(
+  selectedSaveId: number | null | undefined,
+  activeRenderVariant: RenderVariantSlug | null | undefined,
+  saveId: number,
+  branchSlug: RenderVariantSlug | null,
+): boolean {
+  if (selectedSaveId !== saveId) return false;
+  return (branchSlug ?? null) === (activeRenderVariant ?? null);
+}
+
 function SelectedSaveLayerB({ material, nested = false }: { material: E4MaterialSettings; nested?: boolean }) {
   return (
     <div
@@ -308,11 +320,13 @@ function SelectedSaveStagePanel({
   zIndex,
   position,
   onPositionCommit,
+  isCurrent,
 }: {
   preview: SavePreview;
   zIndex: number;
   position: DragPoint;
   onPositionCommit: (position: DragPoint) => void;
+  isCurrent: boolean;
 }) {
   const freeLayerB = !preview.material.layerBNestedInA;
   const dragRef = useRef<DragState>(emptyDragState());
@@ -382,7 +396,7 @@ function SelectedSaveStagePanel({
 
   return (
     <div
-      className="experiment-set-one-selected-save-stage"
+      className={`experiment-set-one-selected-save-stage${isCurrent ? ' experiment-set-one-selected-save-stage--current' : ''}`}
       style={style}
       role="group"
       aria-label={label}
@@ -391,6 +405,7 @@ function SelectedSaveStagePanel({
       data-selected-save-branch={preview.branchSlug ?? 'base'}
       data-bezel-style={preview.bezelStyle ?? undefined}
     >
+      {isCurrent && <span className="experiment-set-one-selected-save-stage__current-badge">Current</span>}
       <div
         className="experiment-set-one-selected-save-stage__layer-a"
         style={{ transform: `translate(${SHOWCASE_PANEL_SNAP.x}px, ${SHOWCASE_PANEL_SNAP.y}px)` }}
@@ -423,11 +438,13 @@ function SelectedSaveStagePanel({
 export function SelectedSaveStagePanels() {
   const {
     saves,
+    selectedSaveIdByExperiment,
     selectedSaveKeysByExperiment,
     selectedSaveVisualOrder,
     selectedSavePositions,
     setSelectedSavePosition,
   } = useExperimentSetOne();
+  const { slug: activeRenderVariant } = useRenderVariant();
 
   const previews = useMemo(() => {
     const layoutOrder = selectedSaveInstanceKeys(selectedSaveKeysByExperiment);
@@ -443,6 +460,12 @@ export function SelectedSaveStagePanels() {
         const branchLabel = parsed.branchSlug
           ? RENDER_VARIANTS.find((variant) => variant.slug === parsed.branchSlug)?.label ?? parsed.branchSlug
           : null;
+        const current = isPreviewSaveCurrent(
+          selectedSaveIdByExperiment[experiment],
+          activeRenderVariant,
+          snapshot.id,
+          parsed.branchSlug,
+        );
         return [{
           key: `${experiment}:${key}`,
           selectionKey: key,
@@ -454,6 +477,7 @@ export function SelectedSaveStagePanels() {
           material,
           layerCOverride: snapshot.e11LayerC ?? null,
           bezelStyle: snapshot.bezelStyle ?? null,
+          current,
         }];
       }),
     ).sort(
@@ -467,6 +491,8 @@ export function SelectedSaveStagePanels() {
     }));
   }, [
     saves,
+    selectedSaveIdByExperiment,
+    activeRenderVariant,
     selectedSaveKeysByExperiment,
     selectedSaveVisualOrder,
   ]);
@@ -492,6 +518,7 @@ export function SelectedSaveStagePanels() {
           zIndex={zIndex}
           position={selectedSavePositions[preview.key] ?? defaultSelectedSavePosition()}
           onPositionCommit={(position) => setSelectedSavePosition(preview.key, position)}
+          isCurrent={preview.current}
         />
       ))}
     </>
