@@ -1,0 +1,142 @@
+/*
+ * Experiment Set 1 — fixed left menu pane + zoomable/pannable canvas "camera".
+ *
+ * The settings dock is pinned to the left edge as a fixed sidebar (its internal
+ * scrolling is untouched). Everything to the right of it — the wallpaper and the
+ * experiment stage — is treated as one camera: a shared scale + translate is
+ * applied to both layers so you can zoom in and pan around to inspect the panels
+ * up close without changing their real sizes.
+ */
+
+:root {
+  /* Written by StageCamera; defaults keep first paint aligned with the menu. */
+  --e1-cam-zoom: 1;
+  --e1-cam-x: 384px;
+  --e1-cam-y: 0px;
+}
+
+.experiment-set-one-page {
+  --e1-menu-width: 384px;
+}
+
+/* ── Fixed left menu pane ─────────────────────────────────────────────── */
+
+.experiment-one-settings-dock.experiment-one-draggable {
+  position: fixed;
+  left: 0 !important;
+  top: 0 !important;
+  transform: none !important;
+  z-index: 50;
+  height: 100dvh;
+}
+
+.experiment-one-settings-dock__shell {
+  width: var(--e1-menu-width);
+  min-width: 0;
+  border-radius: 0 18px 18px 0;
+}
+
+.experiment-one-settings-dock__shell--collapsed {
+  width: auto;
+  min-width: 240px;
+}
+
+/* Menu is anchored now — drop the drag affordances. */
+.experiment-one-settings-dock__edge-grab {
+  display: none;
+}
+
+.experiment-one-settings-dock__header,
+.experiment-one-draggable--active .experiment-one-settings-dock__header,
+.experiment-one-settings-dock__drag-handle {
+  cursor: default;
+}
+
+/* Header text clears the fixed menu (both normal + showcase-align layouts). */
+.experiment-set-one-page .experiment-set-one-header,
+.experiment-set-one-page[data-showcase-align='true'] .experiment-set-one-header {
+  margin-left: calc(var(--e1-menu-width) + 0.75rem);
+}
+
+/* ── Camera: shared transform on wallpaper + stage ────────────────────── */
+
+body[data-e1-camera='on'] .aero-wallpaper__stage,
+body[data-e1-camera='on'] .experiment-set-one-stage {
+  transform: translate3d(var(--e1-cam-x), var(--e1-cam-y), 0) scale(var(--e1-cam-zoom));
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* Transparent surface that catches drag-to-pan on empty canvas areas.
+   Sits above the wallpaper but below the panels, so dragging a panel still
+   drags the panel and dragging empty space pans the camera. */
+.experiment-set-one-camera-pan {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  touch-action: none;
+  cursor: grab;
+}
+
+.experiment-set-one-camera-pan--panning {
+  cursor: grabbing;
+}
+
+/* ── Zoom controls cluster ────────────────────────────────────────────── */
+
+.experiment-set-one-camera-controls {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(8, 18, 34, 0.9), rgba(6, 14, 27, 0.82));
+  border: 1px solid rgba(160, 215, 255, 0.18);
+  box-shadow: 0 12px 32px rgba(0, 12, 30, 0.42);
+  backdrop-filter: blur(14px) saturate(1.08);
+  -webkit-backdrop-filter: blur(14px) saturate(1.08);
+  font-family: var(--e1-font, system-ui, sans-serif);
+}
+
+.experiment-set-one-camera-controls__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 9px;
+  border: 1px solid rgba(160, 215, 255, 0.18);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(226, 244, 255, 0.92);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.experiment-set-one-camera-controls__btn:hover {
+  background: rgba(126, 232, 255, 0.16);
+  border-color: rgba(126, 232, 255, 0.4);
+}
+
+.experiment-set-one-camera-controls__btn--reset {
+  width: auto;
+  padding: 0 0.6rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+}
+
+.experiment-set-one-camera-controls__value {
+  min-width: 3.4ch;
+  padding: 0 0.2rem;
+  text-align: center;
+  font-size: 0.74rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(200, 232, 255, 0.86);
+  user-select: none;
+}

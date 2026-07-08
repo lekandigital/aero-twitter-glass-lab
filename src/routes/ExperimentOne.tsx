@@ -6,6 +6,7 @@ import {
   ExperimentSetOneSettingsDock,
 } from '../components/experiment-set-one/combinedSettings';
 import { ExperimentSetOneStage } from '../components/experiment-set-one/ExperimentSetOneStage';
+import { StageCamera } from '../components/experiment-set-one/StageCamera';
 
 /** Experiment Set 1 — Experiments One through Eleven */
 export function ExperimentOne() {
@@ -13,6 +14,7 @@ export function ExperimentOne() {
     <ExperimentSetOneProvider>
       <ExperimentOneRefractionFilterDefs />
       <ExperimentSetOneSettingsDock />
+      <StageCamera />
 
       <header className="experiment-set-one-header">
         <h1>Experiment Set 1</h1>

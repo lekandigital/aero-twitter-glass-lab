@@ -16,6 +16,7 @@ import './styles/experiment-set-three.css';
 // no-variant state) by src/render-variants/injectVariantStyles.ts, so it is NOT
 // imported globally here — that would leak main's rules into active variants.
 import './styles/showcase-align.css';
+import './styles/experiment-set-one-camera.css';
 import './styles/glass-frost-surface.css';
 import './styles/material-settings.css';
 import './styles/experiment-set-six.css';
