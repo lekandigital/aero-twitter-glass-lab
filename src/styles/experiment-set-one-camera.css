@@ -28,6 +28,33 @@
   transform: none !important;
   z-index: 50;
   height: 100dvh;
+  /* The dock is pinned, never dragged, in camera mode. The draggable base
+     leaves `will-change: transform, left, top` on it, which permanently
+     promotes the whole pane (and the ~88 backdrop-filters it contains) into one
+     GPU layer — that's what flickers while the saves list scrolls. Release it. */
+  will-change: auto !important;
+}
+
+/* Kill backdrop-filter inside the pinned dock. Every save-chip carries a
+   blur(10px) and the shell a blur(18px), but they only sit over the dock's own
+   ~90%-opaque background — so the blur is visually negligible while costing a
+   full re-raster of every chip on each scroll frame. Removing it stops the
+   flicker and the "list items don't paint while scrolling" without changing how
+   the dock looks. Scoped to camera mode so other pages are untouched. */
+body[data-e1-camera='on'] .experiment-one-settings-dock__shell,
+body[data-e1-camera='on'] .experiment-one-settings-dock__save-chip {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Canvas panels each carry a permanent `will-change: transform, left, top`
+   (for dragging). Left on, every glass panel is its own promoted layer that
+   re-rasters its backdrop-filter on each camera-pan frame — that's the canvas
+   flicker. Promote only the panel actually being dragged; idle panels repaint
+   normally with the rest of the transformed stage. */
+body[data-e1-camera='on'] .experiment-one-draggable:not(.experiment-one-draggable--active),
+body[data-e1-camera='on'] .experiment-set-two-draggable:not(.experiment-set-two-draggable--active) {
+  will-change: auto;
 }
 
 .experiment-one-settings-dock__shell {
@@ -64,6 +91,18 @@ body[data-e1-camera='on'] .aero-wallpaper__stage,
 body[data-e1-camera='on'] .experiment-set-one-stage {
   transform: translate3d(var(--e1-cam-x), var(--e1-cam-y), 0) scale(var(--e1-cam-zoom));
   transform-origin: 0 0;
+  /* No permanent `will-change`/layer promotion here: it forces the wallpaper
+     and stage into separate GPU layers, which makes every `backdrop-filter`
+     that samples them (the dock + all glass panels) render blank while the
+     camera moves. `will-change` is added transiently, only during an active
+     pan/zoom, via [data-e1-cam-active] below. */
+}
+
+/* Transient promotion only while the user is actively panning/zooming, so the
+   motion stays smooth without leaving the layers promoted (and blanking) at
+   rest. StageCamera sets/clears data-e1-cam-active around interactions. */
+body[data-e1-camera='on'][data-e1-cam-active] .aero-wallpaper__stage,
+body[data-e1-camera='on'][data-e1-cam-active] .experiment-set-one-stage {
   will-change: transform;
 }
 
@@ -76,6 +115,12 @@ body[data-e1-camera='on'] .experiment-set-one-stage {
   z-index: 0;
   touch-action: none;
   cursor: grab;
+}
+
+/* Space held: rise above panel content so pan-drag works anywhere on the
+   canvas, not just empty space (dock at z:50 and controls at z:55 stay on top). */
+.experiment-set-one-camera-pan--armed {
+  z-index: 45;
 }
 
 .experiment-set-one-camera-pan--panning {
@@ -138,5 +183,14 @@ body[data-e1-camera='on'] .experiment-set-one-stage {
   font-size: 0.74rem;
   font-variant-numeric: tabular-nums;
   color: rgba(200, 232, 255, 0.86);
+  user-select: none;
+}
+
+.experiment-set-one-camera-controls__hint {
+  padding: 0 0.5rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.01em;
+  color: rgba(180, 215, 250, 0.62);
+  white-space: nowrap;
   user-select: none;
 }
