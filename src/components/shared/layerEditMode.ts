@@ -1,14 +1,14 @@
 import type { MaterialFieldBase } from './MaterialSettingControl';
 import { orderedSections } from './materialSettingGroups';
 
-export type LayerEditMode = 'both' | 'layerA' | 'layerB' | 'layerC';
+export type LayerEditMode = 'both' | 'layerA' | 'layerB' | 'layerC' | 'layerD' | 'layerE';
 
 export const E3_SHARED_SECTIONS = ['Palette'] as const;
 
 export const E4_SHARED_SECTIONS = ['Palette', 'Layer A · Bezel layout'] as const;
 
 export function stripLayerSectionPrefix(section: string): string {
-  return section.replace(/^Layer [ABC] · /, '');
+  return section.replace(/^Layer [ABCDE] · /, '');
 }
 
 /** Stable foldable-section key across Both / Layer A / Layer B display names. */
@@ -40,9 +40,13 @@ export function isIndependentLayerSizeField(fieldId: string): boolean {
 export const LAYER_A_LAYOUT_FIELD_IDS = ['layerAWidth', 'layerAHeight'] as const;
 export const LAYER_B_LAYOUT_FIELD_IDS = ['layerBWidth', 'layerBHeight'] as const;
 
+export function isTopLayerEditMode(mode: LayerEditMode): mode is 'layerC' | 'layerD' | 'layerE' {
+  return mode === 'layerC' || mode === 'layerD' || mode === 'layerE';
+}
+
 export function layoutFieldIdsForMode(mode: LayerEditMode): readonly string[] {
   if (mode === 'layerA') return LAYER_A_LAYOUT_FIELD_IDS;
-  if (mode === 'layerB' || mode === 'layerC') return LAYER_B_LAYOUT_FIELD_IDS;
+  if (mode === 'layerB' || isTopLayerEditMode(mode)) return LAYER_B_LAYOUT_FIELD_IDS;
   return [...LAYER_A_LAYOUT_FIELD_IDS, ...LAYER_B_LAYOUT_FIELD_IDS];
 }
 
@@ -87,9 +91,9 @@ export function shouldShowFieldInLayerMode(
 
   if (mode === 'layerA' && isB && paired) return false;
   if (mode === 'layerA' && isB && isIndependentLayerSizeField(fieldId)) return false;
-  if ((mode === 'layerB' || mode === 'layerC') && isA && paired) return false;
-  if ((mode === 'layerB' || mode === 'layerC') && isA && isIndependentLayerSizeField(fieldId)) return false;
-  if (mode === 'layerC' && isA && !isB) return false;
+  if ((mode === 'layerB' || isTopLayerEditMode(mode)) && isA && paired) return false;
+  if ((mode === 'layerB' || isTopLayerEditMode(mode)) && isA && isIndependentLayerSizeField(fieldId)) return false;
+  if (isTopLayerEditMode(mode) && isA && !isB) return false;
   return true;
 }
 
@@ -176,7 +180,7 @@ export function resolveFieldValueForLayerMode(
     if (isIndependentLayerSizeField(fieldId)) return settings[fieldId];
     return settings[`layerB${suffix}`];
   }
-  if (mode === 'layerC' && fieldId.startsWith('layerA')) {
+  if (isTopLayerEditMode(mode) && fieldId.startsWith('layerA')) {
     const suffix = fieldId.slice(6);
     if (isIndependentLayerSizeField(fieldId)) return settings[fieldId];
     return settings[`layerB${suffix}`];

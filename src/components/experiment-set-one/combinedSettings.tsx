@@ -64,7 +64,13 @@ import { MaterialSettingFieldRow } from '../shared/MaterialSettingControl';
 import { ExperimentMultiLayerSettings } from '../shared/ExperimentMultiLayerSettings';
 import { LayerEditModeToggle } from '../shared/LayerEditModeToggle';
 import { LayerVisibilityToggles } from '../shared/LayerVisibilityToggles';
-import { sectionsForLayerMode, foldableSectionId, augmentFieldsWithLayerLayout, type LayerEditMode } from '../shared/layerEditMode';
+import {
+  sectionsForLayerMode,
+  foldableSectionId,
+  augmentFieldsWithLayerLayout,
+  isTopLayerEditMode,
+  type LayerEditMode,
+} from '../shared/layerEditMode';
 import {
   captureSettingsScrollAnchor,
   restoreSettingsScrollAnchor,
@@ -560,9 +566,13 @@ type ExperimentSetOneContextValue = {
   layerAVisible: boolean;
   layerBVisible: boolean;
   layerCVisible: boolean;
+  layerDVisible: boolean;
+  layerEVisible: boolean;
   toggleLayerAVisible: () => void;
   toggleLayerBVisible: () => void;
   toggleLayerCVisible: () => void;
+  toggleLayerDVisible: () => void;
+  toggleLayerEVisible: () => void;
   experimentVisible: ExperimentVisibility;
   toggleExperimentVisible: (id: ExperimentId) => void;
   activeExperiment: ExperimentId;
@@ -714,6 +724,11 @@ function resolveInitialE11LayerCLayout(
   boot: ExperimentSetOneSession,
   _e11: E4MaterialSettings,
 ): ExperimentElevenLayerCLayoutSettings {
+  const selectedSaveId = boot.selectedSaveIdByExperiment?.eleven;
+  if (selectedSaveId != null) {
+    const snapshot = loadExperimentSetOneSaves().find((save) => save.id === selectedSaveId);
+    if (snapshot?.e11LayerCLayout) return snapshot.e11LayerCLayout;
+  }
   if (boot.e11LayerCLayout) return boot.e11LayerCLayout;
   return { ...EXPERIMENT_ELEVEN_LAYER_C_LAYOUT };
 }
@@ -793,6 +808,8 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   const [layerAVisible, setLayerAVisible] = useState(boot.layerAVisible !== false);
   const [layerBVisible, setLayerBVisible] = useState(boot.layerBVisible !== false);
   const [layerCVisible, setLayerCVisible] = useState(boot.layerCVisible !== false);
+  const [layerDVisible, setLayerDVisible] = useState(boot.layerDVisible !== false);
+  const [layerEVisible, setLayerEVisible] = useState(boot.layerEVisible !== false);
   const [experimentVisible, setExperimentVisible] = useState<ExperimentVisibility>(
     boot.experimentVisible ?? DEFAULT_EXPERIMENT_VISIBILITY,
   );
@@ -1162,6 +1179,8 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     setLayerAVisible(true);
     setLayerBVisible(true);
     setLayerCVisible(true);
+    setLayerDVisible(true);
+    setLayerEVisible(true);
   }, []);
 
   const toggleLayerAVisible = useCallback(() => {
@@ -1174,6 +1193,14 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
 
   const toggleLayerCVisible = useCallback(() => {
     setLayerCVisible((visible) => !visible);
+  }, []);
+
+  const toggleLayerDVisible = useCallback(() => {
+    setLayerDVisible((visible) => !visible);
+  }, []);
+
+  const toggleLayerEVisible = useCallback(() => {
+    setLayerEVisible((visible) => !visible);
   }, []);
 
   const saveCurrent = useCallback((layout?: ExperimentSetOneLayoutSnapshot) => {
@@ -1424,7 +1451,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         if (snapshot.e4) {
           const next = normalizeExperimentElevenPanelGeometry(normalize(snapshot.e4));
           setE11State(next);
-          setE11LayerCLayoutState({ ...EXPERIMENT_ELEVEN_LAYER_C_LAYOUT });
+          setE11LayerCLayoutState(snapshot.e11LayerCLayout ?? { ...EXPERIMENT_ELEVEN_LAYER_C_LAYOUT });
         }
         return;
       }
@@ -1635,6 +1662,8 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       layerAVisible,
       layerBVisible,
       layerCVisible,
+      layerDVisible,
+      layerEVisible,
       inspectMode,
       experimentVisible,
       referenceWallpaper,
@@ -1649,7 +1678,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       e5BorderRefinementsVersion,
       activeRenderVariant,
     });
-  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, e11LayerCLayout, hidePanelText, layerAVisible, layerBVisible, layerCVisible, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, e5BorderRefinementsVersion, activeRenderVariant]);
+  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, e11LayerCLayout, hidePanelText, layerAVisible, layerBVisible, layerCVisible, layerDVisible, layerEVisible, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, e5BorderRefinementsVersion, activeRenderVariant]);
 
   useEffect(() => {
     const page = pageRef.current;
@@ -1786,9 +1815,13 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       layerAVisible,
       layerBVisible,
       layerCVisible,
+      layerDVisible,
+      layerEVisible,
       toggleLayerAVisible,
       toggleLayerBVisible,
       toggleLayerCVisible,
+      toggleLayerDVisible,
+      toggleLayerEVisible,
       experimentVisible,
       toggleExperimentVisible,
       activeExperiment,
@@ -1813,7 +1846,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       referenceWallpaper,
       toggleReferenceWallpaper,
     }),
-    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, e11LayerCLayout, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE11, setE6LayerC, setE11LayerCLayout, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, setSelectedSavePosition, replaceSaveMultiSelection, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper],
+    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, e11LayerCLayout, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE11, setE6LayerC, setE11LayerCLayout, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, layerDVisible, layerEVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, setSelectedSavePosition, replaceSaveMultiSelection, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper],
   );
 
   return (
@@ -1863,6 +1896,8 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         data-layer-a-visible={layerAVisible ? 'true' : 'false'}
         data-layer-b-visible={layerBVisible ? 'true' : 'false'}
         data-layer-c-visible={layerCVisible ? 'true' : 'false'}
+        data-layer-d-visible={layerDVisible ? 'true' : 'false'}
+        data-layer-e-visible={layerEVisible ? 'true' : 'false'}
         data-render-variant={activeRenderVariant ?? ''}
         data-selected-save-four={selectedSaveIdByExperiment.four ?? ''}
         data-selected-save-five={selectedSaveIdByExperiment.five ?? ''}
@@ -2044,9 +2079,13 @@ export function ExperimentSetOneSettingsDock() {
     layerAVisible,
     layerBVisible,
     layerCVisible,
+    layerDVisible,
+    layerEVisible,
     toggleLayerAVisible,
     toggleLayerBVisible,
     toggleLayerCVisible,
+    toggleLayerDVisible,
+    toggleLayerEVisible,
     activeExperiment,
     selectedSaveIdByExperiment,
     selectedExperimentIds,
@@ -2301,17 +2340,21 @@ export function ExperimentSetOneSettingsDock() {
     selection?.experiment === 'eleven' &&
     isE6LayerCInspectTarget(selection.target);
   const dockLayerEditMode: LayerEditMode =
-    layerEditMode === 'layerC' && dockExperiment !== 'six' && dockExperiment !== 'eleven'
+    (isTopLayerEditMode(layerEditMode) &&
+      dockExperiment !== 'six' &&
+      dockExperiment !== 'eight' &&
+      dockExperiment !== 'eleven') ||
+    ((layerEditMode === 'layerD' || layerEditMode === 'layerE') && dockExperiment !== 'eleven')
       ? 'both'
       : layerEditMode;
   const e6LayerCMode =
     (dockExperiment === 'six' || dockExperiment === 'eight') &&
     (layerEditMode === 'layerC' || (inspectingE6LayerC && layerEditMode === 'both'));
-  const e6LayerEditMode: LayerEditMode = e6LayerCMode ? 'layerC' : layerEditMode;
+  const e6LayerEditMode: LayerEditMode = e6LayerCMode ? 'layerC' : dockLayerEditMode;
   const e11LayerCMode =
     dockExperiment === 'eleven' &&
-    (layerEditMode === 'layerC' || (inspectingE11LayerC && layerEditMode === 'both'));
-  const e11LayerEditMode: LayerEditMode = e11LayerCMode ? 'layerC' : dockLayerEditMode;
+    (isTopLayerEditMode(layerEditMode) || (inspectingE11LayerC && layerEditMode === 'both'));
+  const e11LayerEditMode: LayerEditMode = e11LayerCMode ? layerEditMode : dockLayerEditMode;
   const note = selectionNote(selection);
   const filtering = selection !== null;
   const visibleE1Fields = useMemo(
@@ -2447,10 +2490,11 @@ export function ExperimentSetOneSettingsDock() {
   );
   const e11LayerCDefaults = useMemo(
     () =>
+      selectedElevenSave?.e11LayerCLayout ??
       experimentElevenLayerCLayoutFromMaterial(
         experimentElevenLayerCDisplayMaterial(e11, selectedElevenSave?.e11LayerC),
       ),
-    [e11, selectedElevenSave?.e11LayerC],
+    [e11, selectedElevenSave?.e11LayerC, selectedElevenSave?.e11LayerCLayout],
   );
   const visibleE11Fields = useMemo(() => {
     if (e11LayerCMode) return e11LayerCLayoutFields;
@@ -2513,7 +2557,7 @@ export function ExperimentSetOneSettingsDock() {
     if (container) {
       pendingScrollAnchorRef.current = captureSettingsScrollAnchor(container);
     }
-    if (mode === 'layerC') clearSelection();
+    if (isTopLayerEditMode(mode)) clearSelection();
     setLayerEditMode(mode);
   }, [clearSelection]);
 
@@ -3265,16 +3309,24 @@ export function ExperimentSetOneSettingsDock() {
                       onChange={handleLayerEditModeChange}
                       layout="side"
                       showLayerC={dockExperiment === 'six' || dockExperiment === 'eight' || dockExperiment === 'eleven'}
+                      showLayerD={dockExperiment === 'eleven'}
+                      showLayerE={dockExperiment === 'eleven'}
                     />
                     <span className="experiment-one-settings-dock__layer-rail-label">Show</span>
                     <LayerVisibilityToggles
                       layerAVisible={layerAVisible}
                       layerBVisible={layerBVisible}
                       layerCVisible={layerCVisible}
+                      layerDVisible={layerDVisible}
+                      layerEVisible={layerEVisible}
                       onToggleLayerA={toggleLayerAVisible}
                       onToggleLayerB={toggleLayerBVisible}
                       onToggleLayerC={toggleLayerCVisible}
+                      onToggleLayerD={toggleLayerDVisible}
+                      onToggleLayerE={toggleLayerEVisible}
                       showLayerC={dockExperiment === 'six' || dockExperiment === 'eight' || dockExperiment === 'eleven'}
+                      showLayerD={dockExperiment === 'eleven'}
+                      showLayerE={dockExperiment === 'eleven'}
                     />
                   </aside>
                 )}

@@ -30,7 +30,11 @@ import {
 } from './showcasePanelGeometry';
 import { normalizeExperimentTenPanelGeometry } from './experimentTenPanelGeometry';
 import { applyExperimentElevenPanelGeometry } from './experimentElevenPanelGeometry';
-import { experimentElevenLayerCDisplayMaterial } from './experimentElevenLayerCMaterial';
+import {
+  applyExperimentElevenLayerCLayout,
+  experimentElevenLayerCDisplayMaterial,
+  type ExperimentElevenLayerCLayoutSettings,
+} from './experimentElevenLayerCMaterial';
 import type { ExperimentSetOneSnapshot } from './savedConfigs';
 import { useRenderVariant } from '../../render-variants/RenderVariantContext';
 
@@ -49,10 +53,17 @@ type SavePreview = {
   branchLabel: string | null;
   material: E4MaterialSettings;
   layerCOverride: Partial<E4MaterialSettings> | null;
+  layerDOverride: Partial<E4MaterialSettings> | null;
+  layerEOverride: Partial<E4MaterialSettings> | null;
+  layerCLayoutOverride: ExperimentElevenLayerCLayoutSettings | null;
+  layerDLayoutOverride: ExperimentElevenLayerCLayoutSettings | null;
+  layerELayoutOverride: ExperimentElevenLayerCLayoutSettings | null;
   /** Semantic appearance opt-in, driven by the save's own field — not its id. */
   bezelStyle: string | null;
   current: boolean;
 };
+
+type SelectedSaveTopLayerId = 'c' | 'd' | 'e';
 
 const PREVIEW_EXPERIMENTS: PreviewExperiment[] = ['four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
 const FREE_LAYER_B_SNAP = { x: 52, y: 60 } as const;
@@ -224,18 +235,29 @@ function SelectedSaveLayerB({ material, nested = false }: { material: E4Material
 function SelectedSaveLayerC({
   material,
   layerCOverride,
+  layoutOverride,
+  layerId,
+  label,
 }: {
   material: E4MaterialSettings;
   layerCOverride: Partial<E4MaterialSettings> | null;
+  layoutOverride: ExperimentElevenLayerCLayoutSettings | null;
+  layerId: SelectedSaveTopLayerId;
+  label: string;
 }) {
   const layerCMaterial = useMemo(
-    () => selectedSaveLayerCMaterial(material, layerCOverride),
-    [material, layerCOverride],
+    () => {
+      const next = selectedSaveLayerCMaterial(material, layerCOverride);
+      return layoutOverride ? applyExperimentElevenLayerCLayout(next, layoutOverride) : next;
+    },
+    [material, layerCOverride, layoutOverride],
   );
   return (
     <div
-      className="experiment-four-layer-b experiment-eleven-layer-c"
+      className={`experiment-four-layer-b experiment-eleven-layer-c experiment-eleven-top-layer experiment-eleven-layer-${layerId}`}
       role="presentation"
+      aria-label={label}
+      data-e11-top-layer={layerId}
       style={{
         ...e4SettingsToCssVars(layerCMaterial),
         ...e4LayerBDimensionStyle(layerCMaterial, false),
@@ -266,9 +288,9 @@ function SelectedSaveLayerC({
   );
 }
 
-function SelectedSaveLayerA({ material, showLayerC }: { material: E4MaterialSettings; showLayerC: boolean }) {
+function SelectedSaveLayerA({ material, showTopLayer }: { material: E4MaterialSettings; showTopLayer: boolean }) {
   const showNestedB = material.layerBNestedInA;
-  const showInset = showNestedB || showLayerC;
+  const showInset = showNestedB || showTopLayer;
   return (
     <div
       className="experiment-four-layer-a"
@@ -329,6 +351,47 @@ function SelectedSaveStagePanel({
   isCurrent: boolean;
 }) {
   const freeLayerB = !preview.material.layerBNestedInA;
+  const { layerCVisible, layerDVisible, layerEVisible } = useExperimentSetOne();
+  const topLayers = useMemo(
+    () => {
+      if (preview.experiment !== 'eleven') return [];
+      return [
+        {
+          id: 'c' as const,
+          label: 'Layer C',
+          visible: layerCVisible,
+          override: preview.layerCOverride,
+          layoutOverride: preview.layerCLayoutOverride,
+        },
+        {
+          id: 'd' as const,
+          label: 'Layer D',
+          visible: layerDVisible,
+          override: preview.layerDOverride,
+          layoutOverride: preview.layerDLayoutOverride,
+        },
+        {
+          id: 'e' as const,
+          label: 'Layer E',
+          visible: layerEVisible,
+          override: preview.layerEOverride,
+          layoutOverride: preview.layerELayoutOverride,
+        },
+      ].filter((layer) => layer.visible && (layer.id === 'c' || layer.override));
+    },
+    [
+      layerCVisible,
+      layerDVisible,
+      layerEVisible,
+      preview.experiment,
+      preview.layerCOverride,
+      preview.layerDOverride,
+      preview.layerEOverride,
+      preview.layerCLayoutOverride,
+      preview.layerDLayoutOverride,
+      preview.layerELayoutOverride,
+    ],
+  );
   const dragRef = useRef<DragState>(emptyDragState());
   const [draftPosition, setDraftPosition] = useState(position);
   const positionRef = useRef(position);
@@ -411,7 +474,7 @@ function SelectedSaveStagePanel({
         style={{ transform: `translate(${SHOWCASE_PANEL_SNAP.x}px, ${SHOWCASE_PANEL_SNAP.y}px)` }}
         {...dragHandlers}
       >
-        <SelectedSaveLayerA material={preview.material} showLayerC={preview.experiment === 'eleven'} />
+        <SelectedSaveLayerA material={preview.material} showTopLayer={topLayers.length > 0} />
       </div>
       {freeLayerB && (
         <div
@@ -422,15 +485,22 @@ function SelectedSaveStagePanel({
           <SelectedSaveLayerB material={preview.material} />
         </div>
       )}
-      {preview.experiment === 'eleven' && (
+      {topLayers.map((layer) => (
         <div
-          className="experiment-set-one-selected-save-stage__layer-c"
+          key={layer.id}
+          className={`experiment-set-one-selected-save-stage__layer-c experiment-set-one-selected-save-stage__layer-${layer.id}`}
           style={{ transform: `translate(${SHOWCASE_PANEL_SNAP.x}px, ${SHOWCASE_PANEL_SNAP.y}px)` }}
           {...dragHandlers}
         >
-          <SelectedSaveLayerC material={preview.material} layerCOverride={preview.layerCOverride} />
+          <SelectedSaveLayerC
+            material={preview.material}
+            layerCOverride={layer.override}
+            layoutOverride={layer.layoutOverride}
+            layerId={layer.id}
+            label={layer.label}
+          />
         </div>
-      )}
+      ))}
     </div>
   );
 }
@@ -476,6 +546,11 @@ export function SelectedSaveStagePanels() {
           branchLabel,
           material,
           layerCOverride: snapshot.e11LayerC ?? null,
+          layerDOverride: snapshot.e11LayerD ?? null,
+          layerEOverride: snapshot.e11LayerE ?? null,
+          layerCLayoutOverride: snapshot.e11LayerCLayout ?? null,
+          layerDLayoutOverride: snapshot.e11LayerDLayout ?? null,
+          layerELayoutOverride: snapshot.e11LayerELayout ?? null,
           bezelStyle: snapshot.bezelStyle ?? null,
           current,
         }];

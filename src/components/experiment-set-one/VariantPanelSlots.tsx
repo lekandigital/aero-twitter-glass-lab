@@ -563,9 +563,9 @@ function ExperimentElevenLayerBSheet({ nested = false }: { nested?: boolean }) {
 }
 
 function ExperimentElevenLayerASheet({ nestedB = false }: { nestedB?: boolean }) {
-  const { e11, layerBVisible, layerCVisible } = useExperimentSetOne();
+  const { e11, layerBVisible, layerCVisible, layerDVisible, layerEVisible } = useExperimentSetOne();
   const showNestedB = nestedB && layerBVisible;
-  const showInset = layerBVisible || layerCVisible;
+  const showInset = layerBVisible || layerCVisible || layerDVisible || layerEVisible;
   return (
     <div
       className="experiment-four-layer-a"
@@ -631,9 +631,10 @@ function ExperimentElevenDraggableLayerA({
   layoutResetVersion?: number;
   nestedB?: boolean;
 }) {
-  const { layerAVisible, layerBVisible, layerCVisible } = useLayerStageVisibility();
+  const { layerAVisible, layerBVisible, layerCVisible, layerDVisible, layerEVisible } = useLayerStageVisibility();
   const keepNestedComposite = nestedB && layerBVisible;
-  if (!layerAVisible && !keepNestedComposite && !layerCVisible) return null;
+  const hasTopLayer = layerCVisible || layerDVisible || layerEVisible;
+  if (!layerAVisible && !keepNestedComposite && !hasTopLayer) return null;
 
   return (
     <ExperimentTwoDraggableSheet

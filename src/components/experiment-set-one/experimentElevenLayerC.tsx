@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useExperimentSetOne } from './combinedSettings';
 import { useRenderVariant } from '../../render-variants/RenderVariantContext';
 import { EXPERIMENT_SET_ONE_POSITION_KEYS } from './dragPositions';
+import type { ExperimentSetOneSnapshot } from './savedConfigs';
 import { ExperimentSetTwoDraggableShell } from '../experiment-set-two/primitives';
 import {
   e4InspectAttrs,
@@ -15,8 +16,43 @@ import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/Pwzz
 import {
   applyExperimentElevenLayerCLayout,
   experimentElevenLayerCDisplayMaterial,
+  type ExperimentElevenLayerCLayoutSettings,
 } from './experimentElevenLayerCMaterial';
 import { e6LayerCInspectAttrs } from '../experiment-set-six/layerCMaterialSettings';
+
+type ExperimentElevenTopLayerId = 'c' | 'd' | 'e';
+type ExperimentElevenTopLayerMaterialField = 'e11LayerC' | 'e11LayerD' | 'e11LayerE';
+type ExperimentElevenTopLayerLayoutField = 'e11LayerCLayout' | 'e11LayerDLayout' | 'e11LayerELayout';
+
+const EXPERIMENT_ELEVEN_TOP_LAYERS = [
+  {
+    id: 'c',
+    label: 'Layer C',
+    field: 'e11LayerC',
+    layoutField: 'e11LayerCLayout',
+    persistKey: EXPERIMENT_SET_ONE_POSITION_KEYS.layerC11,
+  },
+  {
+    id: 'd',
+    label: 'Layer D',
+    field: 'e11LayerD',
+    layoutField: 'e11LayerDLayout',
+    persistKey: EXPERIMENT_SET_ONE_POSITION_KEYS.layerD11,
+  },
+  {
+    id: 'e',
+    label: 'Layer E',
+    field: 'e11LayerE',
+    layoutField: 'e11LayerELayout',
+    persistKey: EXPERIMENT_SET_ONE_POSITION_KEYS.layerE11,
+  },
+] as const satisfies readonly {
+  id: ExperimentElevenTopLayerId;
+  label: string;
+  field: ExperimentElevenTopLayerMaterialField;
+  layoutField: ExperimentElevenTopLayerLayoutField;
+  persistKey: string;
+}[];
 
 function layerBackdropLights(prefix: 'layerA' | 'layerB', settings: E4MaterialSettings) {
   return {
@@ -52,15 +88,38 @@ function layerBackdropReflexEnabled(prefix: 'layerA' | 'layerB', settings: E4Mat
   ]);
 }
 
-function ExperimentElevenLayerCSheet({ material }: { material: E4MaterialSettings }) {
-  const layerCSettings = material;
+function selectedSaveTopLayerOverride(
+  save: ExperimentSetOneSnapshot | undefined,
+  field: ExperimentElevenTopLayerMaterialField,
+): Partial<E4MaterialSettings> | undefined {
+  return save?.[field];
+}
+
+function selectedSaveTopLayerLayout(
+  save: ExperimentSetOneSnapshot | undefined,
+  field: ExperimentElevenTopLayerLayoutField,
+): ExperimentElevenLayerCLayoutSettings | undefined {
+  return save?.[field];
+}
+
+function ExperimentElevenTopLayerSheet({
+  material,
+  layerId,
+  label,
+}: {
+  material: E4MaterialSettings;
+  layerId: ExperimentElevenTopLayerId;
+  label: string;
+}) {
+  const layerSettings = material;
   return (
     <div
-      className="experiment-four-layer-b experiment-eleven-layer-c"
+      className={`experiment-four-layer-b experiment-eleven-layer-c experiment-eleven-top-layer experiment-eleven-layer-${layerId}`}
       role="region"
-      aria-label="Experiment Eleven layer C"
-      style={{ ...e4SettingsToCssVars(layerCSettings), ...e4LayerBDimensionStyle(layerCSettings, false) }}
-      {...e6LayerCInspectAttrs('layer-c', 'Layer C · panel', 'eleven')}
+      aria-label={`Experiment Eleven layer ${layerId.toUpperCase()}`}
+      style={{ ...e4SettingsToCssVars(layerSettings), ...e4LayerBDimensionStyle(layerSettings, false) }}
+      data-e11-top-layer={layerId}
+      {...e6LayerCInspectAttrs('layer-c', `${label} · panel`, 'eleven')}
     >
       <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />
       <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--bottom" aria-hidden="true" />
@@ -76,10 +135,10 @@ function ExperimentElevenLayerCSheet({ material }: { material: E4MaterialSetting
       <PwzzovOGlassCorners
         layerClass="experiment-four-layer-b"
         inspectTarget="layer-b-corners"
-        edgeReflexEnabled={layerBackdropReflexEnabled('layerB', layerCSettings)}
-        rimSideGapTop={layerCSettings.layerBRimSideGapTop}
-        rimSideGapBottom={layerCSettings.layerBRimSideGapBottom}
-        backdropLights={layerBackdropLights('layerB', layerCSettings)}
+        edgeReflexEnabled={layerBackdropReflexEnabled('layerB', layerSettings)}
+        rimSideGapTop={layerSettings.layerBRimSideGapTop}
+        rimSideGapBottom={layerSettings.layerBRimSideGapBottom}
+        backdropLights={layerBackdropLights('layerB', layerSettings)}
       />
       <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--a" aria-hidden="true" />
       <span className="experiment-four-layer-b__sparkle experiment-four-layer-b__sparkle--b" aria-hidden="true" />
@@ -89,29 +148,43 @@ function ExperimentElevenLayerCSheet({ material }: { material: E4MaterialSetting
 
 function ExperimentElevenLayerCDraggablePane({
   material,
+  layerId,
+  label,
   initialPosition,
+  persistKey,
   layoutResetVersion = 0,
 }: {
   material: E4MaterialSettings;
+  layerId: ExperimentElevenTopLayerId;
+  label: string;
   initialPosition: { x: number; y: number };
+  persistKey: string;
   layoutResetVersion?: number;
 }) {
   return (
     <ExperimentSetTwoDraggableShell
       bounds="parent"
       initialPosition={initialPosition}
-      persistKey={EXPERIMENT_SET_ONE_POSITION_KEYS.layerC11}
+      persistKey={persistKey}
       layoutResetVersion={layoutResetVersion}
-      ariaLabel="Experiment Eleven — layer C"
+      ariaLabel={`Experiment Eleven — layer ${layerId.toUpperCase()}`}
       className="experiment-six-layer-c-draggable"
     >
-      <ExperimentElevenLayerCSheet material={material} />
+      <ExperimentElevenTopLayerSheet material={material} layerId={layerId} label={label} />
     </ExperimentSetTwoDraggableShell>
   );
 }
 
 export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layoutResetVersion: number }) {
-  const { layerCVisible, e11, e11LayerCLayout, saves, selectedSaveIdByExperiment } = useExperimentSetOne();
+  const {
+    layerCVisible,
+    layerDVisible,
+    layerEVisible,
+    e11,
+    e11LayerCLayout,
+    saves,
+    selectedSaveIdByExperiment,
+  } = useExperimentSetOne();
   const { slug } = useRenderVariant();
   const [inset, setInset] = useState<HTMLElement | null>(null);
   const selectedSaveId = selectedSaveIdByExperiment.eleven;
@@ -119,24 +192,33 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
     () => (selectedSaveId == null ? undefined : saves.find((save) => save.id === selectedSaveId)),
     [saves, selectedSaveId],
   );
-  const layerCSettings: E4MaterialSettings = useMemo(
+  const topLayers = useMemo(
     () =>
-      applyExperimentElevenLayerCLayout(
-        experimentElevenLayerCDisplayMaterial(e11, selectedSave?.e11LayerC),
-        e11LayerCLayout,
-      ),
-    [e11, e11LayerCLayout, selectedSave?.e11LayerC],
-  );
-  const initialPosition = useMemo(
-    () => ({
-      x: Math.max(0, Math.round((e11.layerBWidth as number - (layerCSettings.layerBWidth as number)) / 2)),
-      y: 0,
-    }),
-    [e11.layerBWidth, layerCSettings.layerBWidth],
+      EXPERIMENT_ELEVEN_TOP_LAYERS.flatMap((layer) => {
+        const visible =
+          layer.id === 'c' ? layerCVisible : layer.id === 'd' ? layerDVisible : layerEVisible;
+        if (!visible) return [];
+        const override = selectedSaveTopLayerOverride(selectedSave, layer.field);
+        if (layer.id !== 'c' && !override) return [];
+        const layout = selectedSaveTopLayerLayout(selectedSave, layer.layoutField) ?? e11LayerCLayout;
+        const material = applyExperimentElevenLayerCLayout(
+          experimentElevenLayerCDisplayMaterial(e11, override),
+          layout,
+        );
+        return [{
+          ...layer,
+          material,
+          initialPosition: {
+            x: Math.max(0, Math.round((e11.layerBWidth as number - (material.layerBWidth as number)) / 2)),
+            y: 0,
+          },
+        }];
+      }),
+    [e11, e11LayerCLayout, layerCVisible, layerDVisible, layerEVisible, selectedSave],
   );
 
   useLayoutEffect(() => {
-    if (!layerCVisible) {
+    if (topLayers.length === 0) {
       setInset(null);
       return;
     }
@@ -145,16 +227,24 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
     );
     setInset(found);
     return () => setInset(null);
-  }, [layoutResetVersion, slug, layerCVisible]);
+  }, [layoutResetVersion, slug, topLayers.length]);
 
-  if (!layerCVisible || !inset) return null;
+  if (topLayers.length === 0 || !inset) return null;
 
   return createPortal(
-    <ExperimentElevenLayerCDraggablePane
-      material={layerCSettings}
-      initialPosition={initialPosition}
-      layoutResetVersion={layoutResetVersion}
-    />,
+    <>
+      {topLayers.map((layer) => (
+        <ExperimentElevenLayerCDraggablePane
+          key={layer.id}
+          material={layer.material}
+          layerId={layer.id}
+          label={layer.label}
+          initialPosition={layer.initialPosition}
+          persistKey={layer.persistKey}
+          layoutResetVersion={layoutResetVersion}
+        />
+      ))}
+    </>,
     inset,
   );
 }
