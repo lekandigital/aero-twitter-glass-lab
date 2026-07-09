@@ -7,20 +7,31 @@ const BASE_OPTIONS: { value: LayerEditMode; label: string; shortLabel: string }[
 ];
 
 const LAYER_C_OPTION = { value: 'layerC' as const, label: 'Layer C', shortLabel: 'C' };
+const LAYER_D_OPTION = { value: 'layerD' as const, label: 'Layer D', shortLabel: 'D' };
+const LAYER_E_OPTION = { value: 'layerE' as const, label: 'Layer E', shortLabel: 'E' };
 
 export function LayerEditModeToggle({
   value,
   onChange,
   layout = 'horizontal',
   showLayerC = false,
+  showLayerD = false,
+  showLayerE = false,
 }: {
   value: LayerEditMode;
   onChange: (mode: LayerEditMode) => void;
   layout?: 'horizontal' | 'side';
   showLayerC?: boolean;
+  showLayerD?: boolean;
+  showLayerE?: boolean;
 }) {
   const isSide = layout === 'side';
-  const options = showLayerC ? [...BASE_OPTIONS, LAYER_C_OPTION] : BASE_OPTIONS;
+  const options = [
+    ...BASE_OPTIONS,
+    ...(showLayerC ? [LAYER_C_OPTION] : []),
+    ...(showLayerD ? [LAYER_D_OPTION] : []),
+    ...(showLayerE ? [LAYER_E_OPTION] : []),
+  ];
 
   return (
     <div

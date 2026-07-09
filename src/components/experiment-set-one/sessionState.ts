@@ -66,6 +66,10 @@ export type ExperimentSetOneSession = {
   layerBVisible?: boolean;
   /** Stage visibility for layer C on E6 (independent of layer B). */
   layerCVisible?: boolean;
+  /** Stage visibility for Experiment Eleven top layer D. */
+  layerDVisible?: boolean;
+  /** Stage visibility for Experiment Eleven top layer E. */
+  layerEVisible?: boolean;
   inspectMode: boolean;
   experimentVisible: ExperimentVisibility;
   referenceWallpaper: boolean;
@@ -97,6 +101,8 @@ export function defaultSession(): ExperimentSetOneSession {
     layerAVisible: true,
     layerBVisible: true,
     layerCVisible: true,
+    layerDVisible: true,
+    layerEVisible: true,
     inspectMode: true,
     experimentVisible: DEFAULT_EXPERIMENT_VISIBILITY,
     referenceWallpaper: false,
@@ -294,6 +300,8 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       layerAVisible: parsed.layerAVisible !== false,
       layerBVisible: parsed.layerBVisible !== false,
       layerCVisible: parsed.layerCVisible !== false,
+      layerDVisible: parsed.layerDVisible !== false,
+      layerEVisible: parsed.layerEVisible !== false,
       inspectMode: parsed.inspectMode !== false,
       experimentVisible: normalizeExperimentVisibility(parsed.experimentVisible),
       referenceWallpaper: Boolean(parsed.referenceWallpaper),
@@ -313,6 +321,8 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
         parsed.layerEditMode === 'layerA' ||
         parsed.layerEditMode === 'layerB' ||
         parsed.layerEditMode === 'layerC' ||
+        parsed.layerEditMode === 'layerD' ||
+        parsed.layerEditMode === 'layerE' ||
         parsed.layerEditMode === 'both'
           ? parsed.layerEditMode
           : 'both',

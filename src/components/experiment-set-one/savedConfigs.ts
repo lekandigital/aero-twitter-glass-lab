@@ -33,6 +33,12 @@ export type ExperimentSetOneLayoutSnapshot = {
   selectedSavePositions?: Record<string, { x: number; y: number }>;
 };
 
+type ExperimentElevenTopLayerLayoutSnapshot = {
+  width: number;
+  height: number;
+  radius: number;
+};
+
 export type ExperimentSetOneSnapshot = {
   id: number;
   label: string;
@@ -43,6 +49,16 @@ export type ExperimentSetOneSnapshot = {
   e4?: Partial<E4MaterialSettings>;
   /** Optional E11-only material override for the horizontal right-overlap Layer C strip. */
   e11LayerC?: Partial<E4MaterialSettings>;
+  /** Optional E11-only material override for the horizontal right-overlap Layer D strip. */
+  e11LayerD?: Partial<E4MaterialSettings>;
+  /** Optional E11-only material override for the horizontal right-overlap Layer E strip. */
+  e11LayerE?: Partial<E4MaterialSettings>;
+  /** Optional E11-only layout override for Layer C. */
+  e11LayerCLayout?: ExperimentElevenTopLayerLayoutSnapshot;
+  /** Optional E11-only layout override for Layer D. */
+  e11LayerDLayout?: ExperimentElevenTopLayerLayoutSnapshot;
+  /** Optional E11-only layout override for Layer E. */
+  e11LayerELayout?: ExperimentElevenTopLayerLayoutSnapshot;
   /** Which experiment this save is meant for (used to filter saves list + load behavior). */
   scope?: SaveScope;
   /** When true, loading only merges Experiment Four corner lighting fields. */

@@ -127,7 +127,20 @@
   display: none !important;
 }
 
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-four-layer-a:has(.experiment-eleven-top-layer) > :not(.experiment-four-layer-a__bezel-inset) {
+  display: none !important;
+}
+
 .experiment-set-one-page[data-layer-a-visible='false'][data-layer-c-visible='true'] .experiment-four-layer-a:has(.experiment-eleven-layer-c) {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  overflow: visible !important;
+}
+
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-four-layer-a:has(.experiment-eleven-top-layer) {
   background: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -142,6 +155,12 @@
   display: none !important;
 }
 
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-four-layer-a:has(.experiment-eleven-top-layer)::before,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-four-layer-a:has(.experiment-eleven-top-layer)::after {
+  content: none !important;
+  display: none !important;
+}
+
 .experiment-set-one-page[data-layer-a-visible='false'][data-layer-c-visible='true'] .experiment-four-layer-a:has(.experiment-eleven-layer-c) .experiment-four-layer-a__bezel-rim,
 .experiment-set-one-page[data-layer-a-visible='false'][data-layer-c-visible='true'] .experiment-four-layer-a:has(.experiment-eleven-layer-c) .experiment-four-layer-a__bezel-rim-edge,
 .experiment-set-one-page[data-layer-a-visible='false'][data-layer-c-visible='true'] .experiment-four-layer-a:has(.experiment-eleven-layer-c) .experiment-four-layer-a__bezel-rim-side,
@@ -152,11 +171,34 @@
   display: none !important;
 }
 
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-four-layer-a:has(.experiment-eleven-top-layer) .experiment-four-layer-a__bezel-rim,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-four-layer-a:has(.experiment-eleven-top-layer) .experiment-four-layer-a__bezel-rim-edge,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-four-layer-a:has(.experiment-eleven-top-layer) .experiment-four-layer-a__bezel-rim-side,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-four-layer-a:has(.experiment-eleven-top-layer) .experiment-four-layer-a__shine,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-four-layer-a:has(.experiment-eleven-top-layer) .experiment-four-layer-a__radial-corners,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-four-layer-a:has(.experiment-eleven-top-layer) .experiment-four-layer-a__pwzzovO-glass,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-four-layer-a:has(.experiment-eleven-top-layer) .experiment-four-layer-a__sparkle {
+  display: none !important;
+}
+
 .experiment-set-one-page[data-layer-a-visible='false'][data-layer-c-visible='true'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven'] .experiment-four-layer-a > :not(.experiment-four-layer-a__bezel-inset) {
   display: none !important;
 }
 
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven']:has(.experiment-eleven-top-layer) .experiment-four-layer-a > :not(.experiment-four-layer-a__bezel-inset) {
+  display: none !important;
+}
+
 .experiment-set-one-page[data-layer-a-visible='false'][data-layer-c-visible='true'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven'] .experiment-four-layer-a {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  overflow: visible !important;
+}
+
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven']:has(.experiment-eleven-top-layer) .experiment-four-layer-a {
   background: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -171,6 +213,12 @@
   display: none !important;
 }
 
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven']:has(.experiment-eleven-top-layer) .experiment-four-layer-a::before,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven']:has(.experiment-eleven-top-layer) .experiment-four-layer-a::after {
+  content: none !important;
+  display: none !important;
+}
+
 .experiment-set-one-page[data-layer-a-visible='false'][data-layer-c-visible='true'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven'] .experiment-four-layer-a .experiment-four-layer-a__bezel-rim,
 .experiment-set-one-page[data-layer-a-visible='false'][data-layer-c-visible='true'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven'] .experiment-four-layer-a .experiment-four-layer-a__bezel-rim-edge,
 .experiment-set-one-page[data-layer-a-visible='false'][data-layer-c-visible='true'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven'] .experiment-four-layer-a .experiment-four-layer-a__bezel-rim-side,
@@ -181,6 +229,16 @@
   display: none !important;
 }
 
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven']:has(.experiment-eleven-top-layer) .experiment-four-layer-a .experiment-four-layer-a__bezel-rim,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven']:has(.experiment-eleven-top-layer) .experiment-four-layer-a .experiment-four-layer-a__bezel-rim-edge,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven']:has(.experiment-eleven-top-layer) .experiment-four-layer-a .experiment-four-layer-a__bezel-rim-side,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven']:has(.experiment-eleven-top-layer) .experiment-four-layer-a .experiment-four-layer-a__shine,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven']:has(.experiment-eleven-top-layer) .experiment-four-layer-a .experiment-four-layer-a__radial-corners,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven']:has(.experiment-eleven-top-layer) .experiment-four-layer-a .experiment-four-layer-a__pwzzovO-glass,
+.experiment-set-one-page[data-layer-a-visible='false'] .experiment-set-one-selected-save-stage[data-selected-save-experiment='eleven']:has(.experiment-eleven-top-layer) .experiment-four-layer-a .experiment-four-layer-a__sparkle {
+  display: none !important;
+}
+
 /* Hide nested B rect only — layer C circle stays visible when B is toggled off. */
 .experiment-set-one-page[data-layer-b-visible='false'] .experiment-four-layer-a__bezel-inset > .experiment-four-layer-b:not(.experiment-six-layer-c):not(.experiment-eleven-layer-c) {
   display: none !important;
@@ -188,6 +246,11 @@
 
 .experiment-set-one-page[data-layer-b-visible='false'][data-layer-c-visible='false'] .experiment-four-layer-a__bezel-inset {
   display: none !important;
+}
+
+.experiment-set-one-page[data-layer-b-visible='false'][data-layer-c-visible='false'] .experiment-four-layer-a__bezel-inset:has(.experiment-eleven-layer-d),
+.experiment-set-one-page[data-layer-b-visible='false'][data-layer-c-visible='false'] .experiment-four-layer-a__bezel-inset:has(.experiment-eleven-layer-e) {
+  display: block !important;
 }
 
 .experiment-set-one-page[data-layer-b-visible='false'] .experiment-set-two-draggable:has(> .experiment-four-layer-b:not(.experiment-six-layer-c):not(.experiment-eleven-layer-c)),

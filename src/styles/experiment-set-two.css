@@ -184,6 +184,14 @@
   z-index: 5;
 }
 
+.experiment-set-one-selected-save-stage__layer-d {
+  z-index: 6;
+}
+
+.experiment-set-one-selected-save-stage__layer-e {
+  z-index: 7;
+}
+
 .experiment-set-one-selected-save-stage .experiment-four-layer-a,
 .experiment-set-one-selected-save-stage .experiment-four-layer-b {
   pointer-events: none;
