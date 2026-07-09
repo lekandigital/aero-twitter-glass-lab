@@ -20,6 +20,7 @@ import './styles/experiment-set-one-camera.css';
 import './styles/glass-frost-surface.css';
 import './styles/material-settings.css';
 import './styles/experiment-set-six.css';
+import './styles/experiment-eleven-haze.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
