@@ -106,10 +106,12 @@ function ExperimentElevenTopLayerSheet({
   material,
   layerId,
   label,
+  dampenTranslucency = false,
 }: {
   material: E4MaterialSettings;
   layerId: ExperimentElevenTopLayerId;
   label: string;
+  dampenTranslucency?: boolean;
 }) {
   const layerSettings = material;
   return (
@@ -117,7 +119,11 @@ function ExperimentElevenTopLayerSheet({
       className={`experiment-four-layer-b experiment-eleven-layer-c experiment-eleven-top-layer experiment-eleven-layer-${layerId}`}
       role="region"
       aria-label={`Experiment Eleven layer ${layerId.toUpperCase()}`}
-      style={{ ...e4SettingsToCssVars(layerSettings), ...e4LayerBDimensionStyle(layerSettings, false) }}
+      style={{
+        ...e4SettingsToCssVars(layerSettings),
+        ...e4LayerBDimensionStyle(layerSettings, false),
+        opacity: dampenTranslucency ? 0.9 : undefined,
+      }}
       data-e11-top-layer={layerId}
       {...e6LayerCInspectAttrs('layer-c', `${label} · panel`, 'eleven')}
     >
@@ -150,6 +156,7 @@ function ExperimentElevenLayerCDraggablePane({
   material,
   layerId,
   label,
+  dampenTranslucency,
   initialPosition,
   persistKey,
   layoutResetVersion = 0,
@@ -157,6 +164,7 @@ function ExperimentElevenLayerCDraggablePane({
   material: E4MaterialSettings;
   layerId: ExperimentElevenTopLayerId;
   label: string;
+  dampenTranslucency: boolean;
   initialPosition: { x: number; y: number };
   persistKey: string;
   layoutResetVersion?: number;
@@ -170,13 +178,20 @@ function ExperimentElevenLayerCDraggablePane({
       ariaLabel={`Experiment Eleven — layer ${layerId.toUpperCase()}`}
       className="experiment-six-layer-c-draggable"
     >
-      <ExperimentElevenTopLayerSheet material={material} layerId={layerId} label={label} />
+      <ExperimentElevenTopLayerSheet
+        material={material}
+        layerId={layerId}
+        label={label}
+        dampenTranslucency={dampenTranslucency}
+      />
     </ExperimentSetTwoDraggableShell>
   );
 }
 
 export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layoutResetVersion: number }) {
   const {
+    layerAVisible,
+    layerBVisible,
     layerCVisible,
     layerDVisible,
     layerEVisible,
@@ -208,13 +223,14 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
         return [{
           ...layer,
           material,
+          dampenTranslucency: layerAVisible && layerBVisible,
           initialPosition: {
             x: Math.max(0, Math.round((e11.layerBWidth as number - (material.layerBWidth as number)) / 2)),
             y: 0,
           },
         }];
       }),
-    [e11, e11LayerCLayout, layerCVisible, layerDVisible, layerEVisible, selectedSave],
+    [e11, e11LayerCLayout, layerAVisible, layerBVisible, layerCVisible, layerDVisible, layerEVisible, selectedSave],
   );
 
   useLayoutEffect(() => {
@@ -239,6 +255,7 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
           material={layer.material}
           layerId={layer.id}
           label={layer.label}
+          dampenTranslucency={layer.dampenTranslucency}
           initialPosition={layer.initialPosition}
           persistKey={layer.persistKey}
           layoutResetVersion={layoutResetVersion}

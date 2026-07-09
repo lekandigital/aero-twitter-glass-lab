@@ -1349,6 +1349,32 @@
   opacity: 0.22;
 }
 
+.experiment-set-one-page[data-layer-a-visible='true'][data-layer-b-visible='true'] .experiment-eleven-top-layer {
+  opacity: 0.9;
+}
+
+.experiment-set-one-page[data-layer-a-visible='true'][data-layer-b-visible='true'] .experiment-eleven-top-layer::after {
+  opacity: calc((0.28 + var(--e4-layerB-shine-opacity) * 0.14));
+}
+
+.experiment-set-one-page[data-layer-a-visible='true'][data-layer-b-visible='true'] .experiment-eleven-top-layer .experiment-four-layer-b__shine {
+  opacity: calc(var(--e4-layerB-shine-opacity) * 0.24);
+}
+
+.experiment-set-one-page[data-layer-a-visible='true'][data-layer-b-visible='true'] .experiment-eleven-top-layer .experiment-four-layer-b__pwzzovO-glass-wrap {
+  opacity: 0.32;
+}
+
+.experiment-set-one-page[data-layer-a-visible='true'][data-layer-b-visible='true'] .experiment-eleven-top-layer .experiment-four-layer-b__rim-edge--bottom,
+.experiment-set-one-page[data-layer-a-visible='true'][data-layer-b-visible='true'] .experiment-eleven-top-layer .experiment-four-layer-b__rim-side--left {
+  opacity: 0.42;
+}
+
+.experiment-set-one-page[data-layer-a-visible='true'][data-layer-b-visible='true'] .experiment-eleven-top-layer .experiment-four-layer-b__rim-edge--top,
+.experiment-set-one-page[data-layer-a-visible='true'][data-layer-b-visible='true'] .experiment-eleven-top-layer .experiment-four-layer-b__rim-side--right {
+  opacity: 0.16;
+}
+
 .experiment-four-layer-b__shine {
   position: absolute;
   inset: 0;
