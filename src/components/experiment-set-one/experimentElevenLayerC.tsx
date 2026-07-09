@@ -21,6 +21,7 @@ import {
 import { e6LayerCInspectAttrs } from '../experiment-set-six/layerCMaterialSettings';
 import {
   ExperimentElevenLayerCSwitcherGlass,
+  type ExperimentElevenSwitcherGlassTone,
   type ExperimentElevenSwitcherGlassVariant,
 } from './ExperimentElevenLayerCSwitcherGlass';
 
@@ -169,6 +170,7 @@ function ExperimentElevenLayerCDraggablePane({
   layoutResetVersion = 0,
   backgroundOverride,
   referenceGlass,
+  referenceGlassTone,
 }: {
   material: E4MaterialSettings;
   layerId: ExperimentElevenTopLayerId;
@@ -179,6 +181,7 @@ function ExperimentElevenLayerCDraggablePane({
   layoutResetVersion?: number;
   backgroundOverride?: string;
   referenceGlass?: ExperimentElevenSwitcherGlassVariant;
+  referenceGlassTone?: ExperimentElevenSwitcherGlassTone;
 }) {
   return (
     <ExperimentSetTwoDraggableShell
@@ -195,6 +198,7 @@ function ExperimentElevenLayerCDraggablePane({
           width={material.layerBWidth as number}
           height={material.layerBHeight as number}
           radius={material.layerBCornerRadius as number}
+          tone={referenceGlassTone}
         />
       ) : (
         <ExperimentElevenTopLayerSheet
@@ -244,12 +248,14 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
         const preserveOpacity = layer.id === 'c' && selectedSave?.e11LayerCPreserveOpacity;
         const backgroundOverride = layer.id === 'c' ? selectedSave?.e11LayerCBackgroundOverride : undefined;
         const referenceGlass = layer.id === 'c' ? selectedSave?.e11LayerCReferenceGlass : undefined;
+        const referenceGlassTone = layer.id === 'c' ? selectedSave?.e11LayerCReferenceTone : undefined;
         return [{
           ...layer,
           material,
           dampenTranslucency: layerAVisible && layerBVisible && !preserveOpacity,
           backgroundOverride,
           referenceGlass,
+          referenceGlassTone,
           initialPosition: {
             x: Math.max(0, Math.round((e11.layerBWidth as number - (material.layerBWidth as number)) / 2)),
             y: 0,
@@ -287,6 +293,7 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
           layoutResetVersion={layoutResetVersion}
           backgroundOverride={layer.backgroundOverride}
           referenceGlass={layer.referenceGlass}
+          referenceGlassTone={layer.referenceGlassTone}
         />
       ))}
     </>,

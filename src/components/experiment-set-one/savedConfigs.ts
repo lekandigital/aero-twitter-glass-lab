@@ -61,6 +61,14 @@ export type ExperimentSetOneSnapshot = {
     | 'ios'
     | 'liquid-css'
     | 'light-btn';
+  /** Optional palette tone for reference-demo Layer C. Demo tones mirror the source CSS variables; others are small pane-fit tweaks. */
+  e11LayerCReferenceTone?:
+    | 'demo-light'
+    | 'demo-dark'
+    | 'demo-dim'
+    | 'ice'
+    | 'aqua'
+    | 'opal';
   /** Optional E11-only material override for the horizontal right-overlap Layer D strip. */
   e11LayerD?: Partial<E4MaterialSettings>;
   /** Optional E11-only material override for the horizontal right-overlap Layer E strip. */

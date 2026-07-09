@@ -17,6 +17,7 @@ import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/PwzzovOGlassCorners';
 import {
   ExperimentElevenLayerCSwitcherGlass,
+  type ExperimentElevenSwitcherGlassTone,
   type ExperimentElevenSwitcherGlassVariant,
 } from './ExperimentElevenLayerCSwitcherGlass';
 import { RENDER_VARIANTS, type RenderVariantSlug } from '../../render-variants/manifest';
@@ -64,6 +65,8 @@ type SavePreview = {
   layerELayoutOverride: ExperimentElevenLayerCLayoutSettings | null;
   /** When set, Layer C renders the exact reference glass instead of the normal sheet. */
   layerCReferenceGlass: ExperimentElevenSwitcherGlassVariant | null;
+  /** Optional reference-demo Layer C palette tone. */
+  layerCReferenceTone: ExperimentElevenSwitcherGlassTone | null;
   /** Semantic appearance opt-in, driven by the save's own field — not its id. */
   bezelStyle: string | null;
   current: boolean;
@@ -245,6 +248,7 @@ function SelectedSaveLayerC({
   layerId,
   label,
   referenceGlass,
+  referenceTone,
 }: {
   material: E4MaterialSettings;
   layerCOverride: Partial<E4MaterialSettings> | null;
@@ -252,6 +256,7 @@ function SelectedSaveLayerC({
   layerId: SelectedSaveTopLayerId;
   label: string;
   referenceGlass: ExperimentElevenSwitcherGlassVariant | null;
+  referenceTone: ExperimentElevenSwitcherGlassTone | null;
 }) {
   const layerCMaterial = useMemo(
     () => {
@@ -275,6 +280,7 @@ function SelectedSaveLayerC({
           width={layerCMaterial.layerBWidth as number}
           height={layerCMaterial.layerBHeight as number}
           radius={layerCMaterial.layerBCornerRadius as number}
+          tone={referenceTone ?? undefined}
         />
       </div>
     );
@@ -390,6 +396,7 @@ function SelectedSaveStagePanel({
           override: preview.layerCOverride,
           layoutOverride: preview.layerCLayoutOverride,
           referenceGlass: preview.layerCReferenceGlass,
+          referenceTone: preview.layerCReferenceTone,
         },
         {
           id: 'd' as const,
@@ -398,12 +405,14 @@ function SelectedSaveStagePanel({
           override: preview.layerDOverride,
           layoutOverride: preview.layerDLayoutOverride,
           referenceGlass: null,
+          referenceTone: null,
         },
         {
           id: 'e' as const,
           label: 'Layer E',
           visible: layerEVisible,
           referenceGlass: null,
+          referenceTone: null,
           override: preview.layerEOverride,
           layoutOverride: preview.layerELayoutOverride,
         },
@@ -421,6 +430,7 @@ function SelectedSaveStagePanel({
       preview.layerDLayoutOverride,
       preview.layerELayoutOverride,
       preview.layerCReferenceGlass,
+      preview.layerCReferenceTone,
     ],
   );
   const dragRef = useRef<DragState>(emptyDragState());
@@ -530,6 +540,7 @@ function SelectedSaveStagePanel({
             layerId={layer.id}
             label={layer.label}
             referenceGlass={layer.referenceGlass}
+            referenceTone={layer.referenceTone}
           />
         </div>
       ))}
@@ -584,6 +595,7 @@ export function SelectedSaveStagePanels() {
           layerDLayoutOverride: snapshot.e11LayerDLayout ?? null,
           layerELayoutOverride: snapshot.e11LayerELayout ?? null,
           layerCReferenceGlass: snapshot.e11LayerCReferenceGlass ?? null,
+          layerCReferenceTone: snapshot.e11LayerCReferenceTone ?? null,
           bezelStyle: snapshot.bezelStyle ?? null,
           current,
         }];

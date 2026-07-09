@@ -24,6 +24,67 @@ export type ExperimentElevenSwitcherGlassVariant =
   | 'liquid-css'
   | 'light-btn';
 
+export type ExperimentElevenSwitcherGlassTone =
+  | 'demo-light'
+  | 'demo-dark'
+  | 'demo-dim'
+  | 'ice'
+  | 'aqua'
+  | 'opal';
+
+type ToneStyle = CSSProperties & Record<`--${string}`, string | number>;
+
+const TONE_STYLES = {
+  'demo-light': {
+    '--c-glass': '#bbbbbc',
+    '--c-light': '#fff',
+    '--c-dark': '#000',
+    '--glass-reflex-dark': 1,
+    '--glass-reflex-light': 1,
+    '--saturation': '150%',
+  },
+  'demo-dark': {
+    '--c-glass': '#bbbbbc',
+    '--c-light': '#fff',
+    '--c-dark': '#000',
+    '--glass-reflex-dark': 2,
+    '--glass-reflex-light': 0.3,
+    '--saturation': '150%',
+  },
+  'demo-dim': {
+    '--c-glass': 'hsl(335 250% 74% / 1)',
+    '--c-light': '#99deff',
+    '--c-dark': '#20001b',
+    '--glass-reflex-dark': 2,
+    '--glass-reflex-light': 0.7,
+    '--saturation': '200%',
+  },
+  ice: {
+    '--c-glass': '#d7f3ff',
+    '--c-light': '#ffffff',
+    '--c-dark': '#183a5a',
+    '--glass-reflex-dark': 1.35,
+    '--glass-reflex-light': 1.15,
+    '--saturation': '175%',
+  },
+  aqua: {
+    '--c-glass': '#8eeaff',
+    '--c-light': '#f7fdff',
+    '--c-dark': '#063452',
+    '--glass-reflex-dark': 1.45,
+    '--glass-reflex-light': 1.05,
+    '--saturation': '190%',
+  },
+  opal: {
+    '--c-glass': '#ebe8f5',
+    '--c-light': '#ffffff',
+    '--c-dark': '#4f5572',
+    '--glass-reflex-dark': 1.1,
+    '--glass-reflex-light': 1.2,
+    '--saturation': '165%',
+  },
+} as const satisfies Record<ExperimentElevenSwitcherGlassTone, ToneStyle>;
+
 /**
  * Every demo's feDisplacementMap `scale` was tuned for the demo's own small box
  * (a stadium button). Stretched onto Layer C's larger 293×125 box the same
@@ -44,16 +105,19 @@ export function ExperimentElevenLayerCSwitcherGlass({
   width,
   height,
   radius,
+  tone = 'demo-light',
 }: {
   variant: ExperimentElevenSwitcherGlassVariant;
   width: number;
   height: number;
   radius: number;
+  tone?: ExperimentElevenSwitcherGlassTone;
 }) {
   const reactId = useId();
   const filterId = `e11-ref-filter-${reactId.replace(/:/g, '')}`;
 
   const baseStyle: CSSProperties = {
+    ...TONE_STYLES[tone],
     width,
     height,
     ['--e11-switcher-radius' as string]: `${radius}px`,
