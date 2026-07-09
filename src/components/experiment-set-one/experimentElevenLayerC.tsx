@@ -19,6 +19,10 @@ import {
   type ExperimentElevenLayerCLayoutSettings,
 } from './experimentElevenLayerCMaterial';
 import { e6LayerCInspectAttrs } from '../experiment-set-six/layerCMaterialSettings';
+import {
+  ExperimentElevenLayerCSwitcherGlass,
+  type ExperimentElevenSwitcherGlassVariant,
+} from './ExperimentElevenLayerCSwitcherGlass';
 
 type ExperimentElevenTopLayerId = 'c' | 'd' | 'e';
 type ExperimentElevenTopLayerMaterialField = 'e11LayerC' | 'e11LayerD' | 'e11LayerE';
@@ -164,6 +168,7 @@ function ExperimentElevenLayerCDraggablePane({
   persistKey,
   layoutResetVersion = 0,
   backgroundOverride,
+  referenceGlass,
 }: {
   material: E4MaterialSettings;
   layerId: ExperimentElevenTopLayerId;
@@ -173,6 +178,7 @@ function ExperimentElevenLayerCDraggablePane({
   persistKey: string;
   layoutResetVersion?: number;
   backgroundOverride?: string;
+  referenceGlass?: ExperimentElevenSwitcherGlassVariant;
 }) {
   return (
     <ExperimentSetTwoDraggableShell
@@ -183,13 +189,22 @@ function ExperimentElevenLayerCDraggablePane({
       ariaLabel={`Experiment Eleven — layer ${layerId.toUpperCase()}`}
       className="experiment-six-layer-c-draggable"
     >
-      <ExperimentElevenTopLayerSheet
-        material={material}
-        layerId={layerId}
-        label={label}
-        dampenTranslucency={dampenTranslucency}
-        backgroundOverride={backgroundOverride}
-      />
+      {referenceGlass ? (
+        <ExperimentElevenLayerCSwitcherGlass
+          variant={referenceGlass}
+          width={material.layerBWidth as number}
+          height={material.layerBHeight as number}
+          radius={material.layerBCornerRadius as number}
+        />
+      ) : (
+        <ExperimentElevenTopLayerSheet
+          material={material}
+          layerId={layerId}
+          label={label}
+          dampenTranslucency={dampenTranslucency}
+          backgroundOverride={backgroundOverride}
+        />
+      )}
     </ExperimentSetTwoDraggableShell>
   );
 }
@@ -228,11 +243,13 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
         );
         const preserveOpacity = layer.id === 'c' && selectedSave?.e11LayerCPreserveOpacity;
         const backgroundOverride = layer.id === 'c' ? selectedSave?.e11LayerCBackgroundOverride : undefined;
+        const referenceGlass = layer.id === 'c' ? selectedSave?.e11LayerCReferenceGlass : undefined;
         return [{
           ...layer,
           material,
           dampenTranslucency: layerAVisible && layerBVisible && !preserveOpacity,
           backgroundOverride,
+          referenceGlass,
           initialPosition: {
             x: Math.max(0, Math.round((e11.layerBWidth as number - (material.layerBWidth as number)) / 2)),
             y: 0,
@@ -269,6 +286,7 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
           persistKey={layer.persistKey}
           layoutResetVersion={layoutResetVersion}
           backgroundOverride={layer.backgroundOverride}
+          referenceGlass={layer.referenceGlass}
         />
       ))}
     </>,

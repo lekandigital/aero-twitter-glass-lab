@@ -15,6 +15,10 @@ import {
 } from '../experiment-set-four/materialSettings';
 import { GlassFrostSurface } from '../shared/GlassFrostSurface';
 import { PwzzovOGlassCorners, pwzzovBackdropReflexEnabled } from '../shared/PwzzovOGlassCorners';
+import {
+  ExperimentElevenLayerCSwitcherGlass,
+  type ExperimentElevenSwitcherGlassVariant,
+} from './ExperimentElevenLayerCSwitcherGlass';
 import { RENDER_VARIANTS, type RenderVariantSlug } from '../../render-variants/manifest';
 import type { ExperimentId } from './experimentVisibility';
 import { useExperimentSetOne } from './combinedSettings';
@@ -58,6 +62,8 @@ type SavePreview = {
   layerCLayoutOverride: ExperimentElevenLayerCLayoutSettings | null;
   layerDLayoutOverride: ExperimentElevenLayerCLayoutSettings | null;
   layerELayoutOverride: ExperimentElevenLayerCLayoutSettings | null;
+  /** When set, Layer C renders the exact reference glass instead of the normal sheet. */
+  layerCReferenceGlass: ExperimentElevenSwitcherGlassVariant | null;
   /** Semantic appearance opt-in, driven by the save's own field — not its id. */
   bezelStyle: string | null;
   current: boolean;
@@ -238,12 +244,14 @@ function SelectedSaveLayerC({
   layoutOverride,
   layerId,
   label,
+  referenceGlass,
 }: {
   material: E4MaterialSettings;
   layerCOverride: Partial<E4MaterialSettings> | null;
   layoutOverride: ExperimentElevenLayerCLayoutSettings | null;
   layerId: SelectedSaveTopLayerId;
   label: string;
+  referenceGlass: ExperimentElevenSwitcherGlassVariant | null;
 }) {
   const layerCMaterial = useMemo(
     () => {
@@ -252,6 +260,25 @@ function SelectedSaveLayerC({
     },
     [material, layerCOverride, layoutOverride],
   );
+  if (referenceGlass) {
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+        }}
+      >
+        <ExperimentElevenLayerCSwitcherGlass
+          variant={referenceGlass}
+          width={layerCMaterial.layerBWidth as number}
+          height={layerCMaterial.layerBHeight as number}
+          radius={layerCMaterial.layerBCornerRadius as number}
+        />
+      </div>
+    );
+  }
   return (
     <div
       className={`experiment-four-layer-b experiment-eleven-layer-c experiment-eleven-top-layer experiment-eleven-layer-${layerId}`}
@@ -362,6 +389,7 @@ function SelectedSaveStagePanel({
           visible: layerCVisible,
           override: preview.layerCOverride,
           layoutOverride: preview.layerCLayoutOverride,
+          referenceGlass: preview.layerCReferenceGlass,
         },
         {
           id: 'd' as const,
@@ -369,11 +397,13 @@ function SelectedSaveStagePanel({
           visible: layerDVisible,
           override: preview.layerDOverride,
           layoutOverride: preview.layerDLayoutOverride,
+          referenceGlass: null,
         },
         {
           id: 'e' as const,
           label: 'Layer E',
           visible: layerEVisible,
+          referenceGlass: null,
           override: preview.layerEOverride,
           layoutOverride: preview.layerELayoutOverride,
         },
@@ -390,6 +420,7 @@ function SelectedSaveStagePanel({
       preview.layerCLayoutOverride,
       preview.layerDLayoutOverride,
       preview.layerELayoutOverride,
+      preview.layerCReferenceGlass,
     ],
   );
   const dragRef = useRef<DragState>(emptyDragState());
@@ -498,6 +529,7 @@ function SelectedSaveStagePanel({
             layoutOverride={layer.layoutOverride}
             layerId={layer.id}
             label={layer.label}
+            referenceGlass={layer.referenceGlass}
           />
         </div>
       ))}
@@ -551,6 +583,7 @@ export function SelectedSaveStagePanels() {
           layerCLayoutOverride: snapshot.e11LayerCLayout ?? null,
           layerDLayoutOverride: snapshot.e11LayerDLayout ?? null,
           layerELayoutOverride: snapshot.e11LayerELayout ?? null,
+          layerCReferenceGlass: snapshot.e11LayerCReferenceGlass ?? null,
           bezelStyle: snapshot.bezelStyle ?? null,
           current,
         }];
