@@ -1,4 +1,4 @@
-import { Component, type ReactNode } from 'react';
+import { Component, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { ExperimentTwoDraggableSheet } from '../experiment-set-two/primitives';
 import { ExperimentFiveDraggableLayerA as DefaultExperimentFiveLayerA } from '../experiment-set-five/primitives';
 import { ExperimentSixDraggableLayerA as DefaultExperimentSixLayerA } from '../experiment-set-six/primitives';
@@ -515,14 +515,20 @@ function ExperimentTenDraggableLayerB({
   );
 }
 
-function ExperimentElevenLayerBSheet({ nested = false }: { nested?: boolean }) {
+function ExperimentElevenLayerBSheet({
+  nested = false,
+  clipPath,
+}: {
+  nested?: boolean;
+  clipPath?: string;
+}) {
   const { e11 } = useExperimentSetOne();
   return (
     <div
       className="experiment-four-layer-b"
       role="region"
       aria-label="Experiment Eleven layer B"
-      style={e4LayerBDimensionStyle(e11, nested)}
+      style={{ ...e4LayerBDimensionStyle(e11, nested), clipPath }}
       {...e4InspectAttrs('layer-b')}
     >
       <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />
@@ -562,10 +568,101 @@ function ExperimentElevenLayerBSheet({ nested = false }: { nested?: boolean }) {
   );
 }
 
+/** Rounded-rect "hole" path (evenodd) cut out of a `width`x`height` box, sized/positioned to `hole`. */
+function roundedNotchClipPath(width: number, height: number, hole: { x: number; y: number; width: number; height: number; radius: number }) {
+  const r = Math.max(0, Math.min(hole.radius, hole.width / 2, hole.height / 2));
+  const x = hole.x;
+  const y = hole.y;
+  const w = hole.width;
+  const h = hole.height;
+  const inner =
+    r > 0
+      ? `M${x + r},${y}H${x + w - r}A${r},${r} 0 0 1 ${x + w},${y + r}V${y + h - r}A${r},${r} 0 0 1 ${x + w - r},${y + h}H${x + r}A${r},${r} 0 0 1 ${x},${y + h - r}V${y + r}A${r},${r} 0 0 1 ${x + r},${y}Z`
+      : `M${x},${y}H${x + w}V${y + h}H${x}Z`;
+  return `path(evenodd, "M0,0H${width}V${height}H0Z ${inner}")`;
+}
+
+/** Tracks the live rect of `[data-e11-top-layer="c"]` inside `containerRef`, relative to the container. */
+function useLiveLayerCRect(containerRef: RefObject<HTMLElement | null>, enabled: boolean) {
+  const [rect, setRect] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+
+  useEffect(() => {
+    if (!enabled) {
+      setRect(null);
+      return;
+    }
+    const container = containerRef.current;
+    if (!container) return;
+
+    const measure = () => {
+      const target = container.querySelector<HTMLElement>('[data-e11-top-layer="c"]');
+      if (!target) {
+        setRect(null);
+        return;
+      }
+      const containerBox = container.getBoundingClientRect();
+      const targetBox = target.getBoundingClientRect();
+      const next = {
+        x: targetBox.left - containerBox.left,
+        y: targetBox.top - containerBox.top,
+        width: targetBox.width,
+        height: targetBox.height,
+      };
+      setRect((prev) =>
+        prev &&
+        prev.x === next.x &&
+        prev.y === next.y &&
+        prev.width === next.width &&
+        prev.height === next.height
+          ? prev
+          : next,
+      );
+    };
+
+    measure();
+    const observer = new MutationObserver(measure);
+    observer.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+    return () => observer.disconnect();
+  }, [containerRef, enabled]);
+
+  return rect;
+}
+
 function ExperimentElevenLayerASheet({ nestedB = false }: { nestedB?: boolean }) {
-  const { e11, layerBVisible, layerCVisible, layerDVisible, layerEVisible } = useExperimentSetOne();
+  const {
+    e11,
+    layerBVisible,
+    layerCVisible,
+    layerDVisible,
+    layerEVisible,
+    saves,
+    selectedSaveIdByExperiment,
+    e11LayerCLayout,
+  } = useExperimentSetOne();
+  const selectedSaveId = selectedSaveIdByExperiment.eleven;
+  const selectedSave = selectedSaveId == null ? undefined : saves.find((save) => save.id === selectedSaveId);
+  const forceHideNestedBForLayerC = selectedSave?.e11LayerCPreserveOpacity === true;
+  const paintNestedB = layerBVisible;
   const showNestedB = nestedB && layerBVisible;
   const showInset = layerBVisible || layerCVisible || layerDVisible || layerEVisible;
+  const insetRef = useRef<HTMLDivElement>(null);
+  const liveCRect = useLiveLayerCRect(insetRef, forceHideNestedBForLayerC && layerCVisible);
+  const nestedBClipPath =
+    forceHideNestedBForLayerC && layerCVisible && liveCRect
+      ? (() => {
+          const bWidth = e11.layerBWidth as number;
+          const bHeight = e11.layerBHeight as number;
+          const cutoutLayout = selectedSave?.e11LayerCLayout ?? e11LayerCLayout;
+          if (!bWidth || !bHeight) return undefined;
+          return roundedNotchClipPath(bWidth, bHeight, {
+            x: liveCRect.x,
+            y: liveCRect.y,
+            width: liveCRect.width,
+            height: liveCRect.height,
+            radius: cutoutLayout.radius,
+          });
+        })()
+      : undefined;
   return (
     <div
       className="experiment-four-layer-a"
@@ -600,8 +697,8 @@ function ExperimentElevenLayerASheet({ nestedB = false }: { nestedB?: boolean })
         backdropLights={layerBackdropLights('layerA', e11)}
       />
       {showInset && (
-        <div className="experiment-four-layer-a__bezel-inset">
-          {layerBVisible && <ExperimentElevenLayerBSheet nested />}
+        <div className="experiment-four-layer-a__bezel-inset" ref={insetRef}>
+          {paintNestedB && <ExperimentElevenLayerBSheet nested clipPath={nestedBClipPath} />}
         </div>
       )}
       <div className="experiment-four-layer-a__content">
