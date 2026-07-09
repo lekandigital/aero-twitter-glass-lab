@@ -1,0 +1,48 @@
+/*
+ * Stacked-glass finish for Experiment Eleven (overlap-pane) Layer C — opt-in per
+ * save via `bezelStyle: "stacked-glass-haze"`. The value surfaces as
+ * `data-bezel-style` on selected-save previews and `data-e11-bezel-style` on the
+ * active main stage, so only saves carrying that marker (e.g. 960) are affected;
+ * nothing else references it, so no other save changes.
+ *
+ * Two effects:
+ *  1) A very subtle internal haze inside Layer C (repurposed ::before) — a faint
+ *     blue-gray smoky patch, darkest middle-right, borderless, `multiply`-blended
+ *     so it rides on the locally transmitted background color instead of flattening
+ *     it. Kept restrained so the pane stays a transmissive sheet, not a gray cloud.
+ *  2) A restrained contact shadow of Layer C onto Layer B, applied to the layer-C
+ *     *wrapper* (not the pane itself, to avoid disturbing Layer C's backdrop-filter)
+ *     via soft, borderless drop-shadows — so Layer C reads as seated into Layer B.
+ */
+
+/* 1) Internal haze — very subtle, blends into the transmitted color. */
+[data-bezel-style='stacked-glass-haze'] .experiment-eleven-layer-c::before,
+[data-e11-bezel-style='stacked-glass-haze'] .experiment-eleven-layer-c::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  opacity: 1 !important;
+  mix-blend-mode: multiply !important;
+  filter: blur(10px) !important;
+  background:
+    radial-gradient(
+      ellipse 60% 54% at 65% 55%,
+      rgba(120, 138, 158, 0.17) 0%,
+      rgba(140, 158, 178, 0.09) 38%,
+      rgba(160, 182, 202, 0.03) 62%,
+      rgba(160, 182, 202, 0) 80%
+    ) !important;
+  box-shadow: none !important;
+}
+
+/* 2) Contact shadow of Layer C onto Layer B — soft, seated, no hard line. */
+[data-bezel-style='stacked-glass-haze'] .experiment-set-one-selected-save-stage__layer-c,
+[data-e11-bezel-style='stacked-glass-haze'] .experiment-six-layer-c-draggable {
+  filter:
+    drop-shadow(0 1px 1px rgba(28, 50, 80, 0.16))
+    drop-shadow(0 3px 5px rgba(28, 50, 80, 0.11))
+    drop-shadow(0 7px 13px rgba(28, 50, 80, 0.07));
+}
