@@ -49,6 +49,10 @@ export type ExperimentSetOneSnapshot = {
   e4?: Partial<E4MaterialSettings>;
   /** Optional E11-only material override for the horizontal right-overlap Layer C strip. */
   e11LayerC?: Partial<E4MaterialSettings>;
+  /** When true, the right-overlap Layer C should keep its hidden-B opacity even if B is visible. */
+  e11LayerCPreserveOpacity?: boolean;
+  /** When set, replaces Layer C's live (position-sampled) background with this explicit CSS gradient — a fixed translucency/color, independent of drag position. */
+  e11LayerCBackgroundOverride?: string;
   /** Optional E11-only material override for the horizontal right-overlap Layer D strip. */
   e11LayerD?: Partial<E4MaterialSettings>;
   /** Optional E11-only material override for the horizontal right-overlap Layer E strip. */

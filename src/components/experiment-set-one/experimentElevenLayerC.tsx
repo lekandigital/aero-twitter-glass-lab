@@ -107,11 +107,13 @@ function ExperimentElevenTopLayerSheet({
   layerId,
   label,
   dampenTranslucency = false,
+  backgroundOverride,
 }: {
   material: E4MaterialSettings;
   layerId: ExperimentElevenTopLayerId;
   label: string;
   dampenTranslucency?: boolean;
+  backgroundOverride?: string;
 }) {
   const layerSettings = material;
   return (
@@ -123,6 +125,7 @@ function ExperimentElevenTopLayerSheet({
         ...e4SettingsToCssVars(layerSettings),
         ...e4LayerBDimensionStyle(layerSettings, false),
         opacity: dampenTranslucency ? 0.9 : undefined,
+        ...(backgroundOverride ? { background: backgroundOverride } : null),
       }}
       data-e11-top-layer={layerId}
       {...e6LayerCInspectAttrs('layer-c', `${label} · panel`, 'eleven')}
@@ -160,6 +163,7 @@ function ExperimentElevenLayerCDraggablePane({
   initialPosition,
   persistKey,
   layoutResetVersion = 0,
+  backgroundOverride,
 }: {
   material: E4MaterialSettings;
   layerId: ExperimentElevenTopLayerId;
@@ -168,6 +172,7 @@ function ExperimentElevenLayerCDraggablePane({
   initialPosition: { x: number; y: number };
   persistKey: string;
   layoutResetVersion?: number;
+  backgroundOverride?: string;
 }) {
   return (
     <ExperimentSetTwoDraggableShell
@@ -183,6 +188,7 @@ function ExperimentElevenLayerCDraggablePane({
         layerId={layerId}
         label={label}
         dampenTranslucency={dampenTranslucency}
+        backgroundOverride={backgroundOverride}
       />
     </ExperimentSetTwoDraggableShell>
   );
@@ -220,10 +226,13 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
           experimentElevenLayerCDisplayMaterial(e11, override),
           layout,
         );
+        const preserveOpacity = layer.id === 'c' && selectedSave?.e11LayerCPreserveOpacity;
+        const backgroundOverride = layer.id === 'c' ? selectedSave?.e11LayerCBackgroundOverride : undefined;
         return [{
           ...layer,
           material,
-          dampenTranslucency: layerAVisible && layerBVisible,
+          dampenTranslucency: layerAVisible && layerBVisible && !preserveOpacity,
+          backgroundOverride,
           initialPosition: {
             x: Math.max(0, Math.round((e11.layerBWidth as number - (material.layerBWidth as number)) / 2)),
             y: 0,
@@ -259,6 +268,7 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
           initialPosition={layer.initialPosition}
           persistKey={layer.persistKey}
           layoutResetVersion={layoutResetVersion}
+          backgroundOverride={layer.backgroundOverride}
         />
       ))}
     </>,
