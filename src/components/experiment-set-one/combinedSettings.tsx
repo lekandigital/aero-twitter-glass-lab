@@ -119,10 +119,12 @@ import {
 } from './experimentElevenPanelGeometry';
 import {
   EXPERIMENT_ELEVEN_LAYER_C_LAYOUT,
+  applyExperimentElevenLayerCLayout,
   experimentElevenLayerCDisplayMaterial,
   experimentElevenLayerCLayoutFromMaterial,
   type ExperimentElevenLayerCLayoutSettings,
 } from './experimentElevenLayerCMaterial';
+import { ExperimentElevenLayerCSwitcherGlass } from './ExperimentElevenLayerCSwitcherGlass';
 import { applyExperimentSixPanelGeometry } from './experimentSixPanelGeometry';
 import {
   applyExperimentEightPanelGeometry,
@@ -272,7 +274,8 @@ function formatSavePlacement(
 
 function elevenSaveLayerCMaterial(save: ExperimentSetOneSnapshot): E4MaterialSettings | null {
   if (!save.e4) return null;
-  return experimentElevenLayerCDisplayMaterial(normalizeE4MaterialSettings(save.e4), save.e11LayerC);
+  const material = experimentElevenLayerCDisplayMaterial(normalizeE4MaterialSettings(save.e4), save.e11LayerC);
+  return save.e11LayerCLayout ? applyExperimentElevenLayerCLayout(material, save.e11LayerCLayout) : material;
 }
 
 function ElevenSaveLayerCPreview({ save }: { save: ExperimentSetOneSnapshot }) {
@@ -281,58 +284,77 @@ function ElevenSaveLayerCPreview({ save }: { save: ExperimentSetOneSnapshot }) {
 
   return (
     <div className="experiment-one-settings-dock__save-chip-preview" aria-hidden="true">
-      <div
-        className="experiment-four-layer-b experiment-eleven-layer-c experiment-one-settings-dock__save-chip-preview-surface"
-        style={{
-          ...e4SettingsToCssVars(material),
-          ...e4LayerBDimensionStyle(material, false),
-          position: 'relative',
-          transform: 'scale(0.18)',
-          transformOrigin: 'top left',
-        }}
-      >
-        <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />
-        <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--bottom" aria-hidden="true" />
-        <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--left" aria-hidden="true" />
-        <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--right" aria-hidden="true" />
-        <GlassFrostSurface />
-        <span className="experiment-four-layer-b__shine" aria-hidden="true" />
-        <span className="experiment-four-layer-b__radial-corners" aria-hidden="true" />
-        <PwzzovOGlassCorners
-          layerClass="experiment-four-layer-b"
-          inspectTarget="layer-b-corners"
-          edgeReflexEnabled={pwzzovBackdropReflexEnabled(material.layerBGlassReflexMode, [
-            material.layerBGlassReflexTlLight,
-            material.layerBGlassReflexTlDark,
-            material.layerBGlassReflexTrLight,
-            material.layerBGlassReflexTrDark,
-            material.layerBGlassReflexBlLight,
-            material.layerBGlassReflexBlDark,
-            material.layerBGlassReflexBrLight,
-            material.layerBGlassReflexBrDark,
-            material.layerBGlassReflexTopLight,
-            material.layerBGlassReflexTopDark,
-            material.layerBGlassReflexBottomLight,
-            material.layerBGlassReflexBottomDark,
-            material.layerBGlassReflexLeftLight,
-            material.layerBGlassReflexLeftDark,
-            material.layerBGlassReflexRightLight,
-            material.layerBGlassReflexRightDark,
-          ])}
-          rimSideGapTop={material.layerBRimSideGapTop}
-          rimSideGapBottom={material.layerBRimSideGapBottom}
-          backdropLights={{
-            tlLight: material.layerBGlassReflexTlLight,
-            trLight: material.layerBGlassReflexTrLight,
-            blLight: material.layerBGlassReflexBlLight,
-            brLight: material.layerBGlassReflexBrLight,
-            topLight: material.layerBGlassReflexTopLight,
-            bottomLight: material.layerBGlassReflexBottomLight,
-            leftLight: material.layerBGlassReflexLeftLight,
-            rightLight: material.layerBGlassReflexRightLight,
+      {save.e11LayerCReferenceGlass ? (
+        <div
+          className="experiment-one-settings-dock__save-chip-preview-surface"
+          style={{
+            position: 'relative',
+            transform: 'scale(0.18)',
+            transformOrigin: 'top left',
           }}
-        />
-      </div>
+        >
+          <ExperimentElevenLayerCSwitcherGlass
+            variant={save.e11LayerCReferenceGlass}
+            width={material.layerBWidth as number}
+            height={material.layerBHeight as number}
+            radius={material.layerBCornerRadius as number}
+            tone={save.e11LayerCReferenceTone}
+          />
+        </div>
+      ) : (
+        <div
+          className="experiment-four-layer-b experiment-eleven-layer-c experiment-one-settings-dock__save-chip-preview-surface"
+          style={{
+            ...e4SettingsToCssVars(material),
+            ...e4LayerBDimensionStyle(material, false),
+            position: 'relative',
+            transform: 'scale(0.18)',
+            transformOrigin: 'top left',
+          }}
+        >
+          <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--top" aria-hidden="true" />
+          <span className="experiment-four-layer-b__rim-edge experiment-four-layer-b__rim-edge--bottom" aria-hidden="true" />
+          <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--left" aria-hidden="true" />
+          <span className="experiment-four-layer-b__rim-side experiment-four-layer-b__rim-side--right" aria-hidden="true" />
+          <GlassFrostSurface />
+          <span className="experiment-four-layer-b__shine" aria-hidden="true" />
+          <span className="experiment-four-layer-b__radial-corners" aria-hidden="true" />
+          <PwzzovOGlassCorners
+            layerClass="experiment-four-layer-b"
+            inspectTarget="layer-b-corners"
+            edgeReflexEnabled={pwzzovBackdropReflexEnabled(material.layerBGlassReflexMode, [
+              material.layerBGlassReflexTlLight,
+              material.layerBGlassReflexTlDark,
+              material.layerBGlassReflexTrLight,
+              material.layerBGlassReflexTrDark,
+              material.layerBGlassReflexBlLight,
+              material.layerBGlassReflexBlDark,
+              material.layerBGlassReflexBrLight,
+              material.layerBGlassReflexBrDark,
+              material.layerBGlassReflexTopLight,
+              material.layerBGlassReflexTopDark,
+              material.layerBGlassReflexBottomLight,
+              material.layerBGlassReflexBottomDark,
+              material.layerBGlassReflexLeftLight,
+              material.layerBGlassReflexLeftDark,
+              material.layerBGlassReflexRightLight,
+              material.layerBGlassReflexRightDark,
+            ])}
+            rimSideGapTop={material.layerBRimSideGapTop}
+            rimSideGapBottom={material.layerBRimSideGapBottom}
+            backdropLights={{
+              tlLight: material.layerBGlassReflexTlLight,
+              trLight: material.layerBGlassReflexTrLight,
+              blLight: material.layerBGlassReflexBlLight,
+              brLight: material.layerBGlassReflexBrLight,
+              topLight: material.layerBGlassReflexTopLight,
+              bottomLight: material.layerBGlassReflexBottomLight,
+              leftLight: material.layerBGlassReflexLeftLight,
+              rightLight: material.layerBGlassReflexRightLight,
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
