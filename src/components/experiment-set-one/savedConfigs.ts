@@ -53,6 +53,14 @@ export type ExperimentSetOneSnapshot = {
   e11LayerCPreserveOpacity?: boolean;
   /** When set, replaces Layer C's live (position-sampled) background with this explicit CSS gradient — a fixed translucency/color, independent of drag position. */
   e11LayerCBackgroundOverride?: string;
+  /** When set, Layer C renders a reference-demo liquid-glass surface (exact CSS/JS) instead of the normal experiment sheet. Sized from e11LayerCLayout. */
+  e11LayerCReferenceGlass?:
+    | 'switcher-background'
+    | 'switcher-button'
+    | 'glass-button'
+    | 'ios'
+    | 'liquid-css'
+    | 'light-btn';
   /** Optional E11-only material override for the horizontal right-overlap Layer D strip. */
   e11LayerD?: Partial<E4MaterialSettings>;
   /** Optional E11-only material override for the horizontal right-overlap Layer E strip. */
