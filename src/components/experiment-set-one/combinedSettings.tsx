@@ -175,7 +175,7 @@ type ExperimentSelection =
   | { experiment: 'ten'; target: E4InspectTarget; label: string }
   | { experiment: 'eleven'; target: E4InspectTarget | E6LayerCInspectTarget; label: string };
 
-const EXPERIMENT_ORDER: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
+const EXPERIMENT_ORDER: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 
 /**
  * The id used for variant-group / manifest lookup.
@@ -372,6 +372,7 @@ function experimentPaneLabel(experiment: ExperimentId): string {
   if (experiment === 'nine') return 'center large pane';
   if (experiment === 'ten') return 'center overlap pane';
   if (experiment === 'eleven') return 'right overlap pane';
+  if (experiment === 'twelve') return 'thick lens';
   return experimentTitle(experiment);
 }
 
@@ -850,6 +851,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     nine: boot.selectedSaveIdByExperiment?.nine ?? null,
     ten: boot.selectedSaveIdByExperiment?.ten ?? null,
     eleven: boot.selectedSaveIdByExperiment?.eleven ?? null,
+    twelve: boot.selectedSaveIdByExperiment?.twelve ?? null,
   });
   const [selectedPanelSetSaveId, setSelectedPanelSetSaveId] = useState<number | null>(null);
   const [selectedExperimentIds, setSelectedExperimentIds] = useState<ExperimentId[]>(() =>
@@ -1477,6 +1479,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         }
         return;
       }
+      if (snapshot.scope === 'twelve') return;
       if (snapshot.scope === 'seven') {
         if (snapshot.e4) {
           setLayerCVisible(false);
@@ -1894,6 +1897,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         data-e9-visible={experimentVisible.nine}
         data-e10-visible={experimentVisible.ten}
         data-e11-visible={experimentVisible.eleven}
+        data-e12-visible={experimentVisible.twelve}
         data-e1-inspect-mode={inspectMode}
         data-e2-inspect-mode={inspectMode}
         data-e3-inspect-mode={inspectMode}
@@ -2023,6 +2027,7 @@ function experimentTitle(experiment: ExperimentSelection['experiment'] | Experim
   if (experiment === 'eight') return 'Experiment Eight';
   if (experiment === 'ten') return 'Experiment Ten';
   if (experiment === 'eleven') return 'Experiment Eleven';
+  if (experiment === 'twelve') return 'Experiment Twelve';
   return 'Experiment Nine';
 }
 
@@ -2657,6 +2662,7 @@ export function ExperimentSetOneSettingsDock() {
                   ['nine', 'center large pane'],
                   ['ten', 'center overlap pane'],
                   ['eleven', 'right overlap pane'],
+                  ['twelve', 'thick lens'],
                 ] as const
               ).map(([id, label]) => {
                 const hasSelectedSaves = (selectedSaveKeysByExperiment[id]?.length ?? 0) > 0;
@@ -3702,6 +3708,14 @@ export function ExperimentSetOneSettingsDock() {
                     : undefined
                 }
               />
+            )}
+            {dockExperiment === 'twelve' && (
+              <div className="experiment-one-settings-dock__settings-scroll">
+                <p className="experiment-one-settings-dock__note">
+                  Exact standalone Thick lens preset: 320 × 200, radius 60, thickness 260, bezel 70,
+                  refractive index 1.9. Drag the lens directly over the wallpaper.
+                </p>
+              </div>
             )}
             </div>
             </div>

@@ -107,7 +107,7 @@ export function defaultSession(): ExperimentSetOneSession {
     experimentVisible: DEFAULT_EXPERIMENT_VISIBILITY,
     referenceWallpaper: false,
     activeExperiment: 'four',
-    selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: null, six: null, seven: null, eight: null, nine: null, ten: null, eleven: null },
+    selectedSaveIdByExperiment: { one: null, two: null, three: null, four: null, five: null, six: null, seven: null, eight: null, nine: null, ten: null, eleven: null, twelve: null },
     selectedExperimentIds: ['four'],
     selectedSaveKeysByExperiment: {},
     saveVisualOrder: [],
@@ -120,7 +120,7 @@ export function defaultSession(): ExperimentSetOneSession {
 
 function normalizeSelectedExperimentIds(raw: unknown, activeExperiment: ExperimentId): ExperimentId[] {
   if (!Array.isArray(raw)) return [activeExperiment];
-  const allowed = new Set<ExperimentId>(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven']);
+  const allowed = new Set<ExperimentId>(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve']);
   const next = Array.from(new Set(raw.filter((id): id is ExperimentId => allowed.has(id))));
   return next.length > 0 ? next : [activeExperiment];
 }
@@ -133,7 +133,7 @@ function normalizeSelectedSaveKeysByExperiment(
   activeRenderVariant: RenderVariantSlug | null | undefined,
 ): Partial<Record<ExperimentId, string[]>> {
   const next: Partial<Record<ExperimentId, string[]>> = {};
-  const allowed = new Set<ExperimentId>(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven']);
+  const allowed = new Set<ExperimentId>(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve']);
   const rawKeyRecord = rawKeys && typeof rawKeys === 'object' ? (rawKeys as Partial<Record<ExperimentId, unknown>>) : undefined;
   const rawIdRecord = rawIds && typeof rawIds === 'object' ? (rawIds as Partial<Record<ExperimentId, unknown>>) : undefined;
   const legacyKeyFor = (experiment: ExperimentId, id: number) =>
@@ -179,7 +179,7 @@ function normalizeSaveVisualOrder(raw: unknown): number[] {
 }
 
 function selectedSaveInstanceKeys(keysByExperiment: Partial<Record<ExperimentId, string[]>>): string[] {
-  const allowed: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
+  const allowed: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
   return allowed.flatMap((experiment) =>
     (keysByExperiment[experiment] ?? []).map((key) => `${experiment}:${key}`),
   );
@@ -260,7 +260,8 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       parsed.activeExperiment === 'eight' ||
       parsed.activeExperiment === 'nine' ||
       parsed.activeExperiment === 'ten' ||
-      parsed.activeExperiment === 'eleven'
+      parsed.activeExperiment === 'eleven' ||
+      parsed.activeExperiment === 'twelve'
         ? parsed.activeExperiment
         : 'four';
     const selectedSaveKeysByExperiment = normalizeSelectedSaveKeysByExperiment(

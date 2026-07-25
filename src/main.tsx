@@ -22,6 +22,7 @@ import './styles/material-settings.css';
 import './styles/experiment-set-six.css';
 import './styles/experiment-eleven-haze.css';
 import './styles/experiment-eleven-switcher-glass.css';
+import './styles/experiment-twelve-thick-lens.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

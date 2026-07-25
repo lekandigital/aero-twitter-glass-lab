@@ -1,0 +1,23 @@
+.experiment-twelve-thick-lens-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  display: grid;
+  grid-template-columns: var(--e1-menu-width, 384px) minmax(0, 1fr);
+  place-items: center;
+  pointer-events: none;
+}
+
+.experiment-twelve-thick-lens {
+  grid-column: 2;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+}
+
+.experiment-twelve-thick-lens:active {
+  cursor: grabbing;
+}
