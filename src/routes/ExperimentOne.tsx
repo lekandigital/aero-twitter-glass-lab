@@ -8,7 +8,7 @@ import {
 import { ExperimentSetOneStage } from '../components/experiment-set-one/ExperimentSetOneStage';
 import { StageCamera } from '../components/experiment-set-one/StageCamera';
 
-/** Experiment Set 1 — Experiments One through Twelve */
+/** Experiment Set 1 — Experiments One through Eleven */
 export function ExperimentOne() {
   return (
     <ExperimentSetOneProvider>
@@ -23,7 +23,7 @@ export function ExperimentOne() {
           frost into draggable sheets. <strong>Experiment Three</strong> uses reference-tuned layer A (clear bezel) and
           layer B (frost body). <strong>Experiment Four</strong> copies Save 2 with reference left-panel proportions and
           opposite-corner highlights (CodePen PwzzovO). <strong>Experiment Eleven</strong> duplicates the center overlap
-          pane as the right overlap pane. <strong>Experiment Twelve</strong> is the standalone Thick lens preset.
+          pane as the right overlap pane.
         </p>
       </header>
 

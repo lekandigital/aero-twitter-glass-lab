@@ -1,4 +1,4 @@
-import { useId, useRef } from 'react';
+import { useId, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, useMotionValue } from 'motion/react';
 import { LiquidFilter } from '../../vendor/web-glass-effect/motion/liquid/filter';
@@ -17,17 +17,64 @@ const THICK_LENS = {
   dpr: 1,
 } as const;
 
-/**
- * Experiment Twelve renders the upstream Thick lens as a page-level surface.
- *
- * Keeping the SVG filter and the draggable surface outside the transformed
- * experiment camera avoids the nested transform/backdrop coordinate mismatch
- * that changed the effect when it was mounted inside Experiment Eleven.
- */
-export function ExperimentTwelveThickLens() {
+type ThickLensAnchor = {
+  left: number;
+  top: number;
+  scale: number;
+};
+
+function useThickLensAnchor(anchorRef?: RefObject<HTMLElement | null>): ThickLensAnchor | null {
+  const [anchor, setAnchor] = useState<ThickLensAnchor | null>(null);
+
+  useLayoutEffect(() => {
+    if (!anchorRef) {
+      setAnchor(null);
+      return;
+    }
+
+    let frame = 0;
+    const measure = () => {
+      const element = anchorRef.current;
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        const next = {
+          left: rect.left,
+          top: rect.top,
+          scale: rect.width / THICK_LENS.width,
+        };
+        setAnchor((previous) =>
+          previous &&
+          previous.left === next.left &&
+          previous.top === next.top &&
+          previous.scale === next.scale
+            ? previous
+            : next,
+        );
+      }
+      frame = requestAnimationFrame(measure);
+    };
+
+    measure();
+    return () => cancelAnimationFrame(frame);
+  }, [anchorRef]);
+
+  return anchor;
+}
+
+export function ThickLensPortal({
+  anchorRef,
+  ariaLabel,
+  testId,
+}: {
+  anchorRef?: RefObject<HTMLElement | null>;
+  ariaLabel: string;
+  testId: string;
+}) {
+  const anchored = Boolean(anchorRef);
+  const anchor = useThickLensAnchor(anchorRef);
   const overlayRef = useRef<HTMLDivElement>(null);
   const reactId = useId();
-  const filterId = `e12-thick-lens-${reactId.replace(/:/g, '')}`;
+  const filterId = `thick-lens-${reactId.replace(/:/g, '')}`;
   const scaleRatio = useMotionValue(1);
 
   if (typeof document === 'undefined') return null;
@@ -35,8 +82,10 @@ export function ExperimentTwelveThickLens() {
   return createPortal(
     <div
       ref={overlayRef}
-      className="experiment-twelve-thick-lens-overlay"
-      data-stage-experiment="twelve"
+      className={`experiment-twelve-thick-lens-overlay${
+        anchored ? ' experiment-twelve-thick-lens-overlay--anchored' : ''
+      }`}
+      data-thick-lens-mode={anchored ? 'experiment-eleven-layer-c' : 'experiment-twelve'}
     >
       <LiquidFilter
         id={filterId}
@@ -61,7 +110,7 @@ export function ExperimentTwelveThickLens() {
         dragConstraints={overlayRef}
         dragElastic={0.04}
         dragMomentum={false}
-        data-testid="experiment-twelve-surface"
+        data-testid={testId}
         style={{
           width: THICK_LENS.width,
           height: THICK_LENS.height,
@@ -69,11 +118,37 @@ export function ExperimentTwelveThickLens() {
           backdropFilter: `url(#${filterId})`,
           WebkitBackdropFilter: `url(#${filterId})`,
           boxShadow: '0 3px 14px rgba(0,0,0,0.1)',
+          ...(anchored
+            ? {
+                left: anchor?.left ?? 0,
+                top: anchor?.top ?? 0,
+                scale: anchor?.scale ?? 1,
+                transformOrigin: 'top left',
+                opacity: anchor ? 1 : 0,
+                pointerEvents: anchor ? 'auto' : 'none',
+              }
+            : null),
         }}
         role="img"
-        aria-label="Experiment Twelve Thick lens"
+        aria-label={ariaLabel}
       />
     </div>,
     document.body,
+  );
+}
+
+/**
+ * Experiment Twelve renders the upstream Thick lens as a page-level surface.
+ *
+ * Keeping the SVG filter and the draggable surface outside the transformed
+ * experiment camera avoids the nested transform/backdrop coordinate mismatch
+ * that changed the effect when it was mounted inside Experiment Eleven.
+ */
+export function ExperimentTwelveThickLens() {
+  return (
+    <ThickLensPortal
+      ariaLabel="Experiment Twelve Thick lens"
+      testId="experiment-twelve-surface"
+    />
   );
 }

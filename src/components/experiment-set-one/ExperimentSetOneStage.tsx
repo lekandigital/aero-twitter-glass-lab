@@ -19,9 +19,8 @@ import { useExperimentSetOne } from './combinedSettings';
 import { VariantPanelSlots } from './VariantPanelSlots';
 import { SelectedSaveStagePanels } from './SelectedSavePreviews';
 import type { ExperimentId } from './experimentVisibility';
-import { ExperimentTwelveThickLens } from './ExperimentTwelveThickLens';
 
-const STAGE_EXPERIMENTS: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const STAGE_EXPERIMENTS: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
 const MULTI_EXPERIMENT_CASCADE_STEP = 28;
 
 function selectedSaveCount(selectedSaveKeysByExperiment: Partial<Record<ExperimentId, string[]>>) {
@@ -212,8 +211,6 @@ export function ExperimentSetOneStage() {
             nestedB={e11.layerBNestedInA}
           />
         ))}
-
-        {show('twelve') && <ExperimentTwelveThickLens />}
 
         <SelectedSaveStagePanels />
       </div>
