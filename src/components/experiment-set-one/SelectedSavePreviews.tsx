@@ -42,10 +42,11 @@ import {
 } from './experimentElevenLayerCMaterial';
 import type { ExperimentSetOneSnapshot } from './savedConfigs';
 import { useRenderVariant } from '../../render-variants/RenderVariantContext';
+import { ExperimentTwelveThickLens } from './ExperimentTwelveThickLens';
 
 type PreviewExperiment = Extract<
   ExperimentId,
-  'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten' | 'eleven'
+  'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten' | 'eleven' | 'twelve'
 >;
 
 type SavePreview = {
@@ -74,7 +75,7 @@ type SavePreview = {
 
 type SelectedSaveTopLayerId = 'c' | 'd' | 'e';
 
-const PREVIEW_EXPERIMENTS: PreviewExperiment[] = ['four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
+const PREVIEW_EXPERIMENTS: PreviewExperiment[] = ['four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 const FREE_LAYER_B_SNAP = { x: 52, y: 60 } as const;
 const SELECTED_SAVE_CASCADE_STEP = 28;
 const SELECTED_SAVE_DRAG_THRESHOLD = 4;
@@ -497,6 +498,10 @@ function SelectedSaveStagePanel({
     onPointerUp: endDrag,
     onPointerCancel: endDrag,
   };
+
+  if (preview.experiment === 'twelve') {
+    return <ExperimentTwelveThickLens />;
+  }
 
   return (
     <div
