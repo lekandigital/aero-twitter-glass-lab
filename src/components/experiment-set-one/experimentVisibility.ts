@@ -9,8 +9,7 @@ export type ExperimentId =
   | 'eight'
   | 'nine'
   | 'ten'
-  | 'eleven'
-  | 'twelve';
+  | 'eleven';
 
 export type ExperimentVisibility = Record<ExperimentId, boolean>;
 
@@ -26,7 +25,6 @@ export const DEFAULT_EXPERIMENT_VISIBILITY: ExperimentVisibility = {
   nine: true,
   ten: true,
   eleven: true,
-  twelve: true,
 };
 
 export function normalizeExperimentVisibility(
@@ -44,6 +42,5 @@ export function normalizeExperimentVisibility(
     nine: raw?.nine !== false,
     ten: raw?.ten !== false,
     eleven: raw?.eleven !== false,
-    twelve: raw?.twelve !== false,
   };
 }

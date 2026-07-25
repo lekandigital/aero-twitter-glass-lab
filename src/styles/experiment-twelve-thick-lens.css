@@ -18,6 +18,20 @@
   touch-action: none;
 }
 
+.experiment-twelve-thick-lens-overlay--anchored {
+  display: block;
+}
+
+.experiment-twelve-thick-lens-overlay--anchored .experiment-twelve-thick-lens {
+  position: fixed;
+  grid-column: auto;
+}
+
+.experiment-eleven-thick-lens-anchor {
+  position: relative;
+  pointer-events: none;
+}
+
 .experiment-twelve-thick-lens:active {
   cursor: grabbing;
 }

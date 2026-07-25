@@ -42,11 +42,11 @@ import {
 } from './experimentElevenLayerCMaterial';
 import type { ExperimentSetOneSnapshot } from './savedConfigs';
 import { useRenderVariant } from '../../render-variants/RenderVariantContext';
-import { ExperimentTwelveThickLens } from './ExperimentTwelveThickLens';
+import { ThickLensPortal } from './ExperimentTwelveThickLens';
 
 type PreviewExperiment = Extract<
   ExperimentId,
-  'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten' | 'eleven' | 'twelve'
+  'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten' | 'eleven'
 >;
 
 type SavePreview = {
@@ -65,7 +65,7 @@ type SavePreview = {
   layerDLayoutOverride: ExperimentElevenLayerCLayoutSettings | null;
   layerELayoutOverride: ExperimentElevenLayerCLayoutSettings | null;
   /** When set, Layer C renders the exact reference glass instead of the normal sheet. */
-  layerCReferenceGlass: ExperimentElevenSwitcherGlassVariant | null;
+  layerCReferenceGlass: ExperimentElevenSwitcherGlassVariant | 'thick-lens' | null;
   /** Optional reference-demo Layer C palette tone. */
   layerCReferenceTone: ExperimentElevenSwitcherGlassTone | null;
   /** Semantic appearance opt-in, driven by the save's own field — not its id. */
@@ -75,7 +75,7 @@ type SavePreview = {
 
 type SelectedSaveTopLayerId = 'c' | 'd' | 'e';
 
-const PREVIEW_EXPERIMENTS: PreviewExperiment[] = ['four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const PREVIEW_EXPERIMENTS: PreviewExperiment[] = ['four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
 const FREE_LAYER_B_SNAP = { x: 52, y: 60 } as const;
 const SELECTED_SAVE_CASCADE_STEP = 28;
 const SELECTED_SAVE_DRAG_THRESHOLD = 4;
@@ -256,9 +256,10 @@ function SelectedSaveLayerC({
   layoutOverride: ExperimentElevenLayerCLayoutSettings | null;
   layerId: SelectedSaveTopLayerId;
   label: string;
-  referenceGlass: ExperimentElevenSwitcherGlassVariant | null;
+  referenceGlass: ExperimentElevenSwitcherGlassVariant | 'thick-lens' | null;
   referenceTone: ExperimentElevenSwitcherGlassTone | null;
 }) {
+  const thickLensAnchorRef = useRef<HTMLDivElement>(null);
   const layerCMaterial = useMemo(
     () => {
       const next = selectedSaveLayerCMaterial(material, layerCOverride);
@@ -266,6 +267,30 @@ function SelectedSaveLayerC({
     },
     [material, layerCOverride, layoutOverride],
   );
+  if (referenceGlass === 'thick-lens') {
+    return (
+      <div
+        ref={thickLensAnchorRef}
+        className="experiment-eleven-thick-lens-anchor"
+        data-e11-top-layer={layerId}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: '50%',
+          width: layerCMaterial.layerBWidth as number,
+          height: layerCMaterial.layerBHeight as number,
+          borderRadius: layerCMaterial.layerBCornerRadius as number,
+          transform: 'translateX(-50%)',
+        }}
+      >
+        <ThickLensPortal
+          anchorRef={thickLensAnchorRef}
+          ariaLabel="Selected Save Experiment Eleven Layer C Thick lens"
+          testId="selected-save-experiment-eleven-thick-lens-surface"
+        />
+      </div>
+    );
+  }
   if (referenceGlass) {
     return (
       <div
@@ -498,10 +523,6 @@ function SelectedSaveStagePanel({
     onPointerUp: endDrag,
     onPointerCancel: endDrag,
   };
-
-  if (preview.experiment === 'twelve') {
-    return <ExperimentTwelveThickLens />;
-  }
 
   return (
     <div

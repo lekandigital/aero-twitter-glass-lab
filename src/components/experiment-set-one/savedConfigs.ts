@@ -60,7 +60,8 @@ export type ExperimentSetOneSnapshot = {
     | 'glass-button'
     | 'ios'
     | 'liquid-css'
-    | 'light-btn';
+    | 'light-btn'
+    | 'thick-lens';
   /** Optional palette tone for reference-demo Layer C. Demo tones mirror the source CSS variables; others are small pane-fit tweaks. */
   e11LayerCReferenceTone?:
     | 'demo-light'
@@ -113,7 +114,7 @@ function builtInReferenceCornerSave(): ExperimentSetOneSnapshot {
 }
 
 function selectedSaveInstanceKeys(keysByExperiment: Partial<Record<ExperimentId, string[]>>): string[] {
-  const order: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+  const order: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
   return order.flatMap((experiment) =>
     (keysByExperiment[experiment] ?? []).map((key) => `${experiment}:${key}`),
   );
@@ -122,7 +123,7 @@ function selectedSaveInstanceKeys(keysByExperiment: Partial<Record<ExperimentId,
 function sortedSelectedSaveKeysByExperiment(
   keysByExperiment?: Partial<Record<ExperimentId, string[]>>,
 ): Partial<Record<ExperimentId, string[]>> {
-  const order: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+  const order: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
   const out: Partial<Record<ExperimentId, string[]>> = {};
   for (const experiment of order) {
     const keys = keysByExperiment?.[experiment];
@@ -145,7 +146,7 @@ function sortedSelectedSavePositions(
 
 function normalizeSelectedExperimentIds(raw: unknown): ExperimentId[] | undefined {
   if (!Array.isArray(raw)) return undefined;
-  const allowed = new Set<ExperimentId>(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve']);
+  const allowed = new Set<ExperimentId>(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven']);
   const next = Array.from(new Set(raw.filter((id): id is ExperimentId => allowed.has(id))));
   return next;
 }
@@ -169,7 +170,7 @@ function normalizeSelectedSaveKeysByExperiment(
   raw: unknown,
 ): Partial<Record<ExperimentId, string[]>> | undefined {
   if (!raw || typeof raw !== 'object') return undefined;
-  const order: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+  const order: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
   const record = raw as Partial<Record<ExperimentId, unknown>>;
   const next: Partial<Record<ExperimentId, string[]>> = {};
   for (const experiment of order) {
@@ -215,8 +216,7 @@ function normalizeLayoutSnapshot(raw: unknown): ExperimentSetOneLayoutSnapshot {
       layout.activeExperiment === 'eight' ||
       layout.activeExperiment === 'nine' ||
       layout.activeExperiment === 'ten' ||
-      layout.activeExperiment === 'eleven' ||
-      layout.activeExperiment === 'twelve'
+      layout.activeExperiment === 'eleven'
     )
       ? { activeExperiment: layout.activeExperiment }
       : {}),
@@ -421,7 +421,7 @@ export function addExperimentSetOneSave(
 
 export function getFieldFromSnapshot(
   snapshot: ExperimentSetOneSnapshot,
-  experiment: 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten' | 'eleven' | 'twelve',
+  experiment: 'one' | 'two' | 'three' | 'four' | 'five' | 'six' | 'seven' | 'eight' | 'nine' | 'ten' | 'eleven',
   fieldId: string,
 ): string | number | boolean | undefined {
   if (experiment === 'four' && snapshot.id === REFERENCE_CORNER_SAVE_ID) {
@@ -430,7 +430,7 @@ export function getFieldFromSnapshot(
     if (override !== undefined) return override;
     return undefined;
   }
-  if (experiment === 'four' || experiment === 'five' || experiment === 'six' || experiment === 'seven' || experiment === 'eight' || experiment === 'nine' || experiment === 'ten' || experiment === 'eleven' || experiment === 'twelve') {
+  if (experiment === 'four' || experiment === 'five' || experiment === 'six' || experiment === 'seven' || experiment === 'eight' || experiment === 'nine' || experiment === 'ten' || experiment === 'eleven') {
     if (!snapshot.e4) return undefined;
     return snapshot.e4[fieldId as keyof E4MaterialSettings] as string | number | boolean;
   }

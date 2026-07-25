@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useExperimentSetOne } from './combinedSettings';
 import { useRenderVariant } from '../../render-variants/RenderVariantContext';
@@ -24,10 +24,12 @@ import {
   type ExperimentElevenSwitcherGlassTone,
   type ExperimentElevenSwitcherGlassVariant,
 } from './ExperimentElevenLayerCSwitcherGlass';
+import { ThickLensPortal } from './ExperimentTwelveThickLens';
 
 type ExperimentElevenTopLayerId = 'c' | 'd' | 'e';
 type ExperimentElevenTopLayerMaterialField = 'e11LayerC' | 'e11LayerD' | 'e11LayerE';
 type ExperimentElevenTopLayerLayoutField = 'e11LayerCLayout' | 'e11LayerDLayout' | 'e11LayerELayout';
+type ExperimentElevenReferenceGlass = ExperimentElevenSwitcherGlassVariant | 'thick-lens';
 
 const EXPERIMENT_ELEVEN_TOP_LAYERS = [
   {
@@ -180,9 +182,11 @@ function ExperimentElevenLayerCDraggablePane({
   persistKey: string;
   layoutResetVersion?: number;
   backgroundOverride?: string;
-  referenceGlass?: ExperimentElevenSwitcherGlassVariant;
+  referenceGlass?: ExperimentElevenReferenceGlass;
   referenceGlassTone?: ExperimentElevenSwitcherGlassTone;
 }) {
+  const thickLensAnchorRef = useRef<HTMLDivElement>(null);
+
   return (
     <ExperimentSetTwoDraggableShell
       bounds="parent"
@@ -192,7 +196,26 @@ function ExperimentElevenLayerCDraggablePane({
       ariaLabel={`Experiment Eleven — layer ${layerId.toUpperCase()}`}
       className="experiment-six-layer-c-draggable"
     >
-      {referenceGlass ? (
+      {referenceGlass === 'thick-lens' ? (
+        <>
+          <div
+            ref={thickLensAnchorRef}
+            className="experiment-eleven-thick-lens-anchor"
+            style={{
+              width: material.layerBWidth as number,
+              height: material.layerBHeight as number,
+              borderRadius: material.layerBCornerRadius as number,
+            }}
+            data-e11-top-layer={layerId}
+            aria-hidden="true"
+          />
+          <ThickLensPortal
+            anchorRef={thickLensAnchorRef}
+            ariaLabel="Experiment Eleven Layer C Thick lens"
+            testId="experiment-eleven-thick-lens-surface"
+          />
+        </>
+      ) : referenceGlass ? (
         <ExperimentElevenLayerCSwitcherGlass
           variant={referenceGlass}
           width={material.layerBWidth as number}

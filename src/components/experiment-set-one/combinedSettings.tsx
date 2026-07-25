@@ -175,7 +175,7 @@ type ExperimentSelection =
   | { experiment: 'ten'; target: E4InspectTarget; label: string }
   | { experiment: 'eleven'; target: E4InspectTarget | E6LayerCInspectTarget; label: string };
 
-const EXPERIMENT_ORDER: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const EXPERIMENT_ORDER: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
 
 /**
  * The id used for variant-group / manifest lookup.
@@ -284,7 +284,21 @@ function ElevenSaveLayerCPreview({ save }: { save: ExperimentSetOneSnapshot }) {
 
   return (
     <div className="experiment-one-settings-dock__save-chip-preview" aria-hidden="true">
-      {save.e11LayerCReferenceGlass ? (
+      {save.e11LayerCReferenceGlass === 'thick-lens' ? (
+        <div
+          className="experiment-one-settings-dock__save-chip-preview-surface"
+          style={{
+            width: material.layerBWidth as number,
+            height: material.layerBHeight as number,
+            borderRadius: material.layerBCornerRadius as number,
+            position: 'relative',
+            transform: 'scale(0.18)',
+            transformOrigin: 'top left',
+            background: 'rgba(220, 244, 255, 0.08)',
+            boxShadow: 'inset 0 0 0 2px rgba(235, 250, 255, 0.72), 0 3px 14px rgba(0,0,0,0.1)',
+          }}
+        />
+      ) : save.e11LayerCReferenceGlass ? (
         <div
           className="experiment-one-settings-dock__save-chip-preview-surface"
           style={{
@@ -1897,7 +1911,6 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         data-e9-visible={experimentVisible.nine}
         data-e10-visible={experimentVisible.ten}
         data-e11-visible={experimentVisible.eleven}
-        data-e12-visible={experimentVisible.twelve}
         data-e1-inspect-mode={inspectMode}
         data-e2-inspect-mode={inspectMode}
         data-e3-inspect-mode={inspectMode}
@@ -2027,7 +2040,6 @@ function experimentTitle(experiment: ExperimentSelection['experiment'] | Experim
   if (experiment === 'eight') return 'Experiment Eight';
   if (experiment === 'ten') return 'Experiment Ten';
   if (experiment === 'eleven') return 'Experiment Eleven';
-  if (experiment === 'twelve') return 'Experiment Twelve';
   return 'Experiment Nine';
 }
 
@@ -2662,7 +2674,6 @@ export function ExperimentSetOneSettingsDock() {
                   ['nine', 'center large pane'],
                   ['ten', 'center overlap pane'],
                   ['eleven', 'right overlap pane'],
-                  ['twelve', 'thick lens'],
                 ] as const
               ).map(([id, label]) => {
                 const hasSelectedSaves = (selectedSaveKeysByExperiment[id]?.length ?? 0) > 0;
@@ -3708,14 +3719,6 @@ export function ExperimentSetOneSettingsDock() {
                     : undefined
                 }
               />
-            )}
-            {dockExperiment === 'twelve' && (
-              <div className="experiment-one-settings-dock__settings-scroll">
-                <p className="experiment-one-settings-dock__note">
-                  Exact standalone Thick lens preset: 320 × 200, radius 60, thickness 260, bezel 70,
-                  refractive index 1.9. Drag the lens directly over the wallpaper.
-                </p>
-              </div>
             )}
             </div>
             </div>
