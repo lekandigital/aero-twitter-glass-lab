@@ -243,6 +243,14 @@ function formatSaveLabel(
   return variantLabel ? `${snapshot.label} (${variantLabel})` : snapshot.label;
 }
 
+function saveChipLabel(snapshot: ExperimentSetOneSnapshot, branchSlug: string | null): string {
+  return formatSaveLabel(snapshot, branchSlug) ?? snapshot.label;
+}
+
+function saveChipTitle(snapshot: ExperimentSetOneSnapshot, branchSlug: string | null): string {
+  return `${saveChipLabel(snapshot, branchSlug)} · click to load · ⌘+click to multi-select`;
+}
+
 function formatLayoutSummary(snapshot: ExperimentSetOneSnapshot): string | null {
   const experimentCount = snapshot.selectedExperimentIds?.length ?? 0;
   const saveCount = Object.values(snapshot.selectedSaveKeysByExperiment ?? {}).reduce(
@@ -3006,7 +3014,8 @@ export function ExperimentSetOneSettingsDock() {
                                   event.currentTarget.click();
                                 }
                               }}
-                              title={`${save.label}${save.branchVariant ? ` (${save.branchVariant})` : ''} · click to load · ⌘+click to multi-select`}
+                              aria-label={saveChipLabel(save, save.branchVariant ?? null)}
+                              title={saveChipTitle(save, save.branchVariant ?? null)}
                               >
                                 <span className="experiment-one-settings-dock__save-chip-main">
                                   <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
@@ -3114,7 +3123,8 @@ export function ExperimentSetOneSettingsDock() {
                                   event.currentTarget.click();
                                 }
                               }}
-                              title={`${save.label} (${variant.label}) · click to load · ⌘+click to multi-select`}
+                              aria-label={saveChipLabel(save, variant.slug)}
+                              title={saveChipTitle(save, variant.slug)}
                               >
                                 <span className="experiment-one-settings-dock__save-chip-main">
                                   <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
@@ -3205,7 +3215,8 @@ export function ExperimentSetOneSettingsDock() {
                                   event.currentTarget.click();
                                 }
                               }}
-                              title={`${save.label}${save.branchVariant ? ` (${save.branchVariant})` : ''} · click to load · ⌘+click to multi-select`}
+                              aria-label={saveChipLabel(save, save.branchVariant ?? null)}
+                              title={saveChipTitle(save, save.branchVariant ?? null)}
                               >
                                 <span className="experiment-one-settings-dock__save-chip-main">
                                   <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
@@ -3295,7 +3306,8 @@ export function ExperimentSetOneSettingsDock() {
                             event.currentTarget.click();
                           }
                         }}
-                        title={`${save.label} · click to load · ⌘+click to multi-select`}
+                        aria-label={saveChipLabel(save, null)}
+                        title={saveChipTitle(save, null)}
                       >
                         <span className="experiment-one-settings-dock__save-chip-main">
                           <span className="experiment-one-settings-dock__save-chip-label">{save.label}</span>
