@@ -386,7 +386,6 @@ function experimentPaneLabel(experiment: ExperimentId): string {
   if (experiment === 'nine') return 'center large pane';
   if (experiment === 'ten') return 'center overlap pane';
   if (experiment === 'eleven') return 'right overlap pane';
-  if (experiment === 'twelve') return 'thick lens';
   return experimentTitle(experiment);
 }
 
@@ -865,7 +864,6 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     nine: boot.selectedSaveIdByExperiment?.nine ?? null,
     ten: boot.selectedSaveIdByExperiment?.ten ?? null,
     eleven: boot.selectedSaveIdByExperiment?.eleven ?? null,
-    twelve: boot.selectedSaveIdByExperiment?.twelve ?? null,
   });
   const [selectedPanelSetSaveId, setSelectedPanelSetSaveId] = useState<number | null>(null);
   const [selectedExperimentIds, setSelectedExperimentIds] = useState<ExperimentId[]>(() =>
@@ -1493,7 +1491,6 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
         }
         return;
       }
-      if (snapshot.scope === 'twelve') return;
       if (snapshot.scope === 'seven') {
         if (snapshot.e4) {
           setLayerCVisible(false);
