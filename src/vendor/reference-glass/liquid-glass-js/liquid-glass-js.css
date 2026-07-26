@@ -1,0 +1,31 @@
+.e11-liquid-glass-js-rect {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 20px;
+  box-sizing: border-box;
+  width: var(--e11-liquid-js-width);
+  height: var(--e11-liquid-js-height);
+  min-width: var(--e11-liquid-js-width);
+  min-height: var(--e11-liquid-js-height);
+  padding: 10px;
+  border-radius: var(--e11-liquid-js-radius);
+  box-shadow: 0 25px 50px rgb(0 0 0 / 25%);
+  cursor: pointer;
+}
+
+.e11-liquid-glass-js-rect__canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--e11-liquid-js-radius);
+  box-shadow: 0 25px 50px rgb(0 0 0 / 25%);
+  pointer-events: none;
+}
+

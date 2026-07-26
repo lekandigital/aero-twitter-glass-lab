@@ -1,0 +1,18 @@
+.e11-liquid-glass-shader-surface {
+  position: relative;
+  width: var(--e11-shader-width);
+  height: var(--e11-shader-height);
+  background: transparent;
+  pointer-events: none;
+}
+
+.e11-liquid-glass-shader-surface__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  pointer-events: none;
+}
+

@@ -5,16 +5,48 @@ import { E3_SETTING_FIELDS, type E3MaterialSettings } from '../experiment-set-th
 import { E4_SETTING_FIELDS, type E4MaterialSettings } from '../experiment-set-four/materialSettings';
 import { downloadTextFile } from '../../utils/downloadTextFile';
 import type { ExperimentSetOneLayoutSnapshot } from './savedConfigs';
+import type { ExperimentSetOneLayerGeometry } from './layerGeometry';
 
 function formatValue(value: string | number | boolean) {
   if (typeof value === 'boolean') return value ? 'true' : 'false';
   return String(value);
 }
 
+/** `    Label (fieldId): value unit` — the one line shape the whole file uses. */
+function settingLine(label: string, id: string, value: string | number | boolean, unit?: string) {
+  return `    ${label} (${id}): ${formatValue(value)}${unit ? ` ${unit}` : ''}`;
+}
+
+/** X/Y for a layer, written into whichever section holds its width and height. */
+function positionLines(layer: ExperimentSetOneLayerGeometry) {
+  return [
+    settingLine(`${layer.label} X position`, `${layer.idPrefix}X`, layer.x, 'px'),
+    settingLine(`${layer.label} Y position`, `${layer.idPrefix}Y`, layer.y, 'px'),
+  ];
+}
+
+/**
+ * Full Layout + Shape block for a layer that has no setting fields of its own
+ * (layer C), matching the section names and ordering layers A and B already use.
+ */
+function formatLayerGeometrySections(layer: ExperimentSetOneLayerGeometry) {
+  return [
+    `  ${layer.label} · Layout`,
+    settingLine(`${layer.label} width`, `${layer.idPrefix}Width`, layer.width, 'px'),
+    settingLine(`${layer.label} height`, `${layer.idPrefix}Height`, layer.height, 'px'),
+    ...positionLines(layer),
+    '',
+    `  ${layer.label} · Shape`,
+    settingLine('Corner radius', `${layer.idPrefix}CornerRadius`, layer.cornerRadius, 'px'),
+    '',
+  ];
+}
+
 function formatExperimentSection(
   title: string,
   settings: Record<string, string | number | boolean>,
   fields: MaterialFieldBase<string>[],
+  layers: ExperimentSetOneLayerGeometry[] = [],
 ) {
   const lines: string[] = [`[${title}]`];
   const sections = [...new Set(fields.map((field) => field.section))];
@@ -26,7 +58,16 @@ function formatExperimentSection(
       const unit = field.unit ? ` ${field.unit}` : '';
       lines.push(`    ${field.label} (${field.id}): ${formatValue(value)}${unit}`);
     }
+    // Layers A and B already list width/height here from their fields; their
+    // positions live outside the settings object, so they are appended to the
+    // same section rather than given one of their own.
+    const owner = layers.find((layer) => layer.hasFieldSections && section === `${layer.label} · Layout`);
+    if (owner) lines.push(...positionLines(owner));
     lines.push('');
+  }
+
+  for (const layer of layers.filter((l) => !l.hasFieldSections)) {
+    lines.push(...formatLayerGeometrySections(layer));
   }
 
   return lines.join('\n');
@@ -64,6 +105,7 @@ export function buildExperimentSetOneConfigText(
   e3: E3MaterialSettings,
   e4: E4MaterialSettings,
   layout?: ExperimentSetOneLayoutSnapshot,
+  layers: ExperimentSetOneLayerGeometry[] = [],
 ) {
   const exportedAt = new Date().toISOString();
   const header = [
@@ -86,7 +128,7 @@ export function buildExperimentSetOneConfigText(
     formatExperimentSection('Experiment Three', e3, E3_SETTING_FIELDS),
     '---',
     '',
-    formatExperimentSection('Experiment Four', e4, E4_SETTING_FIELDS),
+    formatExperimentSection('Experiment Four', e4, E4_SETTING_FIELDS, layers),
   ].join('\n');
 
   return body;
@@ -98,8 +140,9 @@ export function downloadExperimentSetOneConfig(
   e3: E3MaterialSettings,
   e4: E4MaterialSettings,
   layout?: ExperimentSetOneLayoutSnapshot,
+  layers: ExperimentSetOneLayerGeometry[] = [],
 ) {
   const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   const filename = `experiment-set-1-config-${stamp}.txt`;
-  downloadTextFile(filename, buildExperimentSetOneConfigText(e1, e2, e3, e4, layout));
+  downloadTextFile(filename, buildExperimentSetOneConfigText(e1, e2, e3, e4, layout, layers));
 }

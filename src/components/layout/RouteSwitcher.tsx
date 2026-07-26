@@ -18,6 +18,7 @@ const routes: AppRoute[] = [
   { path: '/approach-1', label: 'Approach 1' },
   { path: '/approach-2', label: 'Approach 2' },
   { path: '/experiment-set-1', label: 'Experiment Set 1' },
+  { path: '/button-source-experiments', label: 'Button Source Experiments' },
   { path: '/showcase', label: 'Showcase' },
   { path: '/references', label: 'References' },
   { path: '/reference-lab', label: 'Reference Lab' },

@@ -226,7 +226,14 @@ export function ExperimentSetOneStage() {
   );
 }
 
+/**
+ * Stage backdrop for the photo/video modes. `none` paints nothing, so the page
+ * wallpaper behind the stage (default or reference) is what shows through — the
+ * dock's Default/Ref bg/Photo/Video buttons pick between all four.
+ */
 function ExperimentSetOneBackdrop({ mode }: { mode: ExperimentSetOneStageBackdropMode }) {
+  if (mode === 'none') return null;
+
   if (mode === 'video') {
     return (
       <video

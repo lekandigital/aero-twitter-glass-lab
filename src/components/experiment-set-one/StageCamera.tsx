@@ -25,6 +25,12 @@ const BUTTON_STEP = 1.25;
 const EDGE_KEEP = 160;
 /** Fallback content size before the stage is measured (showcase-align dims). */
 const DEFAULT_CONTENT = { w: 1440, h: 1572 };
+/** How long after the last camera event the layers stay promoted. Trackpad
+ *  momentum arrives in bursts with gaps between flicks; demoting inside a gap
+ *  makes the next flick re-promote and re-raster the whole glass stack, which
+ *  reads as stutter. This has to outlast those gaps but still settle quickly
+ *  once the gesture is really over, so backdrop-filters repaint clean at rest. */
+const IDLE_MS = 500;
 
 type CameraState = { zoom: number; tx: number; ty: number };
 
@@ -81,9 +87,15 @@ export function StageCamera() {
   // Timer that clears data-e1-cam-active once interaction goes idle, so the
   // transient will-change is dropped and backdrop-filters repaint cleanly.
   const idleTimer = useRef<number | null>(null);
+  // Mirrors the data-e1-cam-active attribute so the hot path can skip redundant
+  // writes instead of re-setting it on every event.
+  const active = useRef(false);
   // Unscaled layout size of the stage, used to bound panning. Measured from the
   // DOM on mount + resize so bounds track the actual canvas, not a guess.
   const content = useRef({ ...DEFAULT_CONTENT });
+  // The two elements the camera moves, cached so each frame is a pair of style
+  // writes rather than a pair of DOM queries.
+  const targets = useRef<HTMLElement[] | null>(null);
 
   const measureContent = useCallback(() => {
     const stage = document.querySelector<HTMLElement>('.experiment-set-one-stage');
@@ -92,21 +104,39 @@ export function StageCamera() {
     }
   }, []);
 
+  /**
+   * Set the transform on the wallpaper and stage directly rather than through
+   * the `--e1-cam-*` custom properties on :root. Custom properties inherit, so
+   * updating them at the root invalidated style for every element on the page
+   * once per frame; touching the two moved elements keeps that cost constant.
+   */
+  const writeTransform = useCallback((tx: number, ty: number, zoom: number) => {
+    if (!targets.current?.length || targets.current.some((el) => !el.isConnected)) {
+      targets.current = [
+        ...document.querySelectorAll<HTMLElement>('.aero-wallpaper__stage, .experiment-set-one-stage'),
+      ];
+    }
+    const transform = `translate3d(${tx}px, ${ty}px, 0) scale(${zoom})`;
+    for (const el of targets.current) el.style.transform = transform;
+  }, []);
+
   // Flag the page so CSS applies the shared transform to wallpaper + stage.
   useEffect(() => {
     document.body.dataset.e1Camera = 'on';
     measureContent();
-    const root = document.documentElement.style;
-    root.setProperty('--e1-cam-zoom', String(INITIAL.zoom));
-    root.setProperty('--e1-cam-x', `${INITIAL.tx}px`);
-    root.setProperty('--e1-cam-y', `${INITIAL.ty}px`);
+    writeTransform(INITIAL.tx, INITIAL.ty, INITIAL.zoom);
     return () => {
       delete document.body.dataset.e1Camera;
       delete document.body.dataset.e1CamActive;
+      active.current = false;
+      // The wallpaper outlives this route, so hand it back untransformed —
+      // the inline style isn't gated by [data-e1-camera] the way the rule is.
+      for (const el of targets.current ?? []) el.style.transform = '';
+      targets.current = null;
       if (rafId.current != null) cancelAnimationFrame(rafId.current);
       if (idleTimer.current != null) window.clearTimeout(idleTimer.current);
     };
-  }, [measureContent]);
+  }, [measureContent, writeTransform]);
 
   // Re-measure and re-clamp when the viewport changes so a resize can't strand
   // the content out of bounds.
@@ -119,26 +149,30 @@ export function StageCamera() {
     return () => window.removeEventListener('resize', onResize);
   }, [measureContent]);
 
-  // Mutate the camera, flush to CSS vars on the next frame, and keep the layers
-  // promoted (data-e1-cam-active) only until movement goes idle.
+  // Mutate the camera, flush the transform on the next frame, and keep the
+  // layers promoted (data-e1-cam-active) only until movement goes idle.
   const applyCam = useCallback((next: (prev: CameraState) => CameraState) => {
     camRef.current = clampPan(next(camRef.current), content.current);
-    document.body.dataset.e1CamActive = '';
+    // Write the attribute only when it actually changes. It sits on <body>, so
+    // every write invalidates style for the whole document — doing that on each
+    // wheel tick was most of the cost of a trackpad pan.
+    if (!active.current) {
+      active.current = true;
+      document.body.dataset.e1CamActive = '';
+    }
     if (idleTimer.current != null) window.clearTimeout(idleTimer.current);
     idleTimer.current = window.setTimeout(() => {
+      active.current = false;
       delete document.body.dataset.e1CamActive;
-    }, 180);
+    }, IDLE_MS);
     if (rafId.current != null) return;
     rafId.current = requestAnimationFrame(() => {
       rafId.current = null;
       const { zoom, tx, ty } = camRef.current;
-      const root = document.documentElement.style;
-      root.setProperty('--e1-cam-zoom', String(zoom));
-      root.setProperty('--e1-cam-x', `${tx}px`);
-      root.setProperty('--e1-cam-y', `${ty}px`);
+      writeTransform(tx, ty, zoom);
       setZoomPct((p) => (p === Math.round(zoom * 100) ? p : Math.round(zoom * 100)));
     });
-  }, []);
+  }, [writeTransform]);
 
   // Latest applyCam for effects (resize) that must not re-subscribe on every render.
   const applyCamRef = useRef(applyCam);

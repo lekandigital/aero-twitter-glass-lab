@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps, react-hooks/set-state-in-effect, react-refresh/only-export-components */
 import * as THREE from 'three';
-import { useRef, useState, useEffect, memo } from 'react';
-import type { CSSProperties, ReactNode } from 'react';
+import { useRef, useState, useEffect, useMemo, memo } from 'react';
+import type { CSSProperties, ReactNode, RefObject } from 'react';
 import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
 import type { ThreeElements } from '@react-three/fiber';
 import {
@@ -17,6 +17,10 @@ import {
 } from '@react-three/drei';
 import { easing } from 'maath';
 import { FLUID_GLASS_REFERENCE_OBJECTS } from './config';
+import {
+  captureExperimentStageRegion,
+  releaseExperimentHtml2CanvasAdapter,
+} from '../shared/experimentStageCapture';
 import './FluidGlass.css';
 
 export type Mode = 'lens' | 'bar' | 'cube';
@@ -49,6 +53,12 @@ export interface FluidGlassProps {
    * unchanged.
    */
   transparentObjectOnly?: boolean;
+  /**
+   * A transparent, cropped capture of the real Experiment Eleven material
+   * beneath Layer C. It replaces the showcase wallpaper only inside the
+   * transmission material's private optical buffer.
+   */
+  targetStageSample?: HTMLCanvasElement | null;
 }
 
 export default function FluidGlass({
@@ -57,7 +67,8 @@ export default function FluidGlass({
   lensProps = {},
   barProps = {},
   cubeProps = {},
-  transparentObjectOnly = false
+  transparentObjectOnly = false,
+  targetStageSample = null
 }: FluidGlassProps) {
   const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
   const rawOverrides = mode === 'bar' ? barProps : mode === 'cube' ? cubeProps : lensProps;
@@ -82,7 +93,9 @@ export default function FluidGlass({
       <ScrollControls damping={0.2} pages={3} distance={0.4}>
         {mode === 'bar' && <NavItems items={navItems as NavItem[]} />}
         <Wrapper modeProps={modeProps} transparentObjectOnly={transparentObjectOnly}>
-          {backdrop === 'default' ? (
+          {transparentObjectOnly ? (
+            <TargetStageScene sample={targetStageSample} />
+          ) : backdrop === 'default' ? (
             <Scroll>
               <Typography />
               <Images />
@@ -115,6 +128,30 @@ function SharedMediaScene({ backdrop }: { backdrop: Exclude<BackdropMode, 'defau
     <mesh scale={[viewport.width, viewport.height, 1]}>
       <planeGeometry />
       <meshBasicMaterial map={tex} toneMapped={false} />
+    </mesh>
+  );
+}
+
+function TargetStageScene({ sample }: { sample: HTMLCanvasElement | null }) {
+  const { viewport } = useThree();
+  const texture = useMemo(() => {
+    if (!sample) return null;
+    const next = new THREE.CanvasTexture(sample);
+    next.colorSpace = THREE.SRGBColorSpace;
+    next.wrapS = THREE.ClampToEdgeWrapping;
+    next.wrapT = THREE.ClampToEdgeWrapping;
+    next.needsUpdate = true;
+    return next;
+  }, [sample]);
+
+  useEffect(() => () => texture?.dispose(), [texture]);
+
+  if (!texture) return null;
+
+  return (
+    <mesh scale={[viewport.width, viewport.height, 1]}>
+      <planeGeometry />
+      <meshBasicMaterial map={texture} toneMapped={false} />
     </mesh>
   );
 }
@@ -218,12 +255,15 @@ const ModeWrapper = memo(function ModeWrapper({
       ref.current.scale.setScalar(Math.min(0.15, desired));
     }
 
-    // The source's private transmission buffer intentionally retains the
-    // source scene and opaque #5227ff clear colour: that texture is part of
-    // the exact MeshTransmissionMaterial response. In object-only integration
-    // mode it is never blitted as a visible background plane.
+    // The source renderer still uses its private FBO and exact transmission
+    // material. Object-only integration changes only the optical input: the
+    // real target composition is supplied by TargetStageScene and uncovered
+    // pixels stay transparent instead of inheriting the showcase's purple.
     gl.setRenderTarget(buffer);
-    gl.setClearColor(0x5227ff, 1);
+    gl.setClearColor(
+      transparentObjectOnly ? 0x000000 : 0x5227ff,
+      transparentObjectOnly ? 0 : 1,
+    );
     gl.render(scene, camera);
     gl.setRenderTarget(null);
     gl.setClearColor(transparentObjectOnly ? 0x000000 : 0x5227ff, transparentObjectOnly ? 0 : 1);
@@ -485,6 +525,68 @@ export interface FluidGlassReferenceRendererProps {
   style?: CSSProperties;
 }
 
+function useExperimentStageSample(hostRef: RefObject<HTMLElement | null>) {
+  const [sample, setSample] = useState<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    let disposed = false;
+    let frame = 0;
+    let capturePending = false;
+    let lastCaptureAt = -Infinity;
+    let lastCapturedGeometry = '';
+
+    const track = () => {
+      if (disposed) return;
+      const host = hostRef.current;
+      if (host) {
+        const rect = host.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        const geometry = [
+          Math.round(rect.left * dpr),
+          Math.round(rect.top * dpr),
+          Math.round(rect.width * dpr),
+          Math.round(rect.height * dpr),
+          dpr,
+        ].join(':');
+        const now = performance.now();
+
+        if (
+          rect.width > 0 &&
+          rect.height > 0 &&
+          geometry !== lastCapturedGeometry &&
+          !capturePending &&
+          now - lastCaptureAt >= 100
+        ) {
+          capturePending = true;
+          lastCaptureAt = now;
+          lastCapturedGeometry = geometry;
+          void captureExperimentStageRegion(rect)
+            .then((nextSample) => {
+              if (!disposed) setSample(nextSample);
+            })
+            .catch(() => {
+              // A transient capture failure must not replace the target stage
+              // with a fallback colour or source showcase scene.
+            })
+            .finally(() => {
+              capturePending = false;
+            });
+        }
+      }
+      frame = requestAnimationFrame(track);
+    };
+
+    frame = requestAnimationFrame(track);
+    return () => {
+      disposed = true;
+      cancelAnimationFrame(frame);
+      releaseExperimentHtml2CanvasAdapter();
+    };
+  }, [hostRef]);
+
+  return sample;
+}
+
 /**
  * Native gallery-stage adapter. The 320×240 stage is the exact live area used
  * for each authoritative gallery card; the underlying FluidGlass implementation
@@ -501,6 +603,8 @@ export function FluidGlassReferenceRenderer({
   const sourceObject = FLUID_GLASS_REFERENCE_OBJECTS[
     sourcePresetKey as keyof typeof FLUID_GLASS_REFERENCE_OBJECTS
   ];
+  const hostRef = useRef<HTMLDivElement>(null);
+  const targetStageSample = useExperimentStageSample(hostRef);
 
   if (!sourceObject || sourceObject.mode !== mode) {
     throw new Error(
@@ -510,6 +614,7 @@ export function FluidGlassReferenceRenderer({
 
   return (
     <div
+      ref={hostRef}
       className={`e11-ref-fluid-glass-stage ${className}`.trim()}
       style={style}
       data-e11-reference-family="fluid-glass"
@@ -519,9 +624,12 @@ export function FluidGlassReferenceRenderer({
       data-source-preset-key={sourcePresetKey}
       data-source-component={sourceObject.sourceComponent}
       data-transparent-render-surface={String(sourceObject.transparentRenderSurface)}
+      data-content-policy="object-only"
       data-source-demo-background-mounted="false"
       data-source-stage-mounted={String(sourceObject.visibleSourceStage)}
       data-layer-c-object-count="1"
+      data-fluid-glass-optical-input="live-experiment-stage-capture"
+      data-fluid-glass-optical-input-ready={String(Boolean(targetStageSample))}
       data-fluid-glass-mode={mode}
       data-fluid-glass-glb={sourceObject.glb}
       data-fluid-glass-geometry-key={sourceObject.geometryKey}
@@ -536,6 +644,7 @@ export function FluidGlassReferenceRenderer({
         barProps={mode === 'bar' ? config : {}}
         cubeProps={mode === 'cube' ? config : {}}
         transparentObjectOnly
+        targetStageSample={targetStageSample}
       />
     </div>
   );

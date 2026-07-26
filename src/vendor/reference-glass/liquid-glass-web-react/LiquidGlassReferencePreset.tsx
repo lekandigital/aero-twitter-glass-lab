@@ -45,6 +45,8 @@ export interface LiquidGlassReferencePresetProps {
   contextHeight?: number;
   objectOffsetX?: number;
   objectOffsetY?: number;
+  /** Freeze source-demo positional timelines while keeping the exact surface. */
+  disableAutonomousMotion?: boolean;
   onMapGenerated?: (url: string) => void;
   /** Target-lab anchor used to route source pointer behavior. */
   pointerTargetRef?: RefObject<HTMLElement | null>;
@@ -79,6 +81,7 @@ export function LiquidGlassReferencePreset({
   contextHeight = options.height,
   objectOffsetX = 0,
   objectOffsetY = 0,
+  disableAutonomousMotion = false,
   onMapGenerated,
   pointerTargetRef,
 }: LiquidGlassReferencePresetProps) {
@@ -149,6 +152,8 @@ export function LiquidGlassReferencePreset({
   ]);
 
   useEffect(() => {
+    if (disableAutonomousMotion) return undefined;
+
     if (interaction === "hero") {
       let last = performance.now();
       let x = (objectOffsetX + options.width / 2) / contextWidth;
@@ -210,9 +215,17 @@ export function LiquidGlassReferencePreset({
     return undefined;
     // Source animation uses imperative DOM/filter updates and does not render React.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [interaction, contextHeight, contextWidth, options.height, options.width]);
+  }, [
+    disableAutonomousMotion,
+    interaction,
+    contextHeight,
+    contextWidth,
+    options.height,
+    options.width,
+  ]);
 
   useEffect(() => {
+    if (disableAutonomousMotion) return undefined;
     if (
       interaction !== "hero" &&
       interaction !== "reading" &&
@@ -323,6 +336,7 @@ export function LiquidGlassReferencePreset({
   }, [
     contextHeight,
     contextWidth,
+    disableAutonomousMotion,
     interaction,
     options.height,
     options.width,
@@ -348,9 +362,15 @@ export function LiquidGlassReferencePreset({
       data-liquid-glass-reference=""
       data-e11-reference-preset={presetId}
       data-e11-reference-object-root={presetId}
+      data-reference-preset={presetId}
       data-source-family="liquid-glass-web-react"
       data-source-preset-key={sourcePresetKey}
+      data-source-key={sourcePresetKey}
       data-source-component={sourceComponent}
+      data-source-wrapper-component={sourceComponent}
+      data-source-library-component="react/LiquidGlass"
+      data-renderer-family="liquid-glass-web-react"
+      data-content-policy="object-only"
       data-transparent-render-surface="true"
       data-source-demo-background="absent"
       data-liquid-glass-interaction={interaction}
@@ -364,15 +384,16 @@ export function LiquidGlassReferencePreset({
       data-source-context-width={contextWidth}
       data-source-context-height={contextHeight}
       data-source-pointer-routing={
-        interaction === "static" || interaction === "orbit"
+        disableAutonomousMotion ||
+        interaction === "static" ||
+        interaction === "orbit"
           ? "none"
           : "window-capture"
       }
-      data-source-component-implementation={
-        sourceComponent === "LiquidGlassEngine"
-          ? "core/LiquidGlassEngine via react/LiquidGlass"
-          : "react/LiquidGlass"
+      data-autonomous-motion={
+        disableAutonomousMotion ? "disabled" : "source"
       }
+      data-source-component-implementation="react/LiquidGlass"
       data-liquid-glass-filter-application="backdrop-filter"
     >
       <div
@@ -381,7 +402,8 @@ export function LiquidGlassReferencePreset({
         data-source-demo-background="absent"
         aria-hidden
       >
-        {(interaction === "hero" || interaction === "engine") && (
+        {((interaction === "hero" && !disableAutonomousMotion) ||
+          interaction === "engine") && (
           <div
             ref={sourceGrip}
             className="e11-liquid-web-reference__source-grip"

@@ -1,0 +1,22 @@
+.root {
+  position: relative;
+  display: block;
+  overflow: visible;
+  background: transparent;
+  pointer-events: none;
+}
+
+.canvasShell {
+  position: absolute;
+  background: transparent;
+  pointer-events: none;
+}
+
+.canvasShell canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent;
+  pointer-events: none;
+}
+

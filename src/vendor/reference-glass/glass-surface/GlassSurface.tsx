@@ -45,6 +45,12 @@ export interface GlassSurfaceProps {
   instanceId?: string;
   presetId?: string;
   sourcePresetKey?: string;
+  /**
+   * Integration-only filter-region expansion. It does not change the source
+   * graph or preset values; it prevents displaced pixels from being clipped at
+   * a moving page-level compositing boundary.
+   */
+  filterRegionPaddingPercent?: number;
 }
 
 const sanitizeId = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, '-');
@@ -90,7 +96,8 @@ const GlassSurface = ({
   style = {},
   instanceId = 'surface',
   presetId,
-  sourcePresetKey
+  sourcePresetKey,
+  filterRegionPaddingPercent = 0
 }: GlassSurfaceProps) => {
   const reactId = sanitizeId(useId());
   const id = `e11-ref-gs-${sanitizeId(instanceId)}-${reactId}`;
@@ -257,14 +264,27 @@ const GlassSurface = ({
       data-e11-reference-object-root={presetId}
       data-source-family="glass-surface"
       data-source-preset-key={sourcePresetKey}
+      data-source-key={sourcePresetKey}
       data-source-component="react-bits.GlassSurface"
+      data-reference-preset={presetId}
+      data-renderer-family="glass-surface-svg-filter"
+      data-content-policy="object-only"
       data-transparent-render-surface="true"
       data-glass-surface-filter-id={filterId}
+      data-glass-surface-filter-padding={filterRegionPaddingPercent}
       data-glass-surface-config={JSON.stringify(resolvedConfig)}
     >
       <svg className="e11-ref-glass-surface__filter" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <filter id={filterId} colorInterpolationFilters="sRGB" x="0%" y="0%" width="100%" height="100%">
+          <filter
+            id={filterId}
+            colorInterpolationFilters="sRGB"
+            filterUnits="objectBoundingBox"
+            x={`${-filterRegionPaddingPercent}%`}
+            y={`${-filterRegionPaddingPercent}%`}
+            width={`${100 + filterRegionPaddingPercent * 2}%`}
+            height={`${100 + filterRegionPaddingPercent * 2}%`}
+          >
             <feImage ref={feImageRef} x="0" y="0" width="100%" height="100%" preserveAspectRatio="none" result="map" />
 
             <feDisplacementMap
@@ -338,6 +358,7 @@ export interface GlassSurfaceReferenceRendererProps {
   config: GlassSurfaceProps;
   instanceId?: string;
   children?: ReactNode;
+  filterRegionPaddingPercent?: number;
 }
 
 /**
@@ -350,7 +371,8 @@ export function GlassSurfaceReferenceRenderer({
   sourcePresetKey,
   config,
   instanceId = presetId,
-  children
+  children,
+  filterRegionPaddingPercent = 0
 }: GlassSurfaceReferenceRendererProps) {
   return (
     <GlassSurface
@@ -358,6 +380,7 @@ export function GlassSurfaceReferenceRenderer({
       instanceId={instanceId}
       presetId={presetId}
       sourcePresetKey={sourcePresetKey}
+      filterRegionPaddingPercent={filterRegionPaddingPercent}
     >
       {children}
     </GlassSurface>

@@ -1,0 +1,47 @@
+.e11-chromium-configurable-glass {
+  position: relative;
+  z-index: 0;
+  width: var(--e11-chromium-width);
+  height: var(--e11-chromium-height);
+  border-radius: var(--e11-chromium-radius);
+  opacity: 1;
+  background: light-dark(
+    hsl(0 0% 100% / var(--e11-chromium-frost)),
+    hsl(0 0% 0% / var(--e11-chromium-frost))
+  );
+  backdrop-filter:
+    var(--e11-chromium-filter)
+    saturate(var(--e11-chromium-saturation));
+  -webkit-backdrop-filter:
+    var(--e11-chromium-filter)
+    saturate(var(--e11-chromium-saturation));
+  box-shadow:
+    0 0 2px 1px
+      light-dark(
+        color-mix(in oklch, canvasText, #0000 85%),
+        color-mix(in oklch, canvasText, #0000 65%)
+      )
+      inset,
+    0 0 10px 4px
+      light-dark(
+        color-mix(in oklch, canvasText, #0000 90%),
+        color-mix(in oklch, canvasText, #0000 85%)
+      )
+      inset,
+    0 4px 16px rgb(17 17 26 / 5%),
+    0 8px 24px rgb(17 17 26 / 5%),
+    0 16px 56px rgb(17 17 26 / 5%),
+    0 4px 16px rgb(17 17 26 / 5%) inset,
+    0 8px 24px rgb(17 17 26 / 5%) inset,
+    0 16px 56px rgb(17 17 26 / 5%) inset;
+  transition: opacity 0.26s ease-out;
+}
+
+.e11-chromium-configurable-glass__filter {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+

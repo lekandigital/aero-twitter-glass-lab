@@ -23,6 +23,7 @@
   pointer-events: none;
 }
 
+.experiment-eleven-reference-host--interactive,
 .experiment-eleven-reference-interactive {
   pointer-events: auto;
 }
@@ -101,6 +102,7 @@
   position: relative;
   box-sizing: border-box;
   width: 100%;
+  height: 100%;
   margin: 0;
   padding: 8px 0;
   border: 1px solid rgba(251, 191, 36, 0.3);
@@ -115,11 +117,6 @@
   background: rgba(245, 158, 11, 0.3);
 }
 
-.e11-wge-submit-button > span {
-  position: relative;
-  z-index: 10;
-}
-
 .e11-wge-submit-button__glass {
   position: absolute;
   inset: 0;
@@ -131,118 +128,11 @@
 .e11-wge-bottom-bar {
   box-sizing: border-box;
   width: 100%;
+  height: 100%;
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.05);
   box-shadow: 0 3px 14px rgba(0, 0, 0, 0.1);
   pointer-events: auto;
-}
-
-.e11-wge-bottom-bar__state {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  width: 100%;
-  height: 36px;
-  color: rgba(0, 0, 0, 0.8);
-  pointer-events: none;
-}
-
-.e11-wge-bottom-bar__dimensions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
-}
-
-.e11-wge-bottom-bar__dimensions > div {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.e11-wge-bottom-bar__dimensions span {
-  font: 500 12px/16px ui-sans-serif, system-ui, sans-serif;
-}
-
-.e11-wge-bottom-bar input {
-  box-sizing: border-box;
-  margin: 0;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  outline: none;
-  background: rgba(255, 255, 255, 0.4);
-  color: #000;
-  font-family: ui-sans-serif, system-ui, sans-serif;
-}
-
-.e11-wge-bottom-bar__dimensions input {
-  width: 152.326px;
-  height: 36px;
-  padding: 4px 12px;
-  border-radius: 9999px;
-  font-size: 12px;
-}
-
-.e11-wge-bottom-bar__search {
-  position: relative;
-  flex: 1 1 auto;
-  min-width: 0;
-  height: 36px;
-}
-
-.e11-wge-bottom-bar__search > svg {
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  left: 12px;
-  width: 16px;
-  height: 16px;
-  color: rgba(0, 0, 0, 0.6);
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
-.e11-wge-bottom-bar__search input {
-  width: 100%;
-  height: 36px;
-  padding: 4px 12px 4px 40px;
-  border-radius: 9999px;
-  font-size: 14px;
-}
-
-.e11-wge-bottom-bar__search input::placeholder {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.e11-wge-bottom-bar__zoom {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
-}
-
-.e11-wge-bottom-bar__zoom button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 0;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(0, 0, 0, 0.8);
-}
-
-.e11-wge-bottom-bar__zoom button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #000;
-}
-
-.e11-wge-bottom-bar__zoom button > svg {
-  width: 16px;
-  height: 16px;
 }
 
 .e11-liquidgl-overlay {
@@ -258,15 +148,6 @@
   transform-origin: top left;
   pointer-events: none;
   mix-blend-mode: difference;
-}
-
-.e11-liquidgl-menu-anchor > a {
-  display: block;
-  width: 100%;
-  height: 100%;
-  color: inherit;
-  text-decoration: none;
-  pointer-events: none;
 }
 
 .e11-liquidgl-menu-wrap {
@@ -289,69 +170,4 @@
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   will-change: transform;
   pointer-events: none;
-}
-
-.e11-liquidgl-menu-logo-wrap,
-.e11-liquidgl-menu-items-wrap,
-.e11-liquidgl-menu-item-text {
-  position: relative;
-  z-index: 3;
-}
-
-.e11-liquidgl-menu-logo-wrap,
-.e11-liquidgl-menu-items-wrap,
-.e11-liquidgl-download-wrapper,
-.e11-liquidgl-download-link {
-  display: flex;
-  align-items: center;
-}
-
-.e11-liquidgl-menu-logo {
-  display: block;
-  width: auto;
-  height: 36px;
-  max-width: none;
-}
-
-.e11-liquidgl-menu-item-stack {
-  display: flex;
-  flex-direction: column;
-}
-
-.e11-liquidgl-menu-item-text,
-.e11-liquidgl-small-text-link,
-.e11-liquidgl-version-text {
-  margin: 0;
-  color: #b7b7b7;
-}
-
-.e11-liquidgl-menu-item-text {
-  font-weight: 700;
-  letter-spacing: -0.04rem;
-}
-
-.e11-liquidgl-download-wrapper {
-  justify-content: space-between;
-}
-
-.e11-liquidgl-download-link {
-  gap: 8px;
-}
-
-.e11-liquidgl-download-icon {
-  display: block;
-  width: 12px;
-  height: 12px;
-}
-
-.e11-liquidgl-small-text-link {
-  font-size: 12.8px;
-  font-weight: 600;
-  letter-spacing: -0.02rem;
-}
-
-.e11-liquidgl-version-text {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.02rem;
 }
