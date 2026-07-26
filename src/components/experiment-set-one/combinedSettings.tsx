@@ -176,6 +176,8 @@ type ExperimentSelection =
   | { experiment: 'ten'; target: E4InspectTarget; label: string }
   | { experiment: 'eleven'; target: E4InspectTarget | E6LayerCInspectTarget; label: string };
 
+export type ExperimentSetOneStageBackdropMode = 'photo' | 'video';
+
 const EXPERIMENT_ORDER: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
 
 /**
@@ -654,6 +656,8 @@ type ExperimentSetOneContextValue = {
   toggleSaveMultiSelection: (experiment: ExperimentId, key: string, additive: boolean) => void;
   referenceWallpaper: boolean;
   toggleReferenceWallpaper: () => void;
+  stageBackdropMode: ExperimentSetOneStageBackdropMode;
+  setStageBackdropMode: (mode: ExperimentSetOneStageBackdropMode) => void;
 };
 
 const ExperimentSetOneContext = createContext<ExperimentSetOneContextValue | null>(null);
@@ -872,6 +876,9 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     boot.experimentVisible ?? DEFAULT_EXPERIMENT_VISIBILITY,
   );
   const { referenceWallpaper, toggleReferenceWallpaper } = useReferenceWallpaper();
+  const [stageBackdropMode, setStageBackdropMode] = useState<ExperimentSetOneStageBackdropMode>(
+    boot.stageBackdropMode ?? 'photo',
+  );
   const [layoutResetVersion, setLayoutResetVersion] = useState(0);
   const [activeExperiment, setActiveExperiment] = useState<ExperimentId>(boot.activeExperiment ?? 'four');
   const [selectedSaveIdByExperiment, setSelectedSaveIdByExperiment] = useState<Record<ExperimentId, number | null>>({
@@ -1725,6 +1732,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       inspectMode,
       experimentVisible,
       referenceWallpaper,
+      stageBackdropMode,
       activeExperiment,
       selectedSaveIdByExperiment,
       selectedExperimentIds,
@@ -1736,7 +1744,7 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       e5BorderRefinementsVersion,
       activeRenderVariant,
     });
-  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, e11LayerCLayout, hidePanelText, layerAVisible, layerBVisible, layerCVisible, layerDVisible, layerEVisible, inspectMode, experimentVisible, referenceWallpaper, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, e5BorderRefinementsVersion, activeRenderVariant]);
+  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, e11LayerCLayout, hidePanelText, layerAVisible, layerBVisible, layerCVisible, layerDVisible, layerEVisible, inspectMode, experimentVisible, referenceWallpaper, stageBackdropMode, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, e5BorderRefinementsVersion, activeRenderVariant]);
 
   useEffect(() => {
     const page = pageRef.current;
@@ -1903,8 +1911,10 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       toggleSaveMultiSelection,
       referenceWallpaper,
       toggleReferenceWallpaper,
+      stageBackdropMode,
+      setStageBackdropMode,
     }),
-    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, e11LayerCLayout, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE11, setE6LayerC, setE11LayerCLayout, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, layerDVisible, layerEVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, setSelectedSavePosition, replaceSaveMultiSelection, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper],
+    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, e11LayerCLayout, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE11, setE6LayerC, setE11LayerCLayout, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, layerDVisible, layerEVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, setSelectedSavePosition, replaceSaveMultiSelection, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper, stageBackdropMode],
   );
 
   return (
@@ -2163,6 +2173,8 @@ export function ExperimentSetOneSettingsDock() {
     toggleSaveMultiSelection,
     referenceWallpaper,
     toggleReferenceWallpaper,
+    stageBackdropMode,
+    setStageBackdropMode,
   } = useExperimentSetOne();
   const { slug: activeRenderVariant } = useRenderVariant();
   const [open, setOpen] = useState(true);
@@ -2753,6 +2765,26 @@ export function ExperimentSetOneSettingsDock() {
                   title="Overlay reference.png on aero-bg at matched scale"
                 >
                   Ref bg
+                </button>
+              </div>
+              <div className="experiment-one-settings-dock__toolbar-group">
+                <button
+                  type="button"
+                  className={`experiment-one-settings-dock__toolbar-btn${stageBackdropMode === 'photo' ? ' experiment-one-settings-dock__toolbar-btn--active' : ''}`}
+                  onClick={() => setStageBackdropMode('photo')}
+                  aria-pressed={stageBackdropMode === 'photo'}
+                  title="Show the local photo backdrop behind Experiment Set 1"
+                >
+                  Photo
+                </button>
+                <button
+                  type="button"
+                  className={`experiment-one-settings-dock__toolbar-btn${stageBackdropMode === 'video' ? ' experiment-one-settings-dock__toolbar-btn--active' : ''}`}
+                  onClick={() => setStageBackdropMode('video')}
+                  aria-pressed={stageBackdropMode === 'video'}
+                  title="Show the local video backdrop behind Experiment Set 1"
+                >
+                  Video
                 </button>
               </div>
               <div className="experiment-one-settings-dock__toolbar-group">

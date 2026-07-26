@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import LiquidGlass from 'liquid-glass-react';
 import {
   BarChart3,
@@ -23,6 +24,7 @@ import {
   Users,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { GlassSurfaceReferenceRenderer } from '../vendor/reference-glass/glass-surface';
 import '../styles/glass-showcase.css';
 
 /* =========================================================================
@@ -117,6 +119,110 @@ function InteractionRow({ className }: { className: string }) {
   );
 }
 
+const BACKDROP_OPTIONS = [
+  { key: 'reference', label: 'Reference background', description: 'The Aero wallpaper already used in the rest of the lab.' },
+  { key: 'photograph', label: 'Photograph', description: 'Local shared photo from the custom demo.' },
+  { key: 'video', label: 'Video', description: 'Local shared video from the custom demo.' },
+] as const;
+
+const BACKDROP_ASSETS = {
+  reference: '/aero-bg.png',
+  photograph: '/vendor/reference-glass/custom-demo-assets/photo.jpg',
+  video: '/vendor/reference-glass/custom-demo-assets/video.mp4',
+} as const;
+
+function BackdropComparison() {
+  const [backdrop, setBackdrop] = useState<(typeof BACKDROP_OPTIONS)[number]['key']>('reference');
+
+  return (
+    <section className="gs-section gs-section--backdrop">
+      <div className="gs-section__head">
+        <h2>0 · Backdrop Comparison</h2>
+        <p>
+          Switch between the existing reference wallpaper, the local photograph, and the local video to see how the
+          GlassSurface reads the scene behind it.
+        </p>
+      </div>
+
+      <div className="gs-backdrop-demo">
+        <div className={`gs-backdrop-demo__stage gs-backdrop-demo__stage--${backdrop}`}>
+          <BackdropLayer backdrop={backdrop} />
+          <div className="gs-backdrop-demo__glass">
+            <GlassSurfaceReferenceRenderer
+              presetId={`glass-surface:${backdrop}`}
+              sourcePresetKey={`glass-surface:${backdrop}`}
+              instanceId={`glass-surface-${backdrop}`}
+              config={{
+                width: 360,
+                height: 120,
+                borderRadius: 28,
+                borderWidth: 0.07,
+                brightness: 50,
+                opacity: 0.93,
+                blur: 11,
+                displace: 0,
+                backgroundOpacity: 0.08,
+                saturation: 1.05,
+                distortionScale: -180,
+                redOffset: 0,
+                greenOffset: 10,
+                blueOffset: 20,
+              }}
+            >
+              <div className="gs-backdrop-demo__glass-content">
+                <span className="gs-backdrop-demo__eyebrow">{backdrop}</span>
+                <h3>GlassSurface over live backdrop</h3>
+                <p>{BACKDROP_OPTIONS.find((option) => option.key === backdrop)?.description}</p>
+              </div>
+            </GlassSurfaceReferenceRenderer>
+          </div>
+          <div className="gs-backdrop-demo__badge">Local asset preview</div>
+        </div>
+
+        <div className="gs-backdrop-demo__controls" role="tablist" aria-label="Backdrop options">
+          {BACKDROP_OPTIONS.map((option) => (
+            <button
+              key={option.key}
+              type="button"
+              role="tab"
+              aria-selected={backdrop === option.key}
+              className={`gs-backdrop-demo__control${backdrop === option.key ? ' is-active' : ''}`}
+              onClick={() => setBackdrop(option.key)}
+            >
+              <strong>{option.label}</strong>
+              <span>{option.description}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BackdropLayer({ backdrop }: { backdrop: keyof typeof BACKDROP_ASSETS }) {
+  if (backdrop === 'video') {
+    return (
+      <video
+        className="gs-backdrop-demo__media gs-backdrop-demo__media--video"
+        src={BACKDROP_ASSETS.video}
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden
+      />
+    );
+  }
+
+  return (
+    <div
+      className={`gs-backdrop-demo__media gs-backdrop-demo__media--${backdrop}`}
+      aria-hidden
+      style={{ backgroundImage: `url("${BACKDROP_ASSETS[backdrop]}")` }}
+    />
+  );
+}
+
 export function GlassComponentShowcase() {
   return (
     <div className="gs-page">
@@ -130,6 +236,8 @@ export function GlassComponentShowcase() {
           the reference source it adapts so the closest match to the target can be picked.
         </p>
       </header>
+
+      <BackdropComparison />
 
       {/* 1 — PANEL BEZELS ------------------------------------------------ */}
       <Section
