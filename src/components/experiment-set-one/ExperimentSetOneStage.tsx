@@ -19,9 +19,15 @@ import { useExperimentSetOne } from './combinedSettings';
 import { VariantPanelSlots } from './VariantPanelSlots';
 import { SelectedSaveStagePanels } from './SelectedSavePreviews';
 import type { ExperimentId } from './experimentVisibility';
+import type { ExperimentSetOneStageBackdropMode } from './combinedSettings';
 
 const STAGE_EXPERIMENTS: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
 const MULTI_EXPERIMENT_CASCADE_STEP = 28;
+
+const STAGE_BACKDROP_ASSETS = {
+  photo: '/vendor/reference-glass/custom-demo-assets/photo.jpg',
+  video: '/vendor/reference-glass/custom-demo-assets/video.mp4',
+} as const;
 
 function selectedSaveCount(selectedSaveKeysByExperiment: Partial<Record<ExperimentId, string[]>>) {
   return Object.values(selectedSaveKeysByExperiment).reduce((count, keys) => count + (keys?.length ?? 0), 0);
@@ -41,6 +47,7 @@ export function ExperimentSetOneStage() {
     e11,
     selectedExperimentIds,
     selectedSaveKeysByExperiment,
+    stageBackdropMode,
   } = useExperimentSetOne();
   const nestedB = e4.layerBNestedInA;
   const saveMultiActive = selectedSaveCount(selectedSaveKeysByExperiment) > 0;
@@ -91,6 +98,7 @@ export function ExperimentSetOneStage() {
 
   return (
     <main className="experiment-set-one-stage" aria-label="Experiment Set 1 panel stage">
+      <ExperimentSetOneBackdrop mode={stageBackdropMode} />
       <div className="experiment-set-one-stage__canvas">
         {show('one') && stageShell('one', (
           <ExperimentOneDraggablePanel
@@ -215,5 +223,29 @@ export function ExperimentSetOneStage() {
         <SelectedSaveStagePanels />
       </div>
     </main>
+  );
+}
+
+function ExperimentSetOneBackdrop({ mode }: { mode: ExperimentSetOneStageBackdropMode }) {
+  if (mode === 'video') {
+    return (
+      <video
+        className="experiment-set-one-stage__backdrop experiment-set-one-stage__backdrop--video"
+        src={STAGE_BACKDROP_ASSETS.video}
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden="true"
+      />
+    );
+  }
+
+  return (
+    <div
+      className="experiment-set-one-stage__backdrop experiment-set-one-stage__backdrop--photo"
+      aria-hidden="true"
+      style={{ backgroundImage: `url("${STAGE_BACKDROP_ASSETS.photo}")` }}
+    />
   );
 }
