@@ -52,10 +52,15 @@ export function applyExperimentElevenLayerCLayout(
   material: E4MaterialSettings,
   layout: ExperimentElevenLayerCLayoutSettings,
 ): E4MaterialSettings {
+  const width = Number.isFinite(layout.width) ? layout.width : EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.width;
+  const height = Number.isFinite(layout.height) ? layout.height : EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.height;
+  const radius = Number.isFinite(layout.radius) ? layout.radius : EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.radius;
   return normalizeE4MaterialSettings({
     ...material,
-    layerBWidth: Math.max(16, Math.round(layout.width)),
-    layerBHeight: Math.max(1, Math.round(layout.height)),
-    layerBCornerRadius: Math.max(0, Math.round(layout.radius)),
+    // Preserve source-native sub-pixel geometry (liquidGL's measured menu is
+    // 310.344 × 75.188). Existing integer layouts remain byte-for-byte equal.
+    layerBWidth: Math.max(16, width),
+    layerBHeight: Math.max(1, height),
+    layerBCornerRadius: Math.max(0, radius),
   });
 }

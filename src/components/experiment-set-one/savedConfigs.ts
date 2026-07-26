@@ -16,6 +16,7 @@ import {
 import committedSavesJson from '../../data/experiment-set-one/saves.json';
 import { downloadTextFile } from '../../utils/downloadTextFile';
 import { renderVariantForSaveId, type RenderVariantSlug } from '../../render-variants/manifest';
+import type { ExperimentElevenReferencePresetId } from './experimentElevenReferencePresets';
 
 // Earliest exported config in ~/Downloads that includes Experiment Four.
 // Used only as a one-time migration heuristic for older saves.
@@ -70,6 +71,12 @@ export type ExperimentSetOneSnapshot = {
     | 'ice'
     | 'aqua'
     | 'opal';
+  /**
+   * Namespaced exact-source preset for the extensible Experiment Eleven Layer
+   * C reference system. Legacy e11LayerCReferenceGlass/Tone values remain
+   * supported independently.
+   */
+  e11LayerCReferencePreset?: ExperimentElevenReferencePresetId;
   /** Optional E11-only material override for the horizontal right-overlap Layer D strip. */
   e11LayerD?: Partial<E4MaterialSettings>;
   /** Optional E11-only material override for the horizontal right-overlap Layer E strip. */

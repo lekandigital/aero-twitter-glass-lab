@@ -43,6 +43,10 @@ import {
 import type { ExperimentSetOneSnapshot } from './savedConfigs';
 import { useRenderVariant } from '../../render-variants/RenderVariantContext';
 import { ThickLensPortal } from './ExperimentTwelveThickLens';
+import {
+  ExperimentElevenReferencePresetPreview,
+} from './ExperimentElevenReferencePresetRenderer';
+import type { ExperimentElevenReferencePresetId } from './experimentElevenReferencePresets';
 
 type PreviewExperiment = Extract<
   ExperimentId,
@@ -66,6 +70,8 @@ type SavePreview = {
   layerELayoutOverride: ExperimentElevenLayerCLayoutSettings | null;
   /** When set, Layer C renders the exact reference glass instead of the normal sheet. */
   layerCReferenceGlass: ExperimentElevenSwitcherGlassVariant | 'thick-lens' | null;
+  /** Namespaced source-family preset; rendered as a lightweight selected-save preview. */
+  layerCReferencePreset: ExperimentElevenReferencePresetId | null;
   /** Optional reference-demo Layer C palette tone. */
   layerCReferenceTone: ExperimentElevenSwitcherGlassTone | null;
   /** Semantic appearance opt-in, driven by the save's own field — not its id. */
@@ -250,6 +256,7 @@ function SelectedSaveLayerC({
   label,
   referenceGlass,
   referenceTone,
+  referencePreset,
 }: {
   material: E4MaterialSettings;
   layerCOverride: Partial<E4MaterialSettings> | null;
@@ -258,6 +265,7 @@ function SelectedSaveLayerC({
   label: string;
   referenceGlass: ExperimentElevenSwitcherGlassVariant | 'thick-lens' | null;
   referenceTone: ExperimentElevenSwitcherGlassTone | null;
+  referencePreset: ExperimentElevenReferencePresetId | null;
 }) {
   const thickLensAnchorRef = useRef<HTMLDivElement>(null);
   const layerCMaterial = useMemo(
@@ -267,6 +275,22 @@ function SelectedSaveLayerC({
     },
     [material, layerCOverride, layoutOverride],
   );
+  if (referencePreset) {
+    return (
+      <div
+        data-e11-top-layer={layerId}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+        }}
+        aria-label={`${label} · ${referencePreset}`}
+      >
+        <ExperimentElevenReferencePresetPreview presetId={referencePreset} />
+      </div>
+    );
+  }
   if (referenceGlass === 'thick-lens') {
     return (
       <div
@@ -423,6 +447,7 @@ function SelectedSaveStagePanel({
           layoutOverride: preview.layerCLayoutOverride,
           referenceGlass: preview.layerCReferenceGlass,
           referenceTone: preview.layerCReferenceTone,
+          referencePreset: preview.layerCReferencePreset,
         },
         {
           id: 'd' as const,
@@ -432,6 +457,7 @@ function SelectedSaveStagePanel({
           layoutOverride: preview.layerDLayoutOverride,
           referenceGlass: null,
           referenceTone: null,
+          referencePreset: null,
         },
         {
           id: 'e' as const,
@@ -439,6 +465,7 @@ function SelectedSaveStagePanel({
           visible: layerEVisible,
           referenceGlass: null,
           referenceTone: null,
+          referencePreset: null,
           override: preview.layerEOverride,
           layoutOverride: preview.layerELayoutOverride,
         },
@@ -457,6 +484,7 @@ function SelectedSaveStagePanel({
       preview.layerELayoutOverride,
       preview.layerCReferenceGlass,
       preview.layerCReferenceTone,
+      preview.layerCReferencePreset,
     ],
   );
   const dragRef = useRef<DragState>(emptyDragState());
@@ -567,6 +595,7 @@ function SelectedSaveStagePanel({
             label={layer.label}
             referenceGlass={layer.referenceGlass}
             referenceTone={layer.referenceTone}
+            referencePreset={layer.referencePreset}
           />
         </div>
       ))}
@@ -622,6 +651,7 @@ export function SelectedSaveStagePanels() {
           layerELayoutOverride: snapshot.e11LayerELayout ?? null,
           layerCReferenceGlass: snapshot.e11LayerCReferenceGlass ?? null,
           layerCReferenceTone: snapshot.e11LayerCReferenceTone ?? null,
+          layerCReferencePreset: snapshot.e11LayerCReferencePreset ?? null,
           bezelStyle: snapshot.bezelStyle ?? null,
           current,
         }];

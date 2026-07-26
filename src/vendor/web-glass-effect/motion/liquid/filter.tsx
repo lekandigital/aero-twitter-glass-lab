@@ -82,6 +82,12 @@ export type LiquidFilterProps = {
      * @default 4
      */
     specularSaturation?: number | MotionValue<number>;
+    /**
+     * Bezel used only by the generated specular map. Upstream WGE hard-codes
+     * 50; liquid-glass-main derives it as clampedBezel * 2.5.
+     * @default 50
+     */
+    specularBezelWidth?: number | MotionValue<number>;
     dpr?: number | MotionValue<number>;
     /**
      * Set the profile of the edges.
@@ -106,6 +112,7 @@ export const LiquidFilter: React.FC<LiquidFilterProps> = ({
     scaleRatio,
     specularOpacity = 1,
     specularSaturation = 4,
+    specularBezelWidth = 50,
     bezelHeightFn = CONVEX.fn,
     dpr,
 }) => {
@@ -146,7 +153,7 @@ export const LiquidFilter: React.FC<LiquidFilterProps> = ({
             getValueOrMotion(width),
             getValueOrMotion(height),
             getValueOrMotion(radius),
-            50,
+            getValueOrMotion(specularBezelWidth),
             undefined,
             devicePixelRatio,
         );

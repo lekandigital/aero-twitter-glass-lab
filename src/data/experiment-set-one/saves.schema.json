@@ -9,7 +9,10 @@
       "id": { "type": "integer" },
       "label": { "type": "string" },
       "savedAt": { "type": "string", "format": "date-time" },
-      "scope": { "type": "string", "enum": ["one", "two", "three", "four", "five", "six", "seven", "general"] },
+      "scope": {
+        "type": "string",
+        "enum": ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "general"]
+      },
       "generalPreset": { "type": "string" },
       "panelPosition": {
         "type": "object",
@@ -17,6 +20,52 @@
         "required": ["x", "y"]
       },
       "cornersOnly": { "type": "boolean" },
+      "sourceSaveId": { "type": "integer" },
+      "e11LayerCReferencePreset": {
+        "type": "string",
+        "enum": [
+          "liquid-main:custom-300x200",
+          "liquidgl:demo-1-nav",
+          "fluid-glass:lens",
+          "fluid-glass:frosted",
+          "fluid-glass:bar",
+          "fluid-glass:diamond",
+          "fluid-glass:fluid",
+          "liquid-web:apple",
+          "liquid-web:library-default",
+          "liquid-web:fishbowl",
+          "liquid-web:frosted",
+          "liquid-web:prism",
+          "liquid-web:flat-pane",
+          "liquid-web:hero-circle",
+          "liquid-web:reading-glass",
+          "liquid-web:orbit",
+          "liquid-web:engine-panel",
+          "wge-next:form",
+          "wge-next:bottom-bar",
+          "web-glass:thick-lens",
+          "web-glass:razor-edge",
+          "web-glass:bottom-bar",
+          "web-glass:stress-panel",
+          "web-glass:storybook",
+          "glass-surface:component-default",
+          "glass-surface:upstream-demo",
+          "glass-surface:ios-pill",
+          "glass-surface:prism",
+          "glass-surface:achromatic",
+          "glass-surface:convex"
+        ]
+      },
+      "e11LayerCLayout": {
+        "type": "object",
+        "properties": {
+          "width": { "type": "number", "exclusiveMinimum": 0 },
+          "height": { "type": "number", "exclusiveMinimum": 0 },
+          "radius": { "type": "number", "minimum": 0 }
+        },
+        "required": ["width", "height", "radius"],
+        "additionalProperties": false
+      },
       "e1": { "type": "object" },
       "e2": { "type": "object" },
       "e3": { "type": "object" },

@@ -1,0 +1,17 @@
+.e11-ref-fluid-glass-stage {
+  position: relative;
+  display: block;
+  width: 320px;
+  height: 240px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #5227ff;
+  isolation: isolate;
+}
+
+.e11-ref-fluid-glass-stage > div,
+.e11-ref-fluid-glass-stage canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}

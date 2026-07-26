@@ -25,6 +25,10 @@ import {
   type ExperimentElevenSwitcherGlassVariant,
 } from './ExperimentElevenLayerCSwitcherGlass';
 import { ThickLensPortal } from './ExperimentTwelveThickLens';
+import {
+  ExperimentElevenReferencePresetRenderer,
+} from './ExperimentElevenReferencePresetRenderer';
+import type { ExperimentElevenReferencePresetId } from './experimentElevenReferencePresets';
 
 type ExperimentElevenTopLayerId = 'c' | 'd' | 'e';
 type ExperimentElevenTopLayerMaterialField = 'e11LayerC' | 'e11LayerD' | 'e11LayerE';
@@ -173,6 +177,7 @@ function ExperimentElevenLayerCDraggablePane({
   backgroundOverride,
   referenceGlass,
   referenceGlassTone,
+  referencePreset,
 }: {
   material: E4MaterialSettings;
   layerId: ExperimentElevenTopLayerId;
@@ -184,22 +189,41 @@ function ExperimentElevenLayerCDraggablePane({
   backgroundOverride?: string;
   referenceGlass?: ExperimentElevenReferenceGlass;
   referenceGlassTone?: ExperimentElevenSwitcherGlassTone;
+  referencePreset?: ExperimentElevenReferencePresetId;
 }) {
-  const thickLensAnchorRef = useRef<HTMLDivElement>(null);
+  const referenceAnchorRef = useRef<HTMLDivElement>(null);
 
   return (
     <ExperimentSetTwoDraggableShell
-      bounds="parent"
+      bounds={referencePreset ? 'parent-overflow' : 'parent'}
       initialPosition={initialPosition}
       persistKey={persistKey}
       layoutResetVersion={layoutResetVersion}
       ariaLabel={`Experiment Eleven — layer ${layerId.toUpperCase()}`}
       className="experiment-six-layer-c-draggable"
     >
-      {referenceGlass === 'thick-lens' ? (
+      {referencePreset ? (
+        <div
+          ref={referenceAnchorRef}
+          className="experiment-eleven-reference-anchor"
+          style={{
+            width: material.layerBWidth as number,
+            height: material.layerBHeight as number,
+            borderRadius: material.layerBCornerRadius as number,
+          }}
+          data-e11-reference-anchor={referencePreset}
+          data-e11-top-layer={layerId}
+          aria-label={`${label} · ${referencePreset}`}
+        >
+          <ExperimentElevenReferencePresetRenderer
+            presetId={referencePreset}
+            anchorRef={referenceAnchorRef}
+          />
+        </div>
+      ) : referenceGlass === 'thick-lens' ? (
         <>
           <div
-            ref={thickLensAnchorRef}
+            ref={referenceAnchorRef}
             className="experiment-eleven-thick-lens-anchor"
             style={{
               width: material.layerBWidth as number,
@@ -210,7 +234,7 @@ function ExperimentElevenLayerCDraggablePane({
             aria-hidden="true"
           />
           <ThickLensPortal
-            anchorRef={thickLensAnchorRef}
+            anchorRef={referenceAnchorRef}
             ariaLabel="Experiment Eleven Layer C Thick lens"
             testId="experiment-eleven-thick-lens-surface"
           />
@@ -272,6 +296,7 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
         const backgroundOverride = layer.id === 'c' ? selectedSave?.e11LayerCBackgroundOverride : undefined;
         const referenceGlass = layer.id === 'c' ? selectedSave?.e11LayerCReferenceGlass : undefined;
         const referenceGlassTone = layer.id === 'c' ? selectedSave?.e11LayerCReferenceTone : undefined;
+        const referencePreset = layer.id === 'c' ? selectedSave?.e11LayerCReferencePreset : undefined;
         return [{
           ...layer,
           material,
@@ -279,9 +304,14 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
           backgroundOverride,
           referenceGlass,
           referenceGlassTone,
+          referencePreset,
           initialPosition: {
-            x: Math.max(0, Math.round((e11.layerBWidth as number - (material.layerBWidth as number)) / 2)),
-            y: 0,
+            x: referencePreset
+              ? Math.round((e11.layerBWidth as number - (material.layerBWidth as number)) / 2)
+              : Math.max(0, Math.round((e11.layerBWidth as number - (material.layerBWidth as number)) / 2)),
+            y: referencePreset
+              ? Math.round((e11.layerBHeight as number - (material.layerBHeight as number)) / 2)
+              : 0,
           },
         }];
       }),
@@ -317,6 +347,7 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
           backgroundOverride={layer.backgroundOverride}
           referenceGlass={layer.referenceGlass}
           referenceGlassTone={layer.referenceGlassTone}
+          referencePreset={layer.referencePreset}
         />
       ))}
     </>,
