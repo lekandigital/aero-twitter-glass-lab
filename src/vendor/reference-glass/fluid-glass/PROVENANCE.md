@@ -19,11 +19,18 @@ Authoritative local repository:
 Intentional changes are limited to type-only imports, vendored runtime paths,
 the local Draco decoder path, pinning the source-resolved Noto Sans Regular
 font to its byte-identical vendored file, cursor cleanup, and a scoped native
-gallery-stage adapter. The source's empty `<Scroll html />` portal is omitted:
+gallery-stage adapter. Experiment Eleven also enables the adapter's
+`transparentObjectOnly` integration mode: the source GLB, private FBO scene,
+MeshTransmissionMaterial, camera, and movement remain unchanged, but the
+source's full-viewport FBO display plane is not mounted and the visible
+framebuffer clears to alpha zero. The private FBO keeps the source clear colour
+because it is material input, not a visible backdrop. The source's empty
+`<Scroll html />` portal is omitted:
 it renders no content, while drei creates its React root during render and
 therefore creates a duplicate root under React StrictMode. The R3F scene,
 camera, FBO, meshes, material, pointer damping, visual scroll behavior, text,
-and image composition remain the source implementation.
+and image composition inside the private transmission buffer remain the source
+implementation.
 
 The React Bits implementation retains `LICENSE.md`. The Draco decoder is
 Apache-2.0; its upstream README and license text are stored beside the decoder

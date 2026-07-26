@@ -216,6 +216,7 @@ function ExperimentElevenLayerCDraggablePane({
           aria-label={`${label} · ${referencePreset}`}
         >
           <ExperimentElevenReferencePresetRenderer
+            key={referencePreset}
             presetId={referencePreset}
             anchorRef={referenceAnchorRef}
           />

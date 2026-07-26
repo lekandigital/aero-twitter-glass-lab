@@ -29,17 +29,15 @@ export type ExperimentElevenReferenceRenderer =
   | 'liquidgl-webgl'
   | 'fluid-glass-r3f'
   | 'liquid-glass-web-react'
-  | 'wge-next-form'
+  | 'wge-next-submit-button'
   | 'wge-next-bottom-bar'
   | 'web-glass-svg-filter'
   | 'glass-surface-svg-filter'
 
 export type ExperimentElevenReferenceCompositingStrategy =
-  | 'anchored-backdrop-clone'
-  | 'source-content-filter'
-  | 'self-contained-webgl'
-  | 'source-animated-backdrop'
-  | 'liquidgl-stage-snapshot'
+  | 'transparent-page-portal-backdrop-filter'
+  | 'transparent-webgl-object'
+  | 'live-document-webgl-snapshot'
 
 export interface ExperimentElevenReferenceNativeLayout {
   width: number
@@ -52,13 +50,16 @@ export interface ExperimentElevenReferenceNativeLayout {
     | 'three-lens'
     | 'three-bar'
     | 'three-cube'
-    | 'complete-form'
+    | 'source-button'
 }
 
 export interface ExperimentElevenReferenceCompositing {
   strategy: ExperimentElevenReferenceCompositingStrategy
   pageLevelPortal: boolean
-  samplingSource: 'experiment-stage-without-layer-b' | 'source-demo-bed' | 'r3f-scene' | 'source-form-backdrop'
+  samplingSource:
+    | 'live-experiment-composition'
+    | 'transparent-private-fbo'
+    | 'live-document-composition'
   notes: string
 }
 
@@ -84,8 +85,10 @@ export interface ExperimentElevenReferencePreset {
   id: string
   sourceFamily: ExperimentElevenReferenceSourceFamily
   sourcePresetKey: string
+  sourceComponent: string
   displayLabel: string
   renderer: ExperimentElevenReferenceRenderer
+  transparentRenderSurface: true
   config: Readonly<Record<string, unknown>>
   nativeLayout: ExperimentElevenReferenceNativeLayout
   sourceContext?: ExperimentElevenReferenceSourceContext
@@ -149,7 +152,11 @@ export const LIQUIDGL_DEMO_1_NAV_CONFIG = {
   },
   snapshot: {
     resolution: 2,
-    scope: 'body',
+    sourceDefaultScope: 'body',
+    integrationScope: 'live Experiment Eleven Layer B',
+    selector:
+      '.experiment-set-one-stage__canvas .experiment-set-one-stage__multi-shell[data-stage-experiment="eleven"] [role="region"][aria-label="Experiment Eleven layer B"]',
+    disposableCloneNormalization: true,
   },
   content: {
     version: 'v1.0.1',
@@ -424,57 +431,53 @@ export const LIQUID_GLASS_WEB_SOURCE_CONTEXTS = {
     provenance: 'Motion filtered .orbitBed at the first imperative RAF position.',
   },
   'liquid-web:engine-panel': {
-    width: 770,
-    height: 382,
-    lensOffsetX: 189.8,
-    lensOffsetY: 111,
-    radius: 18,
-    provenance: 'Raw Engine outer stage; filtered bed is the 768×380 one-pixel inset.',
+    width: 768,
+    height: 380,
+    lensOffsetX: 188.8,
+    lensOffsetY: 110,
+    radius: 17,
+    provenance: 'Raw Engine filtered surface (the excluded outer stage border is 770×382).',
   },
 } as const satisfies Record<string, ExperimentElevenReferenceSourceContext>
 
-export const WGE_NEXT_FORM_CONFIG = {
-  frame: { width: 432, height: 560, borderRadius: 12, padding: 24, background: '#000000' },
-  backdrop: {
-    opacity: 0.45,
-    gridSize: 24,
-    lineColor: 'rgba(255,255,255,0.24)',
-    radialGlow: 'radial-gradient(circle at 20% 20%, rgba(56,189,248,0.12), transparent 45%)',
-    animation: { name: 'moveBackground', durationMs: 8000, timing: 'linear', iterations: 'infinite', travel: 120 },
-  },
-  form: { width: 384, verticalGap: 24, nameColumns: 2, nameColumnGap: 16 },
+/**
+ * Exact roots used by the authoritative custom-demo. These identifiers are
+ * also mounted as stable DOM metadata so browser tests verify the component,
+ * not just the numbers claimed by the registry.
+ */
+export const LIQUID_GLASS_WEB_SOURCE_COMPONENTS = {
+  'liquid-web:apple': 'Playground.LiquidGlass',
+  'liquid-web:library-default': 'Playground.LiquidGlass',
+  'liquid-web:fishbowl': 'Playground.LiquidGlass',
+  'liquid-web:frosted': 'Playground.LiquidGlass',
+  'liquid-web:prism': 'Playground.LiquidGlass',
+  'liquid-web:flat-pane': 'Playground.LiquidGlass',
+  'liquid-web:hero-circle': 'GripLens',
+  'liquid-web:reading-glass': 'Primitives.ReadingGlass',
+  'liquid-web:orbit': 'Motion.LiquidGlass',
+  'liquid-web:engine-panel': 'LiquidGlassEngine',
+} as const satisfies Record<keyof typeof LIQUID_GLASS_WEB_SOURCE_CONTEXTS, string>
+
+export const WGE_NEXT_SUBMIT_BUTTON_CONFIG = {
+  width: 384,
+  height: 38,
+  radius: 18,
+  paddingY: 8,
+  label: 'Submit Form',
+  border: '1px solid rgba(251,191,36,0.3)',
+  background: 'rgba(245,158,11,0.2)',
+  hoverBackground: 'rgba(245,158,11,0.3)',
+  color: 'rgb(251,191,36)',
   glass: {
     glassThickness: 110,
+    bezelWidth: 10,
     refractiveIndex: 1.8,
     blur: 0.4,
     specularOpacity: 1,
     specularSaturation: 4,
   },
-  fields: [
-    { key: 'firstName', kind: 'input', label: 'First Name', placeholder: 'John', height: 40, radius: 20, bezelWidth: 20 },
-    { key: 'lastName', kind: 'input', label: 'Last Name', placeholder: 'Doe', height: 40, radius: 20, bezelWidth: 10 },
-    {
-      key: 'message',
-      kind: 'textarea',
-      label: 'Message',
-      placeholder: 'Tell us about yourself...',
-      rows: 4,
-      radius: 16,
-      bezelWidth: 20,
-    },
-    {
-      key: 'gender',
-      kind: 'select',
-      label: 'Gender',
-      placeholder: 'Select your gender',
-      height: 40,
-      radius: 12,
-      bezelWidth: 10,
-      options: ['Male', 'Female', 'Other', 'Prefer not to say'],
-    },
-    { key: 'submit', kind: 'button', label: 'Submit Form', radius: 18, paddingY: 8, bezelWidth: 10 },
-  ],
-  preventSubmitNavigation: true,
+  sourceStructure: 'LiquidGlass nested inside source submit button',
+  transparentOutsideButton: true,
 } as const
 
 export const WGE_NEXT_BOTTOM_BAR_CONFIG = {
@@ -492,9 +495,26 @@ export const WGE_NEXT_BOTTOM_BAR_CONFIG = {
   searchFocused: { blur: 3.5, refractiveIndex: 3 },
   spring: { stiffness: 300, damping: 30 },
   controls: {
-    valueInput: { width: 64, height: 24 },
-    searchInput: { height: 32, placeholder: 'Search images...' },
+    rowHeight: 36,
+    valueInput: {
+      sourceWidth: 'w-full',
+      resolvedWidthAtTargetStage: 152.326,
+      height: 36,
+      background: 'rgba(255,255,255,0.4)',
+      padding: { x: 12, y: 4 },
+    },
+    searchInput: {
+      height: 36,
+      background: 'rgba(255,255,255,0.4)',
+      placeholder: 'Search images...',
+    },
     iconButton: { width: 32, height: 32, radius: 6 },
+  },
+  computedSurface: {
+    width: 640,
+    height: 60,
+    background: 'rgba(255,255,255,0.05)',
+    shadow: '0 3px 14px rgba(0,0,0,0.1)',
   },
 } as const
 
@@ -609,9 +629,9 @@ const sourcePaths = {
     'glass-projects-lab/liquid-glass-showcase/src/glass.ts',
     'glass-projects-lab/liquid-glass-web-react/',
   ],
-  wgeForm: [
+  wgeSubmitButton: [
     'glass-projects-lab/web-glass-effect/apps/next-demo/app/components/liquid-glass-form-demo.tsx',
-    'glass-projects-lab/web-glass-effect/apps/next-demo/app/page.tsx',
+    'glass-projects-lab/web-glass-effect/packages/web-glass-effect/src/motion/liquid/glass.tsx',
   ],
   wgeBottomBar: [
     'glass-projects-lab/web-glass-effect/apps/next-demo/app/components/liquid-glass-demo.tsx',
@@ -631,10 +651,48 @@ const provenance = {
   liquidgl: 'Authoritative liquidGL Demo 1 .menu-wrap and liquidGL.js renderer.',
   fluidGlass: 'DEMO_CONFIGS and the React Bits FluidGlass R3F implementation.',
   liquidWeb: 'PRESETS/DEMO_LENSES merged with every liquid-glass-web-react DEFAULT_OPTIONS value.',
-  wgeForm: 'Complete WGE Next form demo and its animated source backdrop.',
+  wgeSubmitButton: 'The exact Submit Form button and its nested WGE LiquidGlass child; no form or demo frame.',
   wgeBottomBar: 'Complete child bottom bar from WGE Next liquid-glass-demo at source resting values.',
   webGlass: 'PRESETS merged with all web-glass-effect LIBRARY_DEFAULTS.',
   glassSurface: 'DEMO_CONFIGS merged with all GlassSurface component defaults.',
+} as const
+
+/**
+ * Exact authoritative root mounted for each save. Keeping this separate from
+ * labels and numeric configuration makes a claimed preset/component mismatch
+ * machine-detectable.
+ */
+export const EXPERIMENT_ELEVEN_REFERENCE_SOURCE_COMPONENTS = {
+  'liquid-main:custom-300x200': 'liquid-glass-main.custom-surface',
+  'liquidgl:demo-1-nav': 'demo-1.menu-wrap',
+  'fluid-glass:lens': 'FluidGlass/Lens/ModeWrapper',
+  'fluid-glass:frosted': 'FluidGlass/Lens/ModeWrapper',
+  'fluid-glass:bar': 'FluidGlass/Bar/ModeWrapper+NavItems',
+  'fluid-glass:diamond': 'FluidGlass/Cube/ModeWrapper',
+  'fluid-glass:fluid': 'FluidGlass/Lens/ModeWrapper',
+  'liquid-web:apple': 'Playground.LiquidGlass',
+  'liquid-web:library-default': 'Playground.LiquidGlass',
+  'liquid-web:fishbowl': 'Playground.LiquidGlass',
+  'liquid-web:frosted': 'Playground.LiquidGlass',
+  'liquid-web:prism': 'Playground.LiquidGlass',
+  'liquid-web:flat-pane': 'Playground.LiquidGlass',
+  'liquid-web:hero-circle': 'GripLens',
+  'liquid-web:reading-glass': 'Primitives.ReadingGlass',
+  'liquid-web:orbit': 'Motion.LiquidGlass',
+  'liquid-web:engine-panel': 'LiquidGlassEngine',
+  'wge-next:form-submit-button': 'LiquidGlassFormDemo.SubmitButton.LiquidGlass',
+  'wge-next:bottom-bar': 'LiquidGlassDemo.bottomBar.LiquidGlass',
+  'web-glass:thick-lens': 'web-glass-effectshowcase.GlassSurface',
+  'web-glass:razor-edge': 'web-glass-effectshowcase.GlassSurface',
+  'web-glass:bottom-bar': 'web-glass-effectshowcase.GlassSurface',
+  'web-glass:stress-panel': 'web-glass-effectshowcase.GlassSurface',
+  'web-glass:storybook': 'web-glass-effectshowcase.GlassSurface',
+  'glass-surface:component-default': 'react-bits.GlassSurface',
+  'glass-surface:upstream-demo': 'react-bits.GlassSurface',
+  'glass-surface:ios-pill': 'react-bits.GlassSurface',
+  'glass-surface:prism': 'react-bits.GlassSurface',
+  'glass-surface:achromatic': 'react-bits.GlassSurface',
+  'glass-surface:convex': 'react-bits.GlassSurface',
 } as const
 
 function layout(
@@ -664,9 +722,23 @@ function interactions(
 }
 
 function preset(
-  value: ExperimentElevenReferencePreset,
+  value: Omit<
+    ExperimentElevenReferencePreset,
+    'sourceComponent' | 'transparentRenderSurface'
+  >,
 ): ExperimentElevenReferencePreset {
-  return value
+  const sourceComponent =
+    EXPERIMENT_ELEVEN_REFERENCE_SOURCE_COMPONENTS[
+      value.id as keyof typeof EXPERIMENT_ELEVEN_REFERENCE_SOURCE_COMPONENTS
+    ]
+  if (!sourceComponent) {
+    throw new Error(`Missing authoritative source component for ${value.id}`)
+  }
+  return {
+    ...value,
+    sourceComponent,
+    transparentRenderSurface: true,
+  }
 }
 
 const liquidWebPreset = (
@@ -688,10 +760,10 @@ const liquidWebPreset = (
     nativeLayout,
     sourceContext: LIQUID_GLASS_WEB_SOURCE_CONTEXTS[id],
     compositing: compositing(
-      'source-content-filter',
+      'transparent-page-portal-backdrop-filter',
       true,
-      'source-demo-bed',
-      'The exact source SVG filter operates on a scoped copy of the preset’s demonstration bed.',
+      'live-experiment-composition',
+      'Only the native glass object is painted. The exact generated SVG graph is applied as a backdrop filter over the unchanged Experiment Eleven layers; the larger source-motion box is transparent.',
     ),
     interactions: interactions(sourceBehaviors.length > 0, animation, ...sourceBehaviors),
     sourcePath: sourcePaths.liquidWeb,
@@ -714,10 +786,10 @@ const webGlassPreset = (
     config,
     nativeLayout: layout(320, 200, radius, 'rounded-rect'),
     compositing: compositing(
-      'anchored-backdrop-clone',
+      'transparent-page-portal-backdrop-filter',
       true,
-      'experiment-stage-without-layer-b',
-      'A clipped stage clone supplies the material behind Layer B without cutting a hole in Layer B.',
+      'live-experiment-composition',
+      'The transparent page-level surface samples the live Experiment Eleven composition; no backdrop clone, source stage, or Layer B cutout is mounted.',
     ),
     interactions: interactions(false, false),
     sourcePath: sourcePaths.webGlass,
@@ -740,10 +812,10 @@ const glassSurfacePreset = (
     config,
     nativeLayout: layout(320, 120, radius, 'rounded-rect'),
     compositing: compositing(
-      'anchored-backdrop-clone',
+      'transparent-page-portal-backdrop-filter',
       true,
-      'experiment-stage-without-layer-b',
-      'The GlassSurface backdrop filter samples only the clipped stage clone; Layer B remains unchanged.',
+      'live-experiment-composition',
+      'The transparent GlassSurface samples the live Experiment Eleven composition while Layer B opacity, clipping, and paint remain unchanged.',
     ),
     interactions: interactions(false, false),
     sourcePath: sourcePaths.glassSurface,
@@ -760,10 +832,10 @@ export const EXPERIMENT_ELEVEN_REFERENCE_PRESETS = {
     config: LIQUID_MAIN_CUSTOM_CONFIG,
     nativeLayout: layout(300, 200, 60, 'rounded-rect'),
     compositing: compositing(
-      'anchored-backdrop-clone',
+      'transparent-page-portal-backdrop-filter',
       true,
-      'experiment-stage-without-layer-b',
-      'The source SVG filter samples a clipped stage clone while the live opaque Layer B remains visually intact.',
+      'live-experiment-composition',
+      'The source SVG graph is mounted on one transparent page-level object and samples the unchanged live Experiment Eleven layers.',
     ),
     interactions: interactions(false, false),
     sourcePath: sourcePaths.liquidMain,
@@ -778,10 +850,10 @@ export const EXPERIMENT_ELEVEN_REFERENCE_PRESETS = {
     config: LIQUIDGL_DEMO_1_NAV_CONFIG,
     nativeLayout: layout(310.344, 75.188, 21.6, 'liquidgl-menu'),
     compositing: compositing(
-      'liquidgl-stage-snapshot',
+      'live-document-webgl-snapshot',
       true,
-      'experiment-stage-without-layer-b',
-      'liquidGL receives a renderer-scoped stage snapshot that excludes Layer B only from the WebGL input.',
+      'live-document-composition',
+      'The exact liquidGL renderer snapshots the live Layer B DOM behind the object. Its shared canvas is transparent outside .menu-wrap; clone normalization never mutates Layer B and no source page is mounted.',
     ),
     interactions: interactions(false, true, 'liquidGL fade reveal'),
     sourcePath: sourcePaths.liquidgl,
@@ -795,7 +867,12 @@ export const EXPERIMENT_ELEVEN_REFERENCE_PRESETS = {
     renderer: 'fluid-glass-r3f',
     config: { ...FLUID_GLASS_CONFIGS.lensDefault, internals: FLUID_GLASS_INTERNALS },
     nativeLayout: layout(320, 240, 10, 'three-lens'),
-    compositing: compositing('self-contained-webgl', false, 'r3f-scene', 'The source opaque R3F scene is the transmission buffer.'),
+    compositing: compositing(
+      'transparent-webgl-object',
+      false,
+      'transparent-private-fbo',
+      'Only the exact GLB lens is visible on the alpha-zero canvas. The source scene remains private to MeshTransmissionMaterial and is never blitted as a replacement background.',
+    ),
     interactions: interactions(true, true, 'pointer-following lens', 'source ScrollControls'),
     sourcePath: sourcePaths.fluidGlass,
     provenance: provenance.fluidGlass,
@@ -808,7 +885,12 @@ export const EXPERIMENT_ELEVEN_REFERENCE_PRESETS = {
     renderer: 'fluid-glass-r3f',
     config: { ...FLUID_GLASS_CONFIGS.frosted, internals: FLUID_GLASS_INTERNALS },
     nativeLayout: layout(320, 240, 10, 'three-lens'),
-    compositing: compositing('self-contained-webgl', false, 'r3f-scene', 'The source opaque R3F scene is the transmission buffer.'),
+    compositing: compositing(
+      'transparent-webgl-object',
+      false,
+      'transparent-private-fbo',
+      'Only the exact GLB lens is visible on the alpha-zero canvas. The source scene remains private to MeshTransmissionMaterial and is never blitted as a replacement background.',
+    ),
     interactions: interactions(true, true, 'pointer-following lens', 'source ScrollControls'),
     sourcePath: sourcePaths.fluidGlass,
     provenance: provenance.fluidGlass,
@@ -821,7 +903,12 @@ export const EXPERIMENT_ELEVEN_REFERENCE_PRESETS = {
     renderer: 'fluid-glass-r3f',
     config: { ...FLUID_GLASS_CONFIGS.barDefault, internals: FLUID_GLASS_INTERNALS },
     nativeLayout: layout(320, 240, 10, 'three-bar'),
-    compositing: compositing('self-contained-webgl', false, 'r3f-scene', 'The source opaque R3F scene is the transmission buffer.'),
+    compositing: compositing(
+      'transparent-webgl-object',
+      false,
+      'transparent-private-fbo',
+      'Only the exact GLB bar and its source nav items are visible on the alpha-zero canvas. The private transmission FBO never becomes a visible background.',
+    ),
     interactions: interactions(true, true, 'source ScrollControls', 'Home/About/Contact nav text'),
     sourcePath: sourcePaths.fluidGlass,
     provenance: provenance.fluidGlass,
@@ -834,7 +921,12 @@ export const EXPERIMENT_ELEVEN_REFERENCE_PRESETS = {
     renderer: 'fluid-glass-r3f',
     config: { ...FLUID_GLASS_CONFIGS.diamond, internals: FLUID_GLASS_INTERNALS },
     nativeLayout: layout(320, 240, 10, 'three-cube'),
-    compositing: compositing('self-contained-webgl', false, 'r3f-scene', 'The source opaque R3F scene is the transmission buffer.'),
+    compositing: compositing(
+      'transparent-webgl-object',
+      false,
+      'transparent-private-fbo',
+      'Only the exact GLB cube is visible on the alpha-zero canvas. The source scene remains private to MeshTransmissionMaterial and is never blitted as a replacement background.',
+    ),
     interactions: interactions(true, true, 'pointer-following cube', 'source ScrollControls'),
     sourcePath: sourcePaths.fluidGlass,
     provenance: provenance.fluidGlass,
@@ -847,7 +939,12 @@ export const EXPERIMENT_ELEVEN_REFERENCE_PRESETS = {
     renderer: 'fluid-glass-r3f',
     config: { ...FLUID_GLASS_CONFIGS.fluid, internals: FLUID_GLASS_INTERNALS },
     nativeLayout: layout(320, 240, 10, 'three-lens'),
-    compositing: compositing('self-contained-webgl', false, 'r3f-scene', 'The source opaque R3F scene is the transmission buffer.'),
+    compositing: compositing(
+      'transparent-webgl-object',
+      false,
+      'transparent-private-fbo',
+      'Only the exact fluid GLB lens is visible on the alpha-zero canvas. The animated private transmission FBO never becomes a visible background.',
+    ),
     interactions: interactions(true, true, 'pointer-following lens', 'temporal distortion', 'source ScrollControls'),
     sourcePath: sourcePaths.fluidGlass,
     provenance: provenance.fluidGlass,
@@ -944,23 +1041,23 @@ export const EXPERIMENT_ELEVEN_REFERENCE_PRESETS = {
     ['raw engine pointer tracking'],
     true,
   ),
-  'wge-next:form': preset({
-    id: 'wge-next:form',
+  'wge-next:form-submit-button': preset({
+    id: 'wge-next:form-submit-button',
     sourceFamily: 'wge-next',
-    sourcePresetKey: 'LiquidGlassFormDemo.form',
-    displayLabel: 'WGE Next · Form',
-    renderer: 'wge-next-form',
-    config: WGE_NEXT_FORM_CONFIG,
-    nativeLayout: layout(432, 560, 12, 'complete-form'),
+    sourcePresetKey: 'LiquidGlassFormDemo.submitButton',
+    displayLabel: 'WGE Next · Submit Form button',
+    renderer: 'wge-next-submit-button',
+    config: WGE_NEXT_SUBMIT_BUTTON_CONFIG,
+    nativeLayout: layout(384, 38, 18, 'source-button'),
     compositing: compositing(
-      'source-animated-backdrop',
+      'transparent-page-portal-backdrop-filter',
       true,
-      'source-form-backdrop',
-      'Each field samples the form’s own animated grid and radial glow inside the source black frame.',
+      'live-experiment-composition',
+      'The single source button uses a transparent page-level host over the unchanged live Experiment Eleven composition.',
     ),
-    interactions: interactions(true, true, 'input focus', 'textarea editing', 'select', 'submit press without navigation'),
-    sourcePath: sourcePaths.wgeForm,
-    provenance: provenance.wgeForm,
+    interactions: interactions(true, false, 'source hover background', 'native button press'),
+    sourcePath: sourcePaths.wgeSubmitButton,
+    provenance: provenance.wgeSubmitButton,
   }),
   'wge-next:bottom-bar': preset({
     id: 'wge-next:bottom-bar',
@@ -969,14 +1066,14 @@ export const EXPERIMENT_ELEVEN_REFERENCE_PRESETS = {
     displayLabel: 'WGE Next · Glass bottom bar',
     renderer: 'wge-next-bottom-bar',
     config: WGE_NEXT_BOTTOM_BAR_CONFIG,
-    nativeLayout: layout(640, 56, 28, 'rounded-rect'),
+    nativeLayout: layout(640, 60, 28, 'rounded-rect'),
     compositing: compositing(
-      'anchored-backdrop-clone',
+      'transparent-page-portal-backdrop-filter',
       true,
-      'experiment-stage-without-layer-b',
-      'The responsive source bar is mounted at a 672px source stage width, yielding its natural 640px inset box.',
+      'live-experiment-composition',
+      'The responsive source bar keeps its natural 640px inset geometry in a transparent portal and samples the unchanged live Experiment Eleven composition.',
     ),
-    interactions: interactions(true, true, 'hover spring', 'search-focus spring', 'input focus', 'icon pressed states'),
+    interactions: interactions(true, true, 'hover spring', 'search-focus spring', 'input focus'),
     sourcePath: sourcePaths.wgeBottomBar,
     provenance: provenance.wgeBottomBar,
   }),
@@ -1063,6 +1160,33 @@ export type ExperimentElevenReferencePresetId = keyof typeof EXPERIMENT_ELEVEN_R
 
 export const EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS = Object.freeze(
   Object.keys(EXPERIMENT_ELEVEN_REFERENCE_PRESETS) as ExperimentElevenReferencePresetId[],
+)
+
+export const EXPERIMENT_ELEVEN_REFERENCE_FIRST_SAVE_ID = 1038 as const
+
+/**
+ * Deterministic save-to-object audit used by both static and browser tests.
+ * This deliberately includes component identity and transparent compositing,
+ * not only labels/config numbers.
+ */
+export const EXPERIMENT_ELEVEN_REFERENCE_OBJECT_AUDIT = Object.freeze(
+  EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS.map((presetId, index) => {
+    const definition = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[presetId]
+    return Object.freeze({
+      saveId: EXPERIMENT_ELEVEN_REFERENCE_FIRST_SAVE_ID + index,
+      presetId,
+      sourceFamily: definition.sourceFamily,
+      sourcePresetKey: definition.sourcePresetKey,
+      renderer: definition.renderer,
+      nativeWidth: definition.nativeLayout.width,
+      nativeHeight: definition.nativeLayout.height,
+      nativeRadius: definition.nativeLayout.radius,
+      nativeGeometry: definition.nativeLayout.geometry,
+      sourceComponent: definition.sourceComponent,
+      portalRequired: definition.compositing.pageLevelPortal,
+      transparentRenderSurface: definition.transparentRenderSurface,
+    })
+  }),
 )
 
 export function isExperimentElevenReferencePresetId(

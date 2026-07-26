@@ -1,6 +1,7 @@
 import type { RefObject } from 'react';
 import {
   EXPERIMENT_ELEVEN_REFERENCE_PRESETS,
+  LIQUID_GLASS_WEB_SOURCE_COMPONENTS,
   getExperimentElevenReferencePreset,
   type ExperimentElevenReferencePresetId,
 } from './experimentElevenReferencePresets';
@@ -28,9 +29,12 @@ import {
 } from '../../vendor/reference-glass/web-glass-effect/ReferenceWebGlass';
 import {
   WgeNextBottomBarReference,
-  WgeNextFormReference,
+  WgeNextSubmitButtonReference,
 } from '../../vendor/reference-glass/web-glass-effect/ReferenceWgeNext';
-import { LiquidGlDemoOneNav } from '../../vendor/reference-glass/liquidgl/LiquidGlDemoOneNav';
+import {
+  LiquidGlDemoOneNav,
+  type LiquidGlDemoOneNavConfig,
+} from '../../vendor/reference-glass/liquidgl/LiquidGlDemoOneNav';
 
 function liquidMainConfig(
   raw: Readonly<Record<string, unknown>>,
@@ -127,6 +131,7 @@ export function ExperimentElevenReferencePresetRenderer({
   }
 
   if (preset.renderer === 'liquidgl-webgl') {
+    const config = preset.config as unknown as LiquidGlDemoOneNavConfig;
     return (
       <LiquidGlDemoOneNav
         presetId={presetId}
@@ -134,6 +139,7 @@ export function ExperimentElevenReferencePresetRenderer({
         nativeWidth={nativeLayout.width}
         nativeHeight={nativeLayout.height}
         nativeRadius={nativeLayout.radius}
+        config={config}
       />
     );
   }
@@ -158,22 +164,28 @@ export function ExperimentElevenReferencePresetRenderer({
         renderOffsetX={sourceContext.lensOffsetX}
         renderOffsetY={sourceContext.lensOffsetY}
         renderRadius={sourceContext.radius}
-        cloneWallpaper={false}
         interactive={preset.interactions.pointerInteraction}
       >
         <LiquidGlassReferencePreset
+          presetId={presetId}
+          sourcePresetKey={preset.sourcePresetKey}
+          sourceComponent={LIQUID_GLASS_WEB_SOURCE_COMPONENTS[
+            presetId as keyof typeof LIQUID_GLASS_WEB_SOURCE_COMPONENTS
+          ]}
           options={liquidWebOptions(preset.config)}
           interaction={interaction}
           bed={bed}
           contextWidth={sourceContext.width}
           contextHeight={sourceContext.height}
+          objectOffsetX={sourceContext.lensOffsetX}
+          objectOffsetY={sourceContext.lensOffsetY}
           pointerTargetRef={anchorRef}
         />
       </ExperimentElevenReferencePortal>
     );
   }
 
-  if (preset.renderer === 'wge-next-form') {
+  if (preset.renderer === 'wge-next-submit-button') {
     return (
       <ExperimentElevenReferencePortal
         anchorRef={anchorRef}
@@ -183,10 +195,9 @@ export function ExperimentElevenReferencePresetRenderer({
         nativeWidth={nativeLayout.width}
         nativeHeight={nativeLayout.height}
         nativeRadius={nativeLayout.radius}
-        cloneWallpaper={false}
         interactive
       >
-        <WgeNextFormReference presetId={presetId} />
+        <WgeNextSubmitButtonReference presetId={presetId} />
       </ExperimentElevenReferencePortal>
     );
   }
@@ -221,6 +232,7 @@ export function ExperimentElevenReferencePresetRenderer({
       >
         <LiquidMainReferenceSurface
           presetId={presetId}
+          sourcePresetKey={preset.sourcePresetKey}
           config={liquidMainConfig(preset.config)}
         />
       </ExperimentElevenReferencePortal>
@@ -240,6 +252,7 @@ export function ExperimentElevenReferencePresetRenderer({
       >
         <WebGlassReferenceSurface
           presetId={presetId}
+          sourcePresetKey={preset.sourcePresetKey}
           config={preset.config as unknown as WebGlassReferenceConfig}
         />
       </ExperimentElevenReferencePortal>

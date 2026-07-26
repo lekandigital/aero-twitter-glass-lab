@@ -1,16 +1,10 @@
 .e11-liquid-web-reference {
-  --e11-liquid-web-bed-bg: #0b0c0f;
-  --e11-liquid-web-bed-line: rgba(255, 255, 255, 0.2);
-  --e11-liquid-web-bed-line-2: rgba(255, 255, 255, 0.09);
-  --e11-liquid-web-bed-ink: #f4f6f8;
-  --e11-liquid-web-bed-ink-soft: rgba(244, 246, 248, 0.66);
   position: relative;
-  overflow: hidden;
+  display: block;
+  overflow: visible;
   box-sizing: border-box;
-  color-scheme: dark;
-  font-family:
-    ui-sans-serif, -apple-system, "SF Pro Text", "Inter", system-ui,
-    sans-serif;
+  background: transparent;
+  pointer-events: none;
 }
 
 .e11-liquid-web-reference *,
@@ -19,371 +13,36 @@
   box-sizing: border-box;
 }
 
-.e11-liquid-web-reference [data-liquid-glass] {
-  display: block;
-}
-
-.e11-liquid-web-reference [data-liquid-glass] > div:first-child {
+.e11-liquid-web-reference > div:first-of-type {
   width: 100%;
   height: 100%;
+  background: transparent;
+  pointer-events: none;
+  will-change: backdrop-filter !important;
 }
 
-.e11-liquid-web-reference__bed {
+.e11-liquid-web-reference__transparent-source {
   position: relative;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  background-color: var(--e11-liquid-web-bed-bg);
-  color: var(--e11-liquid-web-bed-ink);
-}
-
-.e11-liquid-web-reference__bed--grid::before,
-.e11-liquid-web-reference__bed--chart::before {
-  position: absolute;
-  inset: -2px;
-  content: "";
+  background: transparent;
   pointer-events: none;
 }
 
-.e11-liquid-web-reference__bed--grid::before {
-  background-image:
-    linear-gradient(var(--e11-liquid-web-bed-line-2) 1px, transparent 1px),
-    linear-gradient(
-      90deg,
-      var(--e11-liquid-web-bed-line-2) 1px,
-      transparent 1px
-    ),
-    linear-gradient(var(--e11-liquid-web-bed-line) 1px, transparent 1px),
-    linear-gradient(
-      90deg,
-      var(--e11-liquid-web-bed-line) 1px,
-      transparent 1px
-    );
-  background-size:
-    12px 12px,
-    12px 12px,
-    60px 60px,
-    60px 60px;
-}
-
-.e11-liquid-web-reference__bed--chart::before {
-  background-image:
-    repeating-conic-gradient(
-      from 0deg at 50% 50%,
-      var(--e11-liquid-web-bed-line-2) 0deg 1.2deg,
-      transparent 1.2deg 15deg
-    ),
-    repeating-radial-gradient(
-      circle at 50% 50%,
-      transparent 0 44px,
-      var(--e11-liquid-web-bed-line) 44px 45px
-    ),
-    linear-gradient(var(--e11-liquid-web-bed-line-2) 1px, transparent 1px),
-    linear-gradient(
-      90deg,
-      var(--e11-liquid-web-bed-line-2) 1px,
-      transparent 1px
-    );
-  background-size:
-    100% 100%,
-    100% 100%,
-    20px 20px,
-    20px 20px;
-}
-
-.e11-liquid-web-reference--hero {
-  overflow: visible;
-}
-
-.e11-liquid-web-reference__hero {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.e11-liquid-web-reference__hero-bleed {
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
-  padding: 40px 28px;
-}
-
-.e11-liquid-web-reference__hero-inner {
-  position: relative;
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  padding: 44px 40px 52px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 32px;
-  background-color: #101114;
-  color: #eceef1;
-}
-
-.e11-liquid-web-reference__hero-inner::before {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.055) 1px,
-      transparent 1px
-    ),
-    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.1) 1px,
-      transparent 1px
-    );
-  background-size:
-    16px 16px,
-    16px 16px,
-    80px 80px,
-    80px 80px;
-  content: "";
-  mask-image: radial-gradient(
-    120% 120% at 70% 40%,
-    #000 30%,
-    transparent 100%
-  );
-  pointer-events: none;
-}
-
-.e11-liquid-web-reference__hero-inner > * {
-  position: relative;
-}
-
-.e11-liquid-web-reference__hero-chips {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 26px;
-}
-
-.e11-liquid-web-reference__hero-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 11px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(236, 238, 241, 0.58);
-  font-size: 12px;
-}
-
-.e11-liquid-web-reference__hero-chip-note {
-  color: rgba(236, 238, 241, 0.36);
-  font-family:
-    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
-  font-size: 12px;
-}
-
-.e11-liquid-web-reference__hero-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-}
-
-.e11-liquid-web-reference__hero-dot--chrome {
-  background: #4285f4;
-}
-
-.e11-liquid-web-reference__hero-dot--safari {
-  background: #0fb5ee;
-}
-
-.e11-liquid-web-reference__hero-dot--firefox {
-  background: #ff7139;
-}
-
-.e11-liquid-web-reference__hero-inner h1 {
-  margin: 0 0 20px;
-  font-size: clamp(34px, 5.4vw, 62px);
-  font-weight: 620;
-  letter-spacing: -0.035em;
-  line-height: 1.03;
-}
-
-.e11-liquid-web-reference__hero-inner h1 span {
-  display: block;
-  margin-top: 10px;
-  color: rgba(236, 238, 241, 0.58);
-  font-size: clamp(19px, 2.4vw, 30px);
-  font-weight: 460;
-  letter-spacing: -0.02em;
-}
-
-.e11-liquid-web-reference__hero-lede {
-  max-width: 640px;
-  margin: 0 0 30px;
-  color: rgba(236, 238, 241, 0.58);
-  font-size: 16.5px;
-  line-height: 1.62;
-}
-
-.e11-liquid-web-reference__hero-lede code {
-  padding: 1px 5px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.04);
-  color: #eceef1;
-}
-
-.e11-liquid-web-reference__hero-cta {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.e11-liquid-web-reference__hero-install,
-.e11-liquid-web-reference__hero-button {
-  padding: 11px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-}
-
-.e11-liquid-web-reference__hero-install {
-  background: rgba(255, 255, 255, 0.04);
-  font-family:
-    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
-  font-size: 13px;
-}
-
-.e11-liquid-web-reference__hero-button {
-  background: rgba(255, 255, 255, 0.07);
-  color: #eceef1;
-  font-size: 13.5px;
-}
-
-.e11-liquid-web-reference__hero-hint {
-  margin: 28px 0 0;
-  color: rgba(236, 238, 241, 0.36);
-  font-family:
-    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
-  font-size: 13px;
-}
-
-.e11-liquid-web-reference__hero-grip {
+.e11-liquid-web-reference__source-grip {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 3;
+  z-index: 1;
+  background: transparent;
   cursor: grab;
+  pointer-events: auto;
   touch-action: none;
-  pointer-events: none;
-}
-
-.e11-liquid-web-reference__hero-grip--dragging {
-  cursor: grabbing;
-}
-
-.e11-liquid-web-reference__bed--text {
-  padding: 44px 46px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-}
-
-.e11-liquid-web-reference__bed--text p {
-  position: relative;
-  max-width: 70ch;
-  margin: 0;
-  color: var(--e11-liquid-web-bed-ink);
-  font-size: 18px;
-  line-height: 1.66;
-}
-
-.e11-liquid-web-reference__bed--text a,
-.e11-liquid-web-reference__bed--text strong {
-  color: inherit;
-}
-
-.e11-liquid-web-reference__bed--orbit {
-  display: grid;
-  place-items: center;
-  padding: 60px;
-}
-
-.e11-liquid-web-reference__bed--orbit p {
-  position: relative;
-  max-width: 46ch;
-  margin: 0;
-  padding: 14px 18px;
-  border-radius: 12px;
-  background: rgba(11, 12, 15, 0.72);
-  color: var(--e11-liquid-web-bed-ink);
-  font-size: 15px;
-  line-height: 1.6;
-  text-align: center;
-}
-
-.e11-liquid-web-reference__engine {
-  position: relative;
-  box-sizing: border-box;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 18px;
-  background: #101114;
-  cursor: grab;
-  touch-action: none;
-}
-
-.e11-liquid-web-reference__engine:active {
-  cursor: grabbing;
-}
-
-.e11-liquid-web-reference__filtered,
-.e11-liquid-web-reference__defs {
-  position: absolute;
-  inset: 0;
-}
-
-.e11-liquid-web-reference__filtered {
-  will-change: filter;
-}
-
-.e11-liquid-web-reference__defs {
-  pointer-events: none;
-}
-
-.e11-liquid-web-reference__shadow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
   will-change: transform;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.24),
-    0 14px 40px rgba(0, 0, 0, 0.6);
 }
 
-.e11-liquid-web-reference__bed--engine {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 40px;
-  text-align: center;
-}
-
-.e11-liquid-web-reference__bed--engine h3 {
-  position: relative;
-  margin: 0;
-  color: var(--e11-liquid-web-bed-ink);
-  font-family:
-    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.e11-liquid-web-reference__bed--engine p {
-  position: relative;
-  margin: 0;
-  color: var(--e11-liquid-web-bed-ink-soft);
-  font-size: 14px;
+.e11-liquid-web-reference__source-grip:active {
+  cursor: grabbing;
 }

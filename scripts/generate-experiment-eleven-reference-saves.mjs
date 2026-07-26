@@ -30,12 +30,24 @@ function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'))
 }
 
-function readHeadSaves() {
-  return JSON.parse(execFileSync('git', ['show', `HEAD:${savesGitPath}`], {
-    cwd: repositoryRoot,
-    encoding: 'utf8',
-    maxBuffer: 32 * 1024 * 1024,
-  }))
+function readPreReferenceSaves() {
+  for (let generations = 0; generations < 100; generations += 1) {
+    const revision = generations === 0 ? 'HEAD' : `HEAD${'^'.repeat(generations)}`
+    let saves
+    try {
+      saves = JSON.parse(execFileSync('git', ['show', `${revision}:${savesGitPath}`], {
+        cwd: repositoryRoot,
+        encoding: 'utf8',
+        maxBuffer: 32 * 1024 * 1024,
+      }))
+    } catch {
+      break
+    }
+    if (saves.every((save) => !generatedPresetIds.has(save.e11LayerCReferencePreset))) {
+      return saves
+    }
+  }
+  throw new Error('Could not find the pre-reference-save baseline in recent Git history')
 }
 
 function stableHash(value) {
@@ -82,13 +94,15 @@ export function generateReferenceSaves(saves) {
   }
 }
 
-export function auditReferenceSaves(saves, headSaves = readHeadSaves()) {
-  const headMaximumId = Math.max(...headSaves.map((save) => save.id))
-  const source = headSaves.find((save) => save.id === sourceSaveId)
-  if (!source) throw new Error(`Source Save ${sourceSaveId} is absent from HEAD`)
+export function auditReferenceSaves(saves, baselineSaves = readPreReferenceSaves()) {
+  const baselineMaximumId = Math.max(...baselineSaves.map((save) => save.id))
+  const source = baselineSaves.find((save) => save.id === sourceSaveId)
+  if (!source) {
+    throw new Error(`Source Save ${sourceSaveId} is absent from the pre-reference baseline`)
+  }
 
   const generated = saves
-    .filter((save) => save.id > headMaximumId)
+    .filter((save) => save.id > baselineMaximumId)
     .sort((left, right) => left.id - right.id)
   const duplicateIdCount = saves.length - new Set(saves.map((save) => save.id)).size
   const unexpectedDifferences = generated.map((save) => ({
@@ -96,13 +110,13 @@ export function auditReferenceSaves(saves, headSaves = readHeadSaves()) {
     keys: differingTopLevelKeys(source, save).filter((key) => !allowedCloneDifferences.has(key)),
   }))
 
-  const recordsInHeadById = new Map(headSaves.map((save) => [save.id, save]))
+  const baselineById = new Map(baselineSaves.map((save) => [save.id, save]))
   const modifiedExistingIds = saves
-    .filter((save) => save.id <= headMaximumId)
-    .filter((save) => JSON.stringify(save) !== JSON.stringify(recordsInHeadById.get(save.id)))
+    .filter((save) => save.id <= baselineMaximumId)
+    .filter((save) => JSON.stringify(save) !== JSON.stringify(baselineById.get(save.id)))
     .map((save) => save.id)
-  const removedExistingIds = headSaves
-    .filter((headSave) => !saves.some((save) => save.id === headSave.id))
+  const removedExistingIds = baselineSaves
+    .filter((baselineSave) => !saves.some((save) => save.id === baselineSave.id))
     .map((save) => save.id)
 
   return {
@@ -118,11 +132,11 @@ export function auditReferenceSaves(saves, headSaves = readHeadSaves()) {
     removedExistingIds,
     protectedSaves: Object.fromEntries([249, 1036, 1037].map((id) => {
       const current = saves.find((save) => save.id === id)
-      const head = headSaves.find((save) => save.id === id)
+      const baseline = baselineSaves.find((save) => save.id === id)
       return [id, {
-        unchanged: JSON.stringify(current) === JSON.stringify(head),
+        unchanged: JSON.stringify(current) === JSON.stringify(baseline),
         currentHash: stableHash(current),
-        headHash: stableHash(head),
+        baselineHash: stableHash(baseline),
       }]
     })),
   }

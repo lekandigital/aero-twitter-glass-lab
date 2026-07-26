@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 import { test } from 'node:test'
 import {
+  EXPERIMENT_ELEVEN_REFERENCE_OBJECT_AUDIT,
   EXPERIMENT_ELEVEN_REFERENCE_PRESETS,
 } from '../src/components/experiment-set-one/experimentElevenReferencePresets.ts'
 
@@ -24,14 +25,18 @@ const sourceAssetDirectory = fileURLToPath(
   new URL('../public/vendor/reference-glass', import.meta.url),
 )
 const mountedFamilySelector = [
-  '.e11-ref-fluid-glass-stage',
-  '.e11-liquidgl-overlay',
-  '.e11-liquid-web-reference',
+  '[data-e11-reference-object-root]',
+].join(', ')
+
+const forbiddenSourceSceneSelector = [
+  '[data-e11-reference-backdrop]',
+  '.experiment-eleven-reference-backdrop',
+  '.e11-liquidgl-snapshot',
   '.e11-wge-form',
-  '.e11-wge-bottom-bar__state',
-  '.e11-web-glass-surface',
-  '.e11-liquid-main-surface',
-  '.e11-ref-glass-surface',
+  '.e11-liquid-web-reference__bed',
+  '[data-source-demo-background-mounted="true"]',
+  '[data-source-stage-mounted="true"]',
+  '[data-source-demo-background]:not([data-source-demo-background="absent"])',
 ].join(', ')
 
 function collectRelativeFiles(directory, prefix = '') {
@@ -139,6 +144,134 @@ function saveAriaLabel(save) {
   return save.label
 }
 
+function auditRowForPreset(presetId) {
+  const row = EXPERIMENT_ELEVEN_REFERENCE_OBJECT_AUDIT.find(
+    (candidate) => candidate.presetId === presetId,
+  )
+  assert.ok(row, `${presetId} audit row`)
+  return row
+}
+
+async function readLayerBState(page) {
+  const layerB = page.getByRole('region', {
+    name: 'Experiment Eleven layer B',
+    exact: true,
+  })
+  assert.equal(await layerB.count(), 1, 'one Experiment Eleven Layer B')
+  return layerB.evaluate((element) => {
+    const style = getComputedStyle(element)
+    const rect = element.getBoundingClientRect()
+    return {
+      opacity: style.opacity,
+      clipPath: style.clipPath,
+      background: style.background,
+      backgroundColor: style.backgroundColor,
+      display: style.display,
+      visibility: style.visibility,
+      inlineClipPath: element.style.clipPath,
+      rect: {
+        left: rect.left,
+        top: rect.top,
+        right: rect.right,
+        bottom: rect.bottom,
+        width: rect.width,
+        height: rect.height,
+      },
+    }
+  })
+}
+
+async function assertObjectOnlyCompositing(page, presetId, preset, layerBBaseline) {
+  const row = auditRowForPreset(presetId)
+  const root = page.locator(
+    `[data-e11-reference-object-root="${presetId}"]`,
+  )
+  assert.equal(await root.count(), 1, `${presetId} exact object root count`)
+  assert.equal(await root.getAttribute('data-source-family'), row.sourceFamily)
+  assert.equal(await root.getAttribute('data-source-preset-key'), row.sourcePresetKey)
+  assert.equal(await root.getAttribute('data-source-component'), row.sourceComponent)
+  assert.equal(await root.getAttribute('data-transparent-render-surface'), 'true')
+  assert.equal(await page.locator(forbiddenSourceSceneSelector).count(), 0)
+
+  const overlays = page.locator(
+    `[data-e11-reference-overlay][data-e11-reference-preset="${presetId}"]`,
+  )
+  if (row.portalRequired) {
+    assert.equal(await overlays.count(), 1, `${presetId} one required portal`)
+    const transparentPortalNodes = overlays.locator(
+      '.experiment-eleven-reference-host, .experiment-eleven-reference-renderer',
+    )
+    for (let index = 0; index < await transparentPortalNodes.count(); index += 1) {
+      assert.equal(
+        await transparentPortalNodes.nth(index).evaluate(
+          (element) => getComputedStyle(element).backgroundColor,
+        ),
+        'rgba(0, 0, 0, 0)',
+        `${presetId} portal node ${index} transparent`,
+      )
+    }
+  } else {
+    assert.equal(await overlays.count(), 0, `${presetId} has no page portal`)
+  }
+
+  const canvases = root.locator('canvas')
+  for (let index = 0; index < await canvases.count(); index += 1) {
+    assert.equal(
+      await canvases.nth(index).evaluate(
+        (element) => getComputedStyle(element).backgroundColor,
+      ),
+      'rgba(0, 0, 0, 0)',
+      `${presetId} canvas ${index} transparent`,
+    )
+  }
+
+  const layerB = await readLayerBState(page)
+  assert.deepEqual(
+    {
+      opacity: layerB.opacity,
+      clipPath: layerB.clipPath,
+      background: layerB.background,
+      backgroundColor: layerB.backgroundColor,
+      display: layerB.display,
+      visibility: layerB.visibility,
+      inlineClipPath: layerB.inlineClipPath,
+    },
+    {
+      opacity: layerBBaseline.opacity,
+      clipPath: layerBBaseline.clipPath,
+      background: layerBBaseline.background,
+      backgroundColor: layerBBaseline.backgroundColor,
+      display: layerBBaseline.display,
+      visibility: layerBBaseline.visibility,
+      inlineClipPath: layerBBaseline.inlineClipPath,
+    },
+    `${presetId} Layer B paint/clip/opacity unchanged`,
+  )
+  assert.equal(layerB.opacity, '1')
+  assert.equal(layerB.clipPath, 'none')
+  assert.notEqual(layerB.display, 'none')
+  assert.notEqual(layerB.visibility, 'hidden')
+
+  const anchor = page.locator(`[data-e11-reference-anchor="${presetId}"]`)
+  const underlayVisibleAtOverlap = await anchor.evaluate((anchorElement) => {
+    const layerBElement = document.querySelector(
+      '[role="region"][aria-label="Experiment Eleven layer B"]',
+    )
+    if (!layerBElement) return false
+    const anchorRect = anchorElement.getBoundingClientRect()
+    const layerBRect = layerBElement.getBoundingClientRect()
+    const left = Math.max(anchorRect.left, layerBRect.left)
+    const right = Math.min(anchorRect.right, layerBRect.right)
+    const top = Math.max(anchorRect.top, layerBRect.top)
+    const bottom = Math.min(anchorRect.bottom, layerBRect.bottom)
+    if (right <= left || bottom <= top) return false
+    const elements = document.elementsFromPoint((left + right) / 2, (top + bottom) / 2)
+    return elements.includes(layerBElement)
+  })
+  assert.equal(underlayVisibleAtOverlap, true, `${presetId} Layer B remains under Layer C`)
+  assert.equal(preset.transparentRenderSurface, true)
+}
+
 async function assertUniqueE11Ids(page) {
   const duplicateIds = await page.locator('[id]').evaluateAll((elements) => {
     const ids = elements
@@ -173,6 +306,7 @@ async function assertNativeAnchor(page, presetId, nativeLayout) {
 }
 
 async function assertFamilyStructure(page, presetId, preset) {
+  const row = auditRowForPreset(presetId)
   const overlay = page.locator(
     `[data-e11-reference-overlay][data-e11-reference-preset="${presetId}"]`,
   )
@@ -189,6 +323,17 @@ async function assertFamilyStructure(page, presetId, preset) {
     assert.match(
       await fluidRoot.getAttribute('data-fluid-glass-glb'),
       new RegExp(`/assets/3d/${preset.config.mode === 'cube' ? 'cube' : preset.config.mode}\\.glb$`),
+    )
+    assert.equal(await fluidRoot.getAttribute('data-source-component'), row.sourceComponent)
+    assert.equal(await fluidRoot.getAttribute('data-source-demo-background-mounted'), 'false')
+    assert.equal(await fluidRoot.getAttribute('data-source-stage-mounted'), 'false')
+    assert.equal(
+      await fluidRoot.locator('canvas').evaluate((canvas) => {
+        const context = canvas.getContext('webgl2') ?? canvas.getContext('webgl')
+        return context?.getContextAttributes()?.alpha ?? false
+      }),
+      true,
+      `${presetId} WebGL alpha channel`,
     )
   } else {
     await overlay.waitFor({ state: 'attached', timeout: 15_000 })
@@ -227,40 +372,253 @@ async function assertFamilyStructure(page, presetId, preset) {
     )
   } else if (preset.renderer === 'liquid-glass-web-react') {
     const root = page.locator('.e11-liquid-web-reference')
+    const filtered = root.locator(':scope > div').first()
+    const transparentSource = root.locator(
+      ':scope > div:first-of-type > .e11-liquid-web-reference__transparent-source',
+    )
+    const sourceGrip = root.locator(
+      '.e11-liquid-web-reference__source-grip',
+    )
+    const shadow = root.locator(':scope > div[aria-hidden="true"]').last()
     assert.equal(await root.count(), 1)
+    assert.equal(await root.getAttribute('data-liquid-glass'), '')
     assert.equal(await root.getAttribute('data-liquid-glass-width'), String(preset.nativeLayout.width))
     assert.equal(await root.getAttribute('data-liquid-glass-height'), String(preset.nativeLayout.height))
+    assert.equal(
+      await root.getAttribute('data-source-component-implementation'),
+      preset.sourceComponent === 'LiquidGlassEngine'
+        ? 'core/LiquidGlassEngine via react/LiquidGlass'
+        : 'react/LiquidGlass',
+    )
+    assert.equal(
+      Number(await root.getAttribute('data-source-context-width')),
+      preset.sourceContext.width,
+    )
+    assert.equal(
+      Number(await root.getAttribute('data-source-context-height')),
+      preset.sourceContext.height,
+    )
     await waitUntil(
       async () => (await root.locator('filter[id]').count()) >= 1,
       `${presetId} generated SVG filter`,
     )
-  } else if (preset.renderer === 'wge-next-form') {
-    assert.equal(await page.locator('[data-e11-wge-component="complete-form"]').count(), 1)
-    const form = page.getByRole('form', { name: 'WGE Next complete form', exact: true })
-    assert.equal(await form.count(), 1)
-    assert.equal(await form.locator('input[type="text"]').count(), 2)
-    assert.equal(await form.locator('textarea').count(), 1)
-    assert.equal(await form.locator('select').count(), 1)
-    assert.equal(await form.locator('button[type="submit"]').count(), 1)
-    assert.equal(await page.locator('.e11-wge-form svg filter[id]').count(), 5)
-    await form.getByRole('textbox', { name: 'First Name', exact: true }).fill('Ada')
-    await form.getByRole('textbox', { name: 'Last Name', exact: true }).fill('Lovelace')
-    await form.getByRole('textbox', { name: 'Message', exact: true }).fill('Layer C verification')
-    await form.getByRole('combobox', { name: 'Gender', exact: true })
-      .selectOption('prefer-not-to-say')
+    assert.equal(await root.getAttribute('data-source-demo-background'), 'absent')
+    assert.equal(await transparentSource.count(), 1)
+    assert.equal(
+      await sourceGrip.count(),
+      presetId === 'liquid-web:hero-circle' ||
+        presetId === 'liquid-web:engine-panel'
+        ? 1
+        : 0,
+      `${presetId} source-only interaction grip`,
+    )
+    if (await sourceGrip.count()) {
+      assert.equal(
+        await sourceGrip.evaluate(
+          (element) => getComputedStyle(element).backgroundColor,
+        ),
+        'rgba(0, 0, 0, 0)',
+      )
+    }
+    assert.equal(await filtered.count(), 1)
+    assert.equal(await shadow.count(), 1)
+    assert.equal(
+      await root.evaluate((element) => getComputedStyle(element).backgroundColor),
+      'rgba(0, 0, 0, 0)',
+    )
+    assert.equal(
+      await filtered.evaluate((element) => getComputedStyle(element).backgroundColor),
+      'rgba(0, 0, 0, 0)',
+    )
+    assert.equal(
+      await transparentSource.evaluate(
+        (element) => getComputedStyle(element).backgroundColor,
+      ),
+      'rgba(0, 0, 0, 0)',
+    )
+    assert.match(
+      await filtered.evaluate((element) => getComputedStyle(element).backdropFilter),
+      /url\(/,
+    )
+    const sourceBox = await filtered.evaluate((element) => {
+      const style = getComputedStyle(element)
+      return {
+        width: Number.parseFloat(style.width),
+        height: Number.parseFloat(style.height),
+      }
+    })
+    assert.ok(
+      Math.abs(sourceBox.width - preset.sourceContext.width) <= 0.02,
+      `${presetId} source filter width`,
+    )
+    assert.ok(
+      Math.abs(sourceBox.height - preset.sourceContext.height) <= 0.02,
+      `${presetId} source filter height`,
+    )
+    const shadowBox = await shadow.evaluate((element) => {
+      const style = getComputedStyle(element)
+      return {
+        width: Number.parseFloat(style.width),
+        height: Number.parseFloat(style.height),
+      }
+    })
+    assert.ok(
+      Math.abs(shadowBox.width - preset.nativeLayout.width) <= 0.02,
+      `${presetId} source lens width`,
+    )
+    assert.ok(
+      Math.abs(shadowBox.height - preset.nativeLayout.height) <= 0.02,
+      `${presetId} source lens height`,
+    )
+    const sourceTransform = () =>
+      shadow.evaluate((element) => getComputedStyle(element).transform)
+    const beforeSourceInteraction = await sourceTransform()
+    if (
+      presetId === 'liquid-web:hero-circle' ||
+      presetId === 'liquid-web:orbit'
+    ) {
+      await waitUntil(
+        async () => (await sourceTransform()) !== beforeSourceInteraction,
+        `${presetId} source animation`,
+      )
+    } else if (presetId === 'liquid-web:reading-glass') {
+      await waitUntil(
+        async () =>
+          (await root.getAttribute('data-source-pointer-listener-attached')) ===
+          'true',
+        `${presetId} source pointer listener`,
+      )
+      const rootBox = await root.boundingBox()
+      assert.ok(rootBox)
+      await page.mouse.move(
+        rootBox.x + rootBox.width * 0.68,
+        rootBox.y + rootBox.height * 0.62,
+      )
+      await waitUntil(
+        async () => (await sourceTransform()) !== beforeSourceInteraction,
+        `${presetId} source pointer follow`,
+      )
+    } else if (presetId === 'liquid-web:engine-panel') {
+      await waitUntil(
+        async () =>
+          (await root.getAttribute('data-source-pointer-listener-attached')) ===
+          'true',
+        `${presetId} source pointer listener`,
+      )
+      const anchor = page.locator(`[data-e11-reference-anchor="${presetId}"]`)
+      await anchor.scrollIntoViewIfNeeded()
+      await waitUntil(async () => {
+        const anchorBox = await anchor.boundingBox()
+        const currentLensBox = await shadow.boundingBox()
+        return Boolean(
+          anchorBox &&
+          currentLensBox &&
+          Math.abs(anchorBox.x - currentLensBox.x) <= 1 &&
+          Math.abs(anchorBox.y - currentLensBox.y) <= 1,
+        )
+      }, `${presetId} source lens aligned after scrolling`)
+      const lensBox = await shadow.boundingBox()
+      assert.ok(lensBox)
+      const anchorBeforeSourceDrag = await anchor.boundingBox()
+      assert.ok(anchorBeforeSourceDrag)
+      await page.mouse.move(
+        lensBox.x + lensBox.width / 2,
+        lensBox.y + lensBox.height / 2,
+      )
+      await page.mouse.down()
+      await page.mouse.move(
+        lensBox.x + lensBox.width * 0.7,
+        lensBox.y + lensBox.height * 0.62,
+        { steps: 4 },
+      )
+      await page.mouse.up()
+      try {
+        await waitUntil(
+          async () => (await sourceTransform()) !== beforeSourceInteraction,
+          `${presetId} raw-engine pointer drag`,
+        )
+      } catch (error) {
+        const state = await page.evaluate((id) => {
+          const rootElement = document.querySelector(
+            `[data-e11-reference-object-root="${id}"]`,
+          )
+          const anchorElement = document.querySelector(
+            `[data-e11-reference-anchor="${id}"]`,
+          )
+          const shadowElement = rootElement
+            ? [...rootElement.querySelectorAll(':scope > div[aria-hidden="true"]')].at(-1)
+            : null
+          const point = shadowElement?.getBoundingClientRect()
+          return {
+            root: rootElement?.getBoundingClientRect().toJSON(),
+            anchor: anchorElement?.getBoundingClientRect().toJSON(),
+            shadow: point?.toJSON(),
+            shadowTransform: shadowElement
+              ? getComputedStyle(shadowElement).transform
+              : null,
+            pointerListener: rootElement?.getAttribute(
+              'data-source-pointer-listener-attached',
+            ),
+            hitElement: point
+              ? document
+                  .elementFromPoint(
+                    point.left + point.width / 2,
+                    point.top + point.height / 2,
+                  )
+                  ?.outerHTML.slice(0, 240)
+              : null,
+            viewport: [window.innerWidth, window.innerHeight],
+          }
+        }, presetId)
+        throw new Error(`${error.message}; state=${JSON.stringify(state)}`)
+      }
+      const anchorAfterSourceDrag = await anchor.boundingBox()
+      assert.ok(anchorAfterSourceDrag)
+      assert.ok(
+        Math.abs(anchorAfterSourceDrag.x - anchorBeforeSourceDrag.x) <= 0.5 &&
+          Math.abs(anchorAfterSourceDrag.y - anchorBeforeSourceDrag.y) <= 0.5,
+        `${presetId} source drag does not replace Layer C drag`,
+      )
+    }
+  } else if (preset.renderer === 'wge-next-submit-button') {
+    const button = page.locator(
+      `[data-e11-reference-object-root="${presetId}"][data-e11-wge-component="submit-form-button"]`,
+    )
+    assert.equal(await button.count(), 1)
+    assert.equal(await page.locator('form').count(), 0)
+    assert.equal(await page.locator('input[type="text"]').count(), 0)
+    assert.equal(await page.locator('textarea').count(), 0)
+    assert.equal(await page.locator('select').count(), 0)
+    assert.equal(await page.locator('.e11-wge-submit-button').count(), 1)
+    assert.equal(await button.locator('.e11-wge-submit-button__glass').count(), 1)
+    assert.equal(await button.locator('svg filter[id]').count(), 1)
+    assert.equal((await button.textContent())?.trim(), 'Submit Form')
+    const restBackground = await button.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    )
+    await button.hover()
+    await waitUntil(
+      async () =>
+        (await button.evaluate((element) => getComputedStyle(element).backgroundColor)) !==
+        restBackground,
+      'WGE submit button hover',
+    )
     const urlBeforeSubmit = page.url()
-    await form.getByRole('button', { name: 'Submit', exact: true }).click()
+    await button.click()
     assert.equal(page.url(), urlBeforeSubmit)
   } else if (preset.renderer === 'wge-next-bottom-bar') {
     const root = page.locator('[data-e11-wge-component="complete-bottom-bar"]')
     const surface = page.locator('.e11-wge-bottom-bar')
-    const blur = surface.locator('feGaussianBlur')
+    const filter = page.locator(
+      `[data-e11-reference-overlay][data-e11-reference-preset="${presetId}"] svg filter[id]`,
+    )
+    const blur = filter.locator('feGaussianBlur')
     const search = root.locator('input[placeholder="Search images..."]')
     assert.equal(await root.count(), 1)
     assert.equal(await root.locator('input[type="number"]').count(), 2)
     assert.equal(await search.count(), 1)
     assert.equal(await root.locator('button').count(), 2)
-    assert.equal(await surface.locator('svg filter[id]').count(), 1)
+    assert.equal(await filter.count(), 1)
     assert.equal(await blur.getAttribute('stdDeviation'), '0')
     await surface.hover()
     await waitUntil(
@@ -284,11 +642,25 @@ async function assertFamilyStructure(page, presetId, preset) {
     assert.equal(await menu.count(), 1)
     assert.equal(await menu.getAttribute('data-reveal'), 'fade')
     assert.equal(await menu.getAttribute('data-bevel-depth'), '0.052')
-    await page.locator('body > canvas[data-liquid-ignore]').waitFor({
+    const canvas = page.locator('body > canvas[data-liquid-ignore]')
+    await canvas.waitFor({
       state: 'attached',
       timeout: 15_000,
     })
-    assert.equal(await page.locator('body > canvas[data-liquid-ignore]').count(), 1)
+    assert.equal(await canvas.count(), 1)
+    assert.equal(await canvas.getAttribute('data-source-preset-key'), preset.sourcePresetKey)
+    assert.equal(await canvas.getAttribute('data-transparent-render-surface'), 'true')
+    assert.equal(
+      await canvas.evaluate((element) => getComputedStyle(element).backgroundColor),
+      'rgba(0, 0, 0, 0)',
+    )
+    assert.equal(
+      await canvas.evaluate((element) => {
+        const context = element.getContext('webgl2') ?? element.getContext('webgl')
+        return context?.getContextAttributes()?.alpha ?? false
+      }),
+      true,
+    )
     assert.equal(await page.locator('script[data-e11-liquidgl-script]').count(), 1)
   }
 
@@ -310,12 +682,13 @@ async function selectSave(page, save) {
     .waitFor({ state: 'attached' })
 }
 
-async function selectAndAssert(page, save, { drag = false } = {}) {
+async function selectAndAssert(page, save, layerBBaseline, { drag = false } = {}) {
   const presetId = save.e11LayerCReferencePreset
   const preset = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[presetId]
   await selectSave(page, save)
   await assertNativeAnchor(page, presetId, preset.nativeLayout)
   await assertFamilyStructure(page, presetId, preset)
+  await assertObjectOnlyCompositing(page, presetId, preset, layerBBaseline)
 
   assert.equal(await page.locator('[data-e11-reference-anchor]').count(), 1)
   assert.equal(
@@ -372,6 +745,21 @@ async function selectAndAssert(page, save, { drag = false } = {}) {
       Math.abs(visualBox.y - expectedVisualTop) <= 1,
     )
   }, `${presetId} renderer following its dragged anchor`)
+
+  const moved = await anchor.boundingBox()
+  assert.ok(moved)
+  await page.mouse.move(moved.x + moved.width / 2, moved.y + 4)
+  await page.mouse.down()
+  await page.mouse.move(
+    moved.x + moved.width / 2,
+    moved.y + 4 - deltaY,
+    { steps: 5 },
+  )
+  await page.mouse.up()
+  await waitUntil(async () => {
+    const restored = await anchor.boundingBox()
+    return Boolean(restored && Math.abs(restored.y - before.y) <= 2)
+  }, `${presetId} Layer C drag restoration`)
 }
 
 async function cleanupToSave249(page) {
@@ -382,12 +770,19 @@ async function cleanupToSave249(page) {
       (await page.locator('[data-e11-reference-overlay]').count()) === 0 &&
       (await page.locator(mountedFamilySelector).count()) === 0 &&
       (await page.locator('body > canvas[data-liquid-ignore]').count()) === 0 &&
+      (await page.locator('script[data-e11-liquidgl-script]').count()) === 0 &&
       (await page.locator('.e11-ref-fluid-glass-stage canvas').count()) === 0,
     'all reference renderers to unmount after selecting Save 249',
     15_000,
   )
   assert.equal(await page.locator('[id^="e11-liquid-main-"], [id^="e11-web-glass-"], [id^="e11-wge-"]').count(), 0)
   assert.equal(await page.locator('#liquid-gl-dynamic-styles').count(), 0)
+  assert.equal(
+    await page.evaluate(
+      () => Boolean(window.liquidGL || window.__liquidGLRenderer__ || window.html2canvas),
+    ),
+    false,
+  )
 }
 
 test('all 30 Experiment Eleven reference saves mount, follow drag, switch, and clean up', {
@@ -459,8 +854,14 @@ test('all 30 Experiment Eleven reference saves mount, follow drag, switch, and c
       assert.equal(response.status(), 200, relativePath)
     }
 
+    await selectSave(page, save249)
+    const layerBBaseline = await readLayerBState(page)
+    assert.equal(layerBBaseline.opacity, '1')
+    assert.equal(layerBBaseline.clipPath, 'none')
+    assert.equal(layerBBaseline.inlineClipPath, '')
+
     for (const save of referenceSaves) {
-      await selectAndAssert(page, save, { drag: true })
+      await selectAndAssert(page, save, layerBBaseline, { drag: true })
     }
 
     const rendererRepresentatives = []
@@ -477,7 +878,7 @@ test('all 30 Experiment Eleven reference saves mount, follow drag, switch, and c
 
     await cleanupToSave249(page)
     for (const save of rendererRepresentatives) {
-      await selectAndAssert(page, save)
+      await selectAndAssert(page, save, layerBBaseline)
       const firstMount = await page.evaluate((selector) => ({
         families: document.querySelectorAll(selector).length,
         overlays: document.querySelectorAll('[data-e11-reference-overlay]').length,
@@ -490,7 +891,7 @@ test('all 30 Experiment Eleven reference saves mount, follow drag, switch, and c
         ).size,
       }), mountedFamilySelector)
       await cleanupToSave249(page)
-      await selectAndAssert(page, save)
+      await selectAndAssert(page, save, layerBBaseline)
       const secondMount = await page.evaluate((selector) => ({
         families: document.querySelectorAll(selector).length,
         overlays: document.querySelectorAll('[data-e11-reference-overlay]').length,
