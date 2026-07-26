@@ -15,6 +15,7 @@ import { ApproachOne } from './routes/ApproachOne';
 import { ApproachTwo } from './routes/ApproachTwo';
 import { ExperimentOne } from './routes/ExperimentOne';
 import { GlassComponentShowcase } from './routes/GlassComponentShowcase';
+import { ButtonSourceExperiments } from './routes/ButtonSourceExperiments';
 
 function WorkspaceRoutes() {
   return (
@@ -48,6 +49,14 @@ function App() {
         element={(
           <StandaloneWorkspaceShell>
             <ExperimentOne />
+          </StandaloneWorkspaceShell>
+        )}
+      />
+      <Route
+        path="/button-source-experiments"
+        element={(
+          <StandaloneWorkspaceShell>
+            <ButtonSourceExperiments />
           </StandaloneWorkspaceShell>
         )}
       />

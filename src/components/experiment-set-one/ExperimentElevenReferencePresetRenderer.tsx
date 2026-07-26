@@ -16,6 +16,7 @@ import {
   type SurfaceProps as GlassSurfaceConfig,
 } from '../../vendor/reference-glass/glass-surface';
 import {
+  LiquidGlassEngineReferencePreset,
   LiquidGlassReferencePreset,
   type LiquidGlassReferenceBed,
   type LiquidGlassReferenceInteraction,
@@ -35,6 +36,7 @@ import {
   LiquidGlDemoOneNav,
   type LiquidGlDemoOneNavConfig,
 } from '../../vendor/reference-glass/liquidgl/LiquidGlDemoOneNav';
+import { ExperimentElevenNewGlassPresetRenderer } from './ExperimentElevenNewGlassPresetRenderer';
 
 function liquidMainConfig(
   raw: Readonly<Record<string, unknown>>,
@@ -150,7 +152,7 @@ export function ExperimentElevenReferencePresetRenderer({
     if (!sourceContext) {
       throw new Error(`Missing source context for ${presetId}`);
     }
-    return (
+    const portal = (
       <ExperimentElevenReferencePortal
         anchorRef={anchorRef}
         presetId={presetId}
@@ -166,23 +168,38 @@ export function ExperimentElevenReferencePresetRenderer({
         renderRadius={sourceContext.radius}
         interactive={preset.interactions.pointerInteraction}
       >
-        <LiquidGlassReferencePreset
-          presetId={presetId}
-          sourcePresetKey={preset.sourcePresetKey}
-          sourceComponent={LIQUID_GLASS_WEB_SOURCE_COMPONENTS[
-            presetId as keyof typeof LIQUID_GLASS_WEB_SOURCE_COMPONENTS
-          ]}
-          options={liquidWebOptions(preset.config)}
-          interaction={interaction}
-          bed={bed}
-          contextWidth={sourceContext.width}
-          contextHeight={sourceContext.height}
-          objectOffsetX={sourceContext.lensOffsetX}
-          objectOffsetY={sourceContext.lensOffsetY}
-          pointerTargetRef={anchorRef}
-        />
+        {presetId === 'liquid-web:engine-panel' ? (
+          <LiquidGlassEngineReferencePreset
+            presetId={presetId}
+            sourcePresetKey={preset.sourcePresetKey}
+            options={liquidWebOptions(preset.config)}
+            contextWidth={sourceContext.width}
+            contextHeight={sourceContext.height}
+            objectOffsetX={sourceContext.lensOffsetX}
+            objectOffsetY={sourceContext.lensOffsetY}
+            pointerTargetRef={anchorRef}
+          />
+        ) : (
+          <LiquidGlassReferencePreset
+            presetId={presetId}
+            sourcePresetKey={preset.sourcePresetKey}
+            sourceComponent={LIQUID_GLASS_WEB_SOURCE_COMPONENTS[
+              presetId as keyof typeof LIQUID_GLASS_WEB_SOURCE_COMPONENTS
+            ]}
+            options={liquidWebOptions(preset.config)}
+            interaction={interaction}
+            bed={bed}
+            contextWidth={sourceContext.width}
+            contextHeight={sourceContext.height}
+            objectOffsetX={sourceContext.lensOffsetX}
+            objectOffsetY={sourceContext.lensOffsetY}
+            disableAutonomousMotion={preset.disableAutonomousMotion}
+            pointerTargetRef={anchorRef}
+          />
+        )}
       </ExperimentElevenReferencePortal>
     );
+    return portal;
   }
 
   if (preset.renderer === 'wge-next-submit-button') {
@@ -259,6 +276,29 @@ export function ExperimentElevenReferencePresetRenderer({
     );
   }
 
+  if (
+    preset.renderer === 'glass-project-app-object' ||
+    preset.renderer === 'extracted-source-glass-object'
+  ) {
+    return (
+      <ExperimentElevenReferencePortal
+        anchorRef={anchorRef}
+        presetId={presetId}
+        sourceFamily={preset.sourceFamily}
+        rendererType={preset.renderer}
+        nativeWidth={nativeLayout.width}
+        nativeHeight={nativeLayout.height}
+        nativeRadius={nativeLayout.radius}
+        interactive={preset.interactions.pointerInteraction}
+      >
+        <ExperimentElevenNewGlassPresetRenderer
+          presetId={presetId}
+          preset={preset}
+        />
+      </ExperimentElevenReferencePortal>
+    );
+  }
+
   return (
     <ExperimentElevenReferencePortal
       anchorRef={anchorRef}
@@ -274,6 +314,9 @@ export function ExperimentElevenReferencePresetRenderer({
         sourcePresetKey={preset.sourcePresetKey}
         instanceId={`e11-${presetId}`}
         config={preset.config as unknown as GlassSurfaceConfig}
+        filterRegionPaddingPercent={
+          presetId === 'glass-surface:achromatic' ? 100 : 0
+        }
       />
     </ExperimentElevenReferencePortal>
   );

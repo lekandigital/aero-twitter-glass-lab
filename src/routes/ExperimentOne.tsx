@@ -23,8 +23,8 @@ export function ExperimentOne() {
           frost into draggable sheets. <strong>Experiment Three</strong> uses reference-tuned layer A (clear bezel) and
           layer B (frost body). <strong>Experiment Four</strong> copies Save 2 with reference left-panel proportions and
           opposite-corner highlights (CodePen PwzzovO). <strong>Experiment Eleven</strong> duplicates the center overlap
-          pane as the right overlap pane. Use the dock's backdrop controls to swap the stage between the local photo
-          and local video while keeping the reference wallpaper toggle available separately.
+          pane as the right overlap pane. The dock's background row picks one of four stage backgrounds — default
+          wallpaper, reference wallpaper, the local photo, or the local video.
         </p>
       </header>
 

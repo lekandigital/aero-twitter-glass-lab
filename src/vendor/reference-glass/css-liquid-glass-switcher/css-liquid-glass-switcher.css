@@ -1,0 +1,179 @@
+.e11-css-liquid-glass-switcher {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: var(--e11-switcher-width);
+  max-width: var(--e11-switcher-width);
+  height: var(--e11-switcher-height);
+  box-sizing: border-box;
+  padding: 8px 12px 10px;
+  margin: 0;
+  border: none;
+  border-radius: var(--e11-switcher-radius);
+  background-color: color-mix(
+    in srgb,
+    var(--e11-switcher-c-glass) 12%,
+    transparent
+  );
+  backdrop-filter:
+    blur(8px)
+    var(--e11-switcher-filter)
+    saturate(var(--e11-switcher-saturation));
+  -webkit-backdrop-filter:
+    blur(8px)
+    saturate(var(--e11-switcher-saturation));
+  box-shadow:
+    inset 0 0 0 1px
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-light)
+          calc(var(--e11-switcher-reflex-light) * 10%),
+        transparent
+      ),
+    inset 1.8px 3px 0 -2px
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-light)
+          calc(var(--e11-switcher-reflex-light) * 90%),
+        transparent
+      ),
+    inset -2px -2px 0 -2px
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-light)
+          calc(var(--e11-switcher-reflex-light) * 80%),
+        transparent
+      ),
+    inset -3px -8px 1px -6px
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-light)
+          calc(var(--e11-switcher-reflex-light) * 60%),
+        transparent
+      ),
+    inset -0.3px -1px 4px 0
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-dark)
+          calc(var(--e11-switcher-reflex-dark) * 12%),
+        transparent
+      ),
+    inset -1.5px 2.5px 0 -2px
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-dark)
+          calc(var(--e11-switcher-reflex-dark) * 20%),
+        transparent
+      ),
+    inset 0 3px 4px -2px
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-dark)
+          calc(var(--e11-switcher-reflex-dark) * 20%),
+        transparent
+      ),
+    inset 2px -6.5px 1px -4px
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-dark)
+          calc(var(--e11-switcher-reflex-dark) * 10%),
+        transparent
+      ),
+    0 1px 5px 0
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-dark)
+          calc(var(--e11-switcher-reflex-dark) * 10%),
+        transparent
+      ),
+    0 6px 16px 0
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-dark)
+          calc(var(--e11-switcher-reflex-dark) * 8%),
+        transparent
+      );
+  transition:
+    background-color 400ms cubic-bezier(1, 0, 0.4, 1),
+    box-shadow 400ms cubic-bezier(1, 0, 0.4, 1);
+}
+
+.e11-css-liquid-glass-switcher::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  z-index: -1;
+  display: block;
+  width: 84px;
+  height: calc(100% - 10px);
+  border-radius: var(--e11-switcher-radius);
+  background-color: color-mix(
+    in srgb,
+    var(--e11-switcher-c-glass) 36%,
+    transparent
+  );
+  translate: 0 0;
+  box-shadow:
+    inset 0 0 0 1px
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-light)
+          calc(var(--e11-switcher-reflex-light) * 10%),
+        transparent
+      ),
+    inset 2px 1px 0 -1px
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-light)
+          calc(var(--e11-switcher-reflex-light) * 90%),
+        transparent
+      ),
+    inset -1.5px -1px 0 -1px
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-light)
+          calc(var(--e11-switcher-reflex-light) * 80%),
+        transparent
+      ),
+    inset -2px -6px 1px -5px
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-light)
+          calc(var(--e11-switcher-reflex-light) * 60%),
+        transparent
+      ),
+    inset -1px 2px 3px -1px
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-dark)
+          calc(var(--e11-switcher-reflex-dark) * 20%),
+        transparent
+      ),
+    inset 0 -4px 1px -2px
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-dark)
+          calc(var(--e11-switcher-reflex-dark) * 10%),
+        transparent
+      ),
+    0 3px 6px 0
+      color-mix(
+        in srgb,
+        var(--e11-switcher-c-dark)
+          calc(var(--e11-switcher-reflex-dark) * 8%),
+        transparent
+      );
+}
+
+.e11-css-liquid-glass-switcher__filter {
+  position: absolute;
+  z-index: -1;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+

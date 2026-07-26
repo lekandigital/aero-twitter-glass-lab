@@ -73,7 +73,8 @@ export type ExperimentSetOneSession = {
   inspectMode: boolean;
   experimentVisible: ExperimentVisibility;
   referenceWallpaper: boolean;
-  stageBackdropMode: 'photo' | 'video';
+  /** Stage backdrop behind Experiment Set 1; 'none' hides it entirely. */
+  stageBackdropMode: 'photo' | 'video' | 'none';
   activeExperiment?: ExperimentId;
   selectedSaveIdByExperiment?: Partial<Record<ExperimentId, number | null>>;
   selectedExperimentIds?: ExperimentId[];
@@ -307,7 +308,10 @@ export function loadExperimentSetOneSession(): ExperimentSetOneSession | null {
       inspectMode: parsed.inspectMode !== false,
       experimentVisible: normalizeExperimentVisibility(parsed.experimentVisible),
       referenceWallpaper: Boolean(parsed.referenceWallpaper),
-      stageBackdropMode: parsed.stageBackdropMode === 'video' ? 'video' : 'photo',
+      stageBackdropMode:
+        parsed.stageBackdropMode === 'video' || parsed.stageBackdropMode === 'none'
+          ? parsed.stageBackdropMode
+          : 'photo',
       activeExperiment,
       selectedSaveIdByExperiment: parsed.selectedSaveIdByExperiment ?? undefined,
       selectedExperimentIds: normalizeSelectedExperimentIds(parsed.selectedExperimentIds, activeExperiment),

@@ -60,17 +60,33 @@ function differingTopLevelKeys(left, right) {
 }
 
 export function generateReferenceSaves(saves) {
-  const retained = saves.filter((save) => !generatedPresetIds.has(save.e11LayerCReferencePreset))
-  const source = retained.find((save) => save.id === sourceSaveId)
+  const source = saves.find((save) => save.id === sourceSaveId)
   if (!source) throw new Error(`Source Save ${sourceSaveId} was not found`)
 
-  const currentMaximumSaveId = Math.max(...retained.map((save) => save.id))
-  const firstNewId = currentMaximumSaveId + 1
+  const existingReferenceSaves = saves.filter((save) =>
+    generatedPresetIds.has(save.e11LayerCReferencePreset),
+  )
+  const existingByPreset = new Map()
+  for (const save of existingReferenceSaves) {
+    const presetId = save.e11LayerCReferencePreset
+    if (existingByPreset.has(presetId)) {
+      throw new Error(`Duplicate Experiment Eleven reference preset ${presetId}`)
+    }
+    existingByPreset.set(presetId, save)
+  }
+
+  const currentMaximumSaveId = Math.max(...saves.map((save) => save.id))
+  let nextNewId = currentMaximumSaveId + 1
+  const added = []
 
   const generated = EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS.map((presetId, index) => {
+    const existing = existingByPreset.get(presetId)
+    if (existing) return existing
+
     const definition = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[presetId]
-    const id = firstNewId + index
-    return {
+    const id = nextNewId
+    nextNewId += 1
+    const save = {
       ...structuredClone(source),
       id,
       label: `Save ${id} · Right overlap pane (249 base + ${definition.displayLabel})`,
@@ -83,14 +99,19 @@ export function generateReferenceSaves(saves) {
         radius: definition.nativeLayout.radius,
       },
     }
+    added.push(save)
+    return save
   })
 
+  const firstNewId = added[0]?.id ?? null
+  const lastNewId = added.at(-1)?.id ?? null
   return {
     currentMaximumSaveId,
     firstNewId,
-    lastNewId: firstNewId + generated.length - 1,
+    lastNewId,
     generated,
-    saves: [...retained, ...generated].sort((left, right) => left.id - right.id),
+    added,
+    saves: [...saves, ...added].sort((left, right) => left.id - right.id),
   }
 }
 
@@ -149,8 +170,12 @@ if (mode === '--generate') {
   const result = generateReferenceSaves(currentSaves)
   writeFileSync(savesPath, `${JSON.stringify(result.saves, null, 2)}\n`)
   console.log(
-    `Wrote ${result.generated.length} Experiment Eleven reference saves ` +
-    `(${result.firstNewId}–${result.lastNewId}) to ${savesPath}`,
+    `Added ${result.added.length} Experiment Eleven reference saves` +
+    (result.added.length
+      ? ` (${result.firstNewId}–${result.lastNewId})`
+      : '') +
+    ` without rewriting ${result.generated.length - result.added.length} existing records ` +
+    `in ${savesPath}`,
   )
 } else if (mode === '--check') {
   const expected = generateReferenceSaves(currentSaves).saves

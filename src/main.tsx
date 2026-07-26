@@ -24,6 +24,7 @@ import './styles/experiment-eleven-haze.css';
 import './styles/experiment-eleven-switcher-glass.css';
 import './styles/experiment-twelve-thick-lens.css';
 import './styles/experiment-eleven-reference-glass.css';
+import './styles/button-experiment-set.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -12,6 +12,14 @@ import {
 const saves = JSON.parse(readFileSync(new URL('../src/data/experiment-set-one/saves.json', import.meta.url), 'utf8'))
 const savesText = readFileSync(new URL('../src/data/experiment-set-one/saves.json', import.meta.url), 'utf8')
 const schema = JSON.parse(readFileSync(new URL('../src/data/experiment-set-one/saves.schema.json', import.meta.url), 'utf8'))
+const referencePresetRendererSource = readFileSync(
+  new URL('../src/components/experiment-set-one/ExperimentElevenReferencePresetRenderer.tsx', import.meta.url),
+  'utf8',
+)
+const glassSurfaceSource = readFileSync(
+  new URL('../src/vendor/reference-glass/glass-surface/GlassSurface.tsx', import.meta.url),
+  'utf8',
+)
 function readPreReferenceSavesText() {
   for (let generations = 0; generations < 20; generations += 1) {
     const revision = generations === 0 ? 'HEAD' : `HEAD${'^'.repeat(generations)}`
@@ -31,6 +39,8 @@ const headSaves = JSON.parse(headSavesText)
 const headMaximumId = Math.max(...headSaves.map((save) => save.id))
 const sourceSave = headSaves.find((save) => save.id === 249)
 const generated = saves.filter((save) => save.id > headMaximumId).sort((left, right) => left.id - right.id)
+const originalGenerated = generated.slice(0, 30)
+const newGenerated = generated.slice(30)
 
 const expectedDefinitions = [
   ['liquid-main:custom-300x200', 'Liquid Glass Main · Custom 300×200', 'custom-300x200', 'liquid-main-svg-filter', [300, 200, 60, 'rounded-rect'], 'aa9f8e92aa89ea0b7630d12f23dc70c8a113c2080021450c9aee323b650da99a'],
@@ -50,8 +60,8 @@ const expectedDefinitions = [
   ['liquid-web:reading-glass', 'Liquid Glass Custom · Reading glass', 'PRESETS.Reading glass / DEMO_LENSES.reading', 'liquid-glass-web-react', [150, 150, 75, 'circle'], '434131427e74bbd4ad598533d94ef7fdeaa2a7c65c0653b0b8a0f0759dedf16e'],
   ['liquid-web:orbit', 'Liquid Glass Custom · Orbit', 'PRESETS.Orbit / DEMO_LENSES.orbit', 'liquid-glass-web-react', [170, 170, 85, 'circle'], 'f08578c819481dd9e334dced4ff8d53293d0d5fb8ab93b376155af888dfc5295'],
   ['liquid-web:engine-panel', 'Liquid Glass Custom · Engine panel', 'PRESETS.Engine panel / DEMO_LENSES.engine', 'liquid-glass-web-react', [160, 160, 80, 'circle'], 'f56063beea49b706457a2e145933ba272a265185d354da4c883bdff06d2ccd9d'],
-  ['wge-next:form-submit-button', 'WGE Next · Submit Form button', 'LiquidGlassFormDemo.submitButton', 'wge-next-submit-button', [384, 38, 18, 'source-button'], '7ea079c5bbdca7326ef44ceeae7287f6a2f099664706fdd89047567bd6daaf3b'],
-  ['wge-next:bottom-bar', 'WGE Next · Glass bottom bar', 'LiquidGlassDemo.bottomBar', 'wge-next-bottom-bar', [640, 60, 28, 'rounded-rect'], '62b1a27a508cbdd1456ce09ccf1b14423c2c721103d889e30b26d32d1b9e0474'],
+  ['wge-next:form-submit-button', 'WGE Next · Submit Form button', 'LiquidGlassFormDemo.submitButton', 'wge-next-submit-button', [384, 38, 18, 'source-button'], 'c5469d6005a3ca0c0ad3860bb91ee9362a62da7174ef128b035351ab72b0ccf2'],
+  ['wge-next:bottom-bar', 'WGE Next · Glass bottom bar', 'LiquidGlassDemo.bottomBar', 'wge-next-bottom-bar', [640, 60, 28, 'rounded-rect'], 'bc1d01bbde0906d1fce092e88def7cf2ff5f37ee45a364af967f1949d83b8e89'],
   ['web-glass:thick-lens', 'Web Glass · Thick lens', 'PRESETS.thickLens', 'web-glass-svg-filter', [320, 200, 60, 'rounded-rect'], '3565acd7e385e3b77b6bbec8890aa9d96f1d317843152a287fbad8c58a7e3727'],
   ['web-glass:razor-edge', 'Web Glass · Razor edge', 'PRESETS.razorEdge', 'web-glass-svg-filter', [320, 200, 24, 'rounded-rect'], 'af5b88d0c85f65071c94d32cf1172c295a32746e2033528919b6f56d0b021353'],
   ['web-glass:bottom-bar', 'Web Glass · Bottom bar', 'PRESETS.bottomBar', 'web-glass-svg-filter', [320, 200, 28, 'rounded-rect'], '5577f0573fb5e00ca7fe80e56f313ce13087dff647e9c21cce626be2a2cb1096'],
@@ -65,6 +75,29 @@ const expectedDefinitions = [
   ['glass-surface:convex', 'GlassSurface · Convex', 'DEMO_CONFIGS.convex', 'glass-surface-svg-filter', [320, 120, 30, 'rounded-rect'], '0da074927fdca71eac8a926aa0266d46416946ff5e49dd7c99102a7c7e9a3b4a'],
 ]
 const expectedPresetIds = expectedDefinitions.map(([id]) => id)
+const expectedNewBaseDefinitions = [
+  ['liquid-dom:notification-center-main', 'Liquid DOM · Notification Center main glass', 'NotificationCenterDemo.mainGlass', [298, 528, 70, 'rounded-rect']],
+  ['liquid-dom:notification-center-dock', 'Liquid DOM · Notification Center dock', 'NotificationCenterDemo.bottomGlassDock', [270, 84, 36, 'rounded-rect']],
+  ['liquid-dom:ios-notification-banner', 'Liquid DOM · iOS notification banner', 'IosNotificationDemo.notificationGlass', [616, 112, 48, 'rounded-rect']],
+  ['lucas-romero:macos-dock-shell', 'Lucas Romero · macOS dock shell', 'liquidGlass-wrapper.dock', [528.375, 113.375, 32, 'rounded-rect']],
+  ['apple-liquid-glass:shader-shell', 'Apple Liquid Glass · Shader shell', 'script.js.LiquidGlass', [200, 200, 50, 'rounded-rect']],
+  ['frontend-vue:app-card', 'Frontend Vue · AppCard glass', 'AppCard.vue', [424, 184, 28, 'rounded-rect']],
+  ['css-liquid-glass-switcher:switcher', 'CSS Liquid Glass Switcher · Empty switcher', 'liquid-glass-switcher-css:.switcher', [244, 70, 35, 'rounded-rect']],
+  ['liquid-glass-dist:glass', 'Liquid Glass Dist · Empty .glass', 'liquid-glass/dist:.glass', [324, 324, 162, 'rounded-rect']],
+  ['chromium-configurable-glass:requested', 'Chromium Configurable Glass · Requested preset', 'CONFIG.free+requested-overrides', [358, 140, 54, 'rounded-rect']],
+  ['liquid-glass-shader:lens', 'Liquid Glass Shader · Procedural lens', 'dist:#fragShader', [431, 431, 0, 'shader-superellipse']],
+  ['pure-css-ios-26:glass-container', 'Pure CSS iOS 26 · Glass container', 'pure-css-ios-26:.glassContainer', [300, 200, 30, 'rounded-rect']],
+  ['liquid-glass-js:rounded-rectangle', 'liquid-glass-js · Rounded rectangle', 'demo.js:helloButton', [196, 90, 36, 'rounded-rect']],
+]
+const expectedNewBasePresetIds = expectedNewBaseDefinitions.map(([id]) => id)
+const expectedNewDuplicatePresetIds = expectedNewBasePresetIds.map(
+  (id) => `${id}:358x140-r54`,
+)
+const expectedAllPresetIds = [
+  ...expectedPresetIds,
+  ...expectedNewBasePresetIds,
+  ...expectedNewDuplicatePresetIds,
+]
 
 const allowedDifferences = [
   'e11LayerCLayout',
@@ -96,11 +129,37 @@ function differingKeys(left, right) {
   return [...keys].filter((key) => JSON.stringify(left[key]) !== JSON.stringify(right[key])).sort()
 }
 
-test('the registry contains the requested 30 presets exactly once and in source order', () => {
-  assert.deepEqual(EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS, expectedPresetIds)
-  assert.equal(Object.keys(EXPERIMENT_ELEVEN_REFERENCE_PRESETS).length, 30)
-  assert.equal(new Set(EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS).size, 30)
-  for (const id of expectedPresetIds) {
+function differingLeafPaths(left, right, prefix = '') {
+  if (JSON.stringify(left) === JSON.stringify(right)) return []
+  if (
+    !left ||
+    !right ||
+    typeof left !== 'object' ||
+    typeof right !== 'object' ||
+    Array.isArray(left) ||
+    Array.isArray(right)
+  ) {
+    return [prefix]
+  }
+  const keys = new Set([...Object.keys(left), ...Object.keys(right)])
+  return [...keys].flatMap((key) =>
+    differingLeafPaths(
+      left[key],
+      right[key],
+      prefix ? `${prefix}.${key}` : key,
+    ),
+  )
+}
+
+test('the registry preserves the original 30 and appends the requested 24 in exact source order', () => {
+  assert.deepEqual(EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS, expectedAllPresetIds)
+  assert.deepEqual(
+    EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS.slice(0, 30),
+    expectedPresetIds,
+  )
+  assert.equal(Object.keys(EXPERIMENT_ELEVEN_REFERENCE_PRESETS).length, 54)
+  assert.equal(new Set(EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS).size, 54)
+  for (const id of expectedAllPresetIds) {
     assert.equal(EXPERIMENT_ELEVEN_REFERENCE_PRESETS[id].id, id)
     assert.ok(EXPERIMENT_ELEVEN_REFERENCE_PRESETS[id].sourcePath.length > 0)
     assert.ok(EXPERIMENT_ELEVEN_REFERENCE_PRESETS[id].provenance.length > 0)
@@ -108,10 +167,10 @@ test('the registry contains the requested 30 presets exactly once and in source 
 })
 
 test('the deterministic object audit names the exact transparent root for every save', () => {
-  assert.equal(EXPERIMENT_ELEVEN_REFERENCE_OBJECT_AUDIT.length, 30)
+  assert.equal(EXPERIMENT_ELEVEN_REFERENCE_OBJECT_AUDIT.length, 54)
   assert.deepEqual(
     EXPERIMENT_ELEVEN_REFERENCE_OBJECT_AUDIT.map((row) => row.saveId),
-    Array.from({ length: 30 }, (_, index) => headMaximumId + index + 1),
+    Array.from({ length: 54 }, (_, index) => headMaximumId + index + 1),
   )
   for (const row of EXPERIMENT_ELEVEN_REFERENCE_OBJECT_AUDIT) {
     const save = generated.find((candidate) => candidate.id === row.saveId)
@@ -169,26 +228,147 @@ test('every registry label, source mapping, renderer, native geometry, and full 
   assert.equal(new Set(configHashes).size, 30, 'every requested preset has a distinct complete configuration')
 })
 
+test('Save 1066 keeps Achromatic exact and alone expands its source-aligned filter bounds', () => {
+  const save1066 = saves.find((save) => save.id === 1066)
+  const achromatic = EXPERIMENT_ELEVEN_REFERENCE_PRESETS['glass-surface:achromatic']
+
+  assert.ok(save1066)
+  assert.equal(save1066.e11LayerCReferencePreset, 'glass-surface:achromatic')
+  assert.deepEqual(save1066.e11LayerCLayout, {
+    width: 320,
+    height: 120,
+    radius: 24,
+  })
+  assert.deepEqual(achromatic.nativeLayout, {
+    width: 320,
+    height: 120,
+    radius: 24,
+    geometry: 'rounded-rect',
+  })
+  assert.equal(
+    canonicalHash(achromatic.config),
+    '817afeb01d247dbd0b5e23aaee00d080256653e091d15efe265ff17dd6b03c2a',
+  )
+
+  assert.match(
+    referencePresetRendererSource,
+    /presetId === 'glass-surface:achromatic' \? 100 : 0/,
+  )
+  assert.ok(glassSurfaceSource.includes('filterRegionPaddingPercent = 0'))
+  assert.ok(glassSurfaceSource.includes('filterUnits="objectBoundingBox"'))
+  assert.ok(glassSurfaceSource.includes('x={`${-filterRegionPaddingPercent}%`}'))
+  assert.ok(glassSurfaceSource.includes('y={`${-filterRegionPaddingPercent}%`}'))
+  assert.ok(
+    glassSurfaceSource.includes(
+      'width={`${100 + filterRegionPaddingPercent * 2}%`}',
+    ),
+  )
+  assert.ok(
+    glassSurfaceSource.includes(
+      'height={`${100 + filterRegionPaddingPercent * 2}%`}',
+    ),
+  )
+})
+
+test('the 12 new native definitions identify their exact source objects and geometry', () => {
+  for (const [
+    index,
+    [id, displayLabel, sourcePresetKey, nativeLayout],
+  ] of expectedNewBaseDefinitions.entries()) {
+    const definition = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[id]
+    assert.equal(definition.displayLabel, displayLabel)
+    assert.equal(definition.sourcePresetKey, sourcePresetKey)
+    assert.equal(
+      definition.renderer,
+      index < 6
+        ? 'glass-project-app-object'
+        : 'extracted-source-glass-object',
+    )
+    assert.deepEqual(
+      [
+        definition.nativeLayout.width,
+        definition.nativeLayout.height,
+        definition.nativeLayout.radius,
+        definition.nativeLayout.geometry,
+      ],
+      nativeLayout,
+    )
+    assert.equal(definition.contentPolicy, 'object-only')
+    assert.equal(definition.transparentOutside, true)
+    assert.equal(definition.portalMode, 'anchored-portal')
+    assert.ok(definition.sourcePath.every((path) => path.startsWith('glass-projects-lab/')))
+    assert.ok(definition.sourceComponent.length > 0)
+  }
+})
+
+test('each standardized duplicate changes only source-supported geometry', () => {
+  const allowedConfigPaths = new Set([
+    'geometry.width',
+    'geometry.height',
+    'geometry.cornerRadius',
+    'width',
+    'height',
+    'radius',
+    'outputMask',
+  ])
+  for (const baseId of expectedNewBasePresetIds) {
+    const duplicateId = `${baseId}:358x140-r54`
+    const original = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[baseId]
+    const duplicate = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[duplicateId]
+    assert.equal(duplicate.sourceFamily, original.sourceFamily)
+    assert.equal(duplicate.sourcePresetKey, original.sourcePresetKey)
+    assert.equal(duplicate.sourceComponent, original.sourceComponent)
+    assert.equal(duplicate.renderer, original.renderer)
+    assert.deepEqual(duplicate.sourcePath, original.sourcePath)
+    assert.deepEqual(duplicate.compositing, original.compositing)
+    assert.deepEqual(duplicate.interactions, original.interactions)
+    assert.deepEqual(duplicate.nativeLayout, {
+      width: 358,
+      height: 140,
+      radius: 54,
+      geometry: 'rounded-rect',
+    })
+    const configDifferences = differingLeafPaths(
+      original.config,
+      duplicate.config,
+    )
+    assert.ok(
+      configDifferences.every((path) => allowedConfigPaths.has(path)),
+      `${baseId}: ${configDifferences.join(', ')}`,
+    )
+  }
+})
+
 test('the JSON schema recognizes precisely the centralized reference-preset ids and native layout', () => {
-  assert.deepEqual(schema.items.properties.e11LayerCReferencePreset.enum, expectedPresetIds)
+  assert.deepEqual(schema.items.properties.e11LayerCReferencePreset.enum, expectedAllPresetIds)
   assert.deepEqual(schema.items.properties.e11LayerCLayout.required, ['width', 'height', 'radius'])
   assert.equal(schema.items.properties.e11LayerCLayout.additionalProperties, false)
   assert.ok(schema.items.properties.scope.enum.includes('eleven'))
 })
 
-test('exactly 30 new consecutive save ids start at the former maximum plus one', () => {
-  assert.equal(generated.length, 30)
+test('the original 30 remain fixed and exactly 24 consecutive saves were appended', () => {
+  assert.equal(generated.length, 54)
+  assert.equal(originalGenerated.length, 30)
+  assert.equal(newGenerated.length, 24)
+  assert.deepEqual(
+    originalGenerated.map((save) => save.id),
+    Array.from({ length: 30 }, (_, index) => headMaximumId + index + 1),
+  )
+  assert.deepEqual(
+    newGenerated.map((save) => save.id),
+    Array.from({ length: 24 }, (_, index) => 1068 + index),
+  )
   assert.deepEqual(
     generated.map((save) => save.id),
-    Array.from({ length: 30 }, (_, index) => headMaximumId + index + 1),
+    Array.from({ length: 54 }, (_, index) => headMaximumId + index + 1),
   )
   assert.equal(new Set(saves.map((save) => save.id)).size, saves.length)
 })
 
 test('each requested preset has one Save 249 clone with its exact label and native layout', () => {
-  assert.deepEqual(generated.map((save) => save.e11LayerCReferencePreset), expectedPresetIds)
+  assert.deepEqual(generated.map((save) => save.e11LayerCReferencePreset), expectedAllPresetIds)
   for (const [index, save] of generated.entries()) {
-    const definition = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[expectedPresetIds[index]]
+    const definition = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[expectedAllPresetIds[index]]
     assert.equal(save.sourceSaveId, 249)
     assert.equal(
       save.label,
@@ -236,16 +416,16 @@ test('generated timestamps are deterministic and collision-free', () => {
   const timestampBase = Date.parse('2026-07-25T12:00:00.000Z')
   assert.deepEqual(
     generated.map((save) => save.savedAt),
-    Array.from({ length: 30 }, (_, index) => new Date(timestampBase + index * 1000).toISOString()),
+    Array.from({ length: 54 }, (_, index) => new Date(timestampBase + index * 1000).toISOString()),
   )
-  assert.equal(new Set(generated.map((save) => save.savedAt)).size, 30)
+  assert.equal(new Set(generated.map((save) => save.savedAt)).size, 54)
 })
 
 test('the deterministic generator reports the checked-in saves as current', () => {
   const output = execFileSync(process.execPath, ['scripts/generate-experiment-eleven-reference-saves.mjs', '--check'], {
     encoding: 'utf8',
   })
-  assert.match(output, /Verified 30 deterministic Experiment Eleven reference saves/)
+  assert.match(output, /Verified 54 deterministic Experiment Eleven reference saves/)
 })
 
 test('the machine audit compares against the pre-reference baseline', () => {
@@ -253,13 +433,13 @@ test('the machine audit compares against the pre-reference baseline', () => {
     encoding: 'utf8',
   })
   const audit = JSON.parse(output)
-  assert.equal(audit.newSaveCount, 30)
-  assert.deepEqual(audit.newSaveIdRange, [1038, 1067])
-  assert.equal(audit.labels.length, 30)
-  assert.equal(audit.sourceSaveIds.length, 30)
+  assert.equal(audit.newSaveCount, 54)
+  assert.deepEqual(audit.newSaveIdRange, [1038, 1091])
+  assert.equal(audit.labels.length, 54)
+  assert.equal(audit.sourceSaveIds.length, 54)
   assert.ok(audit.sourceSaveIds.every((id) => id === 249))
-  assert.deepEqual(audit.presetIds, expectedPresetIds)
-  assert.equal(audit.nativeLayouts.length, 30)
+  assert.deepEqual(audit.presetIds, expectedAllPresetIds)
+  assert.equal(audit.nativeLayouts.length, 54)
   assert.equal(audit.duplicateIdCount, 0)
   assert.ok(audit.unexpectedDifferences.every(({ keys }) => keys.length === 0))
   assert.deepEqual(audit.modifiedExistingIds, [])

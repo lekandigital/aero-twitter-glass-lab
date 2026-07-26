@@ -1,0 +1,44 @@
+.e11-pure-css-ios26-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--e11-ios26-width);
+  height: var(--e11-ios26-height);
+  border-radius: var(--e11-ios26-radius);
+}
+
+.e11-pure-css-ios26-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: var(--e11-ios26-radius);
+  box-shadow:
+    inset 2px 2px 0 -2px rgb(255 255 255 / 70%),
+    inset 0 0 3px 1px rgb(255 255 255 / 70%);
+}
+
+.e11-pure-css-ios26-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--e11-ios26-radius);
+  backdrop-filter: blur(var(--e11-ios26-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--e11-ios26-backdrop-blur));
+  filter: var(--e11-ios26-filter);
+  -webkit-filter: var(--e11-ios26-filter);
+}
+
+.e11-pure-css-ios26-filter {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+

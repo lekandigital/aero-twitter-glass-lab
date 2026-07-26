@@ -15,7 +15,7 @@ const saves = JSON.parse(
   readFileSync(new URL('../src/data/experiment-set-one/saves.json', import.meta.url), 'utf8'),
 )
 const referenceSaves = saves
-  .filter((save) => save.id >= 1038 && save.id <= 1067)
+  .filter((save) => save.id >= 1038 && save.id <= 1091)
   .sort((left, right) => left.id - right.id)
 const save249 = saves.find((save) => save.id === 249)
 const host = '127.0.0.1'
@@ -372,22 +372,32 @@ async function assertFamilyStructure(page, presetId, preset) {
     )
   } else if (preset.renderer === 'liquid-glass-web-react') {
     const root = page.locator('.e11-liquid-web-reference')
-    const filtered = root.locator(':scope > div').first()
-    const transparentSource = root.locator(
-      ':scope > div:first-of-type > .e11-liquid-web-reference__transparent-source',
-    )
+    const isRawEngine = presetId === 'liquid-web:engine-panel'
+    const filtered = isRawEngine
+      ? root.locator(':scope > .e11-liquid-web-reference__transparent-source')
+      : root.locator(':scope > div').first()
+    const transparentSource = isRawEngine
+      ? filtered
+      : root.locator(
+        ':scope > div:first-of-type > .e11-liquid-web-reference__transparent-source',
+      )
     const sourceGrip = root.locator(
       '.e11-liquid-web-reference__source-grip',
     )
     const shadow = root.locator(':scope > div[aria-hidden="true"]').last()
     assert.equal(await root.count(), 1)
-    assert.equal(await root.getAttribute('data-liquid-glass'), '')
+    assert.equal(
+      await root.getAttribute(
+        isRawEngine ? 'data-liquid-glass-engine' : 'data-liquid-glass',
+      ),
+      '',
+    )
     assert.equal(await root.getAttribute('data-liquid-glass-width'), String(preset.nativeLayout.width))
     assert.equal(await root.getAttribute('data-liquid-glass-height'), String(preset.nativeLayout.height))
     assert.equal(
       await root.getAttribute('data-source-component-implementation'),
-      preset.sourceComponent === 'LiquidGlassEngine'
-        ? 'core/LiquidGlassEngine via react/LiquidGlass'
+      isRawEngine
+        ? 'core/LiquidGlassEngine'
         : 'react/LiquidGlass',
     )
     assert.equal(
@@ -406,10 +416,7 @@ async function assertFamilyStructure(page, presetId, preset) {
     assert.equal(await transparentSource.count(), 1)
     assert.equal(
       await sourceGrip.count(),
-      presetId === 'liquid-web:hero-circle' ||
-        presetId === 'liquid-web:engine-panel'
-        ? 1
-        : 0,
+      isRawEngine ? 1 : 0,
       `${presetId} source-only interaction grip`,
     )
     if (await sourceGrip.count()) {
@@ -477,9 +484,22 @@ async function assertFamilyStructure(page, presetId, preset) {
       presetId === 'liquid-web:hero-circle' ||
       presetId === 'liquid-web:orbit'
     ) {
-      await waitUntil(
-        async () => (await sourceTransform()) !== beforeSourceInteraction,
-        `${presetId} source animation`,
+      assert.equal(
+        await root.getAttribute('data-autonomous-motion'),
+        'disabled',
+        `${presetId} source-demo motion disabled`,
+      )
+      const rootBox = await root.boundingBox()
+      assert.ok(rootBox)
+      await page.mouse.move(
+        rootBox.x + rootBox.width * 0.7,
+        rootBox.y + rootBox.height * 0.6,
+      )
+      await page.waitForTimeout(300)
+      assert.equal(
+        await sourceTransform(),
+        beforeSourceInteraction,
+        `${presetId} remains stationary without Layer C drag`,
       )
     } else if (presetId === 'liquid-web:reading-glass') {
       await waitUntil(
@@ -580,6 +600,71 @@ async function assertFamilyStructure(page, presetId, preset) {
         `${presetId} source drag does not replace Layer C drag`,
       )
     }
+  } else if (
+    preset.renderer === 'glass-project-app-object' ||
+    preset.renderer === 'extracted-source-glass-object'
+  ) {
+    const root = page.locator(
+      `[data-e11-reference-object-root="${presetId}"]`,
+    )
+    const shell = page.locator(
+      `[data-selected-reference-preset="${presetId}"]`,
+    )
+    assert.equal(await root.count(), 1)
+    assert.equal(await shell.count(), 1)
+    assert.equal((await root.textContent())?.trim(), '')
+    assert.equal(await shell.getAttribute('data-source-path'), preset.sourcePath[0])
+    assert.equal(await shell.getAttribute('data-source-key'), preset.sourcePresetKey)
+    assert.equal(
+      await shell.getAttribute('data-source-component-contract'),
+      preset.sourceComponent,
+    )
+    const rendererFamily = await root.getAttribute('data-renderer-family')
+    if (
+      rendererFamily === 'liquid-dom-webgpu' ||
+      rendererFamily === 'r3f-three-glsl'
+    ) {
+      await waitUntil(
+        async () => (await root.getAttribute('data-render-state')) === 'ready',
+        `${presetId} target-stage optical input`,
+        45_000,
+      )
+    }
+    if (preset.interactions.pointerInteraction) {
+      await page.mouse.move(0, 0)
+      await page.waitForTimeout(450)
+    }
+    const rootBox = await root.boundingBox()
+    assert.ok(rootBox)
+    assert.ok(
+      Math.abs(rootBox.width - preset.nativeLayout.width) <= 0.05,
+      `${presetId} exact rendered width`,
+    )
+    assert.ok(
+      Math.abs(rootBox.height - preset.nativeLayout.height) <= 0.05,
+      `${presetId} exact rendered height`,
+    )
+    const canvases = root.locator('canvas')
+    for (let index = 0; index < await canvases.count(); index += 1) {
+      const canvas = canvases.nth(index)
+      assert.equal(
+        await canvas.evaluate(
+          (element) => getComputedStyle(element).backgroundColor,
+        ),
+        'rgba(0, 0, 0, 0)',
+      )
+      if (rendererFamily !== 'liquid-dom-webgpu') {
+        assert.equal(
+          await canvas.evaluate((element) => {
+            const context =
+              element.getContext('webgl2') ?? element.getContext('webgl')
+            return context?.getContextAttributes()?.alpha ?? false
+          }),
+          true,
+          `${presetId} WebGL alpha channel`,
+        )
+      }
+    }
   } else if (preset.renderer === 'wge-next-submit-button') {
     const button = page.locator(
       `[data-e11-reference-object-root="${presetId}"][data-e11-wge-component="submit-form-button"]`,
@@ -592,7 +677,8 @@ async function assertFamilyStructure(page, presetId, preset) {
     assert.equal(await page.locator('.e11-wge-submit-button').count(), 1)
     assert.equal(await button.locator('.e11-wge-submit-button__glass').count(), 1)
     assert.equal(await button.locator('svg filter[id]').count(), 1)
-    assert.equal((await button.textContent())?.trim(), 'Submit Form')
+    assert.equal((await button.textContent())?.trim(), '')
+    assert.equal(await button.locator('img, [role="img"]').count(), 0)
     const restBackground = await button.evaluate(
       (element) => getComputedStyle(element).backgroundColor,
     )
@@ -607,17 +693,16 @@ async function assertFamilyStructure(page, presetId, preset) {
     await button.click()
     assert.equal(page.url(), urlBeforeSubmit)
   } else if (preset.renderer === 'wge-next-bottom-bar') {
-    const root = page.locator('[data-e11-wge-component="complete-bottom-bar"]')
+    const root = page.locator('[data-e11-wge-component="empty-bottom-bar"]')
     const surface = page.locator('.e11-wge-bottom-bar')
     const filter = page.locator(
       `[data-e11-reference-overlay][data-e11-reference-preset="${presetId}"] svg filter[id]`,
     )
     const blur = filter.locator('feGaussianBlur')
-    const search = root.locator('input[placeholder="Search images..."]')
     assert.equal(await root.count(), 1)
-    assert.equal(await root.locator('input[type="number"]').count(), 2)
-    assert.equal(await search.count(), 1)
-    assert.equal(await root.locator('button').count(), 2)
+    assert.equal(await root.locator('input, textarea, select, button, img').count(), 0)
+    assert.equal((await root.textContent())?.trim(), '')
+    assert.equal(await root.getAttribute('data-visible-child-count'), '0')
     assert.equal(await filter.count(), 1)
     assert.equal(await blur.getAttribute('stdDeviation'), '0')
     await surface.hover()
@@ -625,23 +710,19 @@ async function assertFamilyStructure(page, presetId, preset) {
       async () => Number(await blur.getAttribute('stdDeviation')) === 0.8,
       'WGE bottom bar hover transition',
     )
-    await search.focus()
-    await waitUntil(
-      async () => Number(await blur.getAttribute('stdDeviation')) === 3.5,
-      'WGE bottom bar search-focus transition',
-    )
-    await search.fill('aurora')
-    assert.equal(await search.inputValue(), 'aurora')
-    await search.press('Tab')
+    await page.mouse.move(0, 0)
     await waitUntil(
       async () => Number(await blur.getAttribute('stdDeviation')) === 0,
-      'WGE bottom bar resting transition after search blur',
+      'WGE bottom bar resting transition after hover',
     )
   } else if (preset.renderer === 'liquidgl-webgl') {
     const menu = page.locator('.e11-liquidgl-menu-wrap.menu-wrap')
     assert.equal(await menu.count(), 1)
     assert.equal(await menu.getAttribute('data-reveal'), 'fade')
     assert.equal(await menu.getAttribute('data-bevel-depth'), '0.052')
+    assert.equal((await menu.textContent())?.trim(), '')
+    assert.equal(await menu.locator('img, a, button, input').count(), 0)
+    assert.equal(await menu.getAttribute('data-visible-child-count'), '0')
     const canvas = page.locator('body > canvas[data-liquid-ignore]')
     await canvas.waitFor({
       state: 'attached',
@@ -785,10 +866,10 @@ async function cleanupToSave249(page) {
   )
 }
 
-test('all 30 Experiment Eleven reference saves mount, follow drag, switch, and clean up', {
+test('all 54 Experiment Eleven reference saves mount, follow drag, switch, and clean up', {
   timeout: 360_000,
 }, async () => {
-  assert.equal(referenceSaves.length, 30)
+  assert.equal(referenceSaves.length, 54)
   assert.ok(save249)
   await assertPortFree()
   buildProductionTarget()
@@ -874,7 +955,7 @@ test('all 30 Experiment Eleven reference saves mount, follow drag, switch, and c
       seenRenderers.add(renderer)
       rendererRepresentatives.push(save)
     }
-    assert.equal(rendererRepresentatives.length, 8)
+    assert.equal(rendererRepresentatives.length, 10)
 
     await cleanupToSave249(page)
     for (const save of rendererRepresentatives) {

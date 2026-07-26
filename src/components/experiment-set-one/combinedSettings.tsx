@@ -80,6 +80,7 @@ import { consumeClickAfterHoldDrag } from '../shared/useHoldDrag';
 import { orderedSections, filterFieldsWhen } from '../shared/materialSettingGroups';
 import { useFoldableSections } from '../shared/useFoldableSections';
 import { downloadExperimentSetOneConfig } from './exportConfig';
+import { collectExperimentSetOneLayerGeometry } from './layerGeometry';
 import {
   addExperimentSetOneSave,
   getFieldFromSnapshot,
@@ -176,7 +177,22 @@ type ExperimentSelection =
   | { experiment: 'ten'; target: E4InspectTarget; label: string }
   | { experiment: 'eleven'; target: E4InspectTarget | E6LayerCInspectTarget; label: string };
 
-export type ExperimentSetOneStageBackdropMode = 'photo' | 'video';
+/** What the stage paints over the page wallpaper; `none` leaves it showing. */
+export type ExperimentSetOneStageBackdropMode = 'photo' | 'video' | 'none';
+
+/**
+ * The four mutually exclusive backgrounds the dock offers. `default` and `ref`
+ * are the page wallpaper with the reference overlay off/on (no stage backdrop);
+ * `photo` and `video` paint over it.
+ */
+export type ExperimentSetOneStageBackdrop = 'default' | 'ref' | 'photo' | 'video';
+
+const STAGE_BACKDROP_CHOICES: { value: ExperimentSetOneStageBackdrop; label: string; title: string }[] = [
+  { value: 'default', label: 'Default bg', title: 'Show the default aero-bg wallpaper behind Experiment Set 1' },
+  { value: 'ref', label: 'Ref bg', title: 'Show aero-bg with reference.png overlaid at matched scale' },
+  { value: 'photo', label: 'Photo', title: 'Show the local photo backdrop behind Experiment Set 1' },
+  { value: 'video', label: 'Video', title: 'Show the local video backdrop behind Experiment Set 1' },
+];
 
 const EXPERIMENT_ORDER: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
 
@@ -655,9 +671,10 @@ type ExperimentSetOneContextValue = {
   toggleExperimentMultiSelection: (id: ExperimentId, additive: boolean) => void;
   toggleSaveMultiSelection: (experiment: ExperimentId, key: string, additive: boolean) => void;
   referenceWallpaper: boolean;
-  toggleReferenceWallpaper: () => void;
   stageBackdropMode: ExperimentSetOneStageBackdropMode;
-  setStageBackdropMode: (mode: ExperimentSetOneStageBackdropMode) => void;
+  /** Which of the four backgrounds is showing, and the one call that switches it. */
+  stageBackdrop: ExperimentSetOneStageBackdrop;
+  setStageBackdrop: (backdrop: ExperimentSetOneStageBackdrop) => void;
 };
 
 const ExperimentSetOneContext = createContext<ExperimentSetOneContextValue | null>(null);
@@ -875,9 +892,24 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
   const [experimentVisible, setExperimentVisible] = useState<ExperimentVisibility>(
     boot.experimentVisible ?? DEFAULT_EXPERIMENT_VISIBILITY,
   );
-  const { referenceWallpaper, toggleReferenceWallpaper } = useReferenceWallpaper();
+  const { referenceWallpaper, setReferenceWallpaper } = useReferenceWallpaper();
   const [stageBackdropMode, setStageBackdropMode] = useState<ExperimentSetOneStageBackdropMode>(
     boot.stageBackdropMode ?? 'photo',
+  );
+  // Two independent pieces of state (the stage backdrop, and the page-wide
+  // reference wallpaper preference) presented as one exclusive choice.
+  const stageBackdrop: ExperimentSetOneStageBackdrop =
+    stageBackdropMode === 'photo' || stageBackdropMode === 'video'
+      ? stageBackdropMode
+      : referenceWallpaper
+        ? 'ref'
+        : 'default';
+  const setStageBackdrop = useCallback(
+    (next: ExperimentSetOneStageBackdrop) => {
+      setStageBackdropMode(next === 'photo' || next === 'video' ? next : 'none');
+      setReferenceWallpaper(next === 'ref');
+    },
+    [setReferenceWallpaper],
   );
   const [layoutResetVersion, setLayoutResetVersion] = useState(0);
   const [activeExperiment, setActiveExperiment] = useState<ExperimentId>(boot.activeExperiment ?? 'four');
@@ -1319,8 +1351,28 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
                     ? e11
                     : e4,
       layoutSnapshot,
+      collectExperimentSetOneLayerGeometry(
+        activeExperiment,
+        activeExperiment === 'five'
+          ? e5
+          : activeExperiment === 'six'
+            ? e6
+            : activeExperiment === 'seven'
+              ? e7
+              : activeExperiment === 'eight'
+                ? currentE8
+                : activeExperiment === 'nine'
+                  ? currentE9
+                  : activeExperiment === 'ten'
+                    ? currentE10
+                    : activeExperiment === 'eleven'
+                      ? currentE11
+                      : e4,
+        e6LayerC,
+        e11LayerCLayout,
+      ),
     );
-  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, selection, activeExperiment]);
+  }, [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, e11LayerCLayout, selection, activeExperiment]);
 
   const borderRefineVersion = variantModule?.E5_BORDER_REFINEMENTS_VERSION ?? E5_BORDER_REFINEMENTS_VERSION;
   const borderRefine = variantModule?.refineExperimentFivePanels ?? refineExperimentFivePanels;
@@ -1910,11 +1962,11 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
       toggleExperimentMultiSelection,
       toggleSaveMultiSelection,
       referenceWallpaper,
-      toggleReferenceWallpaper,
       stageBackdropMode,
-      setStageBackdropMode,
+      stageBackdrop,
+      setStageBackdrop,
     }),
-    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, e11LayerCLayout, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE11, setE6LayerC, setE11LayerCLayout, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, layerDVisible, layerEVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, setSelectedSavePosition, replaceSaveMultiSelection, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, toggleReferenceWallpaper, stageBackdropMode],
+    [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e6LayerC, e11LayerCLayout, setE1, setE2, setE3, setE4, setE5, setE6, setE7, setE8, setE9, setE10, setE11, setE6LayerC, setE11LayerCLayout, resetAll, saves, saveCurrent, loadSave, layoutResetVersion, resetLayoutPositions, inspectMode, hidePanelText, layerAVisible, layerBVisible, layerCVisible, layerDVisible, layerEVisible, experimentVisible, toggleExperimentVisible, activeExperiment, selectedSaveIdByExperiment, selectedExperimentIds, selectedSaveKeysByExperiment, saveVisualOrder, selectedSaveVisualOrder, selectedSavePositions, selection, clearSelection, clearMultiSelection, queueSaveLoad, cancelQueuedSaveLoad, bringSaveForward, sendSaveBackward, setSelectedSavePosition, replaceSaveMultiSelection, toggleExperimentMultiSelection, toggleSaveMultiSelection, referenceWallpaper, stageBackdropMode, stageBackdrop, setStageBackdrop],
   );
 
   return (
@@ -2171,10 +2223,8 @@ export function ExperimentSetOneSettingsDock() {
     replaceSaveMultiSelection,
     toggleExperimentMultiSelection,
     toggleSaveMultiSelection,
-    referenceWallpaper,
-    toggleReferenceWallpaper,
-    stageBackdropMode,
-    setStageBackdropMode,
+    stageBackdrop,
+    setStageBackdrop,
   } = useExperimentSetOne();
   const { slug: activeRenderVariant } = useRenderVariant();
   const [open, setOpen] = useState(true);
@@ -2757,35 +2807,21 @@ export function ExperimentSetOneSettingsDock() {
                 >
                   Text
                 </button>
-                <button
-                  type="button"
-                  className={`experiment-one-settings-dock__toolbar-btn${referenceWallpaper ? ' experiment-one-settings-dock__toolbar-btn--active' : ''}`}
-                  onClick={toggleReferenceWallpaper}
-                  aria-pressed={referenceWallpaper}
-                  title="Overlay reference.png on aero-bg at matched scale"
-                >
-                  Ref bg
-                </button>
               </div>
-              <div className="experiment-one-settings-dock__toolbar-group">
-                <button
-                  type="button"
-                  className={`experiment-one-settings-dock__toolbar-btn${stageBackdropMode === 'photo' ? ' experiment-one-settings-dock__toolbar-btn--active' : ''}`}
-                  onClick={() => setStageBackdropMode('photo')}
-                  aria-pressed={stageBackdropMode === 'photo'}
-                  title="Show the local photo backdrop behind Experiment Set 1"
-                >
-                  Photo
-                </button>
-                <button
-                  type="button"
-                  className={`experiment-one-settings-dock__toolbar-btn${stageBackdropMode === 'video' ? ' experiment-one-settings-dock__toolbar-btn--active' : ''}`}
-                  onClick={() => setStageBackdropMode('video')}
-                  aria-pressed={stageBackdropMode === 'video'}
-                  title="Show the local video backdrop behind Experiment Set 1"
-                >
-                  Video
-                </button>
+              <div className="experiment-one-settings-dock__toolbar-group" role="radiogroup" aria-label="Stage background">
+                {STAGE_BACKDROP_CHOICES.map(({ value, label, title }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    role="radio"
+                    className={`experiment-one-settings-dock__toolbar-btn${stageBackdrop === value ? ' experiment-one-settings-dock__toolbar-btn--active' : ''}`}
+                    onClick={() => setStageBackdrop(value)}
+                    aria-checked={stageBackdrop === value}
+                    title={title}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
               <div className="experiment-one-settings-dock__toolbar-group">
                 <button type="button" className="experiment-one-settings-dock__toolbar-btn" onClick={collapseAll} title="Collapse all sections">

@@ -1,0 +1,92 @@
+@import url('https://fonts.cdnfonts.com/css/roobert'); 
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-image: linear-gradient(180deg, #fff, #e8f3fc 50%);
+}
+
+button {
+  border-width: 0;
+  font: inherit;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+:focus {
+  outline: 0;
+}
+
+.button {
+  position: relative;
+  z-index: 0;
+  border: 1px solid #3247cf;
+  border-radius: 8px;
+  padding: 12px 20px;
+  background-image: linear-gradient(180deg, #4098ff, #4058ff 62%, #4075ff);
+  box-shadow: 
+    inset 0 1px 0px rgba(255, 255, 255, .2),
+    inset 0 -1px 0px rgba(0, 0, 0, .2),
+    0 1px 2px rgba(0, 0, 0, .2);
+  font-family: 'Roobert', sans-serif;
+  font-weight: 500;
+  color: #fff;
+  text-shadow: 0 1px rgba(0, 0, 0, .2);
+  transition-property: outline-offset, border-color, transform;
+  transition-duration: .2s;
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .button:hover {
+    transform: scale(1.04);
+  }
+}
+
+.button:active {
+  border-color: #192ba1;
+  transform: scale(.98);
+}
+
+.button::before,
+.button::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: 7px;
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: .2s;
+}
+
+.button::before {
+  background-image: linear-gradient(180deg,#40a6ff,#4058ff 62%,#4075ff);
+  box-shadow:
+    inset 0 1px 0px rgba(255, 255, 255, .2),
+    inset 0 -1px 0px rgba(0, 0, 0, .2);
+}
+
+@media (hover: hover) {  
+  .button:hover::before {
+    opacity: 1;
+  }
+}
+
+.button::after {
+  background-image: linear-gradient(180deg, #0a40ce, #4058ff 38%, #40a0ff);
+  box-shadow: inset 0 1px 1px #0b1c95;
+}
+
+.button:active::after {
+  opacity: 1;
+}

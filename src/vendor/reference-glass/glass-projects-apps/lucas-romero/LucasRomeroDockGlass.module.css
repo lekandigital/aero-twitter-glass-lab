@@ -1,0 +1,65 @@
+.root {
+  position: relative;
+  display: flex;
+  width: var(--lucas-glass-width);
+  height: var(--lucas-glass-height);
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: var(--lucas-glass-radius);
+  background: transparent;
+  box-shadow:
+    0 6px 6px rgb(0 0 0 / 20%),
+    0 0 20px rgb(0 0 0 / 10%);
+  font-weight: 600;
+  pointer-events: auto;
+  transform-origin: center;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+}
+
+.root:hover {
+  width: calc(var(--lucas-glass-width) + var(--lucas-glass-hover-growth));
+  height: calc(var(--lucas-glass-height) + var(--lucas-glass-hover-growth));
+  border-radius: var(--lucas-glass-hover-radius);
+}
+
+.root:hover > .effect,
+.root:hover > .tint,
+.root:hover > .shine {
+  border-radius: var(--lucas-glass-hover-radius);
+}
+
+.effect,
+.tint,
+.shine {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--lucas-glass-radius);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+}
+
+.effect {
+  z-index: 0;
+  backdrop-filter: blur(3px);
+}
+
+.tint {
+  z-index: 1;
+  background: rgb(255 255 255 / 50%);
+}
+
+.shine {
+  z-index: 2;
+  box-shadow:
+    inset 2px 2px 1px 0 rgb(255 255 255 / 50%),
+    inset -1px -1px 1px 1px rgb(255 255 255 / 50%);
+}
+
+.definitions {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+

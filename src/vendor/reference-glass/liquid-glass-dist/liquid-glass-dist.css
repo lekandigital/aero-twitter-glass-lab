@@ -1,0 +1,28 @@
+.e11-liquid-glass-dist-surface {
+  position: relative;
+  display: grid;
+  place-items: center;
+  box-sizing: content-box;
+  width: var(--e11-liquid-dist-content-width);
+  height: var(--e11-liquid-dist-content-height);
+  padding: 0;
+  border: var(--e11-liquid-dist-border-width) solid transparent;
+  border-radius: var(--e11-liquid-dist-radius);
+  outline: 0;
+  background: var(--e11-liquid-dist-background);
+  box-shadow:
+    0 0 0 2px rgb(255 255 255 / 60%),
+    0 16px 32px rgb(0 0 0 / 12%);
+  backdrop-filter: var(--e11-liquid-dist-filter);
+  -webkit-backdrop-filter: var(--e11-liquid-dist-filter);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.e11-liquid-glass-dist-filter {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}

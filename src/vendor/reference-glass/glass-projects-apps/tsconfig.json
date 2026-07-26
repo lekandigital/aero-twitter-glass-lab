@@ -1,0 +1,15 @@
+{
+  "extends": "../../../../tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../../../../node_modules/.tmp/tsconfig.glass-projects-apps.tsbuildinfo"
+  },
+  "include": [
+    "./**/*.ts",
+    "./**/*.tsx",
+    "../shared/experimentStageCapture.ts",
+    "../shared/referenceOpticalInput.ts"
+  ],
+  "exclude": [
+    "./liquid-dom-runtime"
+  ]
+}

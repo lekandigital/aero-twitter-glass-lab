@@ -14,3 +14,6 @@ export type {
   LiquidGlassReferenceInteraction,
   LiquidGlassReferencePresetProps,
 } from "./LiquidGlassReferencePreset";
+
+export { LiquidGlassEngineReferencePreset } from "./LiquidGlassEngineReferencePreset";
+export type { LiquidGlassEngineReferencePresetProps } from "./LiquidGlassEngineReferencePreset";
