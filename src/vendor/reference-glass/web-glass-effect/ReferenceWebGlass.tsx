@@ -60,11 +60,13 @@ function safeFilterId(prefix: string, presetId: string, reactId: string) {
  */
 export function WebGlassReferenceSurface({
   presetId,
+  sourcePresetKey,
   config,
   interactive = false,
   children,
 }: {
   presetId: string;
+  sourcePresetKey: string;
   config: WebGlassReferenceConfig;
   interactive?: boolean;
   children?: React.ReactNode;
@@ -80,7 +82,13 @@ export function WebGlassReferenceSurface({
       className={`e11-web-glass-surface${
         interactive ? ' experiment-eleven-reference-interactive' : ''
       }`}
+      data-e11-reference-preset={presetId}
+      data-e11-reference-object-root={presetId}
       data-e11-web-glass-preset={presetId}
+      data-source-family="web-glass-effect"
+      data-source-preset-key={sourcePresetKey}
+      data-source-component="web-glass-effectshowcase.GlassSurface"
+      data-transparent-render-surface="true"
       data-glass-thickness={config.glassThickness}
       data-bezel-width={config.bezelWidth}
       data-refractive-index={config.refractiveIndex}
@@ -149,9 +157,11 @@ export type LiquidMainReferenceConfig = {
  */
 export function LiquidMainReferenceSurface({
   presetId,
+  sourcePresetKey,
   config,
 }: {
   presetId: string;
+  sourcePresetKey: string;
   config: LiquidMainReferenceConfig;
 }) {
   const reactId = useId();
@@ -166,7 +176,13 @@ export function LiquidMainReferenceSurface({
   return (
     <div
       className="e11-liquid-main-surface"
+      data-e11-reference-preset={presetId}
+      data-e11-reference-object-root={presetId}
       data-e11-liquid-main-preset={presetId}
+      data-source-family="liquid-main"
+      data-source-preset-key={sourcePresetKey}
+      data-source-component="liquid-glass-main.custom-surface"
+      data-transparent-render-surface="true"
       data-glass-thickness={config.glassThickness}
       data-bezel-width={config.bezelWidth}
       data-clamped-bezel-width={clampedBezel}
@@ -226,4 +242,3 @@ export function LiquidMainReferenceSurface({
     </div>
   );
 }
-

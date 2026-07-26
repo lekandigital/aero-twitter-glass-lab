@@ -254,7 +254,11 @@ const GlassSurface = ({
       style={containerStyle}
       data-e11-reference-family="glass-surface"
       data-e11-reference-preset={presetId}
+      data-e11-reference-object-root={presetId}
+      data-source-family="glass-surface"
       data-source-preset-key={sourcePresetKey}
+      data-source-component="react-bits.GlassSurface"
+      data-transparent-render-surface="true"
       data-glass-surface-filter-id={filterId}
       data-glass-surface-config={JSON.stringify(resolvedConfig)}
     >

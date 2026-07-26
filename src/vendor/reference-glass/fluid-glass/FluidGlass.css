@@ -5,7 +5,7 @@
   height: 240px;
   overflow: hidden;
   border-radius: 10px;
-  background: #5227ff;
+  background: transparent;
   isolation: isolate;
 }
 
@@ -14,4 +14,5 @@
   display: block;
   width: 100% !important;
   height: 100% !important;
+  background: transparent !important;
 }

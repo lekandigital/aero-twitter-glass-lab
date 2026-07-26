@@ -94,6 +94,55 @@ export const INTERNALS = {
   } as Record<Mode, string>
 } as const;
 
+/**
+ * Deterministic object/component mapping for the five Experiment Eleven saves.
+ * The preset config still comes directly from DEMO_CONFIGS below; this table
+ * prevents a label/config from being mounted with a different GLB or source
+ * wrapper.
+ */
+export const FLUID_GLASS_REFERENCE_OBJECTS = {
+  'DEMO_CONFIGS.lensDefault': {
+    mode: 'lens',
+    glb: INTERNALS.glb.lens,
+    geometryKey: 'Cylinder',
+    sourceComponent: 'FluidGlass/Lens/ModeWrapper',
+    transparentRenderSurface: true,
+    visibleSourceStage: false
+  },
+  'DEMO_CONFIGS.frosted': {
+    mode: 'lens',
+    glb: INTERNALS.glb.lens,
+    geometryKey: 'Cylinder',
+    sourceComponent: 'FluidGlass/Lens/ModeWrapper',
+    transparentRenderSurface: true,
+    visibleSourceStage: false
+  },
+  'DEMO_CONFIGS.barDefault': {
+    mode: 'bar',
+    glb: INTERNALS.glb.bar,
+    geometryKey: 'Cube',
+    sourceComponent: 'FluidGlass/Bar/ModeWrapper+NavItems',
+    transparentRenderSurface: true,
+    visibleSourceStage: false
+  },
+  'DEMO_CONFIGS.diamond': {
+    mode: 'cube',
+    glb: INTERNALS.glb.cube,
+    geometryKey: 'Cube',
+    sourceComponent: 'FluidGlass/Cube/ModeWrapper',
+    transparentRenderSurface: true,
+    visibleSourceStage: false
+  },
+  'DEMO_CONFIGS.fluid': {
+    mode: 'lens',
+    glb: INTERNALS.glb.lens,
+    geometryKey: 'Cylinder',
+    sourceComponent: 'FluidGlass/Lens/ModeWrapper',
+    transparentRenderSurface: true,
+    visibleSourceStage: false
+  }
+} as const;
+
 /** Every knob FluidGlass will actually forward, including the ones its own demo hides. */
 export const CONTROLS: ControlSpec[] = [
   {

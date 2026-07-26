@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import {
+  EXPERIMENT_ELEVEN_REFERENCE_OBJECT_AUDIT,
   EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS,
   EXPERIMENT_ELEVEN_REFERENCE_PRESETS,
 } from '../src/components/experiment-set-one/experimentElevenReferencePresets.ts'
@@ -11,10 +12,21 @@ import {
 const saves = JSON.parse(readFileSync(new URL('../src/data/experiment-set-one/saves.json', import.meta.url), 'utf8'))
 const savesText = readFileSync(new URL('../src/data/experiment-set-one/saves.json', import.meta.url), 'utf8')
 const schema = JSON.parse(readFileSync(new URL('../src/data/experiment-set-one/saves.schema.json', import.meta.url), 'utf8'))
-const headSavesText = execFileSync('git', ['show', 'HEAD:src/data/experiment-set-one/saves.json'], {
-  encoding: 'utf8',
-  maxBuffer: 32 * 1024 * 1024,
-})
+function readPreReferenceSavesText() {
+  for (let generations = 0; generations < 20; generations += 1) {
+    const revision = generations === 0 ? 'HEAD' : `HEAD${'^'.repeat(generations)}`
+    const text = execFileSync(
+      'git',
+      ['show', `${revision}:src/data/experiment-set-one/saves.json`],
+      { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 },
+    )
+    const revisionSaves = JSON.parse(text)
+    if (Math.max(...revisionSaves.map((save) => save.id)) < 1038) return text
+  }
+  throw new Error('Could not find the pre-reference-save baseline in recent Git history')
+}
+
+const headSavesText = readPreReferenceSavesText()
 const headSaves = JSON.parse(headSavesText)
 const headMaximumId = Math.max(...headSaves.map((save) => save.id))
 const sourceSave = headSaves.find((save) => save.id === 249)
@@ -22,7 +34,7 @@ const generated = saves.filter((save) => save.id > headMaximumId).sort((left, ri
 
 const expectedDefinitions = [
   ['liquid-main:custom-300x200', 'Liquid Glass Main · Custom 300×200', 'custom-300x200', 'liquid-main-svg-filter', [300, 200, 60, 'rounded-rect'], 'aa9f8e92aa89ea0b7630d12f23dc70c8a113c2080021450c9aee323b650da99a'],
-  ['liquidgl:demo-1-nav', 'liquidGL Demo 1 · Nav bar', 'demo-1:.menu-wrap', 'liquidgl-webgl', [310.344, 75.188, 21.6, 'liquidgl-menu'], '83956010c41d1859e096af2319d578c3fe5041cdfe5983b792fdfa6d15a5860d'],
+  ['liquidgl:demo-1-nav', 'liquidGL Demo 1 · Nav bar', 'demo-1:.menu-wrap', 'liquidgl-webgl', [310.344, 75.188, 21.6, 'liquidgl-menu'], '8c53090749c2e0de0d8770fd2f7394beedcb6cd7f36cfda956bc56d20df85c02'],
   ['fluid-glass:lens', 'FluidGlass · Lens', 'DEMO_CONFIGS.lensDefault', 'fluid-glass-r3f', [320, 240, 10, 'three-lens'], '3d7d5738eaccb688a86c1959eac934a73b9ac3d0eafd5583195d26832c63864e'],
   ['fluid-glass:frosted', 'FluidGlass · Frosted', 'DEMO_CONFIGS.frosted', 'fluid-glass-r3f', [320, 240, 10, 'three-lens'], '3e0a9668b5f5b0e6967a62ed10d1c212751524b11d454ea52568b0230ffbf751'],
   ['fluid-glass:bar', 'FluidGlass · Bar', 'DEMO_CONFIGS.barDefault', 'fluid-glass-r3f', [320, 240, 10, 'three-bar'], 'a102bc7aaa4f1bda4ff1d7bd00526c4fd1ea5da5b97f13cbd1a9d1ff1850cc8b'],
@@ -38,8 +50,8 @@ const expectedDefinitions = [
   ['liquid-web:reading-glass', 'Liquid Glass Custom · Reading glass', 'PRESETS.Reading glass / DEMO_LENSES.reading', 'liquid-glass-web-react', [150, 150, 75, 'circle'], '434131427e74bbd4ad598533d94ef7fdeaa2a7c65c0653b0b8a0f0759dedf16e'],
   ['liquid-web:orbit', 'Liquid Glass Custom · Orbit', 'PRESETS.Orbit / DEMO_LENSES.orbit', 'liquid-glass-web-react', [170, 170, 85, 'circle'], 'f08578c819481dd9e334dced4ff8d53293d0d5fb8ab93b376155af888dfc5295'],
   ['liquid-web:engine-panel', 'Liquid Glass Custom · Engine panel', 'PRESETS.Engine panel / DEMO_LENSES.engine', 'liquid-glass-web-react', [160, 160, 80, 'circle'], 'f56063beea49b706457a2e145933ba272a265185d354da4c883bdff06d2ccd9d'],
-  ['wge-next:form', 'WGE Next · Form', 'LiquidGlassFormDemo.form', 'wge-next-form', [432, 560, 12, 'complete-form'], 'dea59deb3d8bf5dbdfebb3a57fda430901e86ff64374d32690455cfc051fff04'],
-  ['wge-next:bottom-bar', 'WGE Next · Glass bottom bar', 'LiquidGlassDemo.bottomBar', 'wge-next-bottom-bar', [640, 56, 28, 'rounded-rect'], '97b15e88f80893f93af2b597dff1a058e6994c3117a9a6d2e55a1b43789e03f8'],
+  ['wge-next:form-submit-button', 'WGE Next · Submit Form button', 'LiquidGlassFormDemo.submitButton', 'wge-next-submit-button', [384, 38, 18, 'source-button'], '7ea079c5bbdca7326ef44ceeae7287f6a2f099664706fdd89047567bd6daaf3b'],
+  ['wge-next:bottom-bar', 'WGE Next · Glass bottom bar', 'LiquidGlassDemo.bottomBar', 'wge-next-bottom-bar', [640, 60, 28, 'rounded-rect'], '62b1a27a508cbdd1456ce09ccf1b14423c2c721103d889e30b26d32d1b9e0474'],
   ['web-glass:thick-lens', 'Web Glass · Thick lens', 'PRESETS.thickLens', 'web-glass-svg-filter', [320, 200, 60, 'rounded-rect'], '3565acd7e385e3b77b6bbec8890aa9d96f1d317843152a287fbad8c58a7e3727'],
   ['web-glass:razor-edge', 'Web Glass · Razor edge', 'PRESETS.razorEdge', 'web-glass-svg-filter', [320, 200, 24, 'rounded-rect'], 'af5b88d0c85f65071c94d32cf1172c295a32746e2033528919b6f56d0b021353'],
   ['web-glass:bottom-bar', 'Web Glass · Bottom bar', 'PRESETS.bottomBar', 'web-glass-svg-filter', [320, 200, 28, 'rounded-rect'], '5577f0573fb5e00ca7fe80e56f313ce13087dff647e9c21cce626be2a2cb1096'],
@@ -95,6 +107,35 @@ test('the registry contains the requested 30 presets exactly once and in source 
   }
 })
 
+test('the deterministic object audit names the exact transparent root for every save', () => {
+  assert.equal(EXPERIMENT_ELEVEN_REFERENCE_OBJECT_AUDIT.length, 30)
+  assert.deepEqual(
+    EXPERIMENT_ELEVEN_REFERENCE_OBJECT_AUDIT.map((row) => row.saveId),
+    Array.from({ length: 30 }, (_, index) => headMaximumId + index + 1),
+  )
+  for (const row of EXPERIMENT_ELEVEN_REFERENCE_OBJECT_AUDIT) {
+    const save = generated.find((candidate) => candidate.id === row.saveId)
+    const definition = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[row.presetId]
+    assert.ok(save, `Save ${row.saveId}`)
+    assert.equal(save.e11LayerCReferencePreset, row.presetId)
+    assert.equal(row.sourceFamily, definition.sourceFamily)
+    assert.equal(row.sourcePresetKey, definition.sourcePresetKey)
+    assert.equal(row.renderer, definition.renderer)
+    assert.equal(row.sourceComponent, definition.sourceComponent)
+    assert.equal(row.portalRequired, definition.compositing.pageLevelPortal)
+    assert.equal(row.transparentRenderSurface, true)
+    assert.deepEqual(
+      [row.nativeWidth, row.nativeHeight, row.nativeRadius, row.nativeGeometry],
+      [
+        definition.nativeLayout.width,
+        definition.nativeLayout.height,
+        definition.nativeLayout.radius,
+        definition.nativeLayout.geometry,
+      ],
+    )
+  }
+})
+
 test('every registry label, source mapping, renderer, native geometry, and full config is exact', () => {
   const configHashes = []
   for (const [id, displayLabel, sourcePresetKey, renderer, nativeLayout, configHash] of expectedDefinitions) {
@@ -102,6 +143,13 @@ test('every registry label, source mapping, renderer, native geometry, and full 
     assert.equal(definition.displayLabel, displayLabel, `${id} display label`)
     assert.equal(definition.sourcePresetKey, sourcePresetKey, `${id} source preset`)
     assert.equal(definition.renderer, renderer, `${id} renderer`)
+    assert.equal(
+      definition.sourceComponent,
+      EXPERIMENT_ELEVEN_REFERENCE_OBJECT_AUDIT.find((row) => row.presetId === id)
+        ?.sourceComponent,
+      `${id} source component`,
+    )
+    assert.equal(definition.transparentRenderSurface, true, `${id} transparent surface`)
     assert.deepEqual(
       [
         definition.nativeLayout.width,
@@ -152,6 +200,7 @@ test('each requested preset has one Save 249 clone with its exact label and nati
       radius: definition.nativeLayout.radius,
     })
     assert.equal('e11LayerCPreserveOpacity' in save, false)
+    assert.equal('e11LayerCBackgroundOverride' in save, false)
     assert.deepEqual(differingKeys(sourceSave, save), allowedDifferences)
   }
 })
@@ -197,4 +246,29 @@ test('the deterministic generator reports the checked-in saves as current', () =
     encoding: 'utf8',
   })
   assert.match(output, /Verified 30 deterministic Experiment Eleven reference saves/)
+})
+
+test('the machine audit compares against the pre-reference baseline', () => {
+  const output = execFileSync(process.execPath, ['scripts/generate-experiment-eleven-reference-saves.mjs', '--audit'], {
+    encoding: 'utf8',
+  })
+  const audit = JSON.parse(output)
+  assert.equal(audit.newSaveCount, 30)
+  assert.deepEqual(audit.newSaveIdRange, [1038, 1067])
+  assert.equal(audit.labels.length, 30)
+  assert.equal(audit.sourceSaveIds.length, 30)
+  assert.ok(audit.sourceSaveIds.every((id) => id === 249))
+  assert.deepEqual(audit.presetIds, expectedPresetIds)
+  assert.equal(audit.nativeLayouts.length, 30)
+  assert.equal(audit.duplicateIdCount, 0)
+  assert.ok(audit.unexpectedDifferences.every(({ keys }) => keys.length === 0))
+  assert.deepEqual(audit.modifiedExistingIds, [])
+  assert.deepEqual(audit.removedExistingIds, [])
+  for (const id of [249, 1036, 1037]) {
+    assert.equal(audit.protectedSaves[id].unchanged, true)
+    assert.equal(
+      audit.protectedSaves[id].currentHash,
+      audit.protectedSaves[id].baselineHash,
+    )
+  }
 })

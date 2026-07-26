@@ -13,6 +13,13 @@ export interface LiquidGlassHost {
    * measured against it.
    */
   filtered: HTMLElement;
+  /**
+   * The upstream component filters its own child DOM. Experiment Eleven's
+   * object-only adapter uses the same generated filter as a backdrop filter so
+   * the lens samples the real pane beneath it without importing a demo bed.
+   * Omitted for the byte-equivalent upstream behavior.
+   */
+  filterApplication?: "filter" | "backdrop-filter";
   /** Empty element the engine renders the `<svg><defs>` filter into. */
   defsHost: HTMLElement;
   /** Optional element positioned over the lens (shadow / rim chrome). */
@@ -82,7 +89,16 @@ export class LiquidGlassEngine {
   onMap: ((url: string) => void) | null = null;
 
   constructor(host: LiquidGlassHost, options?: Partial<LiquidGlassOptions>) {
-    this.host = host;
+    const requestedApplication =
+      host.container.dataset.liquidGlassFilterApplication;
+    this.host = {
+      ...host,
+      filterApplication:
+        host.filterApplication ??
+        (requestedApplication === "backdrop-filter"
+          ? "backdrop-filter"
+          : "filter"),
+    };
     this.options = { ...DEFAULT_OPTIONS, ...options };
     this.id = `liquid-glass-web-react-${++instanceCounter}`;
 
@@ -153,7 +169,7 @@ export class LiquidGlassEngine {
     if (this.rafId !== null) cancelAnimationFrame(this.rafId);
     this.resizeObserver?.disconnect();
     this.resizeObserver = null;
-    this.host.filtered.style.filter = "";
+    this.clearAppliedFilter();
     this.host.defsHost.replaceChildren();
     if (this.mapCanvas) {
       this.mapCanvas.width = 0;
@@ -163,6 +179,25 @@ export class LiquidGlassEngine {
   }
 
   // -- internals ----------------------------------------------------------
+
+  private clearAppliedFilter(): void {
+    if (this.host.filterApplication === "backdrop-filter") {
+      this.host.filtered.style.backdropFilter = "";
+      this.host.filtered.style.removeProperty("-webkit-backdrop-filter");
+      return;
+    }
+    this.host.filtered.style.filter = "";
+  }
+
+  private applyFilter(id: string): void {
+    const value = `url(#${id})`;
+    if (this.host.filterApplication === "backdrop-filter") {
+      this.host.filtered.style.backdropFilter = value;
+      this.host.filtered.style.setProperty("-webkit-backdrop-filter", value);
+      return;
+    }
+    this.host.filtered.style.filter = value;
+  }
 
   private get halfWidth(): number {
     return this.options.width / 2;
@@ -417,12 +452,12 @@ export class LiquidGlassEngine {
     if (IS_SAFARI) {
       // Fresh ID every update, or Safari serves the cached filter output.
       this.filterEl.id = `${this.id}-v${++this.version}`;
-      this.host.filtered.style.filter = `url(#${this.filterEl.id})`;
+      this.applyFilter(this.filterEl.id);
     } else if (!this.filterEl.id) {
       // Everywhere else attribute updates apply in place; assign the filter
       // once and never invalidate it, which keeps dragging cheap.
       this.filterEl.id = this.id;
-      this.host.filtered.style.filter = `url(#${this.id})`;
+      this.applyFilter(this.id);
     }
 
     const shadow = this.host.shadow;

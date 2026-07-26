@@ -17,6 +17,7 @@ export {
   DEFAULT_NAV_ITEMS,
   DEMO_CONFIGS,
   FLUID_GLASS_DEFAULTS,
+  FLUID_GLASS_REFERENCE_OBJECTS,
   INTERNALS
 } from './config';
 export type { ModeProps as FluidGlassConfigModeProps } from './config';
@@ -36,6 +37,7 @@ export const FLUID_GLASS_PROVENANCE = {
     'source-resolved Noto Sans Regular font pinned to its byte-identical vendored WOFF',
     'source empty Scroll html portal omitted to avoid duplicate React roots under StrictMode',
     'native 320x240 gallery-stage adapter and scoped stage CSS',
+    'object-only mode omits the visible source FBO plane and clears the visible framebuffer to alpha zero',
     'cursor cleanup when the bar renderer unmounts'
   ]
 } as const;

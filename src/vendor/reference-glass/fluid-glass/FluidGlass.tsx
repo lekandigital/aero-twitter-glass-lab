@@ -16,6 +16,7 @@ import {
   Text
 } from '@react-three/drei';
 import { easing } from 'maath';
+import { FLUID_GLASS_REFERENCE_OBJECTS } from './config';
 import './FluidGlass.css';
 
 export type Mode = 'lens' | 'bar' | 'cube';
@@ -40,6 +41,14 @@ export interface FluidGlassProps {
   lensProps?: ModeProps;
   barProps?: ModeProps;
   cubeProps?: ModeProps;
+  /**
+   * Experiment Eleven integration mode. The source scene remains available
+   * only to MeshTransmissionMaterial's private FBO, while the full-viewport
+   * buffer plane and opaque source clear colour are omitted from the visible
+   * canvas. The requested GLB object and source material pipeline are otherwise
+   * unchanged.
+   */
+  transparentObjectOnly?: boolean;
 }
 
 export default function FluidGlass({
@@ -47,7 +56,8 @@ export default function FluidGlass({
   backdrop = 'default',
   lensProps = {},
   barProps = {},
-  cubeProps = {}
+  cubeProps = {},
+  transparentObjectOnly = false
 }: FluidGlassProps) {
   const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
   const rawOverrides = mode === 'bar' ? barProps : mode === 'cube' ? cubeProps : lensProps;
@@ -62,10 +72,16 @@ export default function FluidGlass({
   } = rawOverrides;
 
   return (
-    <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
+    <Canvas
+      camera={{ position: [0, 0, 20], fov: 15 }}
+      gl={{ alpha: true }}
+      onCreated={({ gl }) => {
+        gl.setClearColor(transparentObjectOnly ? 0x000000 : 0x5227ff, transparentObjectOnly ? 0 : 1);
+      }}
+    >
       <ScrollControls damping={0.2} pages={3} distance={0.4}>
         {mode === 'bar' && <NavItems items={navItems as NavItem[]} />}
-        <Wrapper modeProps={modeProps}>
+        <Wrapper modeProps={modeProps} transparentObjectOnly={transparentObjectOnly}>
           {backdrop === 'default' ? (
             <Scroll>
               <Typography />
@@ -151,6 +167,7 @@ interface ModeWrapperProps extends MeshProps {
   lockToBottom?: boolean;
   followPointer?: boolean;
   modeProps?: ModeProps;
+  transparentObjectOnly?: boolean;
 }
 
 interface ZoomMaterial extends THREE.Material {
@@ -168,6 +185,7 @@ const ModeWrapper = memo(function ModeWrapper({
   lockToBottom = false,
   followPointer = true,
   modeProps = {},
+  transparentObjectOnly = false,
   ...props
 }: ModeWrapperProps) {
   const ref = useRef<THREE.Mesh>(null!);
@@ -200,10 +218,15 @@ const ModeWrapper = memo(function ModeWrapper({
       ref.current.scale.setScalar(Math.min(0.15, desired));
     }
 
+    // The source's private transmission buffer intentionally retains the
+    // source scene and opaque #5227ff clear colour: that texture is part of
+    // the exact MeshTransmissionMaterial response. In object-only integration
+    // mode it is never blitted as a visible background plane.
     gl.setRenderTarget(buffer);
+    gl.setClearColor(0x5227ff, 1);
     gl.render(scene, camera);
     gl.setRenderTarget(null);
-    gl.setClearColor(0x5227ff, 1);
+    gl.setClearColor(transparentObjectOnly ? 0x000000 : 0x5227ff, transparentObjectOnly ? 0 : 1);
   });
 
   const { scale, ior, thickness, anisotropy, chromaticAberration, ...extraMat } = modeProps as {
@@ -218,10 +241,12 @@ const ModeWrapper = memo(function ModeWrapper({
   return (
     <>
       {createPortal(children, scene)}
-      <mesh scale={[vp.width, vp.height, 1]}>
-        <planeGeometry />
-        <meshBasicMaterial map={buffer.texture} transparent />
-      </mesh>
+      {!transparentObjectOnly && (
+        <mesh scale={[vp.width, vp.height, 1]}>
+          <planeGeometry />
+          <meshBasicMaterial map={buffer.texture} transparent />
+        </mesh>
+      )}
       <mesh
         ref={ref}
         scale={scale ?? 0.15}
@@ -242,31 +267,38 @@ const ModeWrapper = memo(function ModeWrapper({
   );
 });
 
-function Lens({ modeProps, ...p }: { modeProps?: ModeProps } & MeshProps) {
+type SourceModeComponentProps = {
+  modeProps?: ModeProps;
+  transparentObjectOnly?: boolean;
+} & MeshProps;
+
+function Lens({ modeProps, transparentObjectOnly, ...p }: SourceModeComponentProps) {
   return (
     <ModeWrapper
       glb={`${ASSET_ROOT}/assets/3d/lens.glb`}
       geometryKey="Cylinder"
       followPointer
       modeProps={modeProps}
+      transparentObjectOnly={transparentObjectOnly}
       {...p}
     />
   );
 }
 
-function Cube({ modeProps, ...p }: { modeProps?: ModeProps } & MeshProps) {
+function Cube({ modeProps, transparentObjectOnly, ...p }: SourceModeComponentProps) {
   return (
     <ModeWrapper
       glb={`${ASSET_ROOT}/assets/3d/cube.glb`}
       geometryKey="Cube"
       followPointer
       modeProps={modeProps}
+      transparentObjectOnly={transparentObjectOnly}
       {...p}
     />
   );
 }
 
-function Bar({ modeProps = {}, ...p }: { modeProps?: ModeProps } & MeshProps) {
+function Bar({ modeProps = {}, transparentObjectOnly, ...p }: SourceModeComponentProps) {
   const defaultMat = {
     transmission: 1,
     roughness: 0,
@@ -284,6 +316,7 @@ function Bar({ modeProps = {}, ...p }: { modeProps?: ModeProps } & MeshProps) {
       lockToBottom
       followPointer={false}
       modeProps={{ ...defaultMat, ...modeProps }}
+      transparentObjectOnly={transparentObjectOnly}
       {...p}
     />
   );
@@ -465,16 +498,33 @@ export function FluidGlassReferenceRenderer({
   className = '',
   style
 }: FluidGlassReferenceRendererProps) {
+  const sourceObject = FLUID_GLASS_REFERENCE_OBJECTS[
+    sourcePresetKey as keyof typeof FLUID_GLASS_REFERENCE_OBJECTS
+  ];
+
+  if (!sourceObject || sourceObject.mode !== mode) {
+    throw new Error(
+      `FluidGlass source mapping mismatch: ${sourcePresetKey} does not mount mode ${mode}`,
+    );
+  }
+
   return (
     <div
       className={`e11-ref-fluid-glass-stage ${className}`.trim()}
       style={style}
       data-e11-reference-family="fluid-glass"
       data-e11-reference-preset={presetId}
+      data-e11-reference-object-root={presetId}
+      data-source-family="fluid-glass"
       data-source-preset-key={sourcePresetKey}
+      data-source-component={sourceObject.sourceComponent}
+      data-transparent-render-surface={String(sourceObject.transparentRenderSurface)}
+      data-source-demo-background-mounted="false"
+      data-source-stage-mounted={String(sourceObject.visibleSourceStage)}
+      data-layer-c-object-count="1"
       data-fluid-glass-mode={mode}
-      data-fluid-glass-glb={FLUID_GLASS_RUNTIME_ASSETS[mode]}
-      data-fluid-glass-geometry-key={mode === 'lens' ? 'Cylinder' : 'Cube'}
+      data-fluid-glass-glb={sourceObject.glb}
+      data-fluid-glass-geometry-key={sourceObject.geometryKey}
       data-fluid-glass-config={JSON.stringify(config)}
       data-native-width={FLUID_GLASS_NATIVE_LAYOUT.width}
       data-native-height={FLUID_GLASS_NATIVE_LAYOUT.height}
@@ -485,6 +535,7 @@ export function FluidGlassReferenceRenderer({
         lensProps={mode === 'lens' ? config : {}}
         barProps={mode === 'bar' ? config : {}}
         cubeProps={mode === 'cube' ? config : {}}
+        transparentObjectOnly
       />
     </div>
   );
