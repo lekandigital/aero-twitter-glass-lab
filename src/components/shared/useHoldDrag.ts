@@ -37,7 +37,7 @@ type UseHoldDragOptions = {
   dragHandleSelector?: string;
   dragExcludeSelector?: string;
   initialPosition?: DragPoint | 'center';
-  bounds?: 'parent' | 'viewport';
+  bounds?: 'parent' | 'parent-overflow' | 'viewport';
   persistKey?: string;
   layoutResetVersion?: number;
 };
@@ -117,11 +117,21 @@ export function useHoldDrag({
 
     const container = boundsRef.current;
     if (!container) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+    const remainingX = container.clientWidth - shell.offsetWidth;
+    const remainingY = container.clientHeight - shell.offsetHeight;
+    if (bounds === 'parent-overflow') {
+      return {
+        minX: Math.min(0, remainingX),
+        minY: Math.min(0, remainingY),
+        maxX: Math.max(0, remainingX),
+        maxY: Math.max(0, remainingY),
+      };
+    }
     return {
       minX: 0,
       minY: 0,
-      maxX: Math.max(0, container.clientWidth - shell.offsetWidth),
-      maxY: Math.max(0, container.clientHeight - shell.offsetHeight),
+      maxX: Math.max(0, remainingX),
+      maxY: Math.max(0, remainingY),
     };
   }, [bounds, boundsRef, shellRef]);
 
@@ -156,11 +166,17 @@ export function useHoldDrag({
 
     const { minX, minY, maxX, maxY } = getBounds();
     setPosition({
-      x: Math.max(minX, maxX / 2),
-      y: Math.max(minY, maxY / 2),
+      x:
+        bounds === 'parent-overflow'
+          ? (minX + maxX) / 2
+          : Math.max(minX, maxX / 2),
+      y:
+        bounds === 'parent-overflow'
+          ? (minY + maxY) / 2
+          : Math.max(minY, maxY / 2),
     });
     initialized.current = true;
-  }, [clampPosition, getBounds, persistKey, shellRef]);
+  }, [bounds, clampPosition, getBounds, persistKey, shellRef]);
 
   useLayoutEffect(() => {
     if (!initialized.current) placeInitial();

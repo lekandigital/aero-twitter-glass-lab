@@ -73,7 +73,7 @@ type DraggableShellProps = {
   dragHandleSelector?: string;
   dragExcludeSelector?: string;
   initialPosition?: { x: number; y: number } | 'center';
-  bounds?: 'parent' | 'viewport';
+  bounds?: 'parent' | 'parent-overflow' | 'viewport';
   persistKey?: string;
   layoutResetVersion?: number;
   ariaLabel: string;

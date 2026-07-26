@@ -125,6 +125,7 @@ import {
   type ExperimentElevenLayerCLayoutSettings,
 } from './experimentElevenLayerCMaterial';
 import { ExperimentElevenLayerCSwitcherGlass } from './ExperimentElevenLayerCSwitcherGlass';
+import { ExperimentElevenReferencePresetPreview } from './ExperimentElevenReferencePresetRenderer';
 import { applyExperimentSixPanelGeometry } from './experimentSixPanelGeometry';
 import {
   applyExperimentEightPanelGeometry,
@@ -292,7 +293,20 @@ function ElevenSaveLayerCPreview({ save }: { save: ExperimentSetOneSnapshot }) {
 
   return (
     <div className="experiment-one-settings-dock__save-chip-preview" aria-hidden="true">
-      {save.e11LayerCReferenceGlass === 'thick-lens' ? (
+      {save.e11LayerCReferencePreset ? (
+        <div
+          className="experiment-one-settings-dock__save-chip-preview-surface"
+          style={{
+            position: 'relative',
+            transform: 'scale(0.18)',
+            transformOrigin: 'top left',
+          }}
+        >
+          <ExperimentElevenReferencePresetPreview
+            presetId={save.e11LayerCReferencePreset}
+          />
+        </div>
+      ) : save.e11LayerCReferenceGlass === 'thick-lens' ? (
         <div
           className="experiment-one-settings-dock__save-chip-preview-surface"
           style={{

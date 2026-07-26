@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "test": "node --test tests/*.test.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "reference-lab:build": "node scripts/build-reference-lab.mjs",
@@ -19,23 +20,29 @@
     "raw-reference-lab:check": "node scripts/audit-raw-reference-demos.mjs && node scripts/audit-raw-reference-links.mjs && node scripts/check-raw-reference-lab.mjs",
     "saves:import": "npx --yes tsx scripts/import-experiment-set-one-saves.mjs",
     "saves:generate-six": "node scripts/generate-experiment-six-saves.mjs",
+    "saves:generate-eleven": "node scripts/generate-experiment-eleven-reference-saves.mjs --check",
     "render-variants:sync": "node scripts/sync-render-variants.mjs"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
     "7.css": "^0.21.1",
     "html2canvas": "^1.4.1",
     "liquid-glass-react": "^1.1.1",
     "lucide-react": "^1.18.0",
+    "maath": "^0.10.8",
     "motion": "12.23.24",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-router-dom": "^7.17.0"
+    "react-router-dom": "^7.17.0",
+    "three": "^0.180.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.180.0",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",
