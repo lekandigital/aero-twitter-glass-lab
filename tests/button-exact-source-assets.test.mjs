@@ -124,14 +124,63 @@ test('the combined mission audit is internally complete and collision-free', () 
       },
     ),
   )
-  assert.equal(report.initialHead, report.finalHead)
-  assert.equal(report.originMain, report.initialHead)
-  assert.equal(report.commitCountCreatedByTask, 0)
+  // The corrective task starts from the pushed remote commit and must not
+  // create commits of its own.
+  assert.equal(report.remoteBaselineHead, report.finalHead)
+  assert.equal(report.originMain, report.finalHead)
+  assert.equal(report.commitsCreatedByThisTask, 0)
   assert.equal(report.newOriginalSizeLayerCSaves.length, 12)
   assert.equal(report.newStandardizedLayerCSaves.length, 12)
+
+  // Standardized duplicates render at the Save 248 Layer C geometry.
+  assert.deepEqual(
+    [
+      report.standardizedGeometry.width,
+      report.standardizedGeometry.height,
+      report.standardizedGeometry.radius,
+    ],
+    [293, 125, 21],
+  )
+  assert.equal(report.standardizedGeometry.allLayoutsMatchSource, true)
+  assert.equal(report.standardizedGeometry.noLabelClaimsLegacyGeometry, true)
+  assert.equal(report.standardizedGeometry.legacyPresetIdStatus.retained, true)
+  assert.deepEqual(
+    report.standardizedGeometry.saveIds,
+    Array.from({ length: 12 }, (_, index) => 1080 + index),
+  )
+
+  // 1068–1079 pair with 1080–1091 in order.
+  assert.equal(report.pairMapping.length, 12)
+  assert.ok(report.pairMapping.every(({ paired }) => paired))
+  assert.deepEqual(
+    report.pairMapping.map(({ nativeSaveId, standardizedSaveId }) => [
+      nativeSaveId,
+      standardizedSaveId,
+    ]),
+    Array.from({ length: 12 }, (_, index) => [1068 + index, 1080 + index]),
+  )
+
+  // The whole reserved reference block is present.
+  assert.deepEqual(report.referenceSaveBlock.expectedRange, [1038, 1091])
+  assert.equal(report.referenceSaveBlock.presentCount, 54)
+  assert.deepEqual(report.referenceSaveBlock.missingSaveIds, [])
+
+  // The button route is reachable from the central route list.
+  assert.equal(report.buttonRoute.presentInCentralRouteList, true)
+  assert.deepEqual(report.buttonRoute.requiredVisibleLabels, [
+    'Experiment Set 1',
+    'Button Source Experiments',
+  ])
+
   assert.equal(report.buttonPresetCount, 59)
   assert.equal(report.buttonSaveCount, 59)
   assert.equal(report.buttonSaves.length, 59)
+  assert.deepEqual(report.buttonSaveRange, [1092, 1150])
+  assert.deepEqual(report.buttonSaveRangeActual, [1092, 1150])
+  assert.equal(report.buttonExperimentCount, 6)
+  assert.equal(report.buttonLayerAOnly, true)
+  assert.deepEqual(report.buttonExperimentSet.layerModel, ['A'])
+  assert.deepEqual(report.buttonExperimentSet.excludesLayers, ['B', 'C', 'D', 'E'])
   assert.equal(report.duplicateIdCount, 0)
   assert.deepEqual(report.missingSourceObjects, {
     newOriginalGlass: 0,
@@ -148,4 +197,8 @@ test('the combined mission audit is internally complete and collision-free', () 
       ({ unchanged }) => unchanged,
     ),
   )
+  assert.deepEqual(report.sourceRepositoryStatuses, {
+    glassProjectsLab: 'clean',
+    buttonProjectsLab: 'clean',
+  })
 })

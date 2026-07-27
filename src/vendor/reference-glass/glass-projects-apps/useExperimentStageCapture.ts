@@ -1,5 +1,6 @@
 import { useEffect, useState, type RefObject } from 'react';
 import { captureExperimentStageRegion } from '../shared/experimentStageCapture.ts';
+import { retainReferenceOpticalInputCapture } from '../shared/referenceOpticalInput.ts';
 
 export type ExperimentStageCapture = Readonly<{
   canvas: HTMLCanvasElement | null;
@@ -47,6 +48,10 @@ export function useExperimentStageCapture(
     let generation = 0;
     let captureInFlight = false;
     let rerunRequested = false;
+    // Capturing installs the shared html2canvas adapter on `window`. Retain it
+    // for this object's lifetime and release it on unmount, otherwise switching
+    // away from the save leaves `window.html2canvas` behind.
+    const releaseCaptureAdapter = retainReferenceOpticalInputCapture();
 
     const update = async () => {
       if (captureInFlight) {
@@ -122,6 +127,7 @@ export function useExperimentStageCapture(
       window.removeEventListener('scroll', schedule, true);
       window.removeEventListener('transitionend', schedule, true);
       window.removeEventListener('animationend', schedule, true);
+      releaseCaptureAdapter();
     };
   }, [captureInset, rootRef]);
 

@@ -8,6 +8,20 @@ import {
   EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS,
   EXPERIMENT_ELEVEN_REFERENCE_PRESETS,
 } from '../src/components/experiment-set-one/experimentElevenReferencePresets.ts'
+import { EXPERIMENT_ELEVEN_LAYER_C_LAYOUT } from '../src/components/experiment-set-one/experimentElevenLayerCLayout.ts'
+
+/**
+ * The standardized duplicates render at the Save 248 Layer C geometry. The test
+ * reads the shared constant rather than restating the numbers, so the assertion
+ * cannot silently drift away from the source of truth.
+ */
+const STANDARDIZED_GEOMETRY = EXPERIMENT_ELEVEN_LAYER_C_LAYOUT
+
+/**
+ * `:358x140-r54` is a legacy internal id suffix retained for save/state
+ * compatibility. It deliberately no longer describes the rendered geometry.
+ */
+const STANDARDIZED_LEGACY_ID_SUFFIX = ':358x140-r54'
 
 const saves = JSON.parse(readFileSync(new URL('../src/data/experiment-set-one/saves.json', import.meta.url), 'utf8'))
 const savesText = readFileSync(new URL('../src/data/experiment-set-one/saves.json', import.meta.url), 'utf8')
@@ -38,7 +52,13 @@ const headSavesText = readPreReferenceSavesText()
 const headSaves = JSON.parse(headSavesText)
 const headMaximumId = Math.max(...headSaves.map((save) => save.id))
 const sourceSave = headSaves.find((save) => save.id === 249)
-const generated = saves.filter((save) => save.id > headMaximumId).sort((left, right) => left.id - right.id)
+const generatedPresetIdSet = new Set(EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS)
+// Generator-owned records are identified by their preset id. Filtering on
+// "id greater than the baseline maximum" would also sweep in unrelated
+// user-authored saves that happen to sit above the reserved block.
+const generated = saves
+  .filter((save) => generatedPresetIdSet.has(save.e11LayerCReferencePreset))
+  .sort((left, right) => left.id - right.id)
 const originalGenerated = generated.slice(0, 30)
 const newGenerated = generated.slice(30)
 
@@ -91,7 +111,7 @@ const expectedNewBaseDefinitions = [
 ]
 const expectedNewBasePresetIds = expectedNewBaseDefinitions.map(([id]) => id)
 const expectedNewDuplicatePresetIds = expectedNewBasePresetIds.map(
-  (id) => `${id}:358x140-r54`,
+  (id) => `${id}${STANDARDIZED_LEGACY_ID_SUFFIX}`,
 )
 const expectedAllPresetIds = [
   ...expectedPresetIds,
@@ -312,7 +332,7 @@ test('each standardized duplicate changes only source-supported geometry', () =>
     'outputMask',
   ])
   for (const baseId of expectedNewBasePresetIds) {
-    const duplicateId = `${baseId}:358x140-r54`
+    const duplicateId = `${baseId}${STANDARDIZED_LEGACY_ID_SUFFIX}`
     const original = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[baseId]
     const duplicate = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[duplicateId]
     assert.equal(duplicate.sourceFamily, original.sourceFamily)
@@ -323,11 +343,15 @@ test('each standardized duplicate changes only source-supported geometry', () =>
     assert.deepEqual(duplicate.compositing, original.compositing)
     assert.deepEqual(duplicate.interactions, original.interactions)
     assert.deepEqual(duplicate.nativeLayout, {
-      width: 358,
-      height: 140,
-      radius: 54,
+      width: STANDARDIZED_GEOMETRY.width,
+      height: STANDARDIZED_GEOMETRY.height,
+      radius: STANDARDIZED_GEOMETRY.radius,
       geometry: 'rounded-rect',
     })
+    assert.ok(
+      !duplicate.displayLabel.includes('358'),
+      `${duplicateId} label must not claim the legacy geometry`,
+    )
     const configDifferences = differingLeafPaths(
       original.config,
       duplicate.config,
@@ -346,7 +370,7 @@ test('the JSON schema recognizes precisely the centralized reference-preset ids 
   assert.ok(schema.items.properties.scope.enum.includes('eleven'))
 })
 
-test('the original 30 remain fixed and exactly 24 consecutive saves were appended', () => {
+test('the original 30 remain fixed and the 24 requested saves occupy the reserved block', () => {
   assert.equal(generated.length, 54)
   assert.equal(originalGenerated.length, 30)
   assert.equal(newGenerated.length, 24)
@@ -363,6 +387,13 @@ test('the original 30 remain fixed and exactly 24 consecutive saves were appende
     Array.from({ length: 54 }, (_, index) => headMaximumId + index + 1),
   )
   assert.equal(new Set(saves.map((save) => save.id)).size, saves.length)
+  // The reserved block is exactly 1038–1091 and nothing else lives inside it.
+  assert.deepEqual([generated[0].id, generated.at(-1).id], [1038, 1091])
+  assert.equal(
+    saves.filter((save) => save.id >= 1038 && save.id <= 1091).length,
+    54,
+    'no non-generated record may occupy the reserved reference block',
+  )
 })
 
 test('each requested preset has one Save 249 clone with its exact label and native layout', () => {
@@ -451,4 +482,124 @@ test('the machine audit compares against the pre-reference baseline', () => {
       audit.protectedSaves[id].baselineHash,
     )
   }
+})
+
+test('Saves 1080–1091 render at the Save 248 Layer C geometry', () => {
+  const standardized = saves
+    .filter((save) => save.id >= 1080 && save.id <= 1091)
+    .sort((left, right) => left.id - right.id)
+  assert.equal(standardized.length, 12)
+
+  for (const save of standardized) {
+    assert.deepEqual(
+      save.e11LayerCLayout,
+      {
+        width: STANDARDIZED_GEOMETRY.width,
+        height: STANDARDIZED_GEOMETRY.height,
+        radius: STANDARDIZED_GEOMETRY.radius,
+      },
+      `Save ${save.id} layout`,
+    )
+    assert.equal(save.e11LayerCLayout.width, 293)
+    assert.equal(save.e11LayerCLayout.height, 125)
+    assert.equal(save.e11LayerCLayout.radius, 21)
+
+    // Nothing user-visible may still advertise the legacy geometry.
+    assert.ok(!save.label.includes('358×140'), `Save ${save.id} label`)
+    assert.ok(!save.label.includes('r54'), `Save ${save.id} label`)
+
+    const definition = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[save.e11LayerCReferencePreset]
+    assert.deepEqual(
+      [definition.nativeLayout.width, definition.nativeLayout.height, definition.nativeLayout.radius],
+      [STANDARDIZED_GEOMETRY.width, STANDARDIZED_GEOMETRY.height, STANDARDIZED_GEOMETRY.radius],
+      `${definition.id} native layout`,
+    )
+    assert.ok(!definition.displayLabel.includes('358'), `${definition.id} display label`)
+
+    // Every geometry-dependent value inside the source-derived config must have
+    // been regenerated, not merely relabelled.
+    const config = definition.config
+    const geometry = config.geometry ?? config
+    for (const [key, expected] of [
+      ['width', STANDARDIZED_GEOMETRY.width],
+      ['height', STANDARDIZED_GEOMETRY.height],
+    ]) {
+      if (key in geometry) assert.equal(geometry[key], expected, `${definition.id} config ${key}`)
+    }
+    for (const key of ['radius', 'cornerRadius']) {
+      if (key in geometry) {
+        assert.equal(geometry[key], STANDARDIZED_GEOMETRY.radius, `${definition.id} config ${key}`)
+      }
+    }
+  }
+})
+
+test('each native save pairs with its standardized duplicate on everything but geometry', () => {
+  const permittedConfigPaths = new Set([
+    'geometry.width',
+    'geometry.height',
+    'geometry.cornerRadius',
+    'geometry.technicalInset',
+    'width',
+    'height',
+    'radius',
+    'outputMask',
+  ])
+
+  for (let index = 0; index < 12; index += 1) {
+    const nativeSave = saves.find((save) => save.id === 1068 + index)
+    const duplicateSave = saves.find((save) => save.id === 1080 + index)
+    assert.ok(nativeSave, `Save ${1068 + index}`)
+    assert.ok(duplicateSave, `Save ${1080 + index}`)
+
+    const nativeId = nativeSave.e11LayerCReferencePreset
+    assert.equal(
+      duplicateSave.e11LayerCReferencePreset,
+      `${nativeId}${STANDARDIZED_LEGACY_ID_SUFFIX}`,
+      `${nativeSave.id} -> ${duplicateSave.id} pairing`,
+    )
+
+    const native = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[nativeId]
+    const duplicate = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[duplicateSave.e11LayerCReferencePreset]
+
+    assert.equal(duplicate.sourceFamily, native.sourceFamily)
+    assert.equal(duplicate.sourcePresetKey, native.sourcePresetKey)
+    assert.equal(duplicate.sourceComponent, native.sourceComponent)
+    assert.equal(duplicate.sourceRepository, native.sourceRepository)
+    assert.equal(duplicate.renderer, native.renderer)
+    assert.equal(duplicate.contentPolicy, native.contentPolicy)
+    assert.equal(duplicate.transparentOutside, native.transparentOutside)
+    assert.equal(duplicate.transparentRenderSurface, native.transparentRenderSurface)
+    assert.equal(duplicate.portalMode, native.portalMode)
+    assert.deepEqual(duplicate.sourcePath, native.sourcePath)
+    assert.equal(duplicate.provenance, native.provenance)
+    assert.deepEqual(duplicate.compositing, native.compositing)
+    assert.deepEqual(duplicate.interactions, native.interactions)
+
+    const configDifferences = differingLeafPaths(native.config, duplicate.config)
+    assert.ok(
+      configDifferences.every((path) => permittedConfigPaths.has(path)),
+      `${nativeId}: unexpected non-geometry config drift: ${configDifferences.join(', ')}`,
+    )
+
+    // The saves themselves differ only in the generator-owned fields.
+    assert.deepEqual(
+      differingKeys(nativeSave, duplicateSave),
+      ['e11LayerCLayout', 'e11LayerCReferencePreset', 'id', 'label', 'savedAt'],
+      `${nativeSave.id} -> ${duplicateSave.id} save fields`,
+    )
+  }
+})
+
+test('the source-native Chromium save keeps its requested 358×140 r54 configuration', () => {
+  const nativeSave = saves.find((save) => save.id === 1076)
+  assert.equal(nativeSave.e11LayerCReferencePreset, 'chromium-configurable-glass:requested')
+  assert.deepEqual(nativeSave.e11LayerCLayout, { width: 358, height: 140, radius: 54 })
+
+  const native = EXPERIMENT_ELEVEN_REFERENCE_PRESETS['chromium-configurable-glass:requested']
+  assert.deepEqual(
+    [native.nativeLayout.width, native.nativeLayout.height, native.nativeLayout.radius],
+    [358, 140, 54],
+  )
+  assert.equal(native.displayLabel, 'Chromium Configurable Glass · Requested preset')
 })

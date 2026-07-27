@@ -3,17 +3,15 @@ import {
   type E4MaterialSettings,
 } from '../experiment-set-four/materialSettings';
 
-export type ExperimentElevenLayerCLayoutSettings = {
-  width: number;
-  height: number;
-  radius: number;
-};
+import {
+  EXPERIMENT_ELEVEN_LAYER_C_LAYOUT,
+  type ExperimentElevenLayerCLayoutSettings,
+} from './experimentElevenLayerCLayout';
 
-export const EXPERIMENT_ELEVEN_LAYER_C_LAYOUT = {
-  width: 293,
-  height: 125,
-  radius: 21,
-} as const satisfies ExperimentElevenLayerCLayoutSettings;
+export {
+  EXPERIMENT_ELEVEN_LAYER_C_LAYOUT,
+  type ExperimentElevenLayerCLayoutSettings,
+};
 
 export function normalizeExperimentElevenLayerCOverride(
   base: E4MaterialSettings,

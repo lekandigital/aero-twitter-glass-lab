@@ -50,6 +50,7 @@ import {
   createLiquidGlassJsRectGeometry,
 } from '../../vendor/reference-glass/liquid-glass-js/config.ts'
 import type { ReferenceObjectContract } from '../../vendor/reference-glass/shared/sourceObjectContract'
+import { EXPERIMENT_ELEVEN_LAYER_C_LAYOUT } from './experimentElevenLayerCLayout.ts'
 
 export type ExperimentElevenReferenceSourceFamily =
   | 'liquid-main'
@@ -952,11 +953,15 @@ interface NewGlassBaseDefinition {
   provenance: string
 }
 
-const STANDARD_REFERENCE_GEOMETRY = {
-  width: 358,
-  height: 140,
-  radius: 54,
-} as const
+/**
+ * The standardized duplicates are all resized to the Save 248 Layer C geometry.
+ * This intentionally aliases the existing single source of truth in
+ * `experimentElevenLayerCMaterial.ts` rather than repeating 293 / 125 / 21, so the
+ * duplicates and the live Layer C pane can never drift apart.
+ */
+const SAVE_248_LAYER_C_GEOMETRY = EXPERIMENT_ELEVEN_LAYER_C_LAYOUT
+
+const STANDARD_REFERENCE_GEOMETRY = SAVE_248_LAYER_C_GEOMETRY
 
 function recordConfig(value: object): Readonly<Record<string, unknown>> {
   return value as Readonly<Record<string, unknown>>
@@ -1175,7 +1180,11 @@ export const EXPERIMENT_ELEVEN_NEW_GLASS_BASE_DEFINITIONS = [
     displayLabel: 'CSS Liquid Glass Switcher · Empty switcher',
     contract: CSS_LIQUID_GLASS_SWITCHER_CONTRACT,
     config: CSS_LIQUID_GLASS_SWITCHER_DEFAULT_CONFIG,
-    normalizedConfig: createCssLiquidGlassSwitcherGeometry(358, 140, 54),
+    normalizedConfig: createCssLiquidGlassSwitcherGeometry(
+      SAVE_248_LAYER_C_GEOMETRY.width,
+      SAVE_248_LAYER_C_GEOMETRY.height,
+      SAVE_248_LAYER_C_GEOMETRY.radius,
+    ),
     geometry: { width: 244, height: 70, radius: 35 },
   }),
   extractedObjectDefinition({
@@ -1185,7 +1194,11 @@ export const EXPERIMENT_ELEVEN_NEW_GLASS_BASE_DEFINITIONS = [
     displayLabel: 'Liquid Glass Dist · Empty .glass',
     contract: LIQUID_GLASS_DIST_CONTRACT,
     config: LIQUID_GLASS_DIST_DEFAULT_CONFIG,
-    normalizedConfig: createLiquidGlassDistGeometry(358, 140, 54),
+    normalizedConfig: createLiquidGlassDistGeometry(
+      SAVE_248_LAYER_C_GEOMETRY.width,
+      SAVE_248_LAYER_C_GEOMETRY.height,
+      SAVE_248_LAYER_C_GEOMETRY.radius,
+    ),
     geometry: { width: 324, height: 324, radius: 162 },
     pointerInteraction: true,
     animation: true,
@@ -1198,7 +1211,11 @@ export const EXPERIMENT_ELEVEN_NEW_GLASS_BASE_DEFINITIONS = [
     displayLabel: 'Chromium Configurable Glass · Requested preset',
     contract: CHROMIUM_CONFIGURABLE_GLASS_CONTRACT,
     config: CHROMIUM_CONFIGURABLE_GLASS_EXACT_CONFIG,
-    normalizedConfig: createChromiumConfigurableGlassGeometry(358, 140, 54),
+    normalizedConfig: createChromiumConfigurableGlassGeometry(
+      SAVE_248_LAYER_C_GEOMETRY.width,
+      SAVE_248_LAYER_C_GEOMETRY.height,
+      SAVE_248_LAYER_C_GEOMETRY.radius,
+    ),
     geometry: { width: 358, height: 140, radius: 54 },
   }),
   extractedObjectDefinition({
@@ -1208,7 +1225,11 @@ export const EXPERIMENT_ELEVEN_NEW_GLASS_BASE_DEFINITIONS = [
     displayLabel: 'Liquid Glass Shader · Procedural lens',
     contract: LIQUID_GLASS_SHADER_CONTRACT,
     config: LIQUID_GLASS_SHADER_DEFAULT_CONFIG,
-    normalizedConfig: createLiquidGlassShaderGeometryAdaptation(358, 140, 54),
+    normalizedConfig: createLiquidGlassShaderGeometryAdaptation(
+      SAVE_248_LAYER_C_GEOMETRY.width,
+      SAVE_248_LAYER_C_GEOMETRY.height,
+      SAVE_248_LAYER_C_GEOMETRY.radius,
+    ),
     geometry: {
       width: LIQUID_GLASS_SHADER_DEFAULT_CONFIG.width,
       height: LIQUID_GLASS_SHADER_DEFAULT_CONFIG.height,
@@ -1231,7 +1252,11 @@ export const EXPERIMENT_ELEVEN_NEW_GLASS_BASE_DEFINITIONS = [
     displayLabel: 'Pure CSS iOS 26 · Glass container',
     contract: PURE_CSS_IOS_26_CONTAINER_CONTRACT,
     config: PURE_CSS_IOS_26_CONTAINER_DEFAULT_CONFIG,
-    normalizedConfig: createPureCssIos26ContainerGeometry(358, 140, 54),
+    normalizedConfig: createPureCssIos26ContainerGeometry(
+      SAVE_248_LAYER_C_GEOMETRY.width,
+      SAVE_248_LAYER_C_GEOMETRY.height,
+      SAVE_248_LAYER_C_GEOMETRY.radius,
+    ),
     geometry: { width: 300, height: 200, radius: 30 },
   }),
   extractedObjectDefinition({
@@ -1241,7 +1266,11 @@ export const EXPERIMENT_ELEVEN_NEW_GLASS_BASE_DEFINITIONS = [
     displayLabel: 'liquid-glass-js · Rounded rectangle',
     contract: LIQUID_GLASS_JS_RECT_CONTRACT,
     config: LIQUID_GLASS_JS_RECT_DEFAULT_CONFIG,
-    normalizedConfig: createLiquidGlassJsRectGeometry(358, 140, 54),
+    normalizedConfig: createLiquidGlassJsRectGeometry(
+      SAVE_248_LAYER_C_GEOMETRY.width,
+      SAVE_248_LAYER_C_GEOMETRY.height,
+      SAVE_248_LAYER_C_GEOMETRY.radius,
+    ),
     geometry: { width: 196, height: 90, radius: 36 },
     strategy: 'live-document-webgl-snapshot',
     samplingSource: 'live-experiment-stage-capture',
@@ -1250,13 +1279,30 @@ export const EXPERIMENT_ELEVEN_NEW_GLASS_BASE_DEFINITIONS = [
   }),
 ] as const satisfies readonly NewGlassBaseDefinition[]
 
+/**
+ * Historical internal id suffix for the standardized duplicates.
+ *
+ * The literal `358x140-r54` is a *legacy identifier only*: it is the geometry the
+ * duplicates were first generated at. The duplicates now render at the Save 248
+ * Layer C geometry (`SAVE_248_LAYER_C_GEOMETRY`). The suffix is deliberately kept
+ * so existing save records, exported configs, and hydrated local state keep
+ * resolving to the same presets — renaming it would make the generator treat every
+ * duplicate as a new preset and append twelve extra saves. Read the geometry from
+ * `nativeLayout`, never from this string.
+ */
+const STANDARDIZED_DUPLICATE_LEGACY_ID_SUFFIX = ':358x140-r54'
+
+const STANDARDIZED_DUPLICATE_GEOMETRY_LABEL =
+  `${SAVE_248_LAYER_C_GEOMETRY.width}×${SAVE_248_LAYER_C_GEOMETRY.height}` +
+  ` r${SAVE_248_LAYER_C_GEOMETRY.radius}`
+
 function createNewGlassPreset(
   definition: NewGlassBaseDefinition,
   normalized: boolean,
 ): ExperimentElevenReferencePreset {
   const id = (
     normalized
-      ? `${definition.id}:358x140-r54`
+      ? `${definition.id}${STANDARDIZED_DUPLICATE_LEGACY_ID_SUFFIX}`
       : definition.id
   ) as NewGlassPresetId
   return preset({
@@ -1264,12 +1310,17 @@ function createNewGlassPreset(
     sourceFamily: definition.sourceFamily,
     sourcePresetKey: definition.sourcePresetKey,
     displayLabel: normalized
-      ? `${definition.displayLabel} · 358×140 r54`
+      ? `${definition.displayLabel} · ${STANDARDIZED_DUPLICATE_GEOMETRY_LABEL}`
       : definition.displayLabel,
     renderer: definition.renderer,
     config: normalized ? definition.normalizedConfig : definition.config,
     nativeLayout: normalized
-      ? layout(358, 140, 54, 'rounded-rect')
+      ? layout(
+          SAVE_248_LAYER_C_GEOMETRY.width,
+          SAVE_248_LAYER_C_GEOMETRY.height,
+          SAVE_248_LAYER_C_GEOMETRY.radius,
+          'rounded-rect',
+        )
       : definition.nativeLayout,
     compositing: definition.compositing,
     interactions: definition.interactions,
@@ -1284,7 +1335,8 @@ export const EXPERIMENT_ELEVEN_NEW_GLASS_PRESETS = Object.fromEntries([
     createNewGlassPreset(definition, false),
   ] as const),
   ...EXPERIMENT_ELEVEN_NEW_GLASS_BASE_DEFINITIONS.map((definition) => {
-    const id = `${definition.id}:358x140-r54` as NewGlassDuplicatePresetId
+    const id =
+      `${definition.id}${STANDARDIZED_DUPLICATE_LEGACY_ID_SUFFIX}` as NewGlassDuplicatePresetId
     return [id, createNewGlassPreset(definition, true)] as const
   }),
 ]) as Record<NewGlassPresetId, ExperimentElevenReferencePreset>

@@ -17,13 +17,24 @@ import {
 import {
   BUTTON_EXPERIMENT_SAVES,
   BUTTON_INVENTORY_AUDIT,
+  BUTTON_SAVE_ID_END,
+  BUTTON_SAVE_ID_START,
 } from '../src/components/button-experiment-set/saves.ts'
+import { REFERENCE_BUTTON_PRESETS } from '../src/components/button-experiment-set/registry.ts'
+import { EXPERIMENT_ELEVEN_LAYER_C_LAYOUT } from '../src/components/experiment-set-one/experimentElevenLayerCLayout.ts'
+import { APP_ROUTES } from '../src/components/layout/appRoutes.ts'
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = join(scriptDirectory, '..')
 const glassSourceRoot = '/Users/lekan/Dev/glass-projects-lab'
 const buttonSourceRoot = '/Users/lekan/Dev/button-projects-lab'
-const initialHead = '8fa174848cd9425ac7fa69d044ca46d2e0063fe9'
+/**
+ * The remote commit this corrective task started from. The previous mission
+ * baseline (8fa1748) is history now: its work is already published, so counting
+ * commits from it would report already-pushed commits as newly created here.
+ */
+const remoteBaselineHead = 'b197e1cbf0d8b0553d7529db685e2fc9e85ccfff'
+const sessionStartHead = process.env.MISSION_SESSION_START_HEAD ?? remoteBaselineHead
 const expectedProtectedHashes = {
   249: '7f1aea51affa4672d0ddc7c6cb5e542b715ee7eb7ac41b215eee3195ca381714',
   1036: '98be21582d5a8dbce94c8e492a1ebbc97c96ef2aa643a35da71408941da62ce5',
@@ -98,12 +109,92 @@ const existingRepairIds = [
   1056, 1066,
 ]
 
+const standardizedSaves = saves.filter((save) => save.id >= 1080 && save.id <= 1091)
+const standardizedLayouts = standardizedSaves.map((save) => save.e11LayerCLayout)
+const standardizedPresetIds = standardizedSaves.map((save) => save.e11LayerCReferencePreset)
+const referenceBlockIds = saves
+  .filter((save) => save.id >= 1038 && save.id <= 1091)
+  .map((save) => save.id)
+const missingReferenceIds = Array.from({ length: 54 }, (_, index) => 1038 + index)
+  .filter((id) => !referenceBlockIds.includes(id))
+const buttonRouteLabels = APP_ROUTES.map(({ label }) => label)
+
 const report = {
-  initialHead,
+  remoteBaselineHead,
+  sessionStartHead,
   finalHead: currentHead,
   originMain,
-  commitCountCreatedByTask: Number(git(['rev-list', '--count', `${initialHead}..${currentHead}`])),
+  commitsCreatedByThisTask: Number(
+    git(['rev-list', '--count', `${sessionStartHead}..${currentHead}`]),
+  ),
+  workingTreeStatus: git(['status', '--short', '--untracked-files=all']) || 'clean',
   targetRepositoryStatus: git(['status', '--short']) || 'clean',
+
+  standardizedGeometry: {
+    source:
+      'EXPERIMENT_ELEVEN_LAYER_C_LAYOUT (src/components/experiment-set-one/experimentElevenLayerCLayout.ts)',
+    width: EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.width,
+    height: EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.height,
+    radius: EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.radius,
+    saveIds: standardizedSaves.map(({ id }) => id),
+    labels: standardizedSaves.map(({ label }) => label),
+    layouts: standardizedLayouts,
+    allLayoutsMatchSource: standardizedLayouts.every(
+      (layout) =>
+        layout.width === EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.width &&
+        layout.height === EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.height &&
+        layout.radius === EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.radius,
+    ),
+    noLabelClaimsLegacyGeometry: standardizedSaves.every(
+      (save) => !save.label.includes('358') && !save.label.includes('r54'),
+    ),
+    legacyPresetIdStatus: {
+      suffix: ':358x140-r54',
+      retained: standardizedPresetIds.every((id) => id.endsWith(':358x140-r54')),
+      note:
+        'Historical internal identifier retained for save, export and local-state ' +
+        'compatibility; it no longer describes the rendered geometry.',
+    },
+  },
+  pairMapping: Array.from({ length: 12 }, (_, index) => {
+    const native = saveById.get(1068 + index)
+    const standardized = saveById.get(1080 + index)
+    return {
+      nativeSaveId: native?.id ?? null,
+      standardizedSaveId: standardized?.id ?? null,
+      nativePresetId: native?.e11LayerCReferencePreset ?? null,
+      standardizedPresetId: standardized?.e11LayerCReferencePreset ?? null,
+      nativeLayout: native?.e11LayerCLayout ?? null,
+      standardizedLayout: standardized?.e11LayerCLayout ?? null,
+      paired:
+        standardized?.e11LayerCReferencePreset ===
+        `${native?.e11LayerCReferencePreset}:358x140-r54`,
+    }
+  }),
+  measuredInitialPosition: {
+    x: process.env.MISSION_MEASURED_X ?? 'not supplied',
+    y: process.env.MISSION_MEASURED_Y ?? 'not supplied',
+    coordinateParent:
+      '.experiment-set-one-stage__canvas .experiment-four-layer-a__bezel-inset',
+    derivation:
+      'round((bezelInsetWidth - layerCWidth) / 2), round((bezelInsetHeight - layerCHeight) / 2)',
+  },
+  buttonRoute: {
+    path: '/button-source-experiments',
+    presentInCentralRouteList: APP_ROUTES.some(
+      ({ path }) => path === '/button-source-experiments',
+    ),
+    navigationVisibleFromStandalonePages:
+      process.env.MISSION_BUTTON_NAV_RESULT ?? 'not supplied',
+    requiredVisibleLabels: ['Experiment Set 1', 'Button Source Experiments'].filter(
+      (label) => buttonRouteLabels.includes(label),
+    ),
+  },
+  referenceSaveBlock: {
+    expectedRange: [1038, 1091],
+    presentCount: referenceBlockIds.length,
+    missingSaveIds: missingReferenceIds,
+  },
   sourceRepositoryStatuses: {
     glassProjectsLab: git(['status', '--short'], glassSourceRoot) || 'clean',
     buttonProjectsLab: git(['status', '--short'], buttonSourceRoot) || 'clean',
@@ -125,8 +216,22 @@ const report = {
     layerModel: ['A'],
     excludesLayers: ['B', 'C', 'D', 'E'],
   },
-  buttonPresetCount: BUTTON_INVENTORY_AUDIT.length,
+  buttonPresetCount: REFERENCE_BUTTON_PRESETS.length,
   buttonSaveCount: BUTTON_EXPERIMENT_SAVES.length,
+  buttonSaveRange: [BUTTON_SAVE_ID_START, BUTTON_SAVE_ID_END],
+  buttonSaveRangeActual: [
+    BUTTON_EXPERIMENT_SAVES[0]?.id ?? null,
+    BUTTON_EXPERIMENT_SAVES.at(-1)?.id ?? null,
+  ],
+  buttonExperimentCount: BUTTON_EXPERIMENTS.length,
+  buttonLayerAOnly: BUTTON_EXPERIMENT_SAVES.every(
+    (save) =>
+      Boolean(save.layerA) &&
+      !('layerB' in save) &&
+      !('layerC' in save) &&
+      !('layerD' in save) &&
+      !('layerE' in save),
+  ),
   buttonSaves: BUTTON_INVENTORY_AUDIT,
   duplicateIdCount: allSaveIds.length - new Set(allSaveIds).size,
   missingSourceObjects: {

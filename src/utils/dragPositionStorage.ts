@@ -25,3 +25,24 @@ export function saveDragPosition(id: string, position: DragPoint) {
 export function clearDragPosition(id: string) {
   localStorage.removeItem(storageKey(id));
 }
+
+/**
+ * Clears `id` together with every key it namespaces (`id:...`).
+ *
+ * Layer C stores one position per mounted reference object, so resetting layout
+ * positions has to sweep the whole namespace rather than the bare key.
+ */
+export function clearDragPositionNamespace(id: string) {
+  clearDragPosition(id);
+  const prefix = storageKey(`${id}:`);
+  try {
+    const matches: string[] = [];
+    for (let index = 0; index < localStorage.length; index += 1) {
+      const key = localStorage.key(index);
+      if (key && key.startsWith(prefix)) matches.push(key);
+    }
+    for (const key of matches) localStorage.removeItem(key);
+  } catch {
+    // Storage unavailable — nothing to sweep.
+  }
+}

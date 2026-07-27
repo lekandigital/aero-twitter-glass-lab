@@ -15,43 +15,71 @@ const repositoryRoot = join(scriptDirectory, '..')
 const savesPath = join(repositoryRoot, 'src/data/experiment-set-one/saves.json')
 const savesGitPath = relative(repositoryRoot, savesPath)
 const sourceSaveId = 249
+
+/**
+ * The generated reference saves occupy a fixed, reserved block starting here.
+ *
+ * Anchoring to a constant (rather than `max(existingId) + 1`) is what makes the
+ * generator idempotent and recoverable: regenerating always reproduces the same
+ * ids for the same registry order, so a record that was lost can be rebuilt in
+ * place instead of being appended at the end of the file with a new id.
+ */
+const referenceSaveIdStart = 1038
+
 const timestampBase = Date.parse('2026-07-25T12:00:00.000Z')
 const generatedPresetIds = new Set(EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS)
-const allowedCloneDifferences = new Set([
+
+/**
+ * Top-level keys the generator owns on a generated record. Everything else is
+ * inherited verbatim from the Save 249 base clone.
+ */
+const generatedKeys = [
   'id',
   'label',
   'savedAt',
   'sourceSaveId',
   'e11LayerCReferencePreset',
   'e11LayerCLayout',
-])
+]
+const allowedCloneDifferences = new Set(generatedKeys)
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'))
 }
 
+function readSavesAtRevision(revision) {
+  return JSON.parse(execFileSync('git', ['show', `${revision}:${savesGitPath}`], {
+    cwd: repositoryRoot,
+    encoding: 'utf8',
+    maxBuffer: 32 * 1024 * 1024,
+  }))
+}
+
+/**
+ * The pre-reference baseline is the most recent revision whose saves file
+ * predates the reserved generated block entirely.
+ *
+ * This deliberately keys off the reserved id range rather than "does any save
+ * carry a generated preset id". The latter reports a revision in which the
+ * generated saves were *deleted* as though it were the baseline, which hides
+ * exactly the data loss this audit exists to catch.
+ */
 function readPreReferenceSaves() {
   for (let generations = 0; generations < 100; generations += 1) {
     const revision = generations === 0 ? 'HEAD' : `HEAD${'^'.repeat(generations)}`
     let saves
     try {
-      saves = JSON.parse(execFileSync('git', ['show', `${revision}:${savesGitPath}`], {
-        cwd: repositoryRoot,
-        encoding: 'utf8',
-        maxBuffer: 32 * 1024 * 1024,
-      }))
+      saves = readSavesAtRevision(revision)
     } catch {
       break
     }
-    if (saves.every((save) => !generatedPresetIds.has(save.e11LayerCReferencePreset))) {
-      return saves
-    }
+    if (Math.max(...saves.map((save) => save.id)) < referenceSaveIdStart) return saves
   }
   throw new Error('Could not find the pre-reference-save baseline in recent Git history')
 }
 
 function stableHash(value) {
-  return createHash('sha256').update(JSON.stringify(value)).digest('hex')
+  return value === undefined ? null : createHash('sha256').update(JSON.stringify(value)).digest('hex')
 }
 
 function differingTopLevelKeys(left, right) {
@@ -59,59 +87,89 @@ function differingTopLevelKeys(left, right) {
   return [...keys].filter((key) => JSON.stringify(left[key]) !== JSON.stringify(right[key])).sort()
 }
 
+function referenceSaveLabel(id, definition) {
+  return `Save ${id} · Right overlap pane (249 base + ${definition.displayLabel})`
+}
+
+/**
+ * Build one generated record from the Save 249 base and the registry.
+ *
+ * `existing` only contributes its id, so a record that already exists keeps its
+ * id (and therefore its pairing) while its label, layout and preset-derived
+ * fields are refreshed from the registry.
+ */
+function buildReferenceSave(source, presetId, index, existing) {
+  const definition = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[presetId]
+  if (!definition) throw new Error(`Unknown Experiment Eleven reference preset ${presetId}`)
+  const id = existing?.id ?? referenceSaveIdStart + index
+  return {
+    ...structuredClone(source),
+    id,
+    label: referenceSaveLabel(id, definition),
+    savedAt: new Date(timestampBase + index * 1000).toISOString(),
+    sourceSaveId,
+    e11LayerCReferencePreset: presetId,
+    e11LayerCLayout: {
+      width: definition.nativeLayout.width,
+      height: definition.nativeLayout.height,
+      radius: definition.nativeLayout.radius,
+    },
+  }
+}
+
 export function generateReferenceSaves(saves) {
   const source = saves.find((save) => save.id === sourceSaveId)
   if (!source) throw new Error(`Source Save ${sourceSaveId} was not found`)
 
-  const existingReferenceSaves = saves.filter((save) =>
-    generatedPresetIds.has(save.e11LayerCReferencePreset),
-  )
   const existingByPreset = new Map()
-  for (const save of existingReferenceSaves) {
+  for (const save of saves) {
     const presetId = save.e11LayerCReferencePreset
+    if (!generatedPresetIds.has(presetId)) continue
     if (existingByPreset.has(presetId)) {
       throw new Error(`Duplicate Experiment Eleven reference preset ${presetId}`)
     }
     existingByPreset.set(presetId, save)
   }
 
-  const currentMaximumSaveId = Math.max(...saves.map((save) => save.id))
-  let nextNewId = currentMaximumSaveId + 1
   const added = []
+  const updated = []
+  const unchanged = []
 
   const generated = EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS.map((presetId, index) => {
     const existing = existingByPreset.get(presetId)
-    if (existing) return existing
-
-    const definition = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[presetId]
-    const id = nextNewId
-    nextNewId += 1
-    const save = {
-      ...structuredClone(source),
-      id,
-      label: `Save ${id} · Right overlap pane (249 base + ${definition.displayLabel})`,
-      savedAt: new Date(timestampBase + index * 1000).toISOString(),
-      sourceSaveId,
-      e11LayerCReferencePreset: presetId,
-      e11LayerCLayout: {
-        width: definition.nativeLayout.width,
-        height: definition.nativeLayout.height,
-        radius: definition.nativeLayout.radius,
-      },
-    }
-    added.push(save)
+    const save = buildReferenceSave(source, presetId, index, existing)
+    if (!existing) added.push(save)
+    else if (JSON.stringify(existing) !== JSON.stringify(save)) updated.push(save)
+    else unchanged.push(save)
     return save
   })
 
-  const firstNewId = added[0]?.id ?? null
-  const lastNewId = added.at(-1)?.id ?? null
+  const generatedIds = new Set(generated.map((save) => save.id))
+  const collisions = saves
+    .filter((save) => generatedIds.has(save.id))
+    .filter((save) => !generatedPresetIds.has(save.e11LayerCReferencePreset))
+    .map((save) => save.id)
+  if (collisions.length > 0) {
+    throw new Error(
+      `Saves ${collisions.join(', ')} occupy the reserved reference range ` +
+      `${referenceSaveIdStart}–${referenceSaveIdStart + EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS.length - 1} ` +
+      'but are not generated reference saves',
+    )
+  }
+
+  // Preserve every save the generator does not own, then re-insert the full
+  // generated block. User-authored records are never rewritten or reordered
+  // beyond the file-wide sort by id.
+  const preserved = saves.filter((save) => !generatedPresetIds.has(save.e11LayerCReferencePreset))
+
   return {
-    currentMaximumSaveId,
-    firstNewId,
-    lastNewId,
+    firstGeneratedId: generated[0]?.id ?? null,
+    lastGeneratedId: generated.at(-1)?.id ?? null,
     generated,
     added,
-    saves: [...saves, ...added].sort((left, right) => left.id - right.id),
+    updated,
+    unchanged,
+    saves: [...preserved, ...generated].sort((left, right) => left.id - right.id),
   }
 }
 
@@ -123,7 +181,7 @@ export function auditReferenceSaves(saves, baselineSaves = readPreReferenceSaves
   }
 
   const generated = saves
-    .filter((save) => save.id > baselineMaximumId)
+    .filter((save) => generatedPresetIds.has(save.e11LayerCReferencePreset))
     .sort((left, right) => left.id - right.id)
   const duplicateIdCount = saves.length - new Set(saves.map((save) => save.id)).size
   const unexpectedDifferences = generated.map((save) => ({
@@ -139,6 +197,10 @@ export function auditReferenceSaves(saves, baselineSaves = readPreReferenceSaves
   const removedExistingIds = baselineSaves
     .filter((baselineSave) => !saves.some((save) => save.id === baselineSave.id))
     .map((save) => save.id)
+  const unexpectedExtraIds = saves
+    .filter((save) => save.id > baselineMaximumId)
+    .filter((save) => !generatedPresetIds.has(save.e11LayerCReferencePreset))
+    .map((save) => save.id)
 
   return {
     newSaveCount: generated.length,
@@ -151,11 +213,13 @@ export function auditReferenceSaves(saves, baselineSaves = readPreReferenceSaves
     unexpectedDifferences,
     modifiedExistingIds,
     removedExistingIds,
+    unexpectedExtraIds,
     protectedSaves: Object.fromEntries([249, 1036, 1037].map((id) => {
       const current = saves.find((save) => save.id === id)
       const baseline = baselineSaves.find((save) => save.id === id)
       return [id, {
-        unchanged: JSON.stringify(current) === JSON.stringify(baseline),
+        present: current !== undefined,
+        unchanged: current !== undefined && JSON.stringify(current) === JSON.stringify(baseline),
         currentHash: stableHash(current),
         baselineHash: stableHash(baseline),
       }]
@@ -170,12 +234,10 @@ if (mode === '--generate') {
   const result = generateReferenceSaves(currentSaves)
   writeFileSync(savesPath, `${JSON.stringify(result.saves, null, 2)}\n`)
   console.log(
-    `Added ${result.added.length} Experiment Eleven reference saves` +
-    (result.added.length
-      ? ` (${result.firstNewId}–${result.lastNewId})`
-      : '') +
-    ` without rewriting ${result.generated.length - result.added.length} existing records ` +
-    `in ${savesPath}`,
+    `Wrote ${result.generated.length} Experiment Eleven reference saves ` +
+    `(${result.firstGeneratedId}–${result.lastGeneratedId}): ` +
+    `${result.added.length} added, ${result.updated.length} updated in place, ` +
+    `${result.unchanged.length} already current, in ${savesPath}`,
   )
 } else if (mode === '--check') {
   const expected = generateReferenceSaves(currentSaves).saves

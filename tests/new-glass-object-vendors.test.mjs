@@ -47,8 +47,15 @@ import {
   LIQUID_GLASS_SHADER_FRAGMENT,
   LIQUID_GLASS_SHADER_VERTEX,
 } from '../src/vendor/reference-glass/liquid-glass-shader/shaders.ts'
+import { EXPERIMENT_ELEVEN_LAYER_C_LAYOUT } from '../src/components/experiment-set-one/experimentElevenLayerCLayout.ts'
 
-const STANDARD_GEOMETRY = { width: 358, height: 140, radius: 54 }
+/**
+ * The geometry the standardized duplicates are actually resized to. Imported
+ * from the shared constant so this test exercises the shipped values rather
+ * than a stale literal. (Distinct from the Chromium *source-native* requested
+ * config, which legitimately remains 358 × 140 r54 and is asserted as such.)
+ */
+const STANDARD_GEOMETRY = EXPERIMENT_ELEVEN_LAYER_C_LAYOUT
 const GEOMETRY_KEYS = ['height', 'radius', 'width']
 
 function sha256(value) {
@@ -128,23 +135,43 @@ test('source-supported resized configs differ only by width, height, and radius'
   const pairs = [
     [
       CSS_LIQUID_GLASS_SWITCHER_DEFAULT_CONFIG,
-      createCssLiquidGlassSwitcherGeometry(358, 140, 54),
+      createCssLiquidGlassSwitcherGeometry(
+        STANDARD_GEOMETRY.width,
+        STANDARD_GEOMETRY.height,
+        STANDARD_GEOMETRY.radius,
+      ),
     ],
     [
       LIQUID_GLASS_DIST_DEFAULT_CONFIG,
-      createLiquidGlassDistGeometry(358, 140, 54),
+      createLiquidGlassDistGeometry(
+        STANDARD_GEOMETRY.width,
+        STANDARD_GEOMETRY.height,
+        STANDARD_GEOMETRY.radius,
+      ),
     ],
     [
       CHROMIUM_CONFIGURABLE_GLASS_EXACT_CONFIG,
-      createChromiumConfigurableGlassGeometry(358, 140, 54),
+      createChromiumConfigurableGlassGeometry(
+        STANDARD_GEOMETRY.width,
+        STANDARD_GEOMETRY.height,
+        STANDARD_GEOMETRY.radius,
+      ),
     ],
     [
       PURE_CSS_IOS_26_CONTAINER_DEFAULT_CONFIG,
-      createPureCssIos26ContainerGeometry(358, 140, 54),
+      createPureCssIos26ContainerGeometry(
+        STANDARD_GEOMETRY.width,
+        STANDARD_GEOMETRY.height,
+        STANDARD_GEOMETRY.radius,
+      ),
     ],
     [
       LIQUID_GLASS_JS_RECT_DEFAULT_CONFIG,
-      createLiquidGlassJsRectGeometry(358, 140, 54),
+      createLiquidGlassJsRectGeometry(
+        STANDARD_GEOMETRY.width,
+        STANDARD_GEOMETRY.height,
+        STANDARD_GEOMETRY.radius,
+      ),
     ],
   ]
   for (const [original, resized] of pairs) {
@@ -176,9 +203,21 @@ test('dist geometry preserves the source content-box border exactly', () => {
     borderWidth: 2,
     rootFontSizeAtSource: 16,
   })
-  const resized = createLiquidGlassDistGeometry(358, 140, 54)
-  assert.equal(resized.width - resized.borderWidth * 2, 354)
-  assert.equal(resized.height - resized.borderWidth * 2, 136)
+  const resized = createLiquidGlassDistGeometry(
+        STANDARD_GEOMETRY.width,
+        STANDARD_GEOMETRY.height,
+        STANDARD_GEOMETRY.radius,
+      )
+  assert.equal(
+    resized.width - resized.borderWidth * 2,
+    STANDARD_GEOMETRY.width - resized.borderWidth * 2,
+  )
+  assert.equal(
+    resized.height - resized.borderWidth * 2,
+    STANDARD_GEOMETRY.height - resized.borderWidth * 2,
+  )
+  assert.equal(resized.width, 293)
+  assert.equal(resized.height, 125)
 })
 
 test('Chromium free mode keeps exact numeric semantics and map generation', () => {
@@ -304,7 +343,11 @@ test('shader geometry incompatibility is explicit and isolated to the composite 
     LIQUID_GLASS_SHADER_DEFAULT_CONFIG.outputMask,
     'source-superellipse',
   )
-  const resized = createLiquidGlassShaderGeometryAdaptation(358, 140, 54)
+  const resized = createLiquidGlassShaderGeometryAdaptation(
+        STANDARD_GEOMETRY.width,
+        STANDARD_GEOMETRY.height,
+        STANDARD_GEOMETRY.radius,
+      )
   assert.deepEqual(
     {
       width: resized.width,
@@ -313,9 +356,9 @@ test('shader geometry incompatibility is explicit and isolated to the composite 
       outputMask: resized.outputMask,
     },
     {
-      width: 358,
-      height: 140,
-      radius: 54,
+      width: STANDARD_GEOMETRY.width,
+      height: STANDARD_GEOMETRY.height,
+      radius: STANDARD_GEOMETRY.radius,
       outputMask: 'rounded-rect-geometry-adaptation',
     },
   )

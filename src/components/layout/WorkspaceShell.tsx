@@ -8,6 +8,14 @@ type WorkspaceShellProps = {
   children: ReactNode;
 };
 
+type StandaloneWorkspaceShellProps = WorkspaceShellProps & {
+  /**
+   * Opt in to the compact central navigation. Standalone pages own their whole
+   * viewport, so without this they are only reachable by typing the URL.
+   */
+  showRouteSwitcher?: boolean;
+};
+
 export function WorkspaceShell({ children }: WorkspaceShellProps) {
   useEffect(() => {
     applyReferenceWallpaperDom(readReferenceWallpaperPreference());
@@ -24,7 +32,10 @@ export function WorkspaceShell({ children }: WorkspaceShellProps) {
   );
 }
 
-export function StandaloneWorkspaceShell({ children }: WorkspaceShellProps) {
+export function StandaloneWorkspaceShell({
+  children,
+  showRouteSwitcher = false,
+}: StandaloneWorkspaceShellProps) {
   useEffect(() => {
     applyReferenceWallpaperDom(readReferenceWallpaperPreference());
   }, []);
@@ -33,6 +44,7 @@ export function StandaloneWorkspaceShell({ children }: WorkspaceShellProps) {
     <>
       <AeroWallpaper />
       <div className="workspace-page">
+        {showRouteSwitcher ? <RouteSwitcher variant="compact" /> : null}
         {children}
       </div>
     </>
