@@ -23,6 +23,10 @@ import {
 import { REFERENCE_BUTTON_PRESETS } from '../src/components/button-experiment-set/registry.ts'
 import { EXPERIMENT_ELEVEN_LAYER_C_LAYOUT } from '../src/components/experiment-set-one/experimentElevenLayerCLayout.ts'
 import { APP_ROUTES } from '../src/components/layout/appRoutes.ts'
+import {
+  BUTTON_PLACEMENT_EXPERIMENTS,
+  BUTTON_PLACEMENT_EXPERIMENT_IDS,
+} from '../src/components/experiment-set-one/experimentVisibility.ts'
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = join(scriptDirectory, '..')
@@ -33,7 +37,7 @@ const buttonSourceRoot = '/Users/lekan/Dev/button-projects-lab'
  * baseline (8fa1748) is history now: its work is already published, so counting
  * commits from it would report already-pushed commits as newly created here.
  */
-const remoteBaselineHead = 'b197e1cbf0d8b0553d7529db685e2fc9e85ccfff'
+const remoteBaselineHead = '9155774fce798f82bd19557fb24b169948fcd8bc'
 const sessionStartHead = process.env.MISSION_SESSION_START_HEAD ?? remoteBaselineHead
 const expectedProtectedHashes = {
   249: '7f1aea51affa4672d0ddc7c6cb5e542b715ee7eb7ac41b215eee3195ca381714',
@@ -87,10 +91,11 @@ function glassRow(row) {
 
 const currentHead = git(['rev-parse', 'HEAD'])
 const originMain = git(['rev-parse', 'origin/main'])
-const allSaveIds = [
-  ...saves.map(({ id }) => id),
-  ...BUTTON_EXPERIMENT_SAVES.map(({ id }) => id),
-]
+// Two separate numbering spaces: Experiment Set One's save store, and the
+// button placement experiments' saves (1-59). Ids are only required to be
+// unique *within* a system, so duplicates are counted per system.
+const experimentSetOneSaveIds = saves.map(({ id }) => id)
+const buttonSaveIds = BUTTON_EXPERIMENT_SAVES.map(({ id }) => id)
 const protectedSaveHashComparison = Object.fromEntries(
   Object.entries(expectedProtectedHashes).map(([id, expectedHash]) => {
     const currentHash = hash(saveById.get(Number(id)))
@@ -117,7 +122,6 @@ const referenceBlockIds = saves
   .map((save) => save.id)
 const missingReferenceIds = Array.from({ length: 54 }, (_, index) => 1038 + index)
   .filter((id) => !referenceBlockIds.includes(id))
-const buttonRouteLabels = APP_ROUTES.map(({ label }) => label)
 
 const report = {
   remoteBaselineHead,
@@ -171,6 +175,26 @@ const report = {
         `${native?.e11LayerCReferencePreset}:358x140-r54`,
     }
   }),
+  layerCPositionSource: {
+    saveId: 248,
+    coordinateParent:
+      '.experiment-set-one-stage__canvas .experiment-four-layer-a__bezel-inset',
+    measuredWidth: 293,
+    measuredHeight: 125,
+    measuredRadius: 21,
+    measuredX: 15,
+    measuredY: 0,
+    note:
+      'Measured in a clean browser profile with no persisted drag positions, at ' +
+      '1440x900 and 1600x1000, with Layer A and Layer B both visible and hidden.',
+  },
+  standardizedInitialPositions: standardizedSaves.map((save) => ({
+    id: save.id,
+    position: save.e11LayerCInitialPosition ?? null,
+  })),
+  buttonSavesInsideExperimentSetOneJson: saves.filter(
+    (save) => typeof save.buttonPresetId === 'string',
+  ).length,
   measuredInitialPosition: {
     x: process.env.MISSION_MEASURED_X ?? 'not supplied',
     y: process.env.MISSION_MEASURED_Y ?? 'not supplied',
@@ -179,15 +203,13 @@ const report = {
     derivation:
       'round((bezelInsetWidth - layerCWidth) / 2), round((bezelInsetHeight - layerCHeight) / 2)',
   },
-  buttonRoute: {
-    path: '/button-source-experiments',
-    presentInCentralRouteList: APP_ROUTES.some(
+  buttonPlacementExperiments: {
+    // The button experiments are experiments inside Experiment Set 1 now, not a
+    // separate route: each placement's saves are the exact source buttons.
+    ids: BUTTON_PLACEMENT_EXPERIMENT_IDS,
+    labels: BUTTON_PLACEMENT_EXPERIMENTS.map(({ label }) => label),
+    standaloneRouteRemoved: !APP_ROUTES.some(
       ({ path }) => path === '/button-source-experiments',
-    ),
-    navigationVisibleFromStandalonePages:
-      process.env.MISSION_BUTTON_NAV_RESULT ?? 'not supplied',
-    requiredVisibleLabels: ['Experiment Set 1', 'Button Source Experiments'].filter(
-      (label) => buttonRouteLabels.includes(label),
     ),
   },
   referenceSaveBlock: {
@@ -233,7 +255,9 @@ const report = {
       !('layerE' in save),
   ),
   buttonSaves: BUTTON_INVENTORY_AUDIT,
-  duplicateIdCount: allSaveIds.length - new Set(allSaveIds).size,
+  duplicateIdCount:
+    experimentSetOneSaveIds.length - new Set(experimentSetOneSaveIds).size +
+    (buttonSaveIds.length - new Set(buttonSaveIds).size),
   missingSourceObjects: {
     newOriginalGlass: 12 - EXPERIMENT_ELEVEN_REFERENCE_OBJECT_AUDIT
       .filter(({ saveId }) => saveId >= 1068 && saveId <= 1079).length,

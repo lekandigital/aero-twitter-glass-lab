@@ -48,6 +48,9 @@ import {
   LIQUID_GLASS_SHADER_VERTEX,
 } from '../src/vendor/reference-glass/liquid-glass-shader/shaders.ts'
 import { EXPERIMENT_ELEVEN_LAYER_C_LAYOUT } from '../src/components/experiment-set-one/experimentElevenLayerCLayout.ts'
+import { CSS_LIQUID_GLASS_SWITCHER_ROUNDED_RECT_MAP } from '../src/vendor/reference-glass/css-liquid-glass-switcher/config.ts'
+import { LIQUID_GLASS_DIST_ROUNDED_RECT_MAP } from '../src/vendor/reference-glass/liquid-glass-dist/config.ts'
+import { EXPERIMENT_ELEVEN_REFERENCE_PRESETS } from '../src/components/experiment-set-one/experimentElevenReferencePresets.ts'
 
 /**
  * The geometry the standardized duplicates are actually resized to. Imported
@@ -400,4 +403,50 @@ test('renderer roots expose stable object-only audit attributes', () => {
     'utf8',
   )
   assert.doesNotMatch(liquidJsRenderer, /Hello 🍏|alert\(/)
+})
+
+test('the standardized duplicates use a displacement field generated for their own shape', () => {
+  // Both families declare `feImage` in objectBoundingBox units, so the source
+  // map is stretched over whatever box the object occupies. A pill map and a
+  // circle map stretched across 293x125 leave the optical field the wrong
+  // shape, which is the defect these generated maps remove.
+  const switcher = createCssLiquidGlassSwitcherGeometry(
+    STANDARD_GEOMETRY.width,
+    STANDARD_GEOMETRY.height,
+    STANDARD_GEOMETRY.radius,
+    CSS_LIQUID_GLASS_SWITCHER_ROUNDED_RECT_MAP,
+  )
+  const dist = createLiquidGlassDistGeometry(
+    STANDARD_GEOMETRY.width,
+    STANDARD_GEOMETRY.height,
+    STANDARD_GEOMETRY.radius,
+    LIQUID_GLASS_DIST_ROUNDED_RECT_MAP,
+  )
+
+  assert.equal(switcher.displacementMap, 'switcher-map-293x125-r21.png')
+  assert.equal(dist.displacementMap, 'frosted-map-293x125-r21.png')
+
+  // The source-native configs keep their authoritative source maps.
+  assert.equal(CSS_LIQUID_GLASS_SWITCHER_DEFAULT_CONFIG.displacementMap, 'switcher-map.webp')
+  assert.equal(LIQUID_GLASS_DIST_DEFAULT_CONFIG.displacementMap, 'frosted-map.png')
+
+  // And the registry actually wires the generated fields to the duplicates.
+  const switcherDuplicate =
+    EXPERIMENT_ELEVEN_REFERENCE_PRESETS['css-liquid-glass-switcher:switcher:358x140-r54']
+  const distDuplicate =
+    EXPERIMENT_ELEVEN_REFERENCE_PRESETS['liquid-glass-dist:glass:358x140-r54']
+  assert.equal(switcherDuplicate.config.displacementMap, 'switcher-map-293x125-r21.png')
+  assert.equal(distDuplicate.config.displacementMap, 'frosted-map-293x125-r21.png')
+
+  // Generated assets exist and are real PNG files.
+  for (const relativePath of [
+    'css-liquid-glass-switcher/switcher-map-293x125-r21.png',
+    'liquid-glass-dist/frosted-map-293x125-r21.png',
+  ]) {
+    const bytes = readFileSync(
+      new URL(`../public/vendor/reference-glass/${relativePath}`, import.meta.url),
+    )
+    assert.ok(bytes.length > 1000, `${relativePath} is present`)
+    assert.equal(bytes.subarray(1, 4).toString('ascii'), 'PNG', `${relativePath} is a PNG`)
+  }
 })

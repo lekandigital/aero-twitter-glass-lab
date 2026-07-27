@@ -37,10 +37,19 @@ export function experimentElevenLayerCPositionKey(referencePresetId?: string): s
   return referencePresetId ? `${base}:${referencePresetId}` : base;
 }
 
+/**
+ * Each button placement experiment keeps its own dragged position, so moving
+ * the button in one placement never shifts it in another.
+ */
+export function buttonPlacementPositionKey(experiment: string): string {
+  return `exp-set-1:button-placement:${experiment}`;
+}
+
 export function clearAllExperimentSetOnePositions() {
   for (const id of EXPERIMENT_SET_ONE_POSITION_KEY_LIST) {
     clearStoredPositionNamespace(id);
   }
+  clearStoredPositionNamespace('exp-set-1:button-placement');
 }
 
 export { loadDragPosition, saveDragPosition };

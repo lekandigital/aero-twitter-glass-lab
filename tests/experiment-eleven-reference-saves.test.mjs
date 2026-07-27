@@ -120,6 +120,8 @@ const expectedAllPresetIds = [
 ]
 
 const allowedDifferences = [
+  'displayId',
+  'e11LayerCInitialPosition',
   'e11LayerCLayout',
   'e11LayerCReferencePreset',
   'id',
@@ -330,6 +332,10 @@ test('each standardized duplicate changes only source-supported geometry', () =>
     'height',
     'radius',
     'outputMask',
+    // The displacement map is a geometry-derived asset: both of these families
+    // stretch an objectBoundingBox feImage over the object, so a resized object
+    // needs a field generated for its own shape.
+    'displacementMap',
   ])
   for (const baseId of expectedNewBasePresetIds) {
     const duplicateId = `${baseId}${STANDARDIZED_LEGACY_ID_SUFFIX}`
@@ -401,9 +407,12 @@ test('each requested preset has one Save 249 clone with its exact label and nati
   for (const [index, save] of generated.entries()) {
     const definition = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[expectedAllPresetIds[index]]
     assert.equal(save.sourceSaveId, 249)
+    // Standardized duplicates are labelled as the "b" variant of the save they
+    // duplicate, so the list reads 1068, 1068b, 1069, 1069b, …
+    const displayId = save.displayId ?? String(save.id)
     assert.equal(
       save.label,
-      `Save ${save.id} · Right overlap pane (249 base + ${definition.displayLabel})`,
+      `Save ${displayId} · Right overlap pane (249 base + ${definition.displayLabel})`,
     )
     assert.deepEqual(save.e11LayerCLayout, {
       width: definition.nativeLayout.width,
@@ -412,7 +421,10 @@ test('each requested preset has one Save 249 clone with its exact label and nati
     })
     assert.equal('e11LayerCPreserveOpacity' in save, false)
     assert.equal('e11LayerCBackgroundOverride' in save, false)
-    assert.deepEqual(differingKeys(sourceSave, save), allowedDifferences)
+    const expectedDifferences = allowedDifferences.filter(
+      (key) => (key !== 'e11LayerCInitialPosition' && key !== 'displayId') || key in save,
+    )
+    assert.deepEqual(differingKeys(sourceSave, save), expectedDifferences)
   }
 })
 
@@ -544,6 +556,7 @@ test('each native save pairs with its standardized duplicate on everything but g
     'height',
     'radius',
     'outputMask',
+    'displacementMap',
   ])
 
   for (let index = 0; index < 12; index += 1) {
@@ -585,7 +598,15 @@ test('each native save pairs with its standardized duplicate on everything but g
     // The saves themselves differ only in the generator-owned fields.
     assert.deepEqual(
       differingKeys(nativeSave, duplicateSave),
-      ['e11LayerCLayout', 'e11LayerCReferencePreset', 'id', 'label', 'savedAt'],
+      [
+        'displayId',
+        'e11LayerCInitialPosition',
+        'e11LayerCLayout',
+        'e11LayerCReferencePreset',
+        'id',
+        'label',
+        'savedAt',
+      ],
       `${nativeSave.id} -> ${duplicateSave.id} save fields`,
     )
   }
@@ -602,4 +623,97 @@ test('the source-native Chromium save keeps its requested 358×140 r54 configura
     [358, 140, 54],
   )
   assert.equal(native.displayLabel, 'Chromium Configurable Glass · Requested preset')
+})
+
+test('Save 1086 mounts no selected-option pill', () => {
+  // The source `.switcher::after` is the selected-option background: an 84px
+  // pill with its own fill and shadows. The extracted object has no options and
+  // no selection state, so it rendered as a stray grey pill inside the shell.
+  const css = readFileSync(
+    new URL('../src/vendor/reference-glass/css-liquid-glass-switcher/css-liquid-glass-switcher.css', import.meta.url),
+    'utf8',
+  )
+  assert.match(css, /\.e11-css-liquid-glass-switcher::after[\s\S]*?content:\s*none/)
+  assert.match(css, /\.e11-css-liquid-glass-switcher::(after|before)[\s\S]*?display:\s*none/)
+  // No pseudo-element may declare the source pill's 84px width or its fill.
+  assert.doesNotMatch(css, /width:\s*84px/)
+  assert.doesNotMatch(css, /--e11-switcher-c-glass\)\s*36%/)
+})
+
+test('Saves 1086 and 1087 use a displacement field built for the rounded rectangle', () => {
+  // Both families stretch an objectBoundingBox feImage across the object, so a
+  // pill map / circle map produces the wrong optical shape once resized.
+  const switcher = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[
+    `css-liquid-glass-switcher:switcher${STANDARDIZED_LEGACY_ID_SUFFIX}`
+  ]
+  const dist = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[
+    `liquid-glass-dist:glass${STANDARDIZED_LEGACY_ID_SUFFIX}`
+  ]
+  assert.equal(switcher.config.displacementMap, 'switcher-map-293x125-r21.png')
+  assert.equal(dist.config.displacementMap, 'frosted-map-293x125-r21.png')
+
+  // The source-native saves keep their authoritative source maps.
+  assert.equal(
+    EXPERIMENT_ELEVEN_REFERENCE_PRESETS['css-liquid-glass-switcher:switcher'].config.displacementMap,
+    'switcher-map.webp',
+  )
+  assert.equal(
+    EXPERIMENT_ELEVEN_REFERENCE_PRESETS['liquid-glass-dist:glass'].config.displacementMap,
+    'frosted-map.png',
+  )
+})
+
+test('button saves never enter the Experiment Set One save store', () => {
+  const inButtonBlock = saves.filter((save) => save.id >= 1092 && save.id <= 1150)
+  assert.deepEqual(inButtonBlock, [], 'reserved button block must be empty in Experiment Set One')
+  assert.equal(
+    saves.some((save) => 'experimentSetId' in save || 'layerA' in save),
+    false,
+    'no Button Source Experiment record may appear in the Experiment Set One store',
+  )
+})
+
+test('standardized saves carry Save 248 position and not the generic centred one', () => {
+  const source = saves.find((save) => save.id === 248)
+  assert.ok(source?.e4, 'Save 248 is the position authority')
+  const expected = {
+    x: Math.max(0, Math.round((source.e4.layerBWidth - STANDARDIZED_GEOMETRY.width) / 2)),
+    y: 0,
+  }
+  const genericY = Math.round((source.e4.layerBHeight - STANDARDIZED_GEOMETRY.height) / 2)
+
+  for (const save of saves.filter((s) => s.id >= 1080 && s.id <= 1091)) {
+    assert.deepEqual(save.e11LayerCInitialPosition, expected, `Save ${save.id}`)
+    assert.notEqual(save.e11LayerCInitialPosition.y, genericY, `Save ${save.id} must not use centred y`)
+  }
+  // Source-native saves keep their own default placement.
+  for (const save of saves.filter((s) => s.id >= 1068 && s.id <= 1079)) {
+    assert.equal('e11LayerCInitialPosition' in save, false, `Save ${save.id} keeps native placement`)
+  }
+})
+
+test('standardized duplicates are presented as the b variant of their native pair', () => {
+  for (let index = 0; index < 12; index += 1) {
+    const nativeSave = saves.find((save) => save.id === 1068 + index)
+    const duplicate = saves.find((save) => save.id === 1080 + index)
+    assert.equal(duplicate.displayId, `${nativeSave.id}b`, `Save ${duplicate.id} display id`)
+    assert.match(duplicate.label, new RegExp(`^Save ${nativeSave.id}b · `))
+    // Natives keep their plain numeric identity.
+    assert.equal('displayId' in nativeSave, false, `Save ${nativeSave.id} stays plain`)
+  }
+
+  // Sorting on the display key interleaves each duplicate after its native.
+  const key = (save) => {
+    const match = /^(\d+)([a-z])$/.exec(save.displayId ?? '')
+    return match ? [Number(match[1]), match[2].charCodeAt(0) - 96] : [save.id, 0]
+  }
+  const ordered = saves
+    .filter((save) => save.id >= 1068 && save.id <= 1091)
+    .sort((a, b) => {
+      const [ab, av] = key(a)
+      const [bb, bv] = key(b)
+      return ab - bb || av - bv
+    })
+    .map((save) => save.displayId ?? String(save.id))
+  assert.deepEqual(ordered.slice(0, 6), ['1068', '1068b', '1069', '1069b', '1070', '1070b'])
 })

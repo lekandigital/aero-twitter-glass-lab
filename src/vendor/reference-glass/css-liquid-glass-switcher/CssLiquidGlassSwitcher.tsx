@@ -80,7 +80,7 @@ export function CssLiquidGlassSwitcher({
               y="0"
               width="1"
               height="1"
-              href={`${VENDORED_ASSET_ROOT}/switcher-map.webp`}
+              href={`${VENDORED_ASSET_ROOT}/${config.displacementMap}`}
               result="map"
             />
             <feGaussianBlur

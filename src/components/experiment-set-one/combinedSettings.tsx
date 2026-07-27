@@ -1,3 +1,8 @@
+import { experimentSetOneSaveSortKey } from './saveIdRanges';
+import {
+  BUTTON_PLACEMENT_EXPERIMENTS,
+  buttonPlacementSaves,
+} from './buttonPlacementSaves';
 import {
   createContext,
   useCallback,
@@ -103,6 +108,7 @@ import {
 } from './sessionState';
 import {
   DEFAULT_EXPERIMENT_VISIBILITY,
+  isButtonPlacementExperiment,
   type ExperimentId,
   type ExperimentVisibility,
 } from './experimentVisibility';
@@ -524,7 +530,17 @@ function toggleId<T extends string | number>(items: readonly T[], value: T): T[]
 }
 
 function normalizeSaveVisualOrder(raw: number[] | undefined, saves: ExperimentSetOneSnapshot[]): number[] {
-  const availableIds = saves.map((save) => save.id);
+  // Seed the default order by display identity, not by raw numeric id. A "b"
+  // variant is appended to the save file so existing ids never shift, so file
+  // order would list every native first and then all the variants; sorting by
+  // display key instead yields 1038, 1038b, 1039, 1039b, …
+  const availableIds = [...saves]
+    .sort((a, b) => {
+      const [aBase, aVariant] = experimentSetOneSaveSortKey(a);
+      const [bBase, bVariant] = experimentSetOneSaveSortKey(b);
+      return aBase - bBase || aVariant - bVariant || a.id - b.id;
+    })
+    .map((save) => save.id);
   const rawIds = Array.isArray(raw) ? raw.filter((id): id is number => Number.isFinite(id)) : [];
   return Array.from(new Set([...rawIds, ...availableIds]));
 }
@@ -569,13 +585,22 @@ function moveSelectedSaveToOrderEdge(order: string[], key: string, edge: 'front'
   return [...next, key];
 }
 
-function saveOrderIndex(order: number[], id: number): number {
-  const index = order.indexOf(id);
-  return index === -1 ? Number.MAX_SAFE_INTEGER : index;
-}
 
-function sortSavesByVisualOrder<T extends { id: number }>(saves: T[], order: number[]): T[] {
-  return [...saves].sort((a, b) => saveOrderIndex(order, a.id) - saveOrderIndex(order, b.id) || a.id - b.id);
+/**
+ * The save list is always in numeric display order: 1038, 1038b, 1039, 1039b, …
+ *
+ * It deliberately ignores the persisted `saveVisualOrder`. That array is seeded
+ * from whatever saves existed when a session was first stored, so a browser that
+ * predates a newly added save pins it wherever it happened to land in the file —
+ * which parked every "b" variant at the end of the list instead of beside the
+ * save it resizes. Ordering is derived, not remembered.
+ */
+function sortSavesByVisualOrder<T extends { id: number; displayId?: string }>(saves: T[]): T[] {
+  return [...saves].sort((a, b) => {
+    const [aBase, aVariant] = experimentSetOneSaveSortKey(a);
+    const [bBase, bVariant] = experimentSetOneSaveSortKey(b);
+    return aBase - bBase || aVariant - bVariant || a.id - b.id;
+  });
 }
 
 /** Returns the saves that are available for a given experiment, applying scope filtering. */
@@ -925,6 +950,12 @@ function ExperimentSetOneProviderInner({ children }: { children: ReactNode }) {
     nine: boot.selectedSaveIdByExperiment?.nine ?? null,
     ten: boot.selectedSaveIdByExperiment?.ten ?? null,
     eleven: boot.selectedSaveIdByExperiment?.eleven ?? null,
+    'button-left-bottom': boot.selectedSaveIdByExperiment?.['button-left-bottom'] ?? null,
+    'button-left-top': boot.selectedSaveIdByExperiment?.['button-left-top'] ?? null,
+    'button-middle-right': boot.selectedSaveIdByExperiment?.['button-middle-right'] ?? null,
+    'button-middle-left': boot.selectedSaveIdByExperiment?.['button-middle-left'] ?? null,
+    'search-bar': boot.selectedSaveIdByExperiment?.['search-bar'] ?? null,
+    'gear-icon': boot.selectedSaveIdByExperiment?.['gear-icon'] ?? null,
   });
   const [selectedPanelSetSaveId, setSelectedPanelSetSaveId] = useState<number | null>(null);
   const [selectedExperimentIds, setSelectedExperimentIds] = useState<ExperimentId[]>(() =>
@@ -2234,49 +2265,32 @@ export function ExperimentSetOneSettingsDock() {
   );
   const saveScope = selection ? selection.experiment : activeExperiment;
   const scopedSaves = useMemo(() => {
+    // A button placement experiment's saves are the exact source buttons.
+    if (isButtonPlacementExperiment(saveScope)) {
+      return sortSavesByVisualOrder(buttonPlacementSaves(saveScope));
+    }
     if (saveScope === 'five') {
-      return sortSavesByVisualOrder(
-        saves.filter((s) => s.scope === 'four' || s.scope === 'five' || s.scope === 'general' || s.cornersOnly),
-        saveVisualOrder,
-      );
+      return sortSavesByVisualOrder(saves.filter((s) => s.scope === 'four' || s.scope === 'five' || s.scope === 'general' || s.cornersOnly));
     }
     if (saveScope === 'six' || saveScope === 'eight') {
-      return sortSavesByVisualOrder(
-        saves.filter((s) => s.scope === 'six' || s.scope === 'general' || s.cornersOnly),
-        saveVisualOrder,
-      );
+      return sortSavesByVisualOrder(saves.filter((s) => s.scope === 'six' || s.scope === 'general' || s.cornersOnly));
     }
     if (saveScope === 'seven') {
-      return sortSavesByVisualOrder(
-        saves.filter((s) => s.scope === 'seven' || s.scope === 'general' || s.cornersOnly),
-        saveVisualOrder,
-      );
+      return sortSavesByVisualOrder(saves.filter((s) => s.scope === 'seven' || s.scope === 'general' || s.cornersOnly));
     }
     if (saveScope === 'four') {
-      return sortSavesByVisualOrder(
-        saves.filter((s) => s.scope === 'four' || s.scope === 'general' || s.cornersOnly),
-        saveVisualOrder,
-      );
+      return sortSavesByVisualOrder(saves.filter((s) => s.scope === 'four' || s.scope === 'general' || s.cornersOnly));
     }
     if (saveScope === 'nine') {
-      return sortSavesByVisualOrder(
-        saves.filter((s) => s.scope === 'four' || s.scope === 'nine' || s.scope === 'general' || s.cornersOnly),
-        saveVisualOrder,
-      );
+      return sortSavesByVisualOrder(saves.filter((s) => s.scope === 'four' || s.scope === 'nine' || s.scope === 'general' || s.cornersOnly));
     }
     if (saveScope === 'ten') {
-      return sortSavesByVisualOrder(
-        saves.filter((s) => s.scope === 'four' || s.scope === 'nine' || s.scope === 'ten' || s.scope === 'general' || s.cornersOnly),
-        saveVisualOrder,
-      );
+      return sortSavesByVisualOrder(saves.filter((s) => s.scope === 'four' || s.scope === 'nine' || s.scope === 'ten' || s.scope === 'general' || s.cornersOnly));
     }
     if (saveScope === 'eleven') {
-      return sortSavesByVisualOrder(
-        saves.filter((s) => s.scope === 'eleven' || s.scope === 'general' || s.cornersOnly),
-        saveVisualOrder,
-      );
+      return sortSavesByVisualOrder(saves.filter((s) => s.scope === 'eleven' || s.scope === 'general' || s.cornersOnly));
     }
-    return sortSavesByVisualOrder(saves.filter((s) => s.scope === saveScope || s.cornersOnly), saveVisualOrder);
+    return sortSavesByVisualOrder(saves.filter((s) => s.scope === saveScope || s.cornersOnly));
   }, [saves, saveScope, saveVisualOrder]);
   const branchSaveIds = useMemo(
     () => new Set(RENDER_VARIANTS.flatMap((variant) => variant.saveIds)),
@@ -2755,6 +2769,9 @@ export function ExperimentSetOneSettingsDock() {
                   ['nine', 'center large pane'],
                   ['ten', 'center overlap pane'],
                   ['eleven', 'right overlap pane'],
+                  ...BUTTON_PLACEMENT_EXPERIMENTS.map(
+                    ({ id, label }) => [id, label.toLowerCase()] as const,
+                  ),
                 ] as const
               ).map(([id, label]) => {
                 const hasSelectedSaves = (selectedSaveKeysByExperiment[id]?.length ?? 0) > 0;

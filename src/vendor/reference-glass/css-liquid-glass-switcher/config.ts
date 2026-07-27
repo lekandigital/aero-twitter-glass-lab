@@ -16,7 +16,19 @@ export interface CssLiquidGlassSwitcherConfig {
   glassReflexDark: number;
   glassReflexLight: number;
   saturation: string;
+  /**
+   * Displacement-map asset driving the `feDisplacementMap`. The source map
+   * encodes the native 244x70 pill; because the `feImage` is declared in
+   * `objectBoundingBox` units it is stretched over whatever box the object
+   * occupies, so a resized object needs a map generated for its own shape.
+   * See `scripts/generate-rounded-rect-displacement-maps.mjs`.
+   */
+  displacementMap: string;
 }
+
+/** Displacement map generated for the standardized Save 248 Layer C geometry. */
+export const CSS_LIQUID_GLASS_SWITCHER_ROUNDED_RECT_MAP =
+  'switcher-map-293x125-r21.png';
 
 export const CSS_LIQUID_GLASS_SWITCHER_NATIVE_GEOMETRY = {
   width: 244,
@@ -38,18 +50,21 @@ export const CSS_LIQUID_GLASS_SWITCHER_DEFAULT_CONFIG = {
   glassReflexDark: 1,
   glassReflexLight: 1,
   saturation: '150%',
+  displacementMap: 'switcher-map.webp',
 } as const satisfies CssLiquidGlassSwitcherConfig;
 
 export function createCssLiquidGlassSwitcherGeometry(
   width: number,
   height: number,
   radius: number,
+  displacementMap: string = CSS_LIQUID_GLASS_SWITCHER_DEFAULT_CONFIG.displacementMap,
 ): CssLiquidGlassSwitcherConfig {
   return {
     ...CSS_LIQUID_GLASS_SWITCHER_DEFAULT_CONFIG,
     width,
     height,
     radius,
+    displacementMap,
   };
 }
 

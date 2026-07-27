@@ -77,7 +77,7 @@ export function LiquidGlassDistSurface({
       >
         <filter id={filterId} primitiveUnits="objectBoundingBox">
           <feImage
-            href={`${VENDORED_ASSET_ROOT}/frosted-map.png`}
+            href={`${VENDORED_ASSET_ROOT}/${config.displacementMap}`}
             x="0"
             y="0"
             width="1"

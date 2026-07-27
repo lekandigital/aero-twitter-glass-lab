@@ -9,6 +9,11 @@ import {
   EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS,
   EXPERIMENT_ELEVEN_REFERENCE_PRESETS,
 } from '../src/components/experiment-set-one/experimentElevenReferencePresets.ts'
+import {
+  LAYER_C_POSITION_SOURCE_SAVE_ID,
+  save248LayerCPosition,
+} from '../src/components/experiment-set-one/experimentElevenLayerCPosition.ts'
+import { EXPERIMENT_ELEVEN_LAYER_C_LAYOUT } from '../src/components/experiment-set-one/experimentElevenLayerCLayout.ts'
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = join(scriptDirectory, '..')
@@ -40,7 +45,30 @@ const generatedKeys = [
   'sourceSaveId',
   'e11LayerCReferencePreset',
   'e11LayerCLayout',
+  'e11LayerCInitialPosition',
+  'displayId',
 ]
+
+/**
+ * A standardized duplicate is a reference preset resized to the Save 248 Layer C
+ * geometry. Only these carry an explicit initial position; the source-native
+ * saves keep their own default placement.
+ */
+const STANDARDIZED_SUFFIXES = [':358x140-r54', ':save248-layer-c']
+
+function standardizedSuffixOf(presetId) {
+  return STANDARDIZED_SUFFIXES.find((suffix) => presetId.endsWith(suffix)) ?? null
+}
+
+function isStandardizedPreset(presetId) {
+  const layout = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[presetId]?.nativeLayout
+  return (
+    standardizedSuffixOf(presetId) !== null &&
+    layout?.width === EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.width &&
+    layout?.height === EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.height &&
+    layout?.radius === EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.radius
+  )
+}
 const allowedCloneDifferences = new Set(generatedKeys)
 
 function readJson(path) {
@@ -87,8 +115,17 @@ function differingTopLevelKeys(left, right) {
   return [...keys].filter((key) => JSON.stringify(left[key]) !== JSON.stringify(right[key])).sort()
 }
 
-function referenceSaveLabel(id, definition) {
-  return `Save ${id} · Right overlap pane (249 base + ${definition.displayLabel})`
+function referenceSaveLabel(displayId, definition) {
+  return `Save ${displayId} · Right overlap pane (249 base + ${definition.displayLabel})`
+}
+
+/**
+ * The native preset a standardized duplicate was derived from, e.g.
+ * `liquid-dom:notification-center-main:358x140-r54` -> `…-main`.
+ */
+function nativePresetIdFor(presetId) {
+  const suffix = standardizedSuffixOf(presetId)
+  return suffix ? presetId.slice(0, -suffix.length) : null
 }
 
 /**
@@ -98,28 +135,46 @@ function referenceSaveLabel(id, definition) {
  * id (and therefore its pairing) while its label, layout and preset-derived
  * fields are refreshed from the registry.
  */
-function buildReferenceSave(source, presetId, index, existing) {
+function buildReferenceSave(source, presetId, index, existing, positionSource, nativeIdByPreset) {
   const definition = EXPERIMENT_ELEVEN_REFERENCE_PRESETS[presetId]
   if (!definition) throw new Error(`Unknown Experiment Eleven reference preset ${presetId}`)
   const id = existing?.id ?? referenceSaveIdStart + index
+  const layout = {
+    width: definition.nativeLayout.width,
+    height: definition.nativeLayout.height,
+    radius: definition.nativeLayout.radius,
+  }
+  const standardized = isStandardizedPreset(presetId)
+  // Standardized duplicates open exactly where Save 248's Layer C sits. The
+  // offset is derived from Save 248's own Layer B box, not restated as a literal.
+  const initialPosition = standardized
+    ? save248LayerCPosition(positionSource.e4.layerBWidth, layout.width)
+    : null
+  // A standardized duplicate is presented as the "b" variant of the save it
+  // duplicates, so the list reads 1068, 1068b, 1069, 1069b, … instead of
+  // parking all twelve duplicates after the natives.
+  const nativeId = standardized ? nativeIdByPreset.get(nativePresetIdFor(presetId)) : null
+  const displayId = nativeId == null ? String(id) : `${nativeId}b`
   return {
     ...structuredClone(source),
     id,
-    label: referenceSaveLabel(id, definition),
+    label: referenceSaveLabel(displayId, definition),
     savedAt: new Date(timestampBase + index * 1000).toISOString(),
     sourceSaveId,
     e11LayerCReferencePreset: presetId,
-    e11LayerCLayout: {
-      width: definition.nativeLayout.width,
-      height: definition.nativeLayout.height,
-      radius: definition.nativeLayout.radius,
-    },
+    e11LayerCLayout: layout,
+    ...(initialPosition ? { e11LayerCInitialPosition: initialPosition } : {}),
+    ...(nativeId == null ? {} : { displayId }),
   }
 }
 
 export function generateReferenceSaves(saves) {
   const source = saves.find((save) => save.id === sourceSaveId)
   if (!source) throw new Error(`Source Save ${sourceSaveId} was not found`)
+  const positionSource = saves.find((save) => save.id === LAYER_C_POSITION_SOURCE_SAVE_ID)
+  if (!positionSource?.e4) {
+    throw new Error(`Layer C position source Save ${LAYER_C_POSITION_SOURCE_SAVE_ID} was not found`)
+  }
 
   const existingByPreset = new Map()
   for (const save of saves) {
@@ -135,9 +190,18 @@ export function generateReferenceSaves(saves) {
   const updated = []
   const unchanged = []
 
+  // Native preset id -> the save id that renders it, so each standardized
+  // duplicate can be labelled as that save's "b" variant.
+  const nativeIdByPreset = new Map(
+    EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS.map((presetId, index) => [
+      presetId,
+      existingByPreset.get(presetId)?.id ?? referenceSaveIdStart + index,
+    ]),
+  )
+
   const generated = EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS.map((presetId, index) => {
     const existing = existingByPreset.get(presetId)
-    const save = buildReferenceSave(source, presetId, index, existing)
+    const save = buildReferenceSave(source, presetId, index, existing, positionSource, nativeIdByPreset)
     if (!existing) added.push(save)
     else if (JSON.stringify(existing) !== JSON.stringify(save)) updated.push(save)
     else unchanged.push(save)
@@ -206,9 +270,11 @@ export function auditReferenceSaves(saves, baselineSaves = readPreReferenceSaves
     newSaveCount: generated.length,
     newSaveIdRange: generated.length === 0 ? null : [generated[0].id, generated.at(-1).id],
     labels: generated.map((save) => save.label),
+    displayIds: generated.map((save) => save.displayId ?? String(save.id)),
     sourceSaveIds: generated.map((save) => save.sourceSaveId),
     presetIds: generated.map((save) => save.e11LayerCReferencePreset),
     nativeLayouts: generated.map((save) => save.e11LayerCLayout),
+    initialPositions: generated.map((save) => save.e11LayerCInitialPosition ?? null),
     duplicateIdCount,
     unexpectedDifferences,
     modifiedExistingIds,

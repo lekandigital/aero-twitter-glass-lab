@@ -1,5 +1,5 @@
 /** Draggable panels for Experiment Set 1 — positions persist across refresh. */
-import type { CSSProperties, ReactNode } from 'react';
+import { Fragment, type CSSProperties, type ReactNode } from 'react';
 import {
   ExperimentOneDraggablePanel,
   ExperimentOneGlassPanel,
@@ -19,6 +19,8 @@ import { useExperimentSetOne } from './combinedSettings';
 import { VariantPanelSlots } from './VariantPanelSlots';
 import { SelectedSaveStagePanels } from './SelectedSavePreviews';
 import type { ExperimentId } from './experimentVisibility';
+import { BUTTON_PLACEMENT_EXPERIMENTS } from './buttonPlacementSaves';
+import { ButtonPlacementStage } from './ButtonPlacementStage';
 import type { ExperimentSetOneStageBackdropMode } from './combinedSettings';
 
 const STAGE_EXPERIMENTS: ExperimentId[] = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
@@ -47,6 +49,7 @@ export function ExperimentSetOneStage() {
     e11,
     selectedExperimentIds,
     selectedSaveKeysByExperiment,
+    selectedSaveIdByExperiment,
     stageBackdropMode,
   } = useExperimentSetOne();
   const nestedB = e4.layerBNestedInA;
@@ -100,6 +103,20 @@ export function ExperimentSetOneStage() {
     <main className="experiment-set-one-stage" aria-label="Experiment Set 1 panel stage">
       <ExperimentSetOneBackdrop mode={stageBackdropMode} />
       <div className="experiment-set-one-stage__canvas">
+        {BUTTON_PLACEMENT_EXPERIMENTS.map(({ id }) => (
+          <Fragment key={id}>
+            {show(id)
+              ? stageShell(
+                  id,
+                  <ButtonPlacementStage
+                    experiment={id}
+                    selectedSaveId={selectedSaveIdByExperiment[id] ?? null}
+                    layoutResetVersion={layoutResetVersion}
+                  />,
+                )
+              : null}
+          </Fragment>
+        ))}
         {show('one') && stageShell('one', (
           <ExperimentOneDraggablePanel
             initialPosition={{ x: 40, y: 40 }}
