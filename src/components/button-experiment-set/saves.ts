@@ -7,8 +7,15 @@ import {
   REFERENCE_BUTTON_PRESETS,
 } from './registry.ts';
 
-export const BUTTON_SAVE_ID_START = 1092 as const;
-export const BUTTON_SAVE_ID_END = 1150 as const;
+/**
+ * Button saves live in their own numbering space and start at 1.
+ *
+ * They are the saves *of* the six button placement experiments inside
+ * Experiment Set 1, not records in the Experiment Set One save store, so they
+ * do not need to avoid that store's ids and are not renumbered around it.
+ */
+export const BUTTON_SAVE_ID_START = 1 as const;
+export const BUTTON_SAVE_ID_END = 59 as const;
 
 const SAVED_AT_BASE = Date.parse('2026-07-26T12:00:00.000Z');
 
@@ -36,6 +43,10 @@ if (BUTTON_EXPERIMENT_SAVES.length !== REFERENCE_BUTTON_EXPECTED_COUNT) {
 
 if (BUTTON_EXPERIMENT_SAVES.at(-1)?.id !== BUTTON_SAVE_ID_END) {
   throw new Error(`Button save range must end at ${BUTTON_SAVE_ID_END}`);
+}
+
+if (BUTTON_EXPERIMENT_SAVES[0]?.id !== 1) {
+  throw new Error('Button saves must start at 1');
 }
 
 if (new Set(BUTTON_EXPERIMENT_SAVES.map(({ id }) => id)).size !== BUTTON_EXPERIMENT_SAVES.length) {

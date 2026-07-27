@@ -165,20 +165,40 @@ test('the combined mission audit is internally complete and collision-free', () 
   assert.equal(report.referenceSaveBlock.presentCount, 54)
   assert.deepEqual(report.referenceSaveBlock.missingSaveIds, [])
 
-  // The button route is reachable from the central route list.
-  assert.equal(report.buttonRoute.presentInCentralRouteList, true)
-  assert.deepEqual(report.buttonRoute.requiredVisibleLabels, [
-    'Experiment Set 1',
-    'Button Source Experiments',
+  // The button experiments live inside Experiment Set 1, not on their own route.
+  assert.equal(report.buttonPlacementExperiments.standaloneRouteRemoved, true)
+  assert.deepEqual(report.buttonPlacementExperiments.labels, [
+    'Button Left Bottom',
+    'Button Left Top',
+    'Button Middle Right',
+    'Button Middle Left',
+    'Search Bar',
+    'Gear Icon',
   ])
 
   assert.equal(report.buttonPresetCount, 59)
   assert.equal(report.buttonSaveCount, 59)
   assert.equal(report.buttonSaves.length, 59)
-  assert.deepEqual(report.buttonSaveRange, [1092, 1150])
-  assert.deepEqual(report.buttonSaveRangeActual, [1092, 1150])
+  assert.deepEqual(report.buttonSaveRange, [1, 59])
+  assert.deepEqual(report.buttonSaveRangeActual, [1, 59])
   assert.equal(report.buttonExperimentCount, 6)
   assert.equal(report.buttonLayerAOnly, true)
+
+  // Button saves live in their own numbering space, not the Experiment Set One store.
+  assert.equal(report.buttonSavesInsideExperimentSetOneJson, 0)
+
+  // Standardized saves open at Save 248's own Layer C offset.
+  assert.equal(report.layerCPositionSource.saveId, 248)
+  assert.deepEqual(
+    [report.layerCPositionSource.measuredX, report.layerCPositionSource.measuredY],
+    [15, 0],
+  )
+  assert.equal(report.standardizedInitialPositions.length, 12)
+  assert.ok(
+    report.standardizedInitialPositions.every(
+      ({ position }) => position && position.x === 15 && position.y === 0,
+    ),
+  )
   assert.deepEqual(report.buttonExperimentSet.layerModel, ['A'])
   assert.deepEqual(report.buttonExperimentSet.excludesLayers, ['B', 'C', 'D', 'E'])
   assert.equal(report.duplicateIdCount, 0)

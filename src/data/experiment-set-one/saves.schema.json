@@ -4,23 +4,66 @@
   "type": "array",
   "items": {
     "type": "object",
-    "required": ["id", "label", "savedAt", "e1", "e2", "e3"],
+    "required": [
+      "id",
+      "label",
+      "savedAt",
+      "e1",
+      "e2",
+      "e3"
+    ],
     "properties": {
-      "id": { "type": "integer" },
-      "label": { "type": "string" },
-      "savedAt": { "type": "string", "format": "date-time" },
+      "id": {
+        "type": "integer"
+      },
+      "label": {
+        "type": "string"
+      },
+      "savedAt": {
+        "type": "string",
+        "format": "date-time"
+      },
       "scope": {
         "type": "string",
-        "enum": ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "general"]
+        "enum": [
+          "one",
+          "two",
+          "three",
+          "four",
+          "five",
+          "six",
+          "seven",
+          "eight",
+          "nine",
+          "ten",
+          "eleven",
+          "general"
+        ]
       },
-      "generalPreset": { "type": "string" },
+      "generalPreset": {
+        "type": "string"
+      },
       "panelPosition": {
         "type": "object",
-        "properties": { "x": { "type": "number" }, "y": { "type": "number" } },
-        "required": ["x", "y"]
+        "properties": {
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ]
       },
-      "cornersOnly": { "type": "boolean" },
-      "sourceSaveId": { "type": "integer" },
+      "cornersOnly": {
+        "type": "boolean"
+      },
+      "sourceSaveId": {
+        "type": "integer"
+      },
       "e11LayerCReferencePreset": {
         "type": "string",
         "enum": [
@@ -77,23 +120,96 @@
           "chromium-configurable-glass:requested:358x140-r54",
           "liquid-glass-shader:lens:358x140-r54",
           "pure-css-ios-26:glass-container:358x140-r54",
-          "liquid-glass-js:rounded-rectangle:358x140-r54"
+          "liquid-glass-js:rounded-rectangle:358x140-r54",
+          "liquid-main:custom-300x200:save248-layer-c",
+          "liquidgl:demo-1-nav:save248-layer-c",
+          "fluid-glass:lens:save248-layer-c",
+          "fluid-glass:frosted:save248-layer-c",
+          "fluid-glass:bar:save248-layer-c",
+          "fluid-glass:diamond:save248-layer-c",
+          "fluid-glass:fluid:save248-layer-c",
+          "liquid-web:apple:save248-layer-c",
+          "liquid-web:library-default:save248-layer-c",
+          "liquid-web:fishbowl:save248-layer-c",
+          "liquid-web:frosted:save248-layer-c",
+          "liquid-web:prism:save248-layer-c",
+          "liquid-web:flat-pane:save248-layer-c",
+          "liquid-web:hero-circle:save248-layer-c",
+          "liquid-web:reading-glass:save248-layer-c",
+          "liquid-web:orbit:save248-layer-c",
+          "liquid-web:engine-panel:save248-layer-c",
+          "wge-next:form-submit-button:save248-layer-c",
+          "wge-next:bottom-bar:save248-layer-c",
+          "web-glass:thick-lens:save248-layer-c",
+          "web-glass:razor-edge:save248-layer-c",
+          "web-glass:bottom-bar:save248-layer-c",
+          "web-glass:stress-panel:save248-layer-c",
+          "web-glass:storybook:save248-layer-c",
+          "glass-surface:component-default:save248-layer-c",
+          "glass-surface:upstream-demo:save248-layer-c",
+          "glass-surface:ios-pill:save248-layer-c",
+          "glass-surface:prism:save248-layer-c",
+          "glass-surface:achromatic:save248-layer-c",
+          "glass-surface:convex:save248-layer-c"
         ]
       },
       "e11LayerCLayout": {
         "type": "object",
         "properties": {
-          "width": { "type": "number", "exclusiveMinimum": 0 },
-          "height": { "type": "number", "exclusiveMinimum": 0 },
-          "radius": { "type": "number", "minimum": 0 }
+          "width": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "height": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "radius": {
+            "type": "number",
+            "minimum": 0
+          }
         },
-        "required": ["width", "height", "radius"],
+        "required": [
+          "width",
+          "height",
+          "radius"
+        ],
         "additionalProperties": false
       },
-      "e1": { "type": "object" },
-      "e2": { "type": "object" },
-      "e3": { "type": "object" },
-      "e4": { "type": "object" }
+      "e11LayerCInitialPosition": {
+        "description": "Explicit initial Layer C position in the draggable bounds coordinate space (.experiment-four-layer-a__bezel-inset). Set on the standardized reference saves so they open exactly where Save 248 Layer C sits.",
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ],
+        "additionalProperties": false
+      },
+      "displayId": {
+        "description": "Display identifier for a lettered variant of another save (e.g. 1068b). Labelling and list ordering only; the numeric id remains authoritative.",
+        "type": "string",
+        "pattern": "^[0-9]+[a-z]$"
+      },
+      "e1": {
+        "type": "object"
+      },
+      "e2": {
+        "type": "object"
+      },
+      "e3": {
+        "type": "object"
+      },
+      "e4": {
+        "type": "object"
+      }
     }
   }
 }

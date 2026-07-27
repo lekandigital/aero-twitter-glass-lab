@@ -6,6 +6,7 @@ import {
   EXPERIMENT_SET_ONE_POSITION_KEYS,
   experimentElevenLayerCPositionKey,
 } from './dragPositions';
+import { isValidLayerCPosition } from './experimentElevenLayerCPosition';
 import type { ExperimentSetOneSnapshot } from './savedConfigs';
 import { ExperimentSetTwoDraggableShell } from '../experiment-set-two/primitives';
 import {
@@ -317,14 +318,20 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
             layer.id === 'c'
               ? experimentElevenLayerCPositionKey(referencePreset)
               : layer.persistKey,
-          initialPosition: {
-            x: referencePreset
-              ? Math.round((e11.layerBWidth as number - (material.layerBWidth as number)) / 2)
-              : Math.max(0, Math.round((e11.layerBWidth as number - (material.layerBWidth as number)) / 2)),
-            y: referencePreset
-              ? Math.round((e11.layerBHeight as number - (material.layerBHeight as number)) / 2)
-              : 0,
-          },
+          // An explicit saved position wins. The standardized reference saves
+          // carry Save 248's exact Layer C offset, so they must not fall back to
+          // the generic vertically-centred reference placement.
+          initialPosition:
+            (layer.id === 'c' && isValidLayerCPosition(selectedSave?.e11LayerCInitialPosition)
+              ? selectedSave.e11LayerCInitialPosition
+              : undefined) ?? {
+              x: referencePreset
+                ? Math.round((e11.layerBWidth as number - (material.layerBWidth as number)) / 2)
+                : Math.max(0, Math.round((e11.layerBWidth as number - (material.layerBWidth as number)) / 2)),
+              y: referencePreset
+                ? Math.round((e11.layerBHeight as number - (material.layerBHeight as number)) / 2)
+                : 0,
+            },
         }];
       }),
     [e11, e11LayerCLayout, layerAVisible, layerBVisible, layerCVisible, layerDVisible, layerEVisible, selectedSave],

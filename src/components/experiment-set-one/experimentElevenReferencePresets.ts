@@ -22,11 +22,13 @@ import { APPLE_LIQUID_GLASS_SHADER_PARAMETERS } from '../../vendor/reference-gla
 import {
   CSS_LIQUID_GLASS_SWITCHER_CONTRACT,
   CSS_LIQUID_GLASS_SWITCHER_DEFAULT_CONFIG,
+  CSS_LIQUID_GLASS_SWITCHER_ROUNDED_RECT_MAP,
   createCssLiquidGlassSwitcherGeometry,
 } from '../../vendor/reference-glass/css-liquid-glass-switcher/config.ts'
 import {
   LIQUID_GLASS_DIST_CONTRACT,
   LIQUID_GLASS_DIST_DEFAULT_CONFIG,
+  LIQUID_GLASS_DIST_ROUNDED_RECT_MAP,
   createLiquidGlassDistGeometry,
 } from '../../vendor/reference-glass/liquid-glass-dist/config.ts'
 import {
@@ -1184,6 +1186,9 @@ export const EXPERIMENT_ELEVEN_NEW_GLASS_BASE_DEFINITIONS = [
       SAVE_248_LAYER_C_GEOMETRY.width,
       SAVE_248_LAYER_C_GEOMETRY.height,
       SAVE_248_LAYER_C_GEOMETRY.radius,
+      // The source map encodes the 244x70 pill and is stretched by the
+      // objectBoundingBox feImage; the resized object needs its own field.
+      CSS_LIQUID_GLASS_SWITCHER_ROUNDED_RECT_MAP,
     ),
     geometry: { width: 244, height: 70, radius: 35 },
   }),
@@ -1198,6 +1203,9 @@ export const EXPERIMENT_ELEVEN_NEW_GLASS_BASE_DEFINITIONS = [
       SAVE_248_LAYER_C_GEOMETRY.width,
       SAVE_248_LAYER_C_GEOMETRY.height,
       SAVE_248_LAYER_C_GEOMETRY.radius,
+      // The source map encodes the native circle; without a rounded-rectangle
+      // field the resized object refracts only in a central circular region.
+      LIQUID_GLASS_DIST_ROUNDED_RECT_MAP,
     ),
     geometry: { width: 324, height: 324, radius: 162 },
     pointerInteraction: true,
@@ -1341,7 +1349,7 @@ export const EXPERIMENT_ELEVEN_NEW_GLASS_PRESETS = Object.fromEntries([
   }),
 ]) as Record<NewGlassPresetId, ExperimentElevenReferencePreset>
 
-export const EXPERIMENT_ELEVEN_REFERENCE_PRESETS = {
+const BASE_REFERENCE_PRESETS = {
   'liquid-main:custom-300x200': preset({
     id: 'liquid-main:custom-300x200',
     sourceFamily: 'liquid-main',
@@ -1678,7 +1686,85 @@ export const EXPERIMENT_ELEVEN_REFERENCE_PRESETS = {
   ...EXPERIMENT_ELEVEN_NEW_GLASS_PRESETS,
 } as const satisfies Record<string, ExperimentElevenReferencePreset>
 
-export type ExperimentElevenReferencePresetId = keyof typeof EXPERIMENT_ELEVEN_REFERENCE_PRESETS
+/** Id suffix for a source object resized to the Save 248 Layer C geometry. */
+export const SAVE_248_RESIZE_SUFFIX = ':save248-layer-c'
+
+type BaseReferencePresetId = keyof typeof BASE_REFERENCE_PRESETS
+
+/**
+ * The original thirty Right-overlap reference objects. Every one of these gets
+ * a Save 248 Layer C resize, so the save list alternates native/"b" with no
+ * gaps rather than only the twelve newest objects having a counterpart.
+ */
+const ORIGINAL_REFERENCE_PRESET_IDS = Object.keys(BASE_REFERENCE_PRESETS).slice(
+  0,
+  30,
+) as BaseReferencePresetId[]
+
+/**
+ * Resize a source config to the standardized geometry.
+ *
+ * Only geometry keys the source itself exposes are touched — width, height and
+ * whichever radius spelling the family uses, at the top level and inside a
+ * nested `geometry` block. Every other optical value is inherited untouched.
+ */
+function resizeConfigToSave248(
+  config: Readonly<Record<string, unknown>>,
+): Readonly<Record<string, unknown>> {
+  const resizeBlock = (block: Record<string, unknown>) => {
+    const next = { ...block }
+    if ('width' in next) next.width = SAVE_248_LAYER_C_GEOMETRY.width
+    if ('height' in next) next.height = SAVE_248_LAYER_C_GEOMETRY.height
+    for (const key of ['radius', 'cornerRadius', 'borderRadius']) {
+      if (key in next) next[key] = SAVE_248_LAYER_C_GEOMETRY.radius
+    }
+    return next
+  }
+  const next = resizeBlock({ ...config })
+  if (next.geometry && typeof next.geometry === 'object' && !Array.isArray(next.geometry)) {
+    next.geometry = resizeBlock(next.geometry as Record<string, unknown>)
+  }
+  return next as Readonly<Record<string, unknown>>
+}
+
+function save248ResizedPreset(
+  base: ExperimentElevenReferencePreset,
+): ExperimentElevenReferencePreset {
+  return {
+    ...base,
+    id: `${base.id}${SAVE_248_RESIZE_SUFFIX}`,
+    displayLabel:
+      `${base.displayLabel} · ${SAVE_248_LAYER_C_GEOMETRY.width}×` +
+      `${SAVE_248_LAYER_C_GEOMETRY.height} r${SAVE_248_LAYER_C_GEOMETRY.radius}`,
+    nativeLayout: layout(
+      SAVE_248_LAYER_C_GEOMETRY.width,
+      SAVE_248_LAYER_C_GEOMETRY.height,
+      SAVE_248_LAYER_C_GEOMETRY.radius,
+      base.nativeLayout.geometry,
+    ),
+    config: resizeConfigToSave248(base.config),
+  }
+}
+
+const SAVE_248_RESIZED_PRESETS = Object.fromEntries(
+  ORIGINAL_REFERENCE_PRESET_IDS.map((id) => [
+    `${id}${SAVE_248_RESIZE_SUFFIX}`,
+    save248ResizedPreset(BASE_REFERENCE_PRESETS[id]),
+  ]),
+) as Record<`${BaseReferencePresetId}${typeof SAVE_248_RESIZE_SUFFIX}`, ExperimentElevenReferencePreset>
+
+/**
+ * Appended last so the existing generated save ids (1038–1091) never shift; the
+ * save list interleaves them by display id instead.
+ */
+export const EXPERIMENT_ELEVEN_REFERENCE_PRESETS = {
+  ...BASE_REFERENCE_PRESETS,
+  ...SAVE_248_RESIZED_PRESETS,
+}
+
+export type ExperimentElevenReferencePresetId =
+  | BaseReferencePresetId
+  | `${BaseReferencePresetId}${typeof SAVE_248_RESIZE_SUFFIX}`
 
 export const EXPERIMENT_ELEVEN_REFERENCE_PRESET_IDS = Object.freeze(
   Object.keys(EXPERIMENT_ELEVEN_REFERENCE_PRESETS) as ExperimentElevenReferencePresetId[],

@@ -11,6 +11,14 @@ export type AppRoute = {
   path: string;
   label: string;
   external?: boolean;
+  /**
+   * Marks a top-level experiment set. These get a prominent, always-visible
+   * switcher in each experiment set's own header, because the compact route
+   * strip scrolls horizontally and can push entries out of the first viewport.
+   */
+  experimentSet?: boolean;
+  /** Short label for the prominent experiment-set switcher. */
+  shortLabel?: string;
 };
 
 export const APP_ROUTES: readonly AppRoute[] = [
@@ -25,7 +33,6 @@ export const APP_ROUTES: readonly AppRoute[] = [
   { path: '/approach-1', label: 'Approach 1' },
   { path: '/approach-2', label: 'Approach 2' },
   { path: '/experiment-set-1', label: 'Experiment Set 1' },
-  { path: '/button-source-experiments', label: 'Button Source Experiments' },
   { path: '/showcase', label: 'Showcase' },
   { path: '/references', label: 'References' },
   { path: '/reference-lab', label: 'Reference Lab' },

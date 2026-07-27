@@ -2151,3 +2151,47 @@
     gap: 0.1rem;
   }
 }
+
+/*
+ * Button Source Experiments entry inside the dock's experiment selector.
+ * Styled as a peer of the experiment tabs so the separate experiment set is
+ * reachable from the row where experiments are actually chosen.
+ */
+.experiment-one-settings-dock__experiment-tab--link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+/*
+ * Button placement experiments. Layer A only: the selected save's exact source
+ * button is mounted inside the standard draggable shell, so it opens centred in
+ * the stage and can be dragged like any other layer.
+ */
+.experiment-button-placement-draggable {
+  pointer-events: auto;
+}
+
+.experiment-button-placement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.experiment-button-placement__layer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.experiment-button-placement__empty {
+  margin: 0;
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  color: var(--aero-text-muted);
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px dashed rgba(255, 255, 255, 0.28);
+}

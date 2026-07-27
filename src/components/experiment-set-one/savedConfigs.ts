@@ -17,6 +17,11 @@ import committedSavesJson from '../../data/experiment-set-one/saves.json';
 import { downloadTextFile } from '../../utils/downloadTextFile';
 import { renderVariantForSaveId, type RenderVariantSlug } from '../../render-variants/manifest';
 import type { ExperimentElevenReferencePresetId } from './experimentElevenReferencePresets';
+import {
+  isButtonExperimentSaveId,
+  migrateReservedButtonRangeSaves,
+} from './saveIdRanges';
+import type { ExperimentElevenLayerCPosition } from './experimentElevenLayerCPosition';
 
 // Earliest exported config in ~/Downloads that includes Experiment Four.
 // Used only as a one-time migration heuristic for older saves.
@@ -81,8 +86,21 @@ export type ExperimentSetOneSnapshot = {
   e11LayerD?: Partial<E4MaterialSettings>;
   /** Optional E11-only material override for the horizontal right-overlap Layer E strip. */
   e11LayerE?: Partial<E4MaterialSettings>;
+  /**
+   * Display identifier for saves that are a lettered variant of another save
+   * (e.g. `1068b` — the standardized duplicate of Save 1068). Purely for
+   * labelling and list ordering; the numeric `id` remains authoritative.
+   */
+  displayId?: string;
   /** Optional E11-only layout override for Layer C. */
   e11LayerCLayout?: ExperimentElevenTopLayerLayoutSnapshot;
+  /**
+   * Optional explicit initial position for Layer C, in the coordinate space of
+   * the draggable shell's bounds (`.experiment-four-layer-a__bezel-inset`).
+   * Set on the standardized reference saves so they open exactly where Save
+   * 248's Layer C sits instead of using the generic centred fallback.
+   */
+  e11LayerCInitialPosition?: ExperimentElevenLayerCPosition;
   /** Optional E11-only layout override for Layer D. */
   e11LayerDLayout?: ExperimentElevenTopLayerLayoutSnapshot;
   /** Optional E11-only layout override for Layer E. */
@@ -97,6 +115,11 @@ export type ExperimentSetOneSnapshot = {
   sourceSaveId?: number;
   /** Semantic appearance opt-in (e.g. "frosted-blue-matte"). Drives a data attribute so CSS keys on the style, not the save's id. */
   bezelStyle?: string;
+  /**
+   * Exact source button mounted by a button placement experiment's save.
+   * Present only on the six button placement experiments' saves.
+   */
+  buttonPresetId?: string;
   /** General-scope preset id (e.g. accidental glitch captures). */
   generalPreset?: string;
   /** Stage drag position for general presets (experiment-four layer A slot). */
@@ -286,7 +309,10 @@ function readLegacyStorage(): ExperimentSetOneSnapshot[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw) as ExperimentSetOneSnapshot[];
     if (!Array.isArray(parsed)) return [];
-    return dedupeSnapshots(parsed.map(migrateSnapshotScope));
+    // A stale profile may still hold records inside the reserved Button Source
+    // Experiment block (1092-1150); move the genuine ones out and drop strays.
+    const { saves } = migrateReservedButtonRangeSaves(parsed.map(migrateSnapshotScope));
+    return dedupeSnapshots(saves);
   } catch {
     return memoryStorageFallback ?? [];
   }
@@ -327,7 +353,13 @@ function withNormalizedE4(save: ExperimentSetOneSnapshot): ExperimentSetOneSnaps
 }
 
 function isReservedSaveId(id: number): boolean {
-  return id === REFERENCE_CORNER_SAVE_ID || committedSaveIds().has(id);
+  // The Button Source Experiments own 1092-1150 outright, so Experiment Set One
+  // must never allocate a new save into that block.
+  return (
+    id === REFERENCE_CORNER_SAVE_ID ||
+    isButtonExperimentSaveId(id) ||
+    committedSaveIds().has(id)
+  );
 }
 
 function nextAvailableSaveId(existingIds: Set<number>): number {
@@ -337,7 +369,9 @@ function nextAvailableSaveId(existingIds: Set<number>): number {
 }
 
 function assembleSaveList(storage: ExperimentSetOneSnapshot[]): ExperimentSetOneSnapshot[] {
-  const materialSaves = dedupeSnapshots(storage.filter((save) => !save.cornersOnly && save.id !== REFERENCE_CORNER_SAVE_ID))
+  // Final guard: nothing Experiment Set One renders may sit in the button block.
+  const { saves: separated } = migrateReservedButtonRangeSaves(storage);
+  const materialSaves = dedupeSnapshots(separated.filter((save) => !save.cornersOnly && save.id !== REFERENCE_CORNER_SAVE_ID))
     .sort((a, b) => a.id - b.id)
     .map(withNormalizedE4);
   return [builtInReferenceCornerSave(), ...materialSaves];
@@ -352,7 +386,10 @@ export function getBuiltInReferenceCornerSave(): ExperimentSetOneSnapshot {
 }
 
 export function setExperimentSetOneRuntimeSaves(saves: ExperimentSetOneSnapshot[]) {
-  runtimeSaves = dedupeSnapshots(saves.map((save) => ({ ...migrateSnapshotScope(save), ...normalizeLayoutSnapshot(save) })));
+  const { saves: withoutButtonRange } = migrateReservedButtonRangeSaves(saves);
+  runtimeSaves = dedupeSnapshots(
+    withoutButtonRange.map((save) => ({ ...migrateSnapshotScope(save), ...normalizeLayoutSnapshot(save) })),
+  );
 }
 
 export async function hydrateExperimentSetOneSaves(): Promise<boolean> {

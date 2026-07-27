@@ -84,11 +84,14 @@
 .route-switcher--compact {
   max-width: none;
   margin: 0 0 0.5rem;
-  flex-wrap: nowrap;
+  /*
+   * Wrap rather than scroll. A single `overflow-x: auto` row pushed entries
+   * near the end of the route list (Button Source Experiments among them)
+   * outside the first viewport, which made them undiscoverable.
+   */
+  flex-wrap: wrap;
   gap: 0.35rem;
   padding: 0.3rem 0.5rem;
-  overflow-x: auto;
-  scrollbar-width: thin;
 }
 
 .route-switcher--compact a {
@@ -96,6 +99,52 @@
   padding: 0.2rem 0.55rem;
   font-size: 0.72rem;
   white-space: nowrap;
+}
+
+/* Setup Dashboard experiment-set cards. */
+.setup-experiment-sets {
+  margin-top: 1.5rem;
+}
+
+.setup-experiment-sets__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.setup-experiment-sets__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.setup-experiment-sets__card:hover {
+  background: rgba(94, 184, 255, 0.22);
+  border-color: rgba(94, 184, 255, 0.55);
+}
+
+.setup-experiment-sets__card strong {
+  font-size: 1.02rem;
+}
+
+.setup-experiment-sets__card span {
+  font-size: 0.82rem;
+  color: var(--aero-text-muted);
+}
+
+.setup-experiment-sets__card em {
+  font-family: var(--aero-font-mono);
+  font-size: 0.74rem;
+  font-style: normal;
+  color: var(--aero-accent);
 }
 
 .reference-grid {

@@ -100,72 +100,22 @@
     box-shadow 400ms cubic-bezier(1, 0, 0.4, 1);
 }
 
-.e11-css-liquid-glass-switcher::after {
-  content: '';
-  position: absolute;
-  left: 4px;
-  top: 4px;
-  z-index: -1;
-  display: block;
-  width: 84px;
-  height: calc(100% - 10px);
-  border-radius: var(--e11-switcher-radius);
-  background-color: color-mix(
-    in srgb,
-    var(--e11-switcher-c-glass) 36%,
-    transparent
-  );
-  translate: 0 0;
-  box-shadow:
-    inset 0 0 0 1px
-      color-mix(
-        in srgb,
-        var(--e11-switcher-c-light)
-          calc(var(--e11-switcher-reflex-light) * 10%),
-        transparent
-      ),
-    inset 2px 1px 0 -1px
-      color-mix(
-        in srgb,
-        var(--e11-switcher-c-light)
-          calc(var(--e11-switcher-reflex-light) * 90%),
-        transparent
-      ),
-    inset -1.5px -1px 0 -1px
-      color-mix(
-        in srgb,
-        var(--e11-switcher-c-light)
-          calc(var(--e11-switcher-reflex-light) * 80%),
-        transparent
-      ),
-    inset -2px -6px 1px -5px
-      color-mix(
-        in srgb,
-        var(--e11-switcher-c-light)
-          calc(var(--e11-switcher-reflex-light) * 60%),
-        transparent
-      ),
-    inset -1px 2px 3px -1px
-      color-mix(
-        in srgb,
-        var(--e11-switcher-c-dark)
-          calc(var(--e11-switcher-reflex-dark) * 20%),
-        transparent
-      ),
-    inset 0 -4px 1px -2px
-      color-mix(
-        in srgb,
-        var(--e11-switcher-c-dark)
-          calc(var(--e11-switcher-reflex-dark) * 10%),
-        transparent
-      ),
-    0 3px 6px 0
-      color-mix(
-        in srgb,
-        var(--e11-switcher-c-dark)
-          calc(var(--e11-switcher-reflex-dark) * 8%),
-        transparent
-      );
+/*
+ * Object-only extraction: the source `.switcher::after` is the *selected option*
+ * background — an 84px pill with its own fill and shadow stack that slides
+ * between the three radio options. The extracted object mounts no options, no
+ * radios and no selection state, so that pseudo-element rendered as a stray grey
+ * pill floating inside the glass shell.
+ *
+ * Only the outer switcher shell is part of the requested object, so the
+ * pseudo-element is disabled outright. Everything that produces the shell's
+ * material — background, blur, SVG displacement, saturation, highlights, inset
+ * reflections and outer shadows — is untouched above.
+ */
+.e11-css-liquid-glass-switcher::after,
+.e11-css-liquid-glass-switcher::before {
+  content: none;
+  display: none;
 }
 
 .e11-css-liquid-glass-switcher__filter {

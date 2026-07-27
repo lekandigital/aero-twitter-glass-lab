@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 import { test } from 'node:test'
 import { EXPERIMENT_ELEVEN_LAYER_C_LAYOUT } from '../src/components/experiment-set-one/experimentElevenLayerCLayout.ts'
+import { save248LayerCPosition } from '../src/components/experiment-set-one/experimentElevenLayerCPosition.ts'
 
 const repositoryRoot = fileURLToPath(new URL('..', import.meta.url))
 const saves = JSON.parse(
@@ -114,16 +115,28 @@ test('the button experiment is reachable from Experiment Set 1 through visible U
 
     // Forward: Experiment Set 1 -> Button Source Experiments, clicking only
     // what a user can actually see. No direct URL navigation.
-    const toButtons = page.getByRole('link', { name: 'Button Source Experiments', exact: true })
+    const toButtons = page.locator('[data-experiment-set-link="/button-source-experiments"]')
     await toButtons.waitFor({ state: 'visible', timeout: 15_000 })
     assert.equal(await toButtons.count(), 1)
+    // It must be inside the first viewport without any scrolling, and be the
+    // element that actually receives a click at its own centre.
+    const box = await toButtons.boundingBox()
+    assert.ok(box, 'button-experiment link has a box')
+    const viewport = page.viewportSize()
+    assert.ok(box.y >= 0 && box.y + box.height <= viewport.height, 'link is vertically in view')
+    assert.ok(box.x >= 0 && box.x + box.width <= viewport.width, 'link is horizontally in view')
+    assert.equal(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      true,
+      'no horizontal page overflow is required to reach it',
+    )
     await toButtons.click()
     await page.waitForURL(`${baseUrl}/button-source-experiments`, { timeout: 15_000 })
     assert.equal(new URL(page.url()).pathname, '/button-source-experiments')
     await page.locator('[data-button-experiment-set]').first().waitFor({ state: 'visible', timeout: 15_000 })
 
     // Reverse: Button Source Experiments -> Experiment Set 1.
-    const toExperiments = page.getByRole('link', { name: 'Experiment Set 1', exact: true })
+    const toExperiments = page.locator('[data-experiment-set-link="/experiment-set-1"]')
     await toExperiments.waitFor({ state: 'visible', timeout: 15_000 })
     assert.equal(await toExperiments.count(), 1)
     await toExperiments.click()
@@ -131,16 +144,13 @@ test('the button experiment is reachable from Experiment Set 1 through visible U
     assert.equal(new URL(page.url()).pathname, '/experiment-set-1')
     await page.locator('.experiment-set-one-page').waitFor({ state: 'visible' })
 
-    // Both labels stay visible on both standalone pages.
-    for (const path of ['/experiment-set-1', '/button-source-experiments']) {
-      await page.goto(`${baseUrl}${path}`, { waitUntil: 'domcontentloaded' })
-      for (const label of ['Experiment Set 1', 'Button Source Experiments']) {
-        await assert.doesNotReject(
-          page.getByRole('link', { name: label, exact: true }).waitFor({ state: 'visible', timeout: 15_000 }),
-          `${label} must be visible on ${path}`,
-        )
-      }
-    }
+    // The entry lives in Experiment Set 1's dock experiment selector, beside
+    // the other experiments — not in a separate header section.
+    await page.goto(`${baseUrl}/experiment-set-1`, { waitUntil: 'domcontentloaded' })
+    await page.locator('.experiment-set-one-page').waitFor({ state: 'visible' })
+    await page
+      .locator('.experiment-one-settings-dock__experiment-tabs [data-experiment-set-link="/button-source-experiments"]')
+      .waitFor({ state: 'visible', timeout: 15_000 })
   } finally {
     await browser?.close()
     await stopProcess(vite.child)
@@ -252,8 +262,9 @@ test('every standardized duplicate opens at the same Layer C geometry and inset-
       )
     }
 
-    // The shared position is exactly what the existing centred draggable-pane
-    // logic yields for the Save 248 Layer C geometry inside Layer B.
+    // The shared position must be Save 248's own Layer C offset, measured in the
+    // same coordinate space, NOT the generic vertically-centred reference
+    // placement (which put these saves far down the pane).
     const layerB = await page.evaluate(() => {
       const element = document.querySelector(
         '.experiment-set-one-stage__canvas .experiment-four-layer-a__bezel-inset',
@@ -261,16 +272,30 @@ test('every standardized duplicate opens at the same Layer C geometry and inset-
       const rect = element.getBoundingClientRect()
       return { width: rect.width, height: rect.height }
     })
-    const expectedX = Math.round((layerB.width - EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.width) / 2)
-    const expectedY = Math.round((layerB.height - EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.height) / 2)
+    const expected = save248LayerCPosition(layerB.width, EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.width)
     assert.ok(
-      Math.abs(first.x - expectedX) <= POSITION_TOLERANCE_PX,
-      `standardized x ${first.x} should be the centred ${expectedX}`,
+      Math.abs(first.x - expected.x) <= POSITION_TOLERANCE_PX,
+      `standardized x ${first.x} should be Save 248's ${expected.x}`,
     )
     assert.ok(
-      Math.abs(first.y - expectedY) <= POSITION_TOLERANCE_PX,
-      `standardized y ${first.y} should be the centred ${expectedY}`,
+      Math.abs(first.y - expected.y) <= POSITION_TOLERANCE_PX,
+      `standardized y ${first.y} should be Save 248's ${expected.y}`,
     )
+    // Regression guard: the generic centred fallback must not come back.
+    const genericY = Math.round((layerB.height - EXPERIMENT_ELEVEN_LAYER_C_LAYOUT.height) / 2)
+    assert.notEqual(
+      Math.round(first.y),
+      genericY,
+      'standardized saves must not use the generic centred placement',
+    )
+    // And every standardized save record must carry the explicit position.
+    for (const save of standardizedSaves) {
+      assert.deepEqual(
+        save.e11LayerCInitialPosition,
+        expected,
+        `Save ${save.id} stored initial position`,
+      )
+    }
 
     // Reload determinism: the same save reopens at the same place.
     const last = standardizedSaves.at(-1)

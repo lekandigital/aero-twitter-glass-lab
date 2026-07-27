@@ -15,7 +15,18 @@ export interface LiquidGlassDistConfig {
   hoverDisplacementScale: number;
   inputBlur: number;
   hoverDurationSeconds: number;
+  /**
+   * Displacement-map asset driving the `feDisplacementMap`. The source map
+   * encodes the native circle; because the `feImage` is declared in
+   * `objectBoundingBox` units it is stretched over whatever box the object
+   * occupies, which leaves a circular refracting region inside a resized
+   * rectangle. See `scripts/generate-rounded-rect-displacement-maps.mjs`.
+   */
+  displacementMap: string;
 }
+
+/** Displacement map generated for the standardized Save 248 Layer C geometry. */
+export const LIQUID_GLASS_DIST_ROUNDED_RECT_MAP = 'frosted-map-293x125-r21.png';
 
 export const LIQUID_GLASS_DIST_SOURCE_DECLARATION = {
   contentWidth: 320,
@@ -44,18 +55,21 @@ export const LIQUID_GLASS_DIST_DEFAULT_CONFIG = {
   hoverDisplacementScale: 1.4,
   inputBlur: 0.02,
   hoverDurationSeconds: 0.3,
+  displacementMap: 'frosted-map.png',
 } as const satisfies LiquidGlassDistConfig;
 
 export function createLiquidGlassDistGeometry(
   width: number,
   height: number,
   radius: number,
+  displacementMap: string = LIQUID_GLASS_DIST_DEFAULT_CONFIG.displacementMap,
 ): LiquidGlassDistConfig {
   return {
     ...LIQUID_GLASS_DIST_DEFAULT_CONFIG,
     width,
     height,
     radius,
+    displacementMap,
   };
 }
 

@@ -16,6 +16,7 @@ import {
 } from '../components/button-experiment-set/saves';
 import { ExactButtonSourceStyles } from '../components/button-experiment-set/ExactButtonSourceStyles';
 import { ReferenceButtonRenderer } from '../components/button-experiment-set/ReferenceButtonRenderer';
+import { ExperimentSetNav } from '../components/layout/ExperimentSetNav';
 
 const INITIAL_SAVE_ID = BUTTON_EXPERIMENT_SAVES[0].id;
 const BUTTON_SELECTION_STORAGE_KEY =
@@ -164,6 +165,7 @@ export function ButtonSourceExperiments() {
       data-available-layer="A"
     >
       <ExactButtonSourceStyles />
+      <ExperimentSetNav />
       <header className="button-experiment-set__header">
         <div>
           <p className="button-experiment-set__eyebrow">Exact-source button laboratory</p>

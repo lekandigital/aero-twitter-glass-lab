@@ -131,12 +131,12 @@ test('authoritative discovery, registry, saves, and audit are complete 1:1 mappi
   )
 })
 
-test('button saves occupy exactly the reserved 1092–1150 range', () => {
-  assert.equal(BUTTON_SAVE_ID_START, 1092)
-  assert.equal(BUTTON_SAVE_ID_END, 1150)
+test('button saves are numbered from 1 to 59 in their own space', () => {
+  assert.equal(BUTTON_SAVE_ID_START, 1)
+  assert.equal(BUTTON_SAVE_ID_END, 59)
   assert.deepEqual(
     BUTTON_EXPERIMENT_SAVES.map(({ id }) => id),
-    Array.from({ length: 59 }, (_, index) => 1092 + index),
+    Array.from({ length: 59 }, (_, index) => 1 + index),
   )
   for (const save of BUTTON_EXPERIMENT_SAVES) {
     assert.equal(save.experimentSetId, BUTTON_EXPERIMENT_SET_ID)

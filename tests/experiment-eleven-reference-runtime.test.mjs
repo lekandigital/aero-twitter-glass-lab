@@ -260,10 +260,13 @@ async function assertObjectOnlyCompositing(page, presetId, preset, layerBBaselin
     if (!layerBElement) return false
     const anchorRect = anchorElement.getBoundingClientRect()
     const layerBRect = layerBElement.getBoundingClientRect()
-    const left = Math.max(anchorRect.left, layerBRect.left)
-    const right = Math.min(anchorRect.right, layerBRect.right)
-    const top = Math.max(anchorRect.top, layerBRect.top)
-    const bottom = Math.min(anchorRect.bottom, layerBRect.bottom)
+    // Clamp the overlap to the viewport before probing: elementsFromPoint only
+    // reports elements for points inside the viewport, so an overlap centre
+    // below the fold would report "Layer B missing" even though it is present.
+    const left = Math.max(anchorRect.left, layerBRect.left, 0)
+    const right = Math.min(anchorRect.right, layerBRect.right, window.innerWidth - 1)
+    const top = Math.max(anchorRect.top, layerBRect.top, 0)
+    const bottom = Math.min(anchorRect.bottom, layerBRect.bottom, window.innerHeight - 1)
     if (right <= left || bottom <= top) return false
     const elements = document.elementsFromPoint((left + right) / 2, (top + bottom) / 2)
     return elements.includes(layerBElement)
@@ -902,7 +905,7 @@ test('all 54 Experiment Eleven reference saves mount, follow drag, switch, and c
       args: ['--enable-unsafe-webgpu', '--use-angle=metal'],
     })
     const context = await browser.newContext({
-      viewport: { width: 1440, height: 1000 },
+      viewport: { width: 1440, height: 1200 },
       deviceScaleFactor: 1,
     })
     const page = await context.newPage()
@@ -1042,7 +1045,7 @@ test('FluidGlass repeat mounts are clean under the development StrictMode runtim
       args: ['--enable-unsafe-webgpu', '--use-angle=metal'],
     })
     const context = await browser.newContext({
-      viewport: { width: 1440, height: 1000 },
+      viewport: { width: 1440, height: 1200 },
       deviceScaleFactor: 1,
     })
     const page = await context.newPage()
