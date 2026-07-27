@@ -1,5 +1,5 @@
 import {
-  clearDragPosition as clearStoredPosition,
+  clearDragPositionNamespace as clearStoredPositionNamespace,
   loadDragPosition,
   saveDragPosition,
 } from '../../utils/dragPositionStorage';
@@ -27,9 +27,19 @@ export const EXPERIMENT_SET_ONE_POSITION_KEYS = {
 
 export const EXPERIMENT_SET_ONE_POSITION_KEY_LIST = Object.values(EXPERIMENT_SET_ONE_POSITION_KEYS);
 
+/**
+ * Layer C stores one drag position per mounted reference object, namespaced
+ * under its base key, so that a position dragged for one object can never be
+ * applied to a differently sized object selected afterwards.
+ */
+export function experimentElevenLayerCPositionKey(referencePresetId?: string): string {
+  const base = EXPERIMENT_SET_ONE_POSITION_KEYS.layerC11;
+  return referencePresetId ? `${base}:${referencePresetId}` : base;
+}
+
 export function clearAllExperimentSetOnePositions() {
   for (const id of EXPERIMENT_SET_ONE_POSITION_KEY_LIST) {
-    clearStoredPosition(id);
+    clearStoredPositionNamespace(id);
   }
 }
 

@@ -47,7 +47,7 @@ function App() {
       <Route
         path="/experiment-set-1"
         element={(
-          <StandaloneWorkspaceShell>
+          <StandaloneWorkspaceShell showRouteSwitcher>
             <ExperimentOne />
           </StandaloneWorkspaceShell>
         )}
@@ -55,7 +55,7 @@ function App() {
       <Route
         path="/button-source-experiments"
         element={(
-          <StandaloneWorkspaceShell>
+          <StandaloneWorkspaceShell showRouteSwitcher>
             <ButtonSourceExperiments />
           </StandaloneWorkspaceShell>
         )}

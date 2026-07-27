@@ -49,6 +49,19 @@ function fingerprint(snapshot) {
     e2: sortedRecord(snapshot.e2),
     e3: sortedRecord(snapshot.e3),
     e4: snapshot.e4 ? sortedRecord(snapshot.e4) : null,
+    // Experiment Eleven Layer C is what distinguishes the generated reference
+    // saves from each other and from their Save 249 base. Without these fields
+    // every reference save collapses onto one fingerprint and all but the first
+    // are silently dropped — this is what deleted Saves 1038–1067 previously.
+    e11LayerC: snapshot.e11LayerC ? sortedRecord(snapshot.e11LayerC) : null,
+    e11LayerCLayout: snapshot.e11LayerCLayout ? sortedRecord(snapshot.e11LayerCLayout) : null,
+    e11LayerCReferencePreset: snapshot.e11LayerCReferencePreset ?? null,
+    e11LayerCReferenceGlass: snapshot.e11LayerCReferenceGlass ?? null,
+    e11LayerCReferenceTone: snapshot.e11LayerCReferenceTone ?? null,
+    e11LayerCPreserveOpacity: snapshot.e11LayerCPreserveOpacity ?? null,
+    e11LayerCBackgroundOverride: snapshot.e11LayerCBackgroundOverride ?? null,
+    e11LayerDLayout: snapshot.e11LayerDLayout ? sortedRecord(snapshot.e11LayerDLayout) : null,
+    e11LayerELayout: snapshot.e11LayerELayout ? sortedRecord(snapshot.e11LayerELayout) : null,
   });
 }
 
@@ -56,7 +69,10 @@ function dedupeSnapshots(saves) {
   const seen = new Set();
   const next = [];
   for (const save of saves) {
-    if (save.cornersOnly) {
+    // Never collapse records the generator owns, and never collapse corner
+    // presets. Deduplication only exists to stop the editor re-saving an
+    // identical ad-hoc snapshot; it must not be able to delete committed data.
+    if (save.cornersOnly || save.e11LayerCReferencePreset) {
       next.push(save);
       continue;
     }

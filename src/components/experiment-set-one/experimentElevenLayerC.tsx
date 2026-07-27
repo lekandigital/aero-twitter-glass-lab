@@ -2,7 +2,10 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useExperimentSetOne } from './combinedSettings';
 import { useRenderVariant } from '../../render-variants/RenderVariantContext';
-import { EXPERIMENT_SET_ONE_POSITION_KEYS } from './dragPositions';
+import {
+  EXPERIMENT_SET_ONE_POSITION_KEYS,
+  experimentElevenLayerCPositionKey,
+} from './dragPositions';
 import type { ExperimentSetOneSnapshot } from './savedConfigs';
 import { ExperimentSetTwoDraggableShell } from '../experiment-set-two/primitives';
 import {
@@ -306,6 +309,14 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
           referenceGlass,
           referenceGlassTone,
           referencePreset,
+          // Layer C's stored position is namespaced per mounted reference
+          // object. Without this a position dragged for one object is reapplied
+          // to the next, differently sized object, which leaves a freshly
+          // selected save visibly off its intended initial placement.
+          persistKey:
+            layer.id === 'c'
+              ? experimentElevenLayerCPositionKey(referencePreset)
+              : layer.persistKey,
           initialPosition: {
             x: referencePreset
               ? Math.round((e11.layerBWidth as number - (material.layerBWidth as number)) / 2)
@@ -320,13 +331,18 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
   );
 
   useLayoutEffect(() => {
-    if (topLayers.length === 0) {
-      setInset(null);
-      return;
-    }
+    // Subscribing to an external system: the portal target is rendered by the
+    // stage, not by this component, so it can only be resolved from the DOM
+    // after layout. The previous run's cleanup already clears the target, so
+    // the empty case needs no separate reset.
+    if (topLayers.length === 0) return;
     const found = document.querySelector<HTMLElement>(
       '.experiment-set-one-stage__canvas .experiment-four-layer-a__bezel-inset',
     );
+    // Resolving a portal target owned by another subtree is only possible
+    // after layout; this matches the convention already used in GlassSurface
+    // and FluidGlass.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInset(found);
     return () => setInset(null);
   }, [layoutResetVersion, slug, topLayers.length]);
@@ -337,7 +353,10 @@ export function ExperimentElevenLayerCBezelPortal({ layoutResetVersion }: { layo
     <>
       {topLayers.map((layer) => (
         <ExperimentElevenLayerCDraggablePane
-          key={layer.id}
+          // Remount when the mounted object changes so the pane re-runs its
+          // initial placement for the new geometry instead of keeping the
+          // previous object's coordinates.
+          key={`${layer.id}:${layer.referencePreset ?? layer.referenceGlass ?? 'sheet'}`}
           material={layer.material}
           layerId={layer.id}
           label={layer.label}
